@@ -1053,3 +1053,962 @@ Formaten:  -
     else
       ()
   )'
+
+================================================================================================================================
+
+[kijk]
+
+https://www.kijk.nl/ --> https://consent.talpanetwork.com/?TN_REFERAL_URL=https://www.kijk.nl/&TN_REFERAL_ORIGIN= (cookie wall)
+
+Antwoordheader in PaleMoon:
+
+Host: www.kijk.nl
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.9) Gecko/20100101 Goanna/4.1 Firefox/60.9 PaleMoon/28.2.2
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: nl,en-US;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate, br
+Referer: https://consent.talpanetwork.com/?TN_REFERAL_URL=https:%2F%2Fwww.kijk.nl%2F&TN_REFERAL_ORIGIN=
+Cookie: CONSENTMGR=ts:1546358787966|consent:true|c1:0; OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=edae8abd-659b-477a-8dfe-caf4d718fcd7; 706b604c-184a-4235-899c-a744921ce65ceuconsent=BOZs6AnOZs6AnADABANLB_-AAAAjCAcAAiABUAC4AIAAZABEgCaAJ4AWwAxABuAD8AIAARgApQBXADvAIQARaAjgCOgEuAJ2AVkAuoBgQDiAHugP0A_YCCg; 706b604c-184a-4235-899c-a744921ce65ccconsent=BOZs6AnOZs6AnADABANLAEAAAAAE54EfETAAQgAAHAA; utag_main=v_id:01680a2a9c200013725d1ee67abe02068001400d0086e$_sn:1$_ss:1$_st:1546360591204$ses_id:1546358791204%3Bexp-session$_pn:1%3Bexp-session$dc_group:79$dc_visit:1$dc_event:1%3Bexp-session; gig_canary=false; gig_canary_ver=2155-1-25772625; AMCV_A1DF40865A97CDF00A495C28%40AdobeOrg=1999109931%7CMCMID%7C60597001633179420918454649860814799344%7CMCAID%7CNONE; gig_hasGmid=login; 706b604c-184a-4235-899c-a744921ce65ceuconsent=BOZs6AnOZs6AnADABANLB_-AAAAjB7_______9______9uz_Gv_v_f__33e8__9v_l_7_-___u_-33d4-_1vf99yfm1-7ftr3tp_87ues2_Xur__59__3z3_Nog; 706b604c-184a-4235-899c-a744921ce65ccconsent=BOZs6AnOZs6AnADABANLAEAAAAAE6ACgACAH0AQABOA; 706b604c-184a-4235-899c-a744921ce65cfaktorId=e024bb11-1299-48e3-bde1-107f1e68860c; s_cc=true; s_sq=%5B%5BB%5D%5D; lastConsentChange=1546358793852
+Connection: keep-alive
+If-None-Match: W/"1f0e3-fT3OIiIk44flJJLFU9CqLmMwCfA"
+Cache-Control: max-age=0
+
+$ xidel -s -H "Cookie: CONSENTMGR=ts:1546358787966|consent:true|c1:0; OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=edae8abd-659b-477a-8dfe-caf4d718fcd7; 706b604c-184a-4235-899c-a744921ce65ceuconsent=BOZs6AnOZs6AnADABANLB_-AAAAjCAcAAiABUAC4AIAAZABEgCaAJ4AWwAxABuAD8AIAARgApQBXADvAIQARaAjgCOgEuAJ2AVkAuoBgQDiAHugP0A_YCCg; 706b604c-184a-4235-899c-a744921ce65ccconsent=BOZs6AnOZs6AnADABANLAEAAAAAE54EfETAAQgAAHAA; utag_main=v_id:01680a2a9c200013725d1ee67abe02068001400d0086e$_sn:1$_ss:1$_st:1546360591204$ses_id:1546358791204%3Bexp-session$_pn:1%3Bexp-session$dc_group:79$dc_visit:1$dc_event:1%3Bexp-session; gig_canary=false; gig_canary_ver=2155-1-25772625; AMCV_A1DF40865A97CDF00A495C28%40AdobeOrg=1999109931%7CMCMID%7C60597001633179420918454649860814799344%7CMCAID%7CNONE; gig_hasGmid=login; 706b604c-184a-4235-899c-a744921ce65ceuconsent=BOZs6AnOZs6AnADABANLB_-AAAAjB7_______9______9uz_Gv_v_f__33e8__9v_l_7_-___u_-33d4-_1vf99yfm1-7ftr3tp_87ues2_Xur__59__3z3_Nog; 706b604c-184a-4235-899c-a744921ce65ccconsent=BOZs6AnOZs6AnADABANLAEAAAAAE6ACgACAH0AQABOA; 706b604c-184a-4235-899c-a744921ce65cfaktorId=e024bb11-1299-48e3-bde1-107f1e68860c; s_cc=true; s_sq=%5B%5BB%5D%5D; lastConsentChange=1546358793852" "https://www.kijk.nl" -e '$raw'
+
+Op deze manier kun je toch kijk.nl scrapen. Misschien is er een kortere/makkelijkere manier.
+Gelukkig hoeft dit voor https://embed.kijk.nl/video/[prid] niet.
+
+------------------------------------------------------------------------------------------------
+
+PRID extractie:
+
+$ cat <<EOF | while read a; do xidel -s -e 'extract("'$a'","(?:video|videos)/(\w+)",1)'; done
+> https://www.kijk.nl/sbs6/hartvannederland/videos/VR83fgb6opk/hart-van-nederland-late-editie
+> http://www.kijk.nl/video/VR83fgb6opk
+> EOF
+VR83fgb6opk
+VR83fgb6opk
+
+------------------------------------------------------------------------------------------------
+
+https://www.kijk.nl/sbs6/hartvannederland/videos/VR83fgb6opk/hart-van-nederland-late-editie
+
+$ xidel -s "https://embed.kijk.nl/video/VR83fgb6opk" -e 'json(//script/extract(.,"playerOptionsObj = (.+);",1)[.])'
+{
+  "playlist": [
+    {
+      "sources": [
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/HMCkPcawlk2N/file.m3u8?feed=prod-getMediaObject&metafile=false",
+          "type": "m3u8"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/vL8zQQsuabAa/file.mpd?feed=prod-getMediaObject&metafile=false",
+          "type": "dash"
+        }
+      ],
+      "image": "https://img.kijk.nl/media/cache/computer_nonretina_series_image/imgsrc06/images/redactioneel/1066581-LS---20181123141846--dbda47f1d5640cd53033c71c0575c46d.jpg?lu=35c71f76acbc843b6aa4333ef7936e11",
+      "mediaid": "VR83fgb6opk",
+      "title": "Hart van Nederland - Late Editie",
+      "description": "Hart van Nederland - Laat: 31 december 2018",
+      "displaytitle": true,
+      "tracks": [],
+      "fwassetid": "VR83fgb6opk",
+      "TAQ": {
+        "dataLayer": {
+          "sbs_partner": "embedded3p",
+          "sko_dt": "20181231",
+          "sko_pr": "hart_van_nederland_-_late_editie",
+          "sko_prid": "506400113",
+          "sko_stid": 63,
+          "sko_t": "2233",
+          "sko_ty": "tv.ep",
+          "sko_gen": 11100,
+          "sbs_vpakey": "VR83fgb6opk",
+          "media_owner": "sbs6",
+          "media_program_name": "Hart van Nederland - Laat",
+          "sbs_season": "0",
+          "media_program_episodenumber": "2018123101025653",
+          "sbs_videotype": "vod",
+          "media_outlet": "embedded_3p",
+          "player_id": "embedded_3p",
+          "player_embedurl": "http://www.kijk.nl/video/VR83fgb6opk",
+          "player_channel": "embedded_3p",
+          "player_channelid": "embedded_3p",
+          "player_source": "embedded_3p",
+          "player_version": "8.2.4",
+          "media_id": "VR83fgb6opk",
+          "media_duration": "1331",
+          "media_duration_type": "long",
+          "media_datepublished": "2018-12-31T22:33:16+01:00",
+          "media_dateexpires": "2019-12-31T05:55:00+01:00",
+          "media_datecreated": "2018-12-31T22:30:00+01:00",
+          "media_datemodified": "2018-12-31T22:30:00+01:00",
+          "media_ispartof": "Hart van Nederland - Laat",
+          "media_playbacktype": "vod",
+          "media_genre": "Nieuws"
+        },
+        "customLayer": {
+          "content_partner": "embedded3p",
+          "sko_dt": "20181231",
+          "sko_pr": "hart_van_nederland_-_late_editie",
+          "sko_prid": "506400113",
+          "sko_stid": 63,
+          "sko_t": "2233",
+          "sko_ty": "tv.ep",
+          "sko_gen": 11100,
+          "sbs_vpakey": "VR83fgb6opk",
+          "sbs_station": "sbs6",
+          "sbs_program": "Hart van Nederland - Laat",
+          "sbs_season": "0",
+          "sbs_episode": "2018123101025653",
+          "program_videotype": "vod",
+          "sbs_outlet": "embedded_3p",
+          "name": "jwplayer",
+          "c2": "13024930",
+          "program_season": "0",
+          "program_episodenumber": "2018123101025653",
+          "live": 0,
+          "media_genre_code": "nieuws/actualiteiten"
+        }
+      }
+    }
+  ],
+  "width": "100%",
+  "height": "100%",
+  "stretching": "uniform",
+  "autostart": "true",
+  "skin": {
+    "name": "kijk",
+    "timeslider": {
+      "progress": "#f48800"
+    }
+  },
+  "advertising": {
+    "admessage": "",
+    "client": "freewheel",
+    "cuetext": "Advertentie",
+    "vpaidcontrols": true,
+    "freewheel": {
+      "networkid": "506166",
+      "serverid": "https://7b935.v.fwmrm.net/ad/g/1",
+      "profileid": "506166:sanoma_sbs_ovp_js_live",
+      "sectionid": "sbs_embedded3p_desktop",
+      "adManagerURL": "https://mssl.fwmrm.net/p/sanoma_sbs_live/AdManager.js",
+      "custom": {
+        "cd_type": "long",
+        "vdur": "1331",
+        "embed_domain": "embed.kijk.nl"
+      }
+    },
+    "schedule": {
+      "adbreak": {
+        "offset": "pre",
+        "tag": "placeholder_preroll"
+      }
+    }
+  },
+  "sharing": {
+    "heading": "Deel Video",
+    "sites": [
+      {
+        "label": "Facebook",
+        "icon": "/talpa-jw-skin/icons/facebook.svg",
+        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=facebook&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FVR83fgb6opk&title=Hart van Nederland - Late Editie&ct=0&tt=0&"
+      },
+      {
+        "label": "Twitter",
+        "icon": "/talpa-jw-skin/icons/twitter.svg",
+        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=twitter&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FVR83fgb6opk&title=Hart van Nederland - Late Editie&ct=0&tt=0&"
+      }
+    ]
+  },
+  "cast": [],
+  "related": [],
+  "videoType": "vod",
+  "adBlockerCheck": true,
+  "allowPlayerApi": false
+}
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '1097,1231p' | xidel -s - --xquery '$json/(playlist)()/{"name":TAQ/dataLayer/concat(upper-case(media_owner),": ",media_program_name),"date":replace(TAQ/dataLayer/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/dataLayer/media_dateexpires,"(\d+)-(\d+)-(\d+)T([\d:]+).+","$3-$2-$1 $4"),"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+{
+  "name": "SBS6: Hart van Nederland - Laat",
+  "date": "31-12-2018",
+  "duration": "00:22:11",
+  "expdate": "31-12-2019 05:55:00",
+  "formats": [
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/1546295155126.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "audiospoor",
+      "vbitrate": "",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "320x180",
+      "vbitrate": "v:398k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=398000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "512x288",
+      "vbitrate": "v:754k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=754000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:1044k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=1044000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "768x432",
+      "vbitrate": "v:1387k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=1387000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "868x488",
+      "vbitrate": "v:2170k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=2170000.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.kijk.nl/sbs6/wegmisbruikers/videos/yWLXx6VtFuG/wegmisbruikers
+
+$ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" -e 'json(//script/extract(.,"playerOptionsObj = (.+);",1)[.])'
+{
+  "playlist": [
+    {
+      "sources": [
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/6jW4kiLWw7Bz/file.m3u8?feed=prod-getMediaObject&metafile=false",
+          "type": "m3u8"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/gR9CONHWSQHC/file.mpd?feed=prod-getMediaObject&metafile=false",
+          "type": "dash"
+        }
+      ],
+      "image": "https://img.kijk.nl/media/cache/computer_nonretina_series_image/imgsrc06/images/redactioneel/1079050-LS---20181214140739--c227486ec6235b395f7a96b978158499.jpg?lu=9d59d19573f5c680d7c96b87afff850d",
+      "mediaid": "yWLXx6VtFuG",
+      "title": "Wegmisbruikers",
+      "description": "Aflevering 4, Seizoen 24",
+      "displaytitle": true,
+      "tracks": [
+        {
+          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-thumbnails.vtt",
+          "type": "webvtt",
+          "kind": "thumbnails"
+        },
+        {
+          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/591af2de-73bc-4ec9-a2e4-5237954f1c2a/Wegmisbruikers_Season_24_Episode_4-webvtt-nl.vtt",
+          "type": "webvtt",
+          "kind": "captions",
+          "label": " Nederlands"
+        },
+        {
+          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/591af2de-73bc-4ec9-a2e4-5237954f1c2a/Wegmisbruikers_Season_24_Episode_4-webvtt-sd.vtt",
+          "type": "webvtt",
+          "kind": "captions",
+          "label": " Doven en Slechthorenden"
+        }
+      ],
+      "fwassetid": "yWLXx6VtFuG",
+      "TAQ": {
+        "dataLayer": {
+          "sbs_partner": "embedded3p",
+          "sko_dt": "20181214",
+          "sko_pr": "wegmisbruikers",
+          "sko_prid": "547724877",
+          "sko_stid": 63,
+          "sko_t": "2027",
+          "sko_ty": "tv.ep",
+          "sko_gen": 21190,
+          "sbs_vpakey": "yWLXx6VtFuG",
+          "media_owner": "sbs6",
+          "media_program_name": "Wegmisbruikers",
+          "sbs_season": "24",
+          "media_program_episodenumber": "4",
+          "sbs_videotype": "vod",
+          "media_outlet": "embedded_3p",
+          "player_id": "embedded_3p",
+          "player_embedurl": "http://www.kijk.nl/video/yWLXx6VtFuG",
+          "player_channel": "embedded_3p",
+          "player_channelid": "embedded_3p",
+          "player_source": "embedded_3p",
+          "player_version": "8.2.4",
+          "media_id": "yWLXx6VtFuG",
+          "media_duration": "2403",
+          "media_duration_type": "long",
+          "media_datepublished": "2018-12-14T21:24:18+01:00",
+          "media_dateexpires": "2019-12-14T21:24:18+01:00",
+          "media_datecreated": "2018-12-14T20:30:00+01:00",
+          "media_datemodified": "2018-12-14T20:30:00+01:00",
+          "media_ispartof": "Wegmisbruikers",
+          "media_playbacktype": "vod",
+          "media_genre": "Scripted Reality"
+        },
+        "customLayer": {
+          "content_partner": "embedded3p",
+          "sko_dt": "20181214",
+          "sko_pr": "wegmisbruikers",
+          "sko_prid": "547724877",
+          "sko_stid": 63,
+          "sko_t": "2027",
+          "sko_ty": "tv.ep",
+          "sko_gen": 21190,
+          "sbs_vpakey": "yWLXx6VtFuG",
+          "sbs_station": "sbs6",
+          "sbs_program": "Wegmisbruikers",
+          "sbs_season": "24",
+          "sbs_episode": "4",
+          "program_videotype": "vod",
+          "sbs_outlet": "embedded_3p",
+          "name": "jwplayer",
+          "c2": "13024930",
+          "program_season": "24",
+          "program_episodenumber": "4",
+          "live": 0,
+          "media_genre_code": "Overige"
+        }
+      }
+    }
+  ],
+  "width": "100%",
+  "height": "100%",
+  "stretching": "uniform",
+  "autostart": "true",
+  "skin": {
+    "name": "kijk",
+    "timeslider": {
+      "progress": "#f48800"
+    }
+  },
+  "advertising": {
+    "admessage": "",
+    "client": "freewheel",
+    "cuetext": "Advertentie",
+    "vpaidcontrols": true,
+    "freewheel": {
+      "networkid": "506166",
+      "serverid": "https://7b935.v.fwmrm.net/ad/g/1",
+      "profileid": "506166:sanoma_sbs_ovp_js_live",
+      "sectionid": "sbs_embedded3p_desktop",
+      "adManagerURL": "https://mssl.fwmrm.net/p/sanoma_sbs_live/AdManager.js",
+      "custom": {
+        "cd_type": "long",
+        "vdur": "2403",
+        "embed_domain": "embed.kijk.nl"
+      }
+    },
+    "schedule": {
+      "adbreak": {
+        "offset": "pre",
+        "tag": "placeholder_preroll"
+      }
+    }
+  },
+  "sharing": {
+    "heading": "Deel Video",
+    "sites": [
+      {
+        "label": "Facebook",
+        "icon": "/talpa-jw-skin/icons/facebook.svg",
+        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=facebook&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FyWLXx6VtFuG&title=Wegmisbruikers&ct=0&tt=0&"
+      },
+      {
+        "label": "Twitter",
+        "icon": "/talpa-jw-skin/icons/twitter.svg",
+        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=twitter&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FyWLXx6VtFuG&title=Wegmisbruikers&ct=0&tt=0&"
+      }
+    ]
+  },
+  "cast": [],
+  "related": [],
+  "videoType": "vod",
+  "adBlockerCheck": true,
+  "allowPlayerApi": false
+}
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '1302,1454p' | xidel -s - --xquery '$json/(playlist)()/{"name":TAQ/dataLayer/concat(upper-case(media_owner),": ",media_program_name,if (sbs_season!=0 and media_program_episodenumber<=99) then concat(" S",sbs_season ! (if (.<10) then "0"||. else .),"E",media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/dataLayer/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/dataLayer/media_dateexpires,"(\d+)-(\d+)-(\d+)T([\d:]+).+","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}' | clip
+{
+  "name": "SBS6: Wegmisbruikers S24E04",
+  "date": "14-12-2018",
+  "duration": "00:40:03",
+  "expdate": "14-12-2019 21:24:18",
+  "subtitle": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/591af2de-73bc-4ec9-a2e4-5237954f1c2a/Wegmisbruikers_Season_24_Episode_4-webvtt-nl.vtt",
+  "formats": [
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/1544789330448.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "audiospoor",
+      "vbitrate": "",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "637x252",
+      "vbitrate": "v:365k",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=365058.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "910x360",
+      "vbitrate": "v:730k",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=730083.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "1092x432",
+      "vbitrate": "v:1500k",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=1500117.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "1820x720",
+      "vbitrate": "v:3000k",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=3000297.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "2730x1080",
+      "vbitrate": "v:4500k",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=4500168.m3u8"
+    },
+    {
+      "format": "hls-7",
+      "extension": "m3u8",
+      "resolution": "2730x1080",
+      "vbitrate": "v:6000k",
+      "abitrate": "a:160k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=6000467.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+http://www.kijk.nl/net5/pekingexpress/videos/w7ZW52xLgL5/aflevering-1
+
+$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/extract(.,"playerOptionsObj = (.+);",1)[.])'
+{
+  "playlist": [
+    {
+      "sources": [			# De 3 m3u8 playlists zijn allemaal hetzelfde. Daarom kiezen we gewoon de 1e --> (sources)()[type="m3u8"][1]/file.
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/jMeLJuBkEPrN/file.m3u8?feed=prod-getMediaObject&metafile=false",
+          "type": "m3u8"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/O3MALYiXrEvo/file.mpd?feed=prod-getMediaObject&metafile=false",
+          "type": "dash"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/DrlDOZ5p_34C/file.m3u8?feed=prod-getMediaObject&metafile=false",
+          "type": "m3u8"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/7VPyrVZ_p2_F/file.mpd?feed=prod-getMediaObject&metafile=false",
+          "type": "dash"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/kvXDJgpLCCNY/file.mpd?feed=prod-getMediaObject&metafile=false",
+          "type": "dash"
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/SaZ_Wcowy8f5/file.m3u8?feed=prod-getMediaObject&metafile=false",
+          "type": "m3u8"
+        }
+      ],
+      [...]
+    }
+  ],
+  [...]
+}
+
+$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/extract(.,"playerOptionsObj = (.+);",1)[.])/(playlist)()/{"name":TAQ/dataLayer/concat(upper-case(media_owner),": ",media_program_name,if (sbs_season!=0 and media_program_episodenumber<=99) then concat(" S",sbs_season ! (if (.<10) then "0"||. else .),"E",media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/dataLayer/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/dataLayer/media_dateexpires,"(\d+)-(\d+)-(\d+)T([\d:]+).+","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+{
+  "name": "NET5: Peking Express S01E01",
+  "date": "03-04-2017",
+  "duration": "01:03:59",
+  "expdate": "31-03-2020 05:55:00",
+  "subtitle": null,
+  "formats": [
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/1535976944566.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "audiospoor",
+      "vbitrate": "",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "320x180",
+      "vbitrate": "v:350k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=350000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "512x288",
+      "vbitrate": "v:655k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=655000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:912k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=912000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "768x432",
+      "vbitrate": "v:1214k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=1214000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "868x488",
+      "vbitrate": "v:1898k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=1898000.m3u8"
+    }
+  ]
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+$ xidel -s "http://api.kijk.nl/v1/default/entitlement/w7ZW52xLgL5" -e '$json/playerInfo'
+{
+  [...],
+  "embed_api_url": "http://embed.kijk.nl/api/video/w7ZW52xLgL5?id=kijkapp",
+  "hasDRM": false
+}
+
+$ xidel -s "http://api.kijk.nl/v1/default/entitlement/w7ZW52xLgL5" -e '$json/playerInfo/json(embed_api_url)'
+{
+  "vpakey": "w7ZW52xLgL5",
+  "videoId": null,
+  "mediaId": null,
+  "assetId": null,
+  "appleTvMediaId": null,
+  "roll": "https://embed.kijk.nl/api/roll/",
+  "unroll": "https://embed.kijk.nl/api/unroll/",
+  "playlist": "https://embed.kijk.nl/api/playlist/.m3u8",
+  [...]
+}
+
+Dit suggereert dat de Ericsson videostreams niet meer beschikbaar zijn, maar als we de url handmatig samenstellen (zie BatchGemist notes), waarbij de user_token én de app_token blijkbaar niet per se nodig zijn, dan werken ze nog gewoon!
+
+$ xidel -s "https://embed.kijk.nl/api/roll/w7ZW52xLgL5_dbzyr6?base_url=https%3A//emp-prod-acc-we.ebsd.ericsson.net/sbsgroup" -e '$json'
+{
+  "live": "false",
+  "duration": "3840200",
+  "markers": [
+    {
+      "start_offset": "0",
+      "duration": "2270840",
+      "type": "AD_VAST",
+      "data": {}
+    },
+    {
+      "start_offset": "2272000",
+      "duration": "1568160",
+      "type": "AD_VAST",
+      "data": {}
+    }
+  ],
+  "streams": [
+    {
+      "name": "1080p",
+      "bitrate": 7000000,
+      "resolution": "1920x1080",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_9/index.m3u8"
+    },
+    {
+      "name": "720p",
+      "bitrate": 4500000,
+      "resolution": "1280x720",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_7/index.m3u8"
+    },
+    {
+      "name": "576p",
+      "bitrate": 2468000,
+      "resolution": "1024x576",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_6/index.m3u8"
+    },
+    {
+      "name": "480p",
+      "bitrate": 1500000,
+      "resolution": "768x432",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_5/index.m3u8"
+    },
+    {
+      "name": "360p",
+      "bitrate": 900000,
+      "resolution": "640x360",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_4/index.m3u8"
+    },
+    {
+      "name": "240p",
+      "bitrate": 500000,
+      "resolution": "512x288",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_3/index.m3u8"
+    }
+  ],
+  "playlist_url": "https://embed.kijk.nl/api/playlist/w7ZW52xLgL5_dbzyr6.m3u8",
+  "media_url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/"
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/extract(.,"playerOptionsObj = (.+);",1)[.])/(playlist)()/{"name":TAQ/dataLayer/concat(upper-case(media_owner),": ",media_program_name,if (sbs_season!=0 and media_program_episodenumber<=99) then concat(" S",sbs_season ! (if (.<10) then "0"||. else .),"E",media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/dataLayer/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/dataLayer/media_dateexpires,"(\d+)-(\d+)-(\d+)T([\d:]+).+","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":[(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/({"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}),x:request({"url":concat("https://embed.kijk.nl/api/playlist/","w7ZW52xLgL5","_dbzyr6.m3u8?base_url=https%3A//emp-prod-acc-we.ebsd.ericsson.net/sbsgroup"),"method":"HEAD","error-handling":"xxx=accept"})[contains(headers[1],"200 OK")]/({"format":"hls-0_hd","extension":"m3u8","resolution":"manifest","url":url},tail(tokenize(unparsed-text(url),"#EXT-X-STREAM-INF:")) ! {"format":concat("hls-",position(),"_hd"),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":extract(.,"BANDWIDTH=(\d+)\d{3}",1)||"k","url":extract(.,"(.+m3u8)",1)})]}'
+{
+  "name": "NET5: Peking Express S01E01",
+  "date": "03-04-2017",
+  "duration": "01:03:59",
+  "expdate": "31-03-2020 05:55:00",
+  "subtitle": null,
+  "formats": [
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/1535976944566.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "audiospoor",
+      "vbitrate": "",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "320x180",
+      "vbitrate": "v:350k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=350000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "512x288",
+      "vbitrate": "v:655k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=655000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:912k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=912000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "768x432",
+      "vbitrate": "v:1214k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=1214000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "868x488",
+      "vbitrate": "v:1898k",
+      "abitrate": "a:94k",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=1898000.m3u8"
+    },
+    {
+      "format": "hls-0_hd",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://embed.kijk.nl/api/playlist/w7ZW52xLgL5_dbzyr6.m3u8?base_url=https%3A//emp-prod-acc-we.ebsd.ericsson.net/sbsgroup"
+    },
+    {
+      "format": "hls-1_hd",
+      "extension": "m3u8",
+      "resolution": "384x216",
+      "vbitrate": "316k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_2/index.m3u8"
+    },
+    {
+      "format": "hls-2_hd",
+      "extension": "m3u8",
+      "resolution": "512x288",
+      "vbitrate": "500k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_3/index.m3u8"
+    },
+    {
+      "format": "hls-3_hd",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "900k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_4/index.m3u8"
+    },
+    {
+      "format": "hls-4_hd",
+      "extension": "m3u8",
+      "resolution": "768x432",
+      "vbitrate": "1500k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_5/index.m3u8"
+    },
+    {
+      "format": "hls-5_hd",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "2468k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_6/index.m3u8"
+    },
+    {
+      "format": "hls-6_hd",
+      "extension": "m3u8",
+      "resolution": "1280x720",
+      "vbitrate": "4500k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_7/index.m3u8"
+    },
+    {
+      "format": "hls-7_hd",
+      "extension": "m3u8",
+      "resolution": "1600x900",
+      "vbitrate": "5750k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_8/index.m3u8"
+    },
+    {
+      "format": "hls-8_hd",
+      "extension": "m3u8",
+      "resolution": "1920x1080",
+      "vbitrate": "7000k",
+      "url": "https://vod-es-gf-prod-2.sbscdn.nl/prod/4/605539/vod_sbs_hd_mux_unenc_2_4_9/index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  json(
+    //script/extract(
+      .,
+      "playerOptionsObj = (.+);",
+      1
+    )[.]
+  )/(playlist)()/{
+    "name":TAQ/dataLayer/concat(
+      upper-case(media_owner),
+      ": ",
+      media_program_name,
+      if (sbs_season!=0 and media_program_episodenumber<=99) then
+        concat(
+          " S",
+          sbs_season ! (
+            if (.<10) then
+              "0"||.
+            else
+              .
+          ),
+          "E",
+          media_program_episodenumber ! (
+            if (.<10) then
+              "0"||.
+            else
+              .
+          )
+        )
+      else
+        ()
+    ),
+    "date":replace(
+      TAQ/dataLayer/sko_dt,
+      "(\d{4})(\d{2})(\d{2})",
+      "$3-$2-$1"
+    ),
+    "duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),
+    "expdate":replace(
+      TAQ/dataLayer/media_dateexpires,
+      "(\d+)-(\d+)-(\d+)T([\d:]+).+",
+      "$3-$2-$1 $4"
+    ),
+    "subtitle":(tracks)()[label=" Nederlands"]/file,
+    "formats":[
+      (sources)()[type="m3u8"][1]/x:request(
+        {
+          "url":file,
+          "method":"HEAD"
+        }
+      )/(
+        {
+          "format":"hls-0",
+          "extension":"m3u8",
+          "resolution":"manifest",
+          "url":url
+        },
+        for $x at $i in tail(
+          tokenize(
+            extract(
+              unparsed-text(url),
+              "(#EXT-X-STREAM-INF.+m3u8$)",
+              1,"ms"
+            ),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "extension":"m3u8",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          ) ! (
+            if (.) then
+              .
+            else
+              "audiospoor"
+          ),
+          "vbitrate":extract(
+            $x,
+            "video=(\d+)\d{3}",
+            1
+          ) ! (
+            if (.) then
+              concat(
+                "v:",
+                .,
+                "k"
+              )
+            else
+              ""
+          ),
+          "abitrate":replace(
+            $x,
+            ".+audio.+?(\d+)\d{3}.+",
+            "a:$1k","s"
+          ),
+          "url":resolve-uri(
+            ".",
+            url
+          )||extract(
+            $x,
+            "(.+m3u8)",
+            1
+          )
+        }
+      ),
+      x:request(
+        {
+          "url":concat(
+            "https://embed.kijk.nl/api/playlist/",
+            "w7ZW52xLgL5",
+            "_dbzyr6.m3u8?base_url=https%3A//emp-prod-acc-we.ebsd.ericsson.net/sbsgroup"
+          ),
+          "method":"HEAD",
+          "error-handling":"xxx=accept"
+        }
+      )[
+        contains(
+          headers[1],
+          "200 OK"
+        )
+      ]/(
+        {
+          "format":"hls-0_hd",
+          "extension":"m3u8",
+          "resolution":"manifest",
+          "url":url
+        },
+        tail(
+          tokenize(
+            unparsed-text(url),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) ! {
+          "format":concat(
+            "hls-",
+            position(),
+            "_hd"
+          ),
+          "extension":"m3u8",
+          "resolution":extract(
+            .,
+            "RESOLUTION=([\dx]+)",
+            1
+          ),
+          "vbitrate":extract(
+            .,
+            "BANDWIDTH=(\d+)\d{3}",
+            1
+          )||"k",
+          "url":extract(
+            .,
+            "(.+m3u8)",
+            1
+          )
+        }
+      )
+    ]
+  }'

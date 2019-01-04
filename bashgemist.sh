@@ -35,6 +35,7 @@ Ondersteunde websites:
   npostart.nl
   gemi.st
   rtl.nl
+  kijk.nl
 EOF
 }
 
@@ -422,6 +423,176 @@ rtl() {
   )"
 }
 
+kijk() {
+  eval "$(xidel "https://embed.kijk.nl/video/$1" --xquery '
+    json:=json(
+      //script/extract(
+        .,
+        "playerOptionsObj = (.+);",
+        1
+      )[.]
+    )/(playlist)()/{
+      "name":TAQ/dataLayer/concat(
+        upper-case(media_owner),
+        ": ",
+        media_program_name,
+        if (sbs_season!=0 and media_program_episodenumber<=99) then
+          concat(
+            " S",
+            sbs_season ! (
+              if (.<10) then
+                "0"||.
+              else
+                .
+            ),
+            "E",
+            media_program_episodenumber ! (
+              if (.<10) then
+                "0"||.
+              else
+                .
+            )
+          )
+        else
+          ()
+      ),
+      "date":replace(
+        TAQ/dataLayer/sko_dt,
+        "(\d{4})(\d{2})(\d{2})",
+        "$3-$2-$1"
+      ),
+      "duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),
+      "expdate":replace(
+        TAQ/dataLayer/media_dateexpires,
+        "(\d+)-(\d+)-(\d+)T([\d:]+).+",
+        "$3-$2-$1 $4"
+      ),
+      "subtitle":(tracks)()[label=" Nederlands"]/file,
+      "formats":[
+        (sources)()[type="m3u8"][1]/x:request(
+          {
+            "url":file,
+            "method":"HEAD"
+          }
+        )/(
+          {
+            "format":"hls-0",
+            "extension":"m3u8",
+            "resolution":"manifest",
+            "url":url
+          },
+          for $x at $i in tail(
+            tokenize(
+              extract(
+                unparsed-text(url),
+                "(#EXT-X-STREAM-INF.+m3u8$)",
+                1,"ms"
+              ),
+              "#EXT-X-STREAM-INF:"
+            )
+          ) order by extract(
+            $x,
+            "BANDWIDTH=(\d+)",
+            1
+          ) count $i
+          return {
+            "format":"hls-"||$i,
+            "extension":"m3u8",
+            "resolution":extract(
+              $x,
+              "RESOLUTION=([\dx]+)",
+              1
+            ) ! (
+              if (.) then
+                .
+              else
+                "audiospoor"
+            ),
+            "vbitrate":extract(
+              $x,
+              "video=(\d+)\d{3}",
+              1
+            ) ! (
+              if (.) then
+                concat(
+                  "v:",
+                  .,
+                  "k"
+                )
+              else
+                ""
+            ),
+            "abitrate":replace(
+              $x,
+              ".+audio.+?(\d+)\d{3}.+",
+              "a:$1k","s"
+            ),
+            "url":resolve-uri(
+              ".",
+              url
+            )||extract(
+              $x,
+              "(.+m3u8)",
+              1
+            )
+          }
+        ),
+        x:request(
+          {
+            "url":concat(
+              "https://embed.kijk.nl/api/playlist/",
+              "'$1'",
+              "_dbzyr6.m3u8?base_url=https%3A//emp-prod-acc-we.ebsd.ericsson.net/sbsgroup"
+            ),
+            "method":"HEAD",
+          "error-handling":"xxx=accept"
+          }
+        )[
+          contains(
+            headers[1],
+            "200 OK"
+          )
+        ]/(
+          {
+            "format":"hls-0_hd",
+            "extension":"m3u8",
+            "resolution":"manifest",
+            "url":url
+          }[url],
+          tail(
+            tokenize(
+              unparsed-text(url),
+              "#EXT-X-STREAM-INF:"
+            )
+          ) ! {
+            "format":concat(
+              "hls-",
+              position(),
+              "_hd"
+            ),
+            "extension":"m3u8",
+            "resolution":extract(
+              .,
+              "RESOLUTION=([\dx]+)",
+              1
+            ),
+            "vbitrate":extract(
+              .,
+              "BANDWIDTH=(\d+)\d{3}",
+              1
+            )||"k",
+            "url":extract(
+              .,
+              "(.+m3u8)",
+              1
+            )
+          }
+        )
+      ]
+    }' --output-format=bash
+  )"
+}
+
 info() {
   xidel - --xquery '
     let $a:={
@@ -617,6 +788,8 @@ elif [[ $url =~ (npostart.nl|gemi.st) ]]; then
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
 elif [[ $url =~ rtl.nl ]]; then
   rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
+elif [[ $url =~ kijk.nl ]]; then
+  kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 else
   echo "bashgemist: niet ondersteunde url." 1>&2
   exit 1
