@@ -1,0 +1,597 @@
+[npo]
+
+$ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
+  json(
+    extract(
+      $raw,
+      "\((.+)\)",
+      1
+    )
+  )[not(error)]/{
+    "name":if (medium="live") then
+      titel||": Livestream"
+    else
+      replace(
+        concat(
+          if (count(.//naam)=1) then
+            .//naam
+          else
+            join(
+              .//naam,
+              " en "
+            ),
+          ": ",
+          if (ptype="episode") then
+            if (aflevering_titel) then
+              if (
+                contains(
+                  titel,
+                  aflevering_titel
+                )
+              ) then
+                titel
+              else
+                if (
+                  contains(
+                    aflevering_titel,
+                    titel
+                  )
+                ) then
+                  aflevering_titel
+                else
+                  concat(
+                    titel,
+                    " - ",
+                    aflevering_titel
+                  )
+            else
+              titel
+          else
+            concat(
+              .//serie_titel,
+              " - ",
+              titel
+            )
+        ),
+        "[&quot;&apos;]",
+        "'\'\''"
+      ),
+    "date":if (medium="live") then
+      "'$(date "+%d-%m-%Y")'"
+    else (
+      if (gidsdatum) then
+        replace(
+          gidsdatum,
+          "(\d+)-(\d+)-(\d+)",
+          "$3-$2-$1"
+        )
+      else
+        if (
+          matches(
+            "https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795",
+            "\d{2}-\d{2}-\d{4}"
+          )
+        ) then
+          extract(
+            "https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795",
+            ".+/([\d-]+)",
+            1
+          )
+        else
+          extract(
+            x:request(
+              {
+                "url":"https://www.npostart.nl/POW_03689795",
+                "method":"HEAD"
+              }
+            )/url,
+            ".+/([\d-]+)",
+            1
+          )
+    ),
+    "duration":if (tijdsduur) then
+      tijdsduur
+    else
+      (),
+    "start":start,
+    "end":eind,
+    "expdate":if (publicatie_eind) then
+      replace(
+        publicatie_eind,
+        "(\d+)-(\d+)-(\d+)T([\d:]+).+",
+        "$3-$2-$1 $4"
+      )
+    else
+      (),
+    "subtitle":if (tt888="ja") then
+      "http://tt888.omroep.nl/tt888/POW_03689795"
+    else
+      (),
+    "formats":let $a:=x:request(
+          {
+            "url":"http://ida.omroep.nl/app.php/POW_03689795?token="||json(
+              "http://ida.omroep.nl/app.php/auth"
+            )/token,
+            "error-handling":"4xx=accept"
+          }
+        )[
+          contains(
+            headers[1],
+            "200"
+          )
+        ]/json/(items)()(),
+        $b:=$a[format="hls"]/x:request(
+          {
+            "url":replace(
+              url,
+              "jsonp",
+              "json"
+            ),
+            "error-handling":"4xx=accept"
+          }
+        )[
+          contains(
+            headers[1],
+            "200"
+          )
+        ]/(
+          if (json instance of string) then
+            json
+          else
+            json/url
+        ),
+        $c:=[
+          reverse(
+            $a[contentType="odi"][format="mp4"]
+          )/x:request(
+            {
+              "url":replace(
+                url,
+                "jsonp",
+                "json"
+              ),
+              "error-handling":"4xx=accept"
+            }
+          )[
+            contains(
+              headers[1],
+              "200"
+            )
+          ]/json/substring-before(
+            url,
+            "?"
+          ) ! {
+            "format":"pg-"||position(),
+            "extension":"m4v",
+            "url":.
+          },
+          {
+            "format":"hls-0",
+            "extension":"m3u8",
+            "resolution":"manifest",
+            "url":$b
+          }[url],
+          for $x at $i in tail(
+            tokenize(
+              extract(
+                unparsed-text($b),
+                "(#EXT-X-STREAM-INF.+m3u8$)",
+                1,"ms"
+              ),
+              "#EXT-X-STREAM-INF:"
+            )
+          ) order by extract(
+            $x,
+            "BANDWIDTH=(\d+)",
+            1
+          ) count $i
+          return {
+            "format":"hls-"||$i,
+            "extension":"m3u8",
+            "resolution":extract(
+              $x,
+              "RESOLUTION=([\dx]+)",
+              1
+            ) ! (
+              if (.) then
+                .
+              else
+                "audiospoor"
+            ),
+            "vbitrate":extract(
+              $x,
+              "video=(\d+)\d{3}",
+              1
+            ) ! (
+              if (.) then
+                concat(
+                  "v:",
+                  .,
+                  "k"
+                )
+              else
+                ""
+            ),
+            "abitrate":replace(
+              $x,
+              ".+audio.+?(\d+)\d{3}.+",
+              "a:$1k","s"
+            ),
+            "url":resolve-uri(
+              ".",
+              $b
+            )||extract(
+              $x,
+              "(.+m3u8)",
+              1
+            )
+          },
+          reverse(
+            $a[contentType="url"][format="mp4"]
+          )/x:request(
+            {
+              "url":url,
+              "method":"HEAD",
+              "error-handling":"xxx=accept"
+            }
+          )[
+            some $x in ("200","302") satisfies contains(
+              headers[1],
+              $x
+            )
+          ]/(
+            if (
+              contains(
+                url,
+                "content-ip"
+              )
+            ) then
+              x:request(
+                {
+                  "url":"https://ipv4-api.nos.nl/resolve.php/video?url="||uri-encode(url),
+                  "method":"HEAD"
+                }
+              )/url
+            else
+              url
+          ) ! {
+            "format":"mp4-"||position(),
+            "extension":extract(
+              .,
+              ".+\.(.+)",
+              1
+            ),
+            "url":.
+          }
+        ]
+    return
+    if ($c()) then
+      $c
+    else
+      ()
+  }'
+{
+  "name": "NOS: NOS Journaal",
+  "date": "12-12-2018",
+  "duration": "00:24:39",
+  "start": null,
+  "end": null,
+  "expdate": "01-01-2101 00:59:00",
+  "subtitle": "http://tt888.omroep.nl/tt888/POW_03689795",
+  "formats": [
+    {
+      "format": "pg-1",
+      "extension": "m4v",
+      "url": "https://content10c1b.omroep.nl/urishieldv2/l27m5a1b0a7d738bd144005c11a640000000.da077fb61a0c5933f1ae79863ff6a403/ceresodi/h264/p/12/10/10/f6/sb_POW_03689795.m4v"
+    },
+    {
+      "format": "pg-2",
+      "extension": "m4v",
+      "url": "https://content10c1a.omroep.nl/urishieldv2/l27m05b6ed9143e505af005c11a640000000.c920edf4f11ccb22769034bacb65fc39/ceresodi/h264/p/12/10/10/f6/bb_POW_03689795.m4v"
+    },
+    {
+      "format": "pg-3",
+      "extension": "m4v",
+      "url": "https://content10c3c.omroep.nl/urishieldv2/l27m07a681274325394d005c11a640000000.0b3f7b41a5e3ecfa9417d26dd3f7d31a/ceresodi/h264/p/12/10/10/f6/std_POW_03689795.m4v"
+    },
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:203k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=96000-video=203000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:203k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=128000-video=203000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:203k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=192000-video=203000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:505k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=96000-video=505000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:505k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=128000-video=505000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:505k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=192000-video=505000.m3u8"
+    },
+    {
+      "format": "hls-7",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1109k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=96000-video=1109000.m3u8"
+    },
+    {
+      "format": "hls-8",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1109k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=128000-video=1109000.m3u8"
+    },
+    {
+      "format": "hls-9",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1109k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=192000-video=1109000.m3u8"
+    },
+    {
+      "format": "hls-10",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1810k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=96000-video=1810000.m3u8"
+    },
+    {
+      "format": "hls-11",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1810k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=128000-video=1810000.m3u8"
+    },
+    {
+      "format": "hls-12",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1810k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m7221b08871bf8532005c11a641000000.e93717a7833dfa2ddc8f4d281895e2b0/p/12/10/10/5c/POW_03689795/POW_03689795.ism/POW_03689795-audio=192000-video=1810000.m3u8"
+    }
+  ]
+}
+
+https://www.npostart.nl/de-laatste-minuten/17-12-2018/POMS_AT_15009224:
+{
+  "name": "AVROTROS: Hunted - De laatste minuten...",
+  "date": "17-12-2018",
+  "duration": "00:01:59",
+  "start": "00:55:06",
+  "end": "00:57:05",
+  "expdate": "01-01-2101 00:59:00",
+  "subtitle": "http://tt888.omroep.nl/tt888/POMS_AT_15009224",
+  "formats": [
+    {
+      "format": "pg-1",
+      "extension": "m4v",
+      "url": "https://content10c4b.omroep.nl/urishieldv2/l27m6c2ec29c3fcf372e005c276570000000.b055f6717fc4e0b8ea2ae9042d1291e2/ceresodi/h264/p/06/10/10/f7/sb_AT_2105785.m4v"
+    },
+    {
+      "format": "pg-2",
+      "extension": "m4v",
+      "url": "https://content10c4c.omroep.nl/urishieldv2/l27m34ec48023fb78477005c276570000000.171fddf89df4a5190ac631f86a056b63/ceresodi/h264/p/06/10/10/f7/bb_AT_2105785.m4v"
+    },
+    {
+      "format": "pg-3",
+      "extension": "m4v",
+      "url": "https://content10c4a.omroep.nl/urishieldv2/l27m3187fe3c262e9d50005c276570000000.d1015a8a55fc8f98ef42e675570af912/ceresodi/h264/p/06/10/10/f7/std_AT_2105785.m4v"
+    },
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:202k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=96000-video=202000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:202k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=128000-video=202000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:202k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=202000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:504k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=96000-video=504000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:504k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=128000-video=504000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:504k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=504000.m3u8"
+    },
+    {
+      "format": "hls-7",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1109k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=96000-video=1109000.m3u8"
+    },
+    {
+      "format": "hls-8",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1109k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=128000-video=1109000.m3u8"
+    },
+    {
+      "format": "hls-9",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1109k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=1109000.m3u8"
+    },
+    {
+      "format": "hls-10",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1813k",
+      "abitrate": "a:96k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=96000-video=1813000.m3u8"
+    },
+    {
+      "format": "hls-11",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1813k",
+      "abitrate": "a:128k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=128000-video=1813000.m3u8"
+    },
+    {
+      "format": "hls-12",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1813k",
+      "abitrate": "a:192k",
+      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=1813000.m3u8"
+    }
+  ]
+}
+
+https://www.npostart.nl/live/npo-1
+{
+  "name": "NPO 1: Livestream",
+  "date": "29-12-2018",
+  "duration": null,
+  "start": null,
+  "end": null,
+  "expdate": null,
+  "subtitle": null,
+  "formats": [
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "audiospoor",
+      "vbitrate": "",
+      "abitrate": "a:128k",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1-audio_nld=128000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "384x216",
+      "vbitrate": "v:200k",
+      "abitrate": "a:128k",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1-audio_nld=128000-video=200000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "480x270",
+      "vbitrate": "v:499k",
+      "abitrate": "a:128k",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1-audio_nld=128000-video=499968.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "v:699k",
+      "abitrate": "a:128k",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1-audio_nld=128000-video=699968.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "768x432",
+      "vbitrate": "v:1000k",
+      "abitrate": "a:128k",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1-audio_nld=128000-video=1000000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "extension": "m3u8",
+      "resolution": "1024x576",
+      "vbitrate": "v:1800k",
+      "abitrate": "a:128k",
+      "url": "https://smoote1e.omroep.nl/urishieldv2/l2fm336d5956703e265a005c278b66000000.d32446ac4749f1a1c62ccb75fc1bde7d/live/npo/tvlive/npo1/npo1.isml/npo1-audio_nld=128000-video=1800000.m3u8"
+    }
+  ]
+}
