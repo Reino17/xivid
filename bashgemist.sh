@@ -32,6 +32,7 @@ Gebruik: bashgemist.sh [optie] url
 Ondersteunde websites:
   npostart.nl
   gemi.st
+  rtl.nl
 EOF
 }
 
@@ -309,6 +310,116 @@ npo() {
   )"
 }
 
+rtl() {
+  eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" --xquery '
+    json:=$json[
+      not(
+        meta/nr_of_videos_total=0
+      )
+    ]/{
+      "name":replace(
+        concat(
+          .//station,
+          ": ",
+          abstracts/name,
+          " - ",
+          if (.//classname="uitzending") then
+            episodes/name
+          else
+            .//title
+        ),
+        "[&quot;&apos;]",
+        "'\'\''"
+      ),
+      "date":replace(
+        (material)()/original_date * duration("PT1S") + date("1970-01-01"),
+        "(\d+)-(\d+)-(\d+)",
+        "$3-$2-$1"
+      ),
+      "duration":format-time(
+        time((material)()/duration) + duration("PT0.5S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
+        replace(
+          (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T00:00:00"),
+          "(\d+)-(\d+)-(\d+)T(.+)",
+          "$3-$2-$1 $4"
+        )
+      else
+        (),
+      "formats":let $a:=.//videohost||.//videopath return [
+        {
+          "format":"hls-0",
+          "extension":"m3u8",
+          "resolution":"manifest",
+          "url":$a
+        },
+        for $x at $i in tail(
+          tokenize(
+            unparsed-text($a),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "extension":"m3u8",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          ) ! (
+            if (.) then
+              .
+            else
+              "audiospoor"
+          ),
+          "vbitrate":extract(
+            $x,
+            "video=(\d+)\d{3}",
+            1
+          ) ! (
+            if (.) then
+              concat(
+                "v:",
+                .,
+                "k"
+              )
+            else
+              ""
+          ),
+          "abitrate":replace(
+            $x,
+            ".+audio.+?(\d+)\d{3}.+",
+            "a:$1k","s"
+          ),
+          "url":let $b:=extract(
+            $x,
+            "(.+m3u8)",
+            1
+          ) return
+          if (
+            starts-with(
+              $b,
+              "http"
+            )
+          ) then
+            $b
+          else
+            resolve-uri(
+              ".",
+              $a
+            )||$b
+        }
+      ]
+    }' --output-format=bash
+  )"
+}
+
 if ! command -v xidel >/dev/null; then
   cat 1>&2 <<EOF
 BashGemist, een video-url extractie script.
@@ -390,6 +501,8 @@ if [[ $url =~ npostart.nl/live ]]; then
   npo "$(xidel "$url" -e '//npo-player/@media-id')"
 elif [[ $url =~ (npostart.nl|gemi.st) ]]; then
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
+elif [[ $url =~ rtl.nl ]]; then
+  rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
 else
   echo "bashgemist: niet ondersteunde url." 1>&2
   exit 1

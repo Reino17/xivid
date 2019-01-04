@@ -595,3 +595,160 @@ https://www.npostart.nl/live/npo-1
     }
   ]
 }
+
+================================================================================================================================
+
+[rtl]
+
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-961d-eba686183076/fmt=adaptive/" --xquery '
+  $json[
+    not(
+      meta/nr_of_videos_total=0
+    )
+  ]/{
+    "name":replace(
+      concat(
+        .//station,
+        ": ",
+        abstracts/name,
+        " - ",
+        if (.//classname="uitzending") then
+          episodes/name
+        else
+          .//title
+      ),
+      "[&quot;&apos;]",
+      "'\'\''"
+    ),
+    "date":replace(
+      (material)()/original_date * duration("PT1S") + date("1970-01-01"),
+      "(\d+)-(\d+)-(\d+)",
+      "$3-$2-$1"
+    ),
+    "duration":format-time(
+      time((material)()/duration) + duration("PT0.5S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
+      replace(
+        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T00:00:00"),
+        "(\d+)-(\d+)-(\d+)T(.+)",
+        "$3-$2-$1 $4"
+      )
+    else
+      (),
+    "formats":let $a:=.//videohost||.//videopath return [
+      {
+        "format":"hls-0",
+        "extension":"m3u8",
+        "resolution":"manifest",
+        "url":$a
+      },
+      for $x at $i in tail(
+        tokenize(
+          unparsed-text($a),
+          "#EXT-X-STREAM-INF:"
+        )
+      ) order by extract(
+        $x,
+        "BANDWIDTH=(\d+)",
+        1
+      ) count $i
+      return {
+        "format":"hls-"||$i,
+        "extension":"m3u8",
+        "resolution":extract(
+          $x,
+          "RESOLUTION=([\dx]+)",
+          1
+        ) ! (
+          if (.) then
+            .
+          else
+            "audiospoor"
+        ),
+        "vbitrate":extract(
+          $x,
+          "video=(\d+)\d{3}",
+          1
+        ) ! (
+          if (.) then
+            concat(
+              "v:",
+              .,
+              "k"
+            )
+          else
+            ""
+        ),
+        "abitrate":replace(
+          $x,
+          ".+audio.+?(\d+)\d{3}.+",
+          "a:$1k","s"
+        ),
+        "url":let $b:=extract(
+          $x,
+          "(.+m3u8)",
+          1
+        ) return
+        if (
+          starts-with(
+            $b,
+            "http"
+          )
+        ) then
+          $b
+        else
+          resolve-uri(
+            ".",
+            $a
+          )||$b
+      }
+    ]
+  }'
+{
+  "name": "RTL4: RTL Nieuws - 19:30 uur",
+  "date": "11-12-2018",
+  "duration": "00:20:18",
+  "expdate": "12-12-2019 05:35:25",
+  "formats": [
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "audiospoor",
+      "vbitrate": "",
+      "abitrate": "a:125k",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "711x400",
+      "vbitrate": "v:903k",
+      "abitrate": "a:125k",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=903000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "912x512",
+      "vbitrate": "v:2093k",
+      "abitrate": "a:125k",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=2093000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "1280x720",
+      "vbitrate": "v:3805k",
+      "abitrate": "a:125k",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=3805000.m3u8"
+    }
+  ]
+}
