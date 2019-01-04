@@ -26,6 +26,8 @@ Gebruik: bashgemist.sh [optie] url
   -h, --help              Toon deze hulppagina.
   -f, --format FORMAAT    Formaat code. Zonder opgave wordt het best
                           beschikbare formaat gekozen.
+  -i, --info              Toon video informatie, incl. een opsomming
+                          van alle beschikbare formaten.
   -j, --json              Toon video informatie als JSON.
   -d, --debug             Toon bash debug informatie.
 
@@ -420,6 +422,115 @@ rtl() {
   )"
 }
 
+info() {
+  xidel - --xquery '
+    let $a:={
+          "name":"Naam:",
+          "date":"Datum:",
+          "duration":"Tijdsduur:",
+          "start":"Begin:",
+          "end":"Einde:",
+          "expdate":"Gratis tot:",
+          "subtitle":"Ondertiteling:"
+        },
+        $b:=$json()[
+          position()<count($json())
+        ] ! .[$json(.)[.]],
+        $c:=max(
+          $b ! $a(.) ! string-length(.)
+        ) ! (
+          if (.>9) then
+            .
+          else
+            9
+        ),
+        $d:=string-join(
+          (1 to $c+1) ! " "
+        ),
+        $e:=[
+          {
+            "format":"formaat",
+            "extension":"extensie",
+            "resolution":"resolutie",
+            "vbitrate":"bitrate"
+          },
+          $json/(formats)()
+        ],
+        $f:=(
+          "format",
+          "extension",
+          "resolution",
+          "vbitrate",
+          "abitrate"
+        ),
+        $g:=$f ! max(
+          $e()(.) ! string-length(.)
+        ),
+        $h:=string-join(
+          (1 to sum($g)) ! " "
+        )
+    return (
+      $b ! concat(
+        substring(
+          $a(.)||$d,
+          1,
+          $c+1
+        ),
+        $json(.)
+      ),
+      if ($e(2)) then
+        for $x at $i in $e() return
+        concat(
+          if ($i=1) then
+            substring(
+              "Formaten:"||$d,
+              1,
+              $c+1
+            )
+          else
+            $d,
+          string-join(
+            for $y at $i in $f return
+            substring(
+              $x($y)||$h,
+              1,
+              $g[$i]+2
+            )
+          ),
+          if ($i=count($e())) then
+            "(best)"
+          else
+            ()
+        )
+      else
+        substring(
+          "Formaten:"||$d,
+          1,
+          $c+1
+        )||"-",
+      if (start) then
+        let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return (
+          "",
+          concat(
+            substring(
+              "Download:"||$d,
+              1,
+              $c+1
+            ),
+            "ffmpeg -ss ",
+            time(start) - $a,
+            " -i [url] -ss ",
+            $a + time("00:00:00"),
+            " -t ",
+            duration,
+            " [...]"
+          )
+        )
+      else
+        ()
+    )' <<< $1
+}
+
 if ! command -v xidel >/dev/null; then
   cat 1>&2 <<EOF
 BashGemist, een video-url extractie script.
@@ -469,6 +580,9 @@ while true; do
           exit 1
         fi
       fi
+      ;;
+    -i|--info)
+      info=1
       ;;
     -j|--json)
       dump_json=1
@@ -520,6 +634,8 @@ if [[ $format ]]; then
     echo "bashgemist: geen video's beschikbaar." 1>&2
     exit 1
   fi
+elif [[ $info ]]; then
+  info "$json"
 elif [[ $dump_json ]]; then
   xidel - -e '$json' <<< $json
 else

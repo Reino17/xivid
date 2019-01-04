@@ -752,3 +752,304 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
     }
   ]
 }
+
+================================================================================================================================
+
+[-i, --info]
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json() return $b'
+name
+date
+duration
+start
+end
+expdate
+subtitle
+formats
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] return $b'
+name
+date
+duration
+start
+end
+expdate
+subtitle
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]] return $b'
+name
+date
+duration
+expdate
+subtitle
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]] return $b ! $a(.)'
+Naam:
+Datum:
+Tijdsduur:
+Gratis tot:
+Ondertiteling:
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]] return max($b ! $a(.) ! string-length(.))'
+14
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) return string-join((1 to $c+1) ! "#")'
+###############
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)),$d:=string-join((1 to $c+1) ! " ") return $b ! concat(substring($a(.)||$d,1,$c+1),$json(.))'
+Naam:          NOS: NOS Journaal
+Datum:         12-12-2018
+Tijdsduur:     00:24:39
+Gratis tot:    01-01-2101 00:59:00
+Ondertiteling: http://tt888.omroep.nl/tt888/POW_03689795
+
+------------------------------------------------------------------------------------------------
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '690,754p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]] return max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9)'
+9
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '690,754p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " ") return $b ! concat(substring($a(.)||$d,1,$c+1),$json(.))' -e '"Formaten:"'
+Naam:     NPO 1: Livestream
+Datum:    29-12-2018
+Formaten:
+
+------------------------------------------------------------------------------------------------
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate") return $f ! $e(1)(.)'
+formaat
+extensie
+resolutie
+bitrate
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate") return $f ! max($e()(.) ! string-length(.))'
+7
+8
+9
+7
+6
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)) return string-join((1 to sum($g)) ! "#")'
+#####################################
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") for $x in $e(1) return concat(substring("Formaten:"||$d,1,$c+1),string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)))'
+Formaten:      formaat  extensie  resolutie  bitrate
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ())'
+Formaten:      formaat  extensie  resolutie  bitrate
+               pg-1     m4v
+               pg-2     m4v
+               pg-3     m4v
+               hls-0    m3u8      manifest
+               hls-1    m3u8      480x270    v:203k   a:96k
+               hls-2    m3u8      480x270    v:203k   a:128k
+               hls-3    m3u8      480x270    v:203k   a:192k
+               hls-4    m3u8      640x360    v:505k   a:96k
+               hls-5    m3u8      640x360    v:505k   a:128k
+               hls-6    m3u8      640x360    v:505k   a:192k
+               hls-7    m3u8      1024x576   v:1109k  a:96k
+               hls-8    m3u8      1024x576   v:1109k  a:128k
+               hls-9    m3u8      1024x576   v:1109k  a:192k
+               hls-10   m3u8      1024x576   v:1810k  a:96k
+               hls-11   m3u8      1024x576   v:1810k  a:128k
+               hls-12   m3u8      1024x576   v:1810k  a:192k  (best)
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '430,557p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()))'
+Naam:          NOS: NOS Journaal
+Datum:         12-12-2018
+Tijdsduur:     00:24:39
+Gratis tot:    01-01-2101 00:59:00
+Ondertiteling: http://tt888.omroep.nl/tt888/POW_03689795
+Formaten:      formaat  extensie  resolutie  bitrate
+               pg-1     m4v
+               pg-2     m4v
+               pg-3     m4v
+               hls-0    m3u8      manifest
+               hls-1    m3u8      480x270    v:203k   a:96k
+               hls-2    m3u8      480x270    v:203k   a:128k
+               hls-3    m3u8      480x270    v:203k   a:192k
+               hls-4    m3u8      640x360    v:505k   a:96k
+               hls-5    m3u8      640x360    v:505k   a:128k
+               hls-6    m3u8      640x360    v:505k   a:192k
+               hls-7    m3u8      1024x576   v:1109k  a:96k
+               hls-8    m3u8      1024x576   v:1109k  a:128k
+               hls-9    m3u8      1024x576   v:1109k  a:192k
+               hls-10   m3u8      1024x576   v:1810k  a:96k
+               hls-11   m3u8      1024x576   v:1810k  a:128k
+               hls-12   m3u8      1024x576   v:1810k  a:192k  (best)
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '690,754p' | xidel -s - --xquery '[...]'
+Naam:     NPO 1: Livestream
+Datum:    29-12-2018
+Formaten: formaat  extensie  resolutie   bitrate
+          hls-0    m3u8      manifest
+          hls-1    m3u8      audiospoor           a:128k
+          hls-2    m3u8      384x216     v:200k   a:128k
+          hls-3    m3u8      480x270     v:499k   a:128k
+          hls-4    m3u8      640x360     v:699k   a:128k
+          hls-5    m3u8      768x432     v:1000k  a:128k
+          hls-6    m3u8      1024x576    v:1800k  a:128k  (best)
+
+------------------------------------------------------------------------------------------------
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '560,687p' | xidel -s - -e 'if (start) then let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return (time(start) - $a,$a + time("00:00:00"),duration) else ()'
+00:55:00
+00:00:06
+00:01:59
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '560,687p' | xidel -s - -e 'if (start) then let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return concat("Download: ","ffmpeg -ss ",time(start) - $a," -i [url] -ss ",$a + time("00:00:00")," -t ",duration," [...]") else ()'
+Download: ffmpeg -ss 00:55:00 -i [url] -ss 00:00:06 -t 00:01:59 [...]
+
+------------------------------------------------------------------------------------------------
+
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '560,687p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()),if (start) then let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return ("",concat(substring("Download:"||$d,1,$c+1),"ffmpeg -ss ",time(start) - $a," -i [url] -ss ",$a + time("00:00:00")," -t ",duration," [...]")) else ())'
+Naam:          AVROTROS: Hunted - De laatste minuten...
+Datum:         17-12-2018
+Tijdsduur:     00:01:59
+Begin:         00:55:06
+Einde:         00:57:05
+Gratis tot:    01-01-2101 00:59:00
+Ondertiteling: http://tt888.omroep.nl/tt888/POMS_AT_15009224
+Formaten:      formaat  extensie  resolutie  bitrate
+               pg-1     m4v
+               pg-2     m4v
+               pg-3     m4v
+               hls-0    m3u8      manifest
+               hls-1    m3u8      480x270    v:202k   a:96k
+               hls-2    m3u8      480x270    v:202k   a:128k
+               hls-3    m3u8      480x270    v:202k   a:192k
+               hls-4    m3u8      640x360    v:504k   a:96k
+               hls-5    m3u8      640x360    v:504k   a:128k
+               hls-6    m3u8      640x360    v:504k   a:192k
+               hls-7    m3u8      1024x576   v:1109k  a:96k
+               hls-8    m3u8      1024x576   v:1109k  a:128k
+               hls-9    m3u8      1024x576   v:1109k  a:192k
+               hls-10   m3u8      1024x576   v:1813k  a:96k
+               hls-11   m3u8      1024x576   v:1813k  a:128k
+               hls-12   m3u8      1024x576   v:1813k  a:192k  (best)
+
+Download:      ffmpeg -ss 00:55:00 -i [url] -ss 00:00:06 -t 00:01:59 [...]
+
+$ cat <<EOF | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),if ($e(2)) then for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()) else substring("Formaten:"||$d,1,$c+1)||"-",if (start) then let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return ("",concat(substring("Download:"||$d,1,$c+1),"ffmpeg -ss ",time(start) - $a," -i [url] -ss ",$a + time("00:00:00")," -t ",duration," [...]")) else ())'
+{
+  "name": "VPRO: Zigeunermuziek doet pijn - Bob Entrop, VPRO, 2008 (58 min.)",
+  "date": "21-07-2010",
+  "duration": "00:58:00",
+  "start": null,
+  "end": null,
+  "expdate": null,
+  "subtitle": null,
+  "formats": null
+}
+EOF
+Naam:      VPRO: Zigeunermuziek doet pijn - Bob Entrop, VPRO, 2008 (58 min.)
+Datum:     21-07-2010
+Tijdsduur: 00:58:00
+Formaten:  -
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:={
+        "name":"Naam:",
+        "date":"Datum:",
+        "duration":"Tijdsduur:",
+        "start":"Begin:",
+        "end":"Einde:",
+        "expdate":"Gratis tot:",
+        "subtitle":"Ondertiteling:"
+      },
+      $b:=$json()[
+        position()<count($json())
+      ] ! .[$json(.)[.]],
+      $c:=max(
+        $b ! $a(.) ! string-length(.)
+      ) ! (
+        if (.>9) then
+          .
+        else
+          9
+      ),
+      $d:=string-join(
+        (1 to $c+1) ! " "
+      ),
+      $e:=[
+        {
+          "format":"formaat",
+          "extension":"extensie",
+          "resolution":"resolutie",
+          "vbitrate":"bitrate"
+        },
+        $json/(formats)()
+      ],
+      $f:=(
+        "format",
+        "extension",
+        "resolution",
+        "vbitrate",
+        "abitrate"
+      ),
+      $g:=$f ! max(
+        $e()(.) ! string-length(.)
+      ),
+      $h:=string-join(
+        (1 to sum($g)) ! " "
+      )
+  return (
+    $b ! concat(
+      substring(
+        $a(.)||$d,
+        1,
+        $c+1
+      ),
+      $json(.)
+    ),
+    if ($e(2)) then
+      for $x at $i in $e() return
+      concat(
+        if ($i=1) then
+          substring(
+            "Formaten:"||$d,
+            1,
+            $c+1
+          )
+        else
+          $d,
+        string-join(
+          for $y at $i in $f return
+          substring(
+            $x($y)||$h,
+            1,
+            $g[$i]+2
+          )
+        ),
+        if ($i=count($e())) then
+          "(best)"
+        else
+          ()
+      )
+    else
+      substring(
+        "Formaten:"||$d,
+        1,
+        $c+1
+      )||"-",
+    if (start) then
+      let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return (
+        "",
+        concat(
+          substring(
+            "Download:"||$d,
+            1,
+            $c+1
+          ),
+          "ffmpeg -ss ",
+          time(start) - $a,
+          " -i [url] -ss ",
+          $a + time("00:00:00"),
+          " -t ",
+          duration,
+          " [...]"
+        )
+      )
+    else
+      ()
+  )'
