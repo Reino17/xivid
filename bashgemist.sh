@@ -36,6 +36,11 @@ Ondersteunde websites:
   gemi.st
   rtl.nl
   kijk.nl
+
+Voorbeelden:
+  bashgemist.sh -f hls-11 https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321
+  bashgemist.sh https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd
+  bashgemist.sh -i https://www.kijk.nl/video/nHD4my1HMKu
 EOF
 }
 
