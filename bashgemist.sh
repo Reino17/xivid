@@ -684,25 +684,25 @@ info() {
           1,
           $c+1
         )||"-",
-      if (start) then
-        let $a:=seconds-from-time(start) mod 30 * dayTimeDuration("PT1S") return (
-          "",
-          concat(
-            substring(
-              "Download:"||$d,
-              1,
-              $c+1
-            ),
-            "ffmpeg -ss ",
-            time(start) - $a,
-            " -i [url] -ss ",
-            $a + time("00:00:00"),
-            " -t ",
-            duration,
-            " [...]"
-          )
+      if (start) then (
+        "",
+        concat(
+          substring(
+            "Download:"||$d,
+            1,
+            $c+1
+          ),
+          "ffmpeg -ss ",
+          time(start) - (
+            seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")
+          ),
+          " -i [url] -ss ",
+          seconds-from-time(start) mod 30,
+          " -t ",
+          duration,
+          " [...]"
         )
-      else
+      ) else
         ()
     )' <<< $1
 }
