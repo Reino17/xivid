@@ -1,5 +1,7 @@
 [npo]
 
+https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795
+
 $ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
   json(
     extract(
@@ -104,7 +106,7 @@ $ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
     else
       (),
     "subtitle":if (tt888="ja") then
-      "http://tt888.omroep.nl/tt888/POW_03689795"
+      "http://tt888.omroep.nl/tt888/"||prid
     else
       (),
     "formats":let $a:=x:request(
@@ -399,7 +401,7 @@ $ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
   ]
 }
 
-https://www.npostart.nl/de-laatste-minuten/17-12-2018/POMS_AT_15009224:
+https://www.npostart.nl/de-laatste-minuten/17-12-2018/POMS_AT_15009224
 {
   "name": "AVROTROS: Hunted - De laatste minuten...",
   "date": "17-12-2018",
@@ -407,7 +409,7 @@ https://www.npostart.nl/de-laatste-minuten/17-12-2018/POMS_AT_15009224:
   "start": "00:55:06",
   "end": "00:57:05",
   "expdate": "01-01-2101 00:59:00",
-  "subtitle": "http://tt888.omroep.nl/tt888/POMS_AT_15009224",
+  "subtitle": "http://tt888.omroep.nl/tt888/AT_2105785",
   "formats": [
     {
       "format": "pg-1",
@@ -599,6 +601,8 @@ https://www.npostart.nl/live/npo-1
 ================================================================================================================================
 
 [rtl]
+
+https://www.rtl.nl/video/143d56f6-816e-3757-961d-eba686183076
 
 $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-961d-eba686183076/fmt=adaptive/" --xquery '
   $json[
@@ -907,7 +911,7 @@ Tijdsduur:     00:01:59
 Begin:         00:55:06
 Einde:         00:57:05
 Gratis tot:    01-01-2101 00:59:00
-Ondertiteling: http://tt888.omroep.nl/tt888/POMS_AT_15009224
+Ondertiteling: http://tt888.omroep.nl/tt888/AT_2105785
 Formaten:      formaat  extensie  resolutie  bitrate
                pg-1     m4v
                pg-2     m4v

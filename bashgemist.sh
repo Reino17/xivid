@@ -149,7 +149,7 @@ npo() {
       else
         (),
       "subtitle":if (tt888="ja") then
-        "http://tt888.omroep.nl/tt888/'$1'"
+        "http://tt888.omroep.nl/tt888/"||prid
       else
         (),
       "formats":let $a:=x:request(
