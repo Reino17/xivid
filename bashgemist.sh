@@ -433,25 +433,25 @@ kijk() {
     json:=json(
       //script/extract(
         .,
-        "playerOptionsObj = (.+);",
+        "playerConfig = (.+);",
         1
       )[.]
     )/(playlist)()/{
-      "name":TAQ/dataLayer/concat(
-        upper-case(media_owner),
+      "name":TAQ/concat(
+        upper-case(customLayer/c_media_station),
         ": ",
-        media_program_name,
-        if (sbs_season!=0 and media_program_episodenumber<=99) then
+        customLayer/c_media_ispartof,
+        if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then
           concat(
             " S",
-            sbs_season ! (
+            dataLayer/media_program_season ! (
               if (.<10) then
                 "0"||.
               else
                 .
             ),
             "E",
-            media_program_episodenumber ! (
+            dataLayer/media_program_episodenumber ! (
               if (.<10) then
                 "0"||.
               else
@@ -462,14 +462,14 @@ kijk() {
           ()
       ),
       "date":replace(
-        TAQ/dataLayer/sko_dt,
+        TAQ/customLayer/c_sko_dt,
         "(\d{4})(\d{2})(\d{2})",
         "$3-$2-$1"
       ),
-      "duration":TAQ/dataLayer/media_duration * dayTimeDuration("PT1S") + time("00:00:00"),
+      "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
       "expdate":replace(
-        TAQ/dataLayer/media_dateexpires,
-        "(\d+)-(\d+)-(\d+)T([\d:]+).+",
+        TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
+        "(\d+)-(\d+)-(\d+)T(.+)",
         "$3-$2-$1 $4"
       ),
       "subtitle":(tracks)()[label=" Nederlands"]/file,
@@ -537,57 +537,6 @@ kijk() {
               url
             )||extract(
               $x,
-              "(.+m3u8)",
-              1
-            )
-          }
-        ),
-        x:request(
-          {
-            "url":concat(
-              "https://embed.kijk.nl/api/playlist/",
-              "'$1'",
-              "_dbzyr6.m3u8?base_url=https%3A//emp-prod-acc-we.ebsd.ericsson.net/sbsgroup"
-            ),
-            "method":"HEAD",
-          "error-handling":"xxx=accept"
-          }
-        )[
-          contains(
-            headers[1],
-            "200 OK"
-          )
-        ]/(
-          {
-            "format":"hls-0_hd",
-            "extension":"m3u8",
-            "resolution":"manifest",
-            "url":url
-          }[url],
-          tail(
-            tokenize(
-              unparsed-text(url),
-              "#EXT-X-STREAM-INF:"
-            )
-          ) ! {
-            "format":concat(
-              "hls-",
-              position(),
-              "_hd"
-            ),
-            "extension":"m3u8",
-            "resolution":extract(
-              .,
-              "RESOLUTION=([\dx]+)",
-              1
-            ),
-            "vbitrate":extract(
-              .,
-              "BANDWIDTH=(\d+)\d{3}",
-              1
-            )||"k",
-            "url":extract(
-              .,
               "(.+m3u8)",
               1
             )
