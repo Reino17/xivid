@@ -1686,6 +1686,63 @@ $ xidel -s "https://embed.kijk.nl/api/roll/w7ZW52xLgL5_dbzyr6?base_url=https%3A/
 
 Update: De api-url werkt inmiddels ook niet meer, MAAR de individuele video-urls hier boven vreemd genoeg nog wel.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+https://www.kijk.nl/sbs6/steenrijkstraatarm/videos/UitidpB9Yx5/steenrijk-straatarm
+
+$ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
+{
+  "playlist": [
+    {
+      "sources": [
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/TzEji1yiQs0E/file.m3u8?feed=prod-getMediaObject&metafile=false&token=5tqJrjfYAKMAGxQ-2NbMcYBWoEAeMFDU",
+          "type": "m3u8",
+          "drm": {
+            "fairplay": {
+              "releasePid": "TzEji1yiQs0E",
+              "certificateUrl": "https://vod-tpc-prod-1.talpatvcdn.nl/fairplay.cer",
+              "processSpcUrl": "https://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay?form=json&schema=1.0&token=5tqJrjfYAKMAGxQ-2NbMcYBWoEAeMFDU&account=http%3A%2F%2Faccess.auth.theplatform.com%2Fdata%2FAccount%2F2702725319&releasePid=TzEji1yiQs0E"
+            }
+          }
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/TyxGZdUvCzwg/file.mpd?feed=prod-getMediaObject&metafile=false&token=5tqJrjfYAKMAGxQ-2NbMcYBWoEAeMFDU",
+          "type": "dash",
+          "drm": {
+            "playready": {
+              "releasePid": "TyxGZdUvCzwg",
+              "url": "https://green.playready.entitlement.theplatform.eu/playready/rightsmanager.asmx?form=json&schema=1.0&auth=5tqJrjfYAKMAGxQ-2NbMcYBWoEAeMFDU&account=http%3A%2F%2Faccess.auth.theplatform.com%2Fdata%2FAccount%2F2702725319&releasePid=TyxGZdUvCzwg"
+            }
+          }
+        },
+        {
+          "file": "https://link.theplatform.eu/s/-9DGhC/TkNGUgBksp7W/file.mpd?feed=prod-getMediaObject&metafile=false&token=5tqJrjfYAKMAGxQ-2NbMcYBWoEAeMFDU",
+          "type": "dash",
+          "drm": {
+            "widevine": {
+              "releasePid": "TkNGUgBksp7W",
+              "url": "https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm?form=json&schema=1.0&token=5tqJrjfYAKMAGxQ-2NbMcYBWoEAeMFDU&account=http%3A%2F%2Faccess.auth.theplatform.com%2Fdata%2FAccount%2F2702725319&releasePid=TkNGUgBksp7W"
+            }
+          }
+        }
+      ],
+      [...]
+    }
+  ],
+  [...]
+}
+
+$ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][not(drm)][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+{
+  "name": "SBS6: Steenrijk, straatarm S03E03",
+  "date": "09-01-2019",
+  "duration": "00:41:35",
+  "expdate": "09-01-2024 21:28:03",
+  "subtitle": null,
+  "formats": null			# Als resultaat van [not(drm)].
+}
+
 ------------------------------------------------------------------------------------------------
 
 --xquery '
@@ -1733,7 +1790,7 @@ Update: De api-url werkt inmiddels ook niet meer, MAAR de individuele video-urls
     ),
     "subtitle":(tracks)()[label=" Nederlands"]/file,
     "formats":[
-      (sources)()[type="m3u8"][1]/x:request(
+      (sources)()[type="m3u8"][not(drm)][1]/x:request(
         {
           "url":file,
           "method":"HEAD"

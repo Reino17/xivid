@@ -474,7 +474,7 @@ kijk() {
       ),
       "subtitle":(tracks)()[label=" Nederlands"]/file,
       "formats":[
-        (sources)()[type="m3u8"][1]/x:request(
+        (sources)()[type="m3u8"][not(drm)][1]/x:request(
           {
             "url":file,
             "method":"HEAD"
