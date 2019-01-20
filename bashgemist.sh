@@ -848,6 +848,23 @@ if [[ $url =~ npostart.nl/live ]]; then
   npo "$(xidel "$url" -e '//npo-player/@media-id')"
 elif [[ $url =~ (npostart.nl|gemi.st) ]]; then
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
+elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
+  eval "$(xidel "$url" -e '
+    join(
+      extract(
+        (
+          //div[@id="embed-player"]/(
+            @data-episode,
+            .//@href
+          ),
+          //a[@rel="nofollow"]/@onclick,
+          //iframe[@class="sbsEmbed"]/@src
+        ),
+        "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
+        (1,2)
+      )
+    )
+  ')"
 elif [[ $url =~ rtl.nl ]]; then
   rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
 elif [[ $url =~ kijk.nl ]]; then
