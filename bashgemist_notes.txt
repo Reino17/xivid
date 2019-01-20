@@ -636,7 +636,7 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
     ),
     "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
       replace(
-        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T00:00:00"),
+        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
         "(\d+)-(\d+)-(\d+)T(.+)",
         "$3-$2-$1 $4"
       )
@@ -716,7 +716,7 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
   "name": "RTL4: RTL Nieuws - 19:30 uur",
   "date": "11-12-2018",
   "duration": "00:20:18",
-  "expdate": "12-12-2019 05:35:25",
+  "expdate": "12-12-2019 06:35:25",
   "formats": [
     {
       "format": "hls-0",

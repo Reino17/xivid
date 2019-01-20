@@ -350,7 +350,7 @@ rtl() {
       ),
       "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
         replace(
-          (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T00:00:00"),
+          (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
           "(\d+)-(\d+)-(\d+)T(.+)",
           "$3-$2-$1 $4"
         )
