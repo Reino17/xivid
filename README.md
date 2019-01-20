@@ -283,7 +283,8 @@ xidel -s - -e '
     start,
     subtitle,
     (formats)()[format="hls-12"]/url
-  )' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
+  )
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
 AVROTROS: Hunted - De laatste minuten...
 17-12-2018
 00:01:59
@@ -314,7 +315,8 @@ xidel -s - -e '
     seconds-from-time(start) mod 30,
     subtitle,
     (formats)()[format="hls-12"]/url
-  )' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
+  )
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
 AVROTROS- Hunted - De laatste minuten... (17122018)
 00:01:59
 00:55:00
@@ -346,8 +348,8 @@ eval "$(xidel -s - -e '
     ss2:=seconds-from-time(start) mod 30,
     sub:=subtitle,
     url:=(formats)()[format="hls-12"]/url
-  )' --output-format=bash <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
-)"
+  )
+' --output-format=bash <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224))"
 
 ffmpeg \
 -ss $ss1 -i $url \
@@ -405,7 +407,8 @@ xidel -s - -e '
         """"{$name}.mkv"""" \
       """
     )
-  )' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
+  )
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
 ```
 - Gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen met alle informatie rechtstreeks uit de JSON:
 ```sh
@@ -439,7 +442,8 @@ xidel -s - -e '
         }.mkv"""" \
       """
     )
-  )' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
+  )
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
 ```
 
 ## Windows
@@ -466,8 +470,8 @@ FOR /F "delims=" %A IN ('bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009
     ss2:^=seconds-from-time^(start^) mod 30^,
     sub:^=subtitle^,
     url:^=^(formats^)^(^)[format^='hls-12']/url
-  ^)^" --output-format^=cmd
-') DO %A
+  ^)
+^" --output-format^=cmd') DO %A
 
 ffmpeg.exe ^
 -ss %ss1% -i %url% ^
@@ -510,7 +514,8 @@ bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^
       -c:s srt -metadata:s:s language=dut ^
       \"{$name}.mkv\"' ^
     ) ^
-  )^"
+  ) ^
+"
 ```
 - Gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen met alle informatie rechtstreeks uit de JSON:
 ```sh
@@ -543,7 +548,8 @@ bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^
         ) ^
       }.mkv\^"' ^
     ) ^
-  )^"
+  ) ^
+"
 ```
 
 # Disclaimer

@@ -271,7 +271,8 @@ $ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
       $c
     else
       ()
-  }'
+  }
+'
 {
   "name": "NOS: NOS Journaal",
   "date": "12-12-2018",
@@ -709,7 +710,8 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
           )||$b
       }
     ]
-  }'
+  }
+'
 {
   "name": "RTL4: RTL Nieuws - 19:30 uur",
   "date": "11-12-2018",
@@ -1055,7 +1057,8 @@ Formaten:  -
       )
     ) else
       ()
-  )'
+  )
+'
 
 ================================================================================================================================
 
@@ -1859,4 +1862,5 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'json(//script/ext
         }
       )
     ]
-  }'
+  }
+'

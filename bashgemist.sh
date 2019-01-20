@@ -314,8 +314,8 @@ npo() {
         $c
       else
         ()
-    }' --output-format=bash
-  )"
+    }
+  ' --output-format=bash)"
 }
 
 rtl() {
@@ -424,8 +424,8 @@ rtl() {
             )||$b
         }
       ]
-    }' --output-format=bash
-  )"
+    }
+  ' --output-format=bash)"
 }
 
 kijk() {
@@ -543,8 +543,8 @@ kijk() {
           }
         )
       ]
-    }' --output-format=bash
-  )"
+    }
+  ' --output-format=bash)"
 }
 
 info() {
@@ -653,7 +653,8 @@ info() {
         )
       ) else
         ()
-    )' <<< $1
+    )
+  ' <<< $1
 }
 
 if ! command -v xidel >/dev/null; then
