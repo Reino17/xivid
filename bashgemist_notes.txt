@@ -1097,67 +1097,324 @@ VR83fgb6opk
 
 ------------------------------------------------------------------------------------------------
 
-https://www.kijk.nl/sbs6/hartvannederland/videos/VR83fgb6opk/hart-van-nederland-late-editie
+https://www.kijk.nl/sbs6/hartvannederland/videos/GgO61doGeqZ/hart-van-nederland-vroeg (15-01-2019)
 
-$ xidel -s "https://embed.kijk.nl/video/VR83fgb6opk" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
+$ xidel -s "https://embed.kijk.nl/video/GgO61doGeqZ" -e 'outer-html(//video)'
+<video data-video-id="5989729116001" data-account="585049245001" data-player="B168VjQ3W" data-embed="default" data-application-id="" class="video-js" controls="" width="100%" height="100%" id="player" preload="none"></video>
+
+Hier wordt blijkbaar nog van Brightcove gebruik gemaakt.
+
+$ xidel -s "https://embed.kijk.nl/video/GgO61doGeqZ" -e 'x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json'
+{
+  "description": "Hart van Nederland - Vroeg",
+  "poster_sources": [
+    {
+      "src": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/stills/sbs6_hartvannederlandvroeg_S2019E11_190115200121985121-still.jpg"
+    }
+  ],
+  "tags": ["hartvannederlandvroeg", "sbs6", "vod"],
+  "cue_points": [],
+  "custom_fields": {
+    "sbs_videotype": "vod",
+    "sbs_adpolicy": "long",
+    "sbs_episode": "S2019E11",
+    "sbs_program": "hartvannederland",
+    "nlz_cst_id": "GgO61doGeqZ",
+    "sko_t": "1900",
+    "sko_stid": "63",
+    "sko_prid": "611490483",
+    "sko_pr": "hart_van_nederland__vroeg",
+    "sko_ty": "tv.ep",
+    "sko_dt": "20190115",
+    "sbs_station": "sbs6"
+  },
+  "account_id": "585049245001",
+  "sources": [
+    {
+      "avg_bitrate": 2.085E6,
+      "width": 868,
+      "duration": 1.3086E6,
+      "size": 3.23033213E8,
+      "stream_name": "mp4:ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200036985121-bg-1885.mp4",
+      "codec": "H264",
+      "asset_id": "5989728026001",
+      "container": "MP4",
+      "height": 488,
+      "app_name": "rtmp://pssbsfs.fplive.net/pssbsfs"
+    },
+    {
+      "avg_bitrate": 866000,
+      "width": 512,
+      "duration": 1.3086E6,
+      "size": 1.21766761E8,
+      "stream_name": "mp4:ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200026985121-bg-650.mp4",
+      "codec": "H264",
+      "asset_id": "5989728027001",
+      "container": "MP4",
+      "height": 288,
+      "app_name": "rtmp://pssbsfs.fplive.net/pssbsfs"
+    },
+    {
+      "avg_bitrate": 1.116E6,
+      "width": 640,
+      "duration": 1.3086E6,
+      "size": 1.62308598E8,
+      "stream_name": "mp4:ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200028985121-bg-900.mp4",
+      "codec": "H264",
+      "asset_id": "5989728344001",
+      "container": "MP4",
+      "height": 360,
+      "app_name": "rtmp://pssbsfs.fplive.net/pssbsfs"
+    },
+    {
+      "avg_bitrate": null,
+      "width": null,
+      "src": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/sbs6_hartvannederlandvroeg_S2019E11_190115201516985121-hls-main.m3u8",
+      "size": 0,
+      "height": null,
+      "duration": -1,
+      "container": "M2TS",
+      "codec": "H264",
+      "asset_id": "5989730179001"
+    },
+    {
+      "avg_bitrate": 1.465E6,
+      "width": 768,
+      "duration": 1.3086E6,
+      "size": 2.11828455E8,
+      "stream_name": "mp4:ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200029985121-bg-1200.mp4",
+      "codec": "H264",
+      "asset_id": "5989730283001",
+      "container": "MP4",
+      "height": 432,
+      "app_name": "rtmp://pssbsfs.fplive.net/pssbsfs"
+    },
+    {
+      "avg_bitrate": 450000,
+      "width": 320,
+      "duration": 1.3086E6,
+      "size": 7.2607446E7,
+      "stream_name": "mp4:ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200022985121-bg-350.mp4",
+      "codec": "H264",
+      "asset_id": "5989730565001",
+      "container": "MP4",
+      "height": 180,
+      "app_name": "rtmp://pssbsfs.fplive.net/pssbsfs"
+    }
+  ],
+  "name": "Hart van Nederland - Vroeg",
+  "reference_id": "sbs6_hartvannederlandvroeg_S2019E11_190115201543",
+  "long_description": "'Waar praat Nederland vandaag over?' Toegankelijk nieuwsprogramma dat het gesprek van de dag op verrassende wijze in beeld brengt.",
+  "duration": 1.3086E6,
+  "economics": "AD_SUPPORTED",
+  "published_at": "2019-01-15T19:15:50.278Z",
+  "text_tracks": [],
+  "updated_at": "2019-01-15T19:15:54.765Z",
+  "thumbnail": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/stills/sbs6_hartvannederlandvroeg_S2019E11_190115200125985121-thumb.jpg",
+  "poster": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/stills/sbs6_hartvannederlandvroeg_S2019E11_190115200121985121-still.jpg",
+  "offline_enabled": false,
+  "link": null,
+  "id": "5989729116001",
+  "ad_keys": null,
+  "thumbnail_sources": [
+    {
+      "src": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/stills/sbs6_hartvannederlandvroeg_S2019E11_190115200125985121-thumb.jpg"
+    }
+  ],
+  "created_at": "2019-01-15T19:15:50.265Z"
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Geen expiration date hier boven. Hier wel:
+
+$ xidel -s "http://api.kijk.nl/v1/default/entitlement/GgO61doGeqZ" -e '$json/playerInfo'
+{
+  "sbsvpakey": "GgO61doGeqZ",
+  "hostingkey": "5989729116001",
+  "license": {
+    "licenseId": "YnJpZ2h0Y292ZS5GVk9ELjAuNTk4OTcyOTExNjAwMQ==",
+    "licensetype": "FVOD",
+    "promotions": [],
+    "ishd": false,
+    "startdate": {
+      "date": "2019-01-15 19:30:46.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Amsterdam"
+    },
+    "enddate": {
+      "date": "2020-01-15 19:30:46.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Amsterdam"
+    },
+    "price": 0,
+    "hascontent": true,
+    "preroll": true,
+    "hostingkey": "5989729116001",
+    "hostingservice": "brightcove",
+    "AvailableOutletDevices": [
+      [...]
+    ]
+  },
+  "embed_video_url": "//embed.kijk.nl/?video=GgO61doGeqZ",
+  "embed_api_url": "http://embed.kijk.nl/api/video/GgO61doGeqZ?id=kijkapp",
+  "hasDRM": false
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+$ xidel -s "https://embed.kijk.nl/video/GgO61doGeqZ" --xquery 'x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/GgO61doGeqZ")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]}'
+{
+  "name": "SBS6: Hart van Nederland - Vroeg S2019E11",
+  "date": "15-01-2019",
+  "duration": "00:21:49",
+  "expdate": "15-01-2020 19:30:46",
+  "formats": [
+    {
+      "format": "pg-1",
+      "extension": "mp4",
+      "resolution": "320x180",
+      "vbitrate": "450k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200022985121-bg-350.mp4"
+    },
+    {
+      "format": "pg-2",
+      "extension": "mp4",
+      "resolution": "512x288",
+      "vbitrate": "866k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200026985121-bg-650.mp4"
+    },
+    {
+      "format": "pg-3",
+      "extension": "mp4",
+      "resolution": "640x360",
+      "vbitrate": "1116k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200028985121-bg-900.mp4"
+    },
+    {
+      "format": "pg-4",
+      "extension": "mp4",
+      "resolution": "768x432",
+      "vbitrate": "1465k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200029985121-bg-1200.mp4"
+    },
+    {
+      "format": "pg-5",
+      "extension": "mp4",
+      "resolution": "868x488",
+      "vbitrate": "2085k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200036985121-bg-1885.mp4"
+    },
+    {
+      "format": "hls-0",
+      "extension": "m3u8",
+      "resolution": "manifest",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/sbs6_hartvannederlandvroeg_S2019E11_190115201516985121-hls-main.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "extension": "m3u8",
+      "resolution": "320x180",
+      "vbitrate": "611k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/r1/sbs6_hartvannederlandvroeg_S2019E11_190115200141985121-hls-350.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "extension": "m3u8",
+      "resolution": "512x288",
+      "vbitrate": "929k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/r2/sbs6_hartvannederlandvroeg_S2019E11_190115200150985121-hls-650.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "extension": "m3u8",
+      "resolution": "640x360",
+      "vbitrate": "1289k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/r3/sbs6_hartvannederlandvroeg_S2019E11_190115200159985121-hls-900.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "extension": "m3u8",
+      "resolution": "768x432",
+      "vbitrate": "1643k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/r4/sbs6_hartvannederlandvroeg_S2019E11_190115200210985121-hls-1200.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "extension": "m3u8",
+      "resolution": "868x488",
+      "vbitrate": "2179k",
+      "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/hls/r8/sbs6_hartvannederlandvroeg_S2019E11_190115200212985121-hls-1885.m3u8"
+    }
+  ]
+}
+
+Inmiddels, na een paar dagen, zijn ook deze video's over gezet naar "theplatform" api. Waarschijnlijk gebruikt Kijk Brightcove nog als backup.
+
+------------------------------------------------------------------------------------------------
+
+
+https://www.kijk.nl/sbs6/hartvannederland/videos/wyK2GhcnFje/hart-van-nederland-vroeg (16-01-2019)
+
+$ xidel -s "https://embed.kijk.nl/video/wyK2GhcnFje" --xquery 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
 {
   "playlist": [
     {
       "sources": [
         {
-          "file": "https://link.theplatform.eu/s/-9DGhC/HMCkPcawlk2N/file.m3u8?feed=prod-getMediaObject&metafile=false",
-          "type": "m3u8"
+          "file": "https://link.theplatform.eu/s/-9DGhC/fKaRT0ndbesA/file.mpd?feed=prod-getMediaObject&metafile=false",
+          "type": "dash"
         },
         {
-          "file": "https://link.theplatform.eu/s/-9DGhC/vL8zQQsuabAa/file.mpd?feed=prod-getMediaObject&metafile=false",
-          "type": "dash"
+          "file": "https://link.theplatform.eu/s/-9DGhC/nxnA_bHJGpLK/file.m3u8?feed=prod-getMediaObject&metafile=false",
+          "type": "m3u8"
         }
       ],
-      "image": "https://img.kijk.nl/media/cache/computer_nonretina_series_image/imgsrc06/images/redactioneel/1066581-LS---20181123141846--dbda47f1d5640cd53033c71c0575c46d.jpg?lu=35c71f76acbc843b6aa4333ef7936e11",
-      "mediaid": "VR83fgb6opk",
-      "title": "Hart van Nederland - Late Editie",
-      "description": "Hart van Nederland - Laat: 31 december 2018",
+      "image": "https://img.kijk.nl/media/cache/computer_nonretina_series_image/imgsrc06/images/redactioneel/1081186-LS---20190117100148--39432a5aae5a45a59f87f1de912c84dd.jpg?lu=73647e9a8561c9ec7625b167c3e43bec",
+      "mediaid": "wyK2GhcnFje",
+      "title": "Hart van Nederland - Vroeg ",
+      "description": "Aflevering 12, Seizoen 2019",
       "displaytitle": true,
       "tracks": [],
-      "fwassetid": "VR83fgb6opk",
+      "fwassetid": "wyK2GhcnFje",
       "TAQ": {
         "dataLayer": {
-          "media_datecreated": 1546291800,
-          "media_datemodified": 1546291800,
-          "media_datepublished": 1546291935,
-          "media_duration": "1331",
+          "media_datecreated": 1547661600,
+          "media_datemodified": 1547661600,
+          "media_datepublished": 1547663352,
+          "media_duration": "1272",
           "media_genre": "Nieuws",
-          "media_id": "VR83fgb6opk",
-          "media_name": "Hart van Nederland - Late Editie",
-          "media_program_episodenumber": "2018123101025653",
-          "media_program_name": "Hart van Nederland - Laat",
-          "media_program_season": "0",
+          "media_id": "wyK2GhcnFje",
+          "media_name": "Hart van Nederland - Vroeg ",
+          "media_program_episodenumber": "12",
+          "media_program_name": "Hart van Nederland - Vroeg",
+          "media_program_season": "2019",
           "media_videotype": "vod",
           "player_channel": "embedded_3p",
           "player_channelid": "embedded_3p",
-          "player_embedurl": "http://www.kijk.nl/video/VR83fgb6opk",
+          "player_embedurl": "http://www.kijk.nl/video/wyK2GhcnFje",
           "player_id": "embedded_3p",
           "player_name": "jwplayer",
           "player_source": "embedded_3p",
           "player_version": "8.2.4"
         },
         "customLayer": {
-          "c_media_dateexpires": 1577768100,
+          "c_media_dateexpires": 1579199352,
           "c_media_duration_type": "long",
           "c_media_genre_code": "nieuws/actualiteiten",
-          "c_media_ispartof": "Hart van Nederland - Laat",
+          "c_media_ispartof": "Hart van Nederland - Vroeg",
           "c_media_live": 0,
           "c_media_outlet": "embedded_3p",
           "c_media_partner": "embedded3p",
           "c_media_playbacktype": "vod",
           "c_media_station": "sbs6",
-          "c_sko_cl": 1331,
-          "c_sko_dt": "20181231",
+          "c_sko_cl": 1272,
+          "c_sko_dt": "20190116",
           "c_sko_gen": 11100,
-          "c_sko_pr": "hart_van_nederland_-_late_editie",
-          "c_sko_prid": "506400113",
+          "c_sko_pr": "hart_van_nederland_-_vroeg_editie",
+          "c_sko_prid": "611490547",
           "c_sko_stid": 63,
-          "c_sko_t": "2232",
+          "c_sko_t": "1900",
           "c_sko_ty": "tv.ep"
         }
       }
@@ -1186,7 +1443,7 @@ $ xidel -s "https://embed.kijk.nl/video/VR83fgb6opk" -e 'json(//script/extract(.
       "adManagerURL": "https://mssl.fwmrm.net/p/sanoma_sbs_live/AdManager.js",
       "custom": {
         "cd_type": "long",
-        "vdur": "1331",
+        "vdur": "1272",
         "embed_domain": "embed.kijk.nl"
       }
     },
@@ -1203,12 +1460,12 @@ $ xidel -s "https://embed.kijk.nl/video/VR83fgb6opk" -e 'json(//script/extract(.
       {
         "label": "Facebook",
         "icon": "/talpa-jw-skin/icons/facebook.svg",
-        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=facebook&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FVR83fgb6opk&title=Hart van Nederland - Late Editie&ct=0&tt=0&"
+        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=facebook&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FwyK2GhcnFje&title=Hart van Nederland - Vroeg &ct=0&tt=0&"
       },
       {
         "label": "Twitter",
         "icon": "/talpa-jw-skin/icons/twitter.svg",
-        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=twitter&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FVR83fgb6opk&title=Hart van Nederland - Late Editie&ct=0&tt=0&"
+        "src": "http://www.addthis.com/bookmark.php?v=300&winname=addthis&pub=sbsinteractievemedia&source=tbx-300&lng=en-US&s=twitter&url=http%3A%2F%2Fwww.kijk.nl%2Fvideo%2FwyK2GhcnFje&title=Hart van Nederland - Vroeg &ct=0&tt=0&"
       }
     ]
   },
@@ -1219,18 +1476,18 @@ $ xidel -s "https://embed.kijk.nl/video/VR83fgb6opk" -e 'json(//script/extract(.
   "allowPlayerApi": false
 }
 
-$ cat bashgemist_notes.txt | sed -n '1100,1217p' | xidel -s - --xquery '$json/(playlist)()/{"name":TAQ/customLayer/concat(upper-case(c_media_station),": ",c_media_ispartof),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/wyK2GhcnFje" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/wyK2GhcnFje")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/customLayer/concat(upper-case(c_media_station),": ",c_media_ispartof),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"formats":(sources)()[type="m3u8"]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
-  "name": "SBS6: Hart van Nederland - Laat",
-  "date": "31-12-2018",
-  "duration": "00:22:11",
-  "expdate": "31-12-2019 05:55:00",
+  "name": "SBS6: Hart van Nederland - Vroeg",
+  "date": "16-01-2019",
+  "duration": "00:21:12",
+  "expdate": "16-01-2020 19:29:12",
   "formats": [
     {
       "format": "hls-0",
       "extension": "m3u8",
       "resolution": "manifest",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/1546295155126.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/1547666742988.m3u8"
     },
     {
       "format": "hls-1",
@@ -1238,47 +1495,47 @@ $ cat bashgemist_notes.txt | sed -n '1100,1217p' | xidel -s - --xquery '$json/(p
       "resolution": "audiospoor",
       "vbitrate": "",
       "abitrate": "a:94k",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index-audio_eng=94000.m3u8"
     },
     {
       "format": "hls-2",
       "extension": "m3u8",
       "resolution": "320x180",
-      "vbitrate": "v:398k",
+      "vbitrate": "v:395k",
       "abitrate": "a:94k",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=398000.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index-audio_eng=94000-video=395000.m3u8"
     },
     {
       "format": "hls-3",
       "extension": "m3u8",
       "resolution": "512x288",
-      "vbitrate": "v:754k",
+      "vbitrate": "v:743k",
       "abitrate": "a:94k",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=754000.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index-audio_eng=94000-video=743000.m3u8"
     },
     {
       "format": "hls-4",
       "extension": "m3u8",
       "resolution": "640x360",
-      "vbitrate": "v:1044k",
+      "vbitrate": "v:996k",
       "abitrate": "a:94k",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=1044000.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index-audio_eng=94000-video=996000.m3u8"
     },
     {
       "format": "hls-5",
       "extension": "m3u8",
       "resolution": "768x432",
-      "vbitrate": "v:1387k",
+      "vbitrate": "v:1313k",
       "abitrate": "a:94k",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=1387000.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index-audio_eng=94000-video=1313000.m3u8"
     },
     {
       "format": "hls-6",
       "extension": "m3u8",
       "resolution": "868x488",
-      "vbitrate": "v:2170k",
+      "vbitrate": "v:2032k",
       "abitrate": "a:94k",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/VR83fgb6opk/1e000a29-b1bf-4704-b9db-251a49c30de0/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index.ism/Hart_van_Nederland_Laat_Season_0_Episode_2018123101025653-index-audio_eng=94000-video=2170000.m3u8"
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/wyK2GhcnFje/6fc90666-61fd-4e10-a474-5a046800f49a/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index.ism/Hart_van_Nederland_Vroeg_Season_2019_Episode_12-index-audio_eng=94000-video=2032000.m3u8"
     }
   ]
 }
@@ -1287,7 +1544,7 @@ $ cat bashgemist_notes.txt | sed -n '1100,1217p' | xidel -s - --xquery '$json/(p
 
 https://www.kijk.nl/sbs6/wegmisbruikers/videos/yWLXx6VtFuG/wegmisbruikers
 
-$ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
+$ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" --xquery 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
 {
   "playlist": [
     {
@@ -1425,7 +1682,7 @@ $ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" -e 'json(//script/extract(.
   "allowPlayerApi": false
 }
 
-$ cat bashgemist_notes.txt | sed -n '1288,1423p' | xidel -s - --xquery '$json/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/yWLXx6VtFuG")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "SBS6: Wegmisbruikers S24E04",
   "date": "14-12-2018",
@@ -1506,7 +1763,7 @@ $ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/ext
 {
   "playlist": [
     {
-      "sources": [			# De 3 m3u8 playlists zijn allemaal hetzelfde. Daarom kiezen we gewoon de 1e --> (sources)()[type="m3u8"][1]/file.
+      "sources": [
         {
           "file": "https://link.theplatform.eu/s/-9DGhC/jMeLJuBkEPrN/file.m3u8?feed=prod-getMediaObject&metafile=false",
           "type": "m3u8"
@@ -1538,12 +1795,14 @@ $ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/ext
   [...]
 }
 
-$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+De 3 m3u8 playlists zijn allemaal hetzelfde. Daarom kiezen we gewoon de 1e --> (sources)()[type="m3u8"][1]/file.
+
+$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/w7ZW52xLgL5")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "NET5: Peking Express S01E01",
   "date": "03-04-2017",
   "duration": "01:03:59",
-  "expdate": "31-03-2020 05:55:00",
+  "expdate": "31-03-2020 04:55:00",
   "subtitle": null,
   "formats": [
     {
@@ -1736,131 +1995,240 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" -e 'json(//script/extract(.
   [...]
 }
 
-$ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][not(drm)][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url},for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+DRM én SAMPLE-AES encryptie. FFmpeg ondersteunt dit nog niet, maar omdat het vanwege DRM sowieso niet gaat werken filteren we deze er uit met [not(drm)].
+
+$ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/UitidpB9Yx5")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[not(drm) and type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "SBS6: Steenrijk, straatarm S03E03",
   "date": "09-01-2019",
   "duration": "00:41:35",
   "expdate": "09-01-2024 21:28:03",
   "subtitle": null,
-  "formats": null			# Als resultaat van [not(drm)].
+  "formats": null
 }
 
 ------------------------------------------------------------------------------------------------
 
 --xquery '
-  json(
-    //script/extract(
-      .,
-      "playerConfig = (.+);",
-      1
-    )[.]
-  )/(playlist)()/{
-    "name":TAQ/concat(
-      upper-case(customLayer/c_media_station),
-      ": ",
-      customLayer/c_media_ispartof,
-      if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then
-        concat(
-          " S",
-          dataLayer/media_program_season ! (
-            if (.<10) then
-              "0"||.
-            else
-              .
+  if (//video) then
+    x:request(
+      {
+        "headers":"Accept: application/json;pk="||extract(
+          unparsed-text(
+            //script[
+              contains(
+                @src,
+                //@data-account
+              )
+            ]/@src
           ),
-          "E",
-          dataLayer/media_program_episodenumber ! (
-            if (.<10) then
-              "0"||.
-            else
-              .
-          )
+          "policyKey:""(.+?)""",
+          1
+        ),
+        "url":concat(
+          "https://edge.api.brightcove.com/playback/v1/accounts/",
+          //@data-account,
+          "/videos/",
+          //@data-video-id
         )
-      else
-        ()
-    ),
-    "date":replace(
-      TAQ/customLayer/c_sko_dt,
-      "(\d{4})(\d{2})(\d{2})",
-      "$3-$2-$1"
-    ),
-    "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
-    "expdate":replace(
-      TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
-      "(\d+)-(\d+)-(\d+)T(.+)",
-      "$3-$2-$1 $4"
-    ),
-    "subtitle":(tracks)()[label=" Nederlands"]/file,
-    "formats":[
-      (sources)()[type="m3u8"][not(drm)][1]/x:request(
-        {
-          "url":file,
-          "method":"HEAD"
-        }
-      )/(
-        {
+      }
+    )/json/{
+      "name":concat(
+        upper-case(custom_fields/sbs_station),
+        ": ",
+        name,
+        if (custom_fields/sbs_episode) then
+          " "||custom_fields/sbs_episode
+        else
+          ()
+      ),
+      "date":replace(
+        custom_fields/sko_dt,
+        "(\d{4})(\d{2})(\d{2})",
+        "$3-$2-$1"
+      ),
+      "duration":round(
+        decimal(duration) div 1000
+      ) * dayTimeDuration("PT1S") + time("00:00:00"),
+      "expdate":replace(
+        json("http://api.kijk.nl/v1/default/entitlement/UitidpB9Yx5")//enddate/date,
+        "(\d+)-(\d+)-(\d+) ([\d:]+).*",
+        "$3-$2-$1 $4"
+      ),
+      "formats":let $a:=(sources)()[size=0]/src return [
+        for $x at $i in (sources)()[stream_name]
+        order by $x/size count $i
+        return
+        $x/{
+          "format":"pg-"||$i,
+          "extension":"mp4",
+          "resolution":concat(
+            width,
+            "x",
+            height
+          ),
+          "vbitrate":round(
+            decimal(avg_bitrate) div 1000
+          )||"k",
+          "url":replace(
+            stream_name,
+            "mp4:",
+            extract(
+              $a,
+              "(.+?nl/)",
+              1
+            )
+          )
+        },{
           "format":"hls-0",
           "extension":"m3u8",
           "resolution":"manifest",
-          "url":url
-        },
-        for $x at $i in tail(
+          "url":$a
+        }[url],
+        tail(
           tokenize(
-            extract(
-              unparsed-text(url),
-              "(#EXT-X-STREAM-INF.+m3u8$)",
-              1,"ms"
-            ),
+            unparsed-text($a),
             "#EXT-X-STREAM-INF:"
           )
-        ) order by extract(
-          $x,
-          "BANDWIDTH=(\d+)",
-          1
-        ) count $i
-        return {
-          "format":"hls-"||$i,
+        ) ! {
+          "format":"hls-"||position(),
           "extension":"m3u8",
           "resolution":extract(
-            $x,
+            .,
             "RESOLUTION=([\dx]+)",
             1
-          ) ! (
-            if (.) then
-              .
-            else
-              "audiospoor"
           ),
-          "vbitrate":extract(
-            $x,
-            "video=(\d+)\d{3}",
-            1
-          ) ! (
-            if (.) then
-              concat(
-                "v:",
-                .,
-                "k"
-              )
-            else
-              ""
-          ),
-          "abitrate":replace(
-            $x,
-            ".+audio.+?(\d+)\d{3}.+",
-            "a:$1k","s"
-          ),
+          "vbitrate":round(
+            extract(
+              .,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"k",
           "url":resolve-uri(
             ".",
-            url
+            $a
           )||extract(
-            $x,
+            .,
             "(.+m3u8)",
             1
           )
         }
-      )
-    ]
-  }
+      ]
+    }
+  else
+    json(
+      //script/extract(
+        .,
+        "playerConfig = (.+);",
+        1
+      )[.]
+    )/(playlist)()/{
+      "name":TAQ/concat(
+        upper-case(customLayer/c_media_station),
+        ": ",
+        customLayer/c_media_ispartof,
+        if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then
+          concat(
+            " S",
+            dataLayer/media_program_season ! (
+              if (.<10) then
+                "0"||.
+              else
+                .
+            ),
+            "E",
+            dataLayer/media_program_episodenumber ! (
+              if (.<10) then
+                "0"||.
+              else
+                .
+            )
+          )
+        else
+          ()
+      ),
+      "date":replace(
+        TAQ/customLayer/c_sko_dt,
+        "(\d{4})(\d{2})(\d{2})",
+        "$3-$2-$1"
+      ),
+      "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
+      "expdate":replace(
+        TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
+        "(\d+)-(\d+)-(\d+)T(.+)",
+        "$3-$2-$1 $4"
+      ),
+      "subtitle":(tracks)()[label=" Nederlands"]/file,
+      "formats":[
+        (sources)()[not(drm) and type="m3u8"][1]/x:request(
+          {
+            "url":file,
+            "method":"HEAD"
+          }
+        )/(
+          {
+            "format":"hls-0",
+            "extension":"m3u8",
+            "resolution":"manifest",
+            "url":url
+          }[url],
+          for $x at $i in tail(
+            tokenize(
+              extract(
+                unparsed-text(url),
+                "(#EXT-X-STREAM-INF.+m3u8$)",
+                1,"ms"
+              ),
+              "#EXT-X-STREAM-INF:"
+            )
+          ) order by extract(
+            $x,
+            "BANDWIDTH=(\d+)",
+            1
+          ) count $i
+          return {
+            "format":"hls-"||$i,
+            "extension":"m3u8",
+            "resolution":extract(
+              $x,
+              "RESOLUTION=([\dx]+)",
+              1
+            ) ! (
+              if (.) then
+                .
+              else
+                "audiospoor"
+            ),
+            "vbitrate":extract(
+              $x,
+              "video=(\d+)\d{3}",
+              1
+            ) ! (
+              if (.) then
+                concat(
+                  "v:",
+                  .,
+                  "k"
+                )
+              else
+                ""
+            ),
+            "abitrate":replace(
+              $x,
+              ".+audio.+?(\d+)\d{3}.+",
+              "a:$1k","s"
+            ),
+            "url":resolve-uri(
+              ".",
+              url
+            )||extract(
+              $x,
+              "(.+m3u8)",
+              1
+            )
+          }
+        )
+      ]
+    }
 '

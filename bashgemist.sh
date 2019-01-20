@@ -430,120 +430,227 @@ rtl() {
 
 kijk() {
   eval "$(xidel "https://embed.kijk.nl/video/$1" --xquery '
-    json:=json(
-      //script/extract(
-        .,
-        "playerConfig = (.+);",
-        1
-      )[.]
-    )/(playlist)()/{
-      "name":TAQ/concat(
-        upper-case(customLayer/c_media_station),
-        ": ",
-        customLayer/c_media_ispartof,
-        if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then
-          concat(
-            " S",
-            dataLayer/media_program_season ! (
-              if (.<10) then
-                "0"||.
-              else
-                .
+    json:=if (//video) then
+      x:request(
+        {
+          "headers":"Accept: application/json;pk="||extract(
+            unparsed-text(
+              //script[
+                contains(
+                  @src,
+                  //@data-account
+                )
+              ]/@src
             ),
-            "E",
-            dataLayer/media_program_episodenumber ! (
-              if (.<10) then
-                "0"||.
-              else
-                .
-            )
+            "policyKey:""(.+?)""",
+            1
+          ),
+          "url":concat(
+            "https://edge.api.brightcove.com/playback/v1/accounts/",
+            //@data-account,
+            "/videos/",
+            //@data-video-id
           )
-        else
-          ()
-      ),
-      "date":replace(
-        TAQ/customLayer/c_sko_dt,
-        "(\d{4})(\d{2})(\d{2})",
-        "$3-$2-$1"
-      ),
-      "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
-      "expdate":replace(
-        TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
-        "(\d+)-(\d+)-(\d+)T(.+)",
-        "$3-$2-$1 $4"
-      ),
-      "subtitle":(tracks)()[label=" Nederlands"]/file,
-      "formats":[
-        (sources)()[type="m3u8"][not(drm)][1]/x:request(
-          {
-            "url":file,
-            "method":"HEAD"
-          }
-        )/(
-          {
+        }
+      )/json/{
+        "name":concat(
+          upper-case(custom_fields/sbs_station),
+          ": ",
+          name,
+          if (custom_fields/sbs_episode) then
+            " "||custom_fields/sbs_episode
+          else
+            ()
+        ),
+        "date":replace(
+          custom_fields/sko_dt,
+          "(\d{4})(\d{2})(\d{2})",
+          "$3-$2-$1"
+        ),
+        "duration":round(
+          decimal(duration) div 1000
+        ) * dayTimeDuration("PT1S") + time("00:00:00"),
+        "expdate":replace(
+          json("http://api.kijk.nl/v1/default/entitlement/'$1'")//enddate/date,
+          "(\d+)-(\d+)-(\d+) ([\d:]+).*",
+          "$3-$2-$1 $4"
+        ),
+        "formats":let $a:=(sources)()[size=0]/src return [
+          for $x at $i in (sources)()[stream_name]
+          order by $x/size count $i
+          return
+          $x/{
+            "format":"pg-"||$i,
+            "extension":"mp4",
+            "resolution":concat(
+              width,
+              "x",
+              height
+            ),
+            "vbitrate":round(
+              decimal(avg_bitrate) div 1000
+            )||"k",
+            "url":replace(
+              stream_name,
+              "mp4:",
+              extract(
+                $a,
+                "(.+?nl/)",
+                1
+              )
+            )
+          },{
             "format":"hls-0",
             "extension":"m3u8",
             "resolution":"manifest",
-            "url":url
-          },
-          for $x at $i in tail(
+            "url":$a
+          }[url],
+          tail(
             tokenize(
-              extract(
-                unparsed-text(url),
-                "(#EXT-X-STREAM-INF.+m3u8$)",
-                1,"ms"
-              ),
+              unparsed-text($a),
               "#EXT-X-STREAM-INF:"
             )
-          ) order by extract(
-            $x,
-            "BANDWIDTH=(\d+)",
-            1
-          ) count $i
-          return {
-            "format":"hls-"||$i,
+          ) ! {
+            "format":"hls-"||position(),
             "extension":"m3u8",
             "resolution":extract(
-              $x,
+              .,
               "RESOLUTION=([\dx]+)",
               1
-            ) ! (
-              if (.) then
-                .
-              else
-                "audiospoor"
             ),
-            "vbitrate":extract(
-              $x,
-              "video=(\d+)\d{3}",
-              1
-            ) ! (
-              if (.) then
-                concat(
-                  "v:",
-                  .,
-                  "k"
-                )
-              else
-                ""
-            ),
-            "abitrate":replace(
-              $x,
-              ".+audio.+?(\d+)\d{3}.+",
-              "a:$1k","s"
-            ),
+            "vbitrate":round(
+              extract(
+                .,
+                "BANDWIDTH=(\d+)",
+                1
+              ) div 1000
+            )||"k",
             "url":resolve-uri(
               ".",
-              url
+              $a
             )||extract(
-              $x,
+              .,
               "(.+m3u8)",
               1
             )
           }
-        )
-      ]
-    }
+        ]
+      }
+    else
+      json(
+        //script/extract(
+          .,
+          "playerConfig = (.+);",
+          1
+        )[.]
+      )/(playlist)()/{
+        "name":TAQ/concat(
+          upper-case(customLayer/c_media_station),
+          ": ",
+          customLayer/c_media_ispartof,
+          if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then
+            concat(
+              " S",
+              dataLayer/media_program_season ! (
+                if (.<10) then
+                  "0"||.
+                else
+                  .
+              ),
+              "E",
+              dataLayer/media_program_episodenumber ! (
+                if (.<10) then
+                  "0"||.
+                else
+                  .
+              )
+            )
+          else
+            ()
+        ),
+        "date":replace(
+          TAQ/customLayer/c_sko_dt,
+          "(\d{4})(\d{2})(\d{2})",
+          "$3-$2-$1"
+        ),
+        "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
+        "expdate":replace(
+          TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
+          "(\d+)-(\d+)-(\d+)T(.+)",
+          "$3-$2-$1 $4"
+        ),
+        "subtitle":(tracks)()[label=" Nederlands"]/file,
+        "formats":[
+          (sources)()[not(drm) and type="m3u8"][1]/x:request(
+            {
+              "url":file,
+              "method":"HEAD"
+            }
+          )/(
+            {
+              "format":"hls-0",
+              "extension":"m3u8",
+              "resolution":"manifest",
+              "url":url
+            }[url],
+            for $x at $i in tail(
+              tokenize(
+                extract(
+                  unparsed-text(url),
+                  "(#EXT-X-STREAM-INF.+m3u8$)",
+                  1,"ms"
+                ),
+                "#EXT-X-STREAM-INF:"
+              )
+            ) order by extract(
+              $x,
+              "BANDWIDTH=(\d+)",
+              1
+            ) count $i
+            return {
+              "format":"hls-"||$i,
+              "extension":"m3u8",
+              "resolution":extract(
+                $x,
+                "RESOLUTION=([\dx]+)",
+                1
+              ) ! (
+                if (.) then
+                  .
+                else
+                  "audiospoor"
+              ),
+              "vbitrate":extract(
+                $x,
+                "video=(\d+)\d{3}",
+                1
+              ) ! (
+                if (.) then
+                  concat(
+                    "v:",
+                    .,
+                    "k"
+                  )
+                else
+                  ""
+              ),
+              "abitrate":replace(
+                $x,
+                ".+audio.+?(\d+)\d{3}.+",
+                "a:$1k","s"
+              ),
+              "url":resolve-uri(
+                ".",
+                url
+              )||extract(
+                $x,
+                "(.+m3u8)",
+                1
+              )
+            }
+          )
+        ]
+      }
   ' --output-format=bash)"
 }
 
