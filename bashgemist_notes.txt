@@ -32,20 +32,19 @@ $ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
                 )
               ) then
                 titel
+              else if (
+                contains(
+                  aflevering_titel,
+                  titel
+                )
+              ) then
+                aflevering_titel
               else
-                if (
-                  contains(
-                    aflevering_titel,
-                    titel
-                  )
-                ) then
+                concat(
+                  titel,
+                  " - ",
                   aflevering_titel
-                else
-                  concat(
-                    titel,
-                    " - ",
-                    aflevering_titel
-                  )
+                )
             else
               titel
           else
@@ -67,29 +66,28 @@ $ xidel -s "http://e.omroep.nl/metadata/POW_03689795" --xquery '
           "(\d+)-(\d+)-(\d+)",
           "$3-$2-$1"
         )
+      else if (
+        matches(
+          "https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795",
+          "\d{2}-\d{2}-\d{4}"
+        )
+      ) then
+        extract(
+          "https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795",
+          ".+/([\d-]+)",
+          1
+        )
       else
-        if (
-          matches(
-            "https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795",
-            "\d{2}-\d{2}-\d{4}"
-          )
-        ) then
-          extract(
-            "https://www.npostart.nl/nos-journaal/12-12-2018/POW_03689795",
-            ".+/([\d-]+)",
-            1
-          )
-        else
-          extract(
-            x:request(
-              {
-                "url":"https://www.npostart.nl/POW_03689795",
-                "method":"HEAD"
-              }
-            )/url,
-            ".+/([\d-]+)",
-            1
-          )
+        extract(
+          x:request(
+            {
+              "url":"https://www.npostart.nl/POW_03689795",
+              "method":"HEAD"
+            }
+          )/url,
+          ".+/([\d-]+)",
+          1
+        )
     ),
     "duration":if (tijdsduur) then
       tijdsduur
@@ -896,16 +894,16 @@ Formaten: formaat  extensie  resolutie   bitrate
 
 ------------------------------------------------------------------------------------------------
 
-$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '403,530p' | xidel -s - -e 'if (start) then (time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),seconds-from-time(start) mod 30,duration) else ()'
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '403,530p' | xidel -s - -e 'if (start) then (time(start) - (seconds-from-time(start) mod 30 * duration("PT1S")),seconds-from-time(start) mod 30,duration) else ()'
 00:55:00
 6
 00:01:59
 
-$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '403,530p' | xidel -s - -e 'if (start) then concat("Download: ffmpeg -ss ",time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))," -i [url] -ss ",seconds-from-time(start) mod 30," -t ",duration," [...]") else ()'
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '403,530p' | xidel -s - -e 'if (start) then concat("Download: ffmpeg -ss ",time(start) - (seconds-from-time(start) mod 30 * duration("PT1S"))," -i [url] -ss ",seconds-from-time(start) mod 30," -t ",duration," [...]") else ()'
 Download: ffmpeg -ss 00:55:00 -i [url] -ss 6 -t 00:01:59 [...]
 ------------------------------------------------------------------------------------------------
 
-$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '403,530p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()),if (start) then ("",concat(substring("Download:"||$d,1,$c+1),"ffmpeg -ss ",time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))," -i [url] -ss ",seconds-from-time(start) mod 30," -t ",duration," [...]")) else ())'
+$ cat /cygdrive/d/Storage/Media/Binaries/bashgemist_notes.txt | sed -n '403,530p' | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()),if (start) then ("",concat(substring("Download:"||$d,1,$c+1),"ffmpeg -ss ",time(start) - (seconds-from-time(start) mod 30 * duration("PT1S"))," -i [url] -ss ",seconds-from-time(start) mod 30," -t ",duration," [...]")) else ())'
 Naam:          AVROTROS: Hunted - De laatste minuten...
 Datum:         17-12-2018
 Tijdsduur:     00:01:59
@@ -933,7 +931,7 @@ Formaten:      formaat  extensie  resolutie  bitrate
 
 Download:      ffmpeg -ss 00:55:00 -i [url] -ss 6 -t 00:01:59 [...]
 
-$ cat <<EOF | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),if ($e(2)) then for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()) else substring("Formaten:"||$d,1,$c+1)||"-",if (start) then ("",concat(substring("Download:"||$d,1,$c+1),"ffmpeg -ss ",time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))," -i [url] -ss ",seconds-from-time(start) mod 30," -t ",duration," [...]")) else ())'
+$ cat <<EOF | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","subtitle":"Ondertiteling:"},$b:=$json()[position()<count($json())] ! .[$json(.)[.]],$c:=max($b ! $a(.) ! string-length(.)) ! (if (.>9) then . else 9),$d:=string-join((1 to $c+1) ! " "),$e:=[{"format":"formaat","extension":"extensie","resolution":"resolutie","vbitrate":"bitrate"},$json/(formats)()],$f:=("format","extension","resolution","vbitrate","abitrate"),$g:=$f ! max($e()(.) ! string-length(.)),$h:=string-join((1 to sum($g)) ! " ") return ($b ! concat(substring($a(.)||$d,1,$c+1),$json(.)),if ($e(2)) then for $x at $i in $e() return concat(if ($i=1) then substring("Formaten:"||$d,1,$c+1) else $d,string-join(for $y at $i in $f return substring($x($y)||$h,1,$g[$i]+2)),if ($i=count($e())) then "(best)" else ()) else substring("Formaten:"||$d,1,$c+1)||"-",if (start) then ("",concat(substring("Download:"||$d,1,$c+1),"ffmpeg -ss ",time(start) - (seconds-from-time(start) mod 30 * duration("PT1S"))," -i [url] -ss ",seconds-from-time(start) mod 30," -t ",duration," [...]")) else ())'
 {
   "name": "VPRO: Zigeunermuziek doet pijn - Bob Entrop, VPRO, 2008 (58 min.)",
   "date": "21-07-2010",
@@ -1047,7 +1045,7 @@ Formaten:  -
         ),
         "ffmpeg -ss ",
         time(start) - (
-          seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")
+          seconds-from-time(start) mod 30 * duration("PT1S")
         ),
         " -i [url] -ss ",
         seconds-from-time(start) mod 30,
@@ -1263,7 +1261,7 @@ $ xidel -s "http://api.kijk.nl/v1/default/entitlement/GgO61doGeqZ" -e '$json/pla
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-$ xidel -s "https://embed.kijk.nl/video/GgO61doGeqZ" --xquery 'x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/GgO61doGeqZ")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/GgO61doGeqZ" --xquery 'x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/GgO61doGeqZ")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(avg_bitrate div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]}'
 {
   "name": "SBS6: Hart van Nederland - Vroeg S2019E11",
   "date": "15-01-2019",
@@ -1476,7 +1474,7 @@ $ xidel -s "https://embed.kijk.nl/video/wyK2GhcnFje" --xquery 'json(//script/ext
   "allowPlayerApi": false
 }
 
-$ xidel -s "https://embed.kijk.nl/video/wyK2GhcnFje" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/wyK2GhcnFje")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/customLayer/concat(upper-case(c_media_station),": ",c_media_ispartof),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"formats":(sources)()[type="m3u8"]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/wyK2GhcnFje" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/wyK2GhcnFje")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(avg_bitrate div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/customLayer/concat(upper-case(c_media_station),": ",c_media_ispartof),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"formats":(sources)()[type="m3u8"]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "SBS6: Hart van Nederland - Vroeg",
   "date": "16-01-2019",
@@ -1682,7 +1680,7 @@ $ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" --xquery 'json(//script/ext
   "allowPlayerApi": false
 }
 
-$ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/yWLXx6VtFuG")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/yWLXx6VtFuG")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(avg_bitrate div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "SBS6: Wegmisbruikers S24E04",
   "date": "14-12-2018",
@@ -1797,7 +1795,7 @@ $ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'json(//script/ext
 
 De 3 m3u8 playlists zijn allemaal hetzelfde. Daarom kiezen we gewoon de 1e --> (sources)()[type="m3u8"][1]/file.
 
-$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/w7ZW52xLgL5")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/w7ZW52xLgL5")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(avg_bitrate div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "NET5: Peking Express S01E01",
   "date": "03-04-2017",
@@ -1997,7 +1995,7 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" -e 'json(//script/extract(.
 
 DRM én SAMPLE-AES encryptie. FFmpeg ondersteunt dit nog niet, maar omdat het vanwege DRM sowieso niet gaat werken filteren we deze er uit met [not(drm)].
 
-$ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(decimal(duration) div 1000) * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/UitidpB9Yx5")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(decimal(avg_bitrate) div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[not(drm) and type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
+$ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:""(.+?)""",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name,if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/UitidpB9Yx5")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":let $a:=(sources)()[size=0]/src return [for $x at $i in (sources)()[stream_name] order by $x/size count $i return $x/{"format":"pg-"||$i,"extension":"mp4","resolution":concat(width,"x",height),"vbitrate":round(avg_bitrate div 1000)||"k","url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))},{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":$a}[url],tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"extension":"m3u8","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"vbitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"k","url":resolve-uri(".",$a)||extract(.,"(.+m3u8)",1)}]} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then concat(" S",dataLayer/media_program_season ! (if (.<10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (.<10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":replace(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"(\d+)-(\d+)-(\d+)T(.+)","$3-$2-$1 $4"),"subtitle":(tracks)()[label=" Nederlands"]/file,"formats":(sources)()[not(drm) and type="m3u8"][1]/x:request({"url":file,"method":"HEAD"})/[{"format":"hls-0","extension":"m3u8","resolution":"manifest","url":url}[url],for $x at $i in tail(tokenize(extract(unparsed-text(url),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"extension":"m3u8","resolution":extract($x,"RESOLUTION=([\dx]+)",1) ! (if (.) then . else "audiospoor"),"vbitrate":extract($x,"video=(\d+)\d{3}",1) ! (if (.) then concat("v:",.,"k") else ""),"abitrate":replace($x,".+audio.+?(\d+)\d{3}.+","a:$1k","s"),"url":resolve-uri(".",url)||extract($x,"(.+m3u8)",1)}]}'
 {
   "name": "SBS6: Steenrijk, straatarm S03E03",
   "date": "09-01-2019",
@@ -2048,8 +2046,8 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then
         "$3-$2-$1"
       ),
       "duration":round(
-        decimal(duration) div 1000
-      ) * dayTimeDuration("PT1S") + time("00:00:00"),
+        duration div 1000
+      ) * duration("PT1S") + time("00:00:00"),
       "expdate":replace(
         json("http://api.kijk.nl/v1/default/entitlement/UitidpB9Yx5")//enddate/date,
         "(\d+)-(\d+)-(\d+) ([\d:]+).*",
@@ -2057,7 +2055,8 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then
       ),
       "formats":let $a:=(sources)()[size=0]/src return [
         for $x at $i in (sources)()[stream_name]
-        order by $x/size count $i
+        order by $x/size
+        count $i
         return
         $x/{
           "format":"pg-"||$i,
@@ -2068,7 +2067,7 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then
             height
           ),
           "vbitrate":round(
-            decimal(avg_bitrate) div 1000
+            avg_bitrate div 1000
           )||"k",
           "url":replace(
             stream_name,
@@ -2153,9 +2152,9 @@ $ xidel -s "https://embed.kijk.nl/video/UitidpB9Yx5" --xquery 'if (//video) then
         "(\d{4})(\d{2})(\d{2})",
         "$3-$2-$1"
       ),
-      "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
+      "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
       "expdate":replace(
-        TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
+        TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
         "(\d+)-(\d+)-(\d+)T(.+)",
         "$3-$2-$1 $4"
       ),

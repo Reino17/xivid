@@ -75,20 +75,19 @@ npo() {
                   )
                 ) then
                   titel
+                else if (
+                  contains(
+                    aflevering_titel,
+                    titel
+                  )
+                ) then
+                  aflevering_titel
                 else
-                  if (
-                    contains(
-                      aflevering_titel,
-                      titel
-                    )
-                  ) then
+                  concat(
+                    titel,
+                    " - ",
                     aflevering_titel
-                  else
-                    concat(
-                      titel,
-                      " - ",
-                      aflevering_titel
-                    )
+                  )
               else
                 titel
             else
@@ -110,29 +109,28 @@ npo() {
             "(\d+)-(\d+)-(\d+)",
             "$3-$2-$1"
           )
+        else if (
+          matches(
+            "'$url'",
+            "\d{2}-\d{2}-\d{4}"
+          )
+        ) then
+          extract(
+            "'$url'",
+            ".+/([\d-]+)",
+            1
+          )
         else
-          if (
-            matches(
-              "'$url'",
-              "\d{2}-\d{2}-\d{4}"
-            )
-          ) then
-            extract(
-              "'$url'",
-              ".+/([\d-]+)",
-              1
-            )
-          else
-            extract(
-              x:request(
-                {
-                  "url":"https://www.npostart.nl/'$1'",
-                  "method":"HEAD"
-                }
-              )/url,
-              ".+/([\d-]+)",
-              1
-            )
+          extract(
+            x:request(
+              {
+                "url":"https://www.npostart.nl/'$1'",
+                "method":"HEAD"
+              }
+            )/url,
+            ".+/([\d-]+)",
+            1
+          )
       ),
       "duration":if (tijdsduur) then
         tijdsduur
@@ -468,8 +466,8 @@ kijk() {
           "$3-$2-$1"
         ),
         "duration":round(
-          decimal(duration) div 1000
-        ) * dayTimeDuration("PT1S") + time("00:00:00"),
+          duration div 1000
+        ) * duration("PT1S") + time("00:00:00"),
         "expdate":replace(
           json("http://api.kijk.nl/v1/default/entitlement/'$1'")//enddate/date,
           "(\d+)-(\d+)-(\d+) ([\d:]+).*",
@@ -477,7 +475,8 @@ kijk() {
         ),
         "formats":let $a:=(sources)()[size=0]/src return [
           for $x at $i in (sources)()[stream_name]
-          order by $x/size count $i
+          order by $x/size
+          count $i
           return
           $x/{
             "format":"pg-"||$i,
@@ -488,7 +487,7 @@ kijk() {
               height
             ),
             "vbitrate":round(
-              decimal(avg_bitrate) div 1000
+              avg_bitrate div 1000
             )||"k",
             "url":replace(
               stream_name,
@@ -573,9 +572,9 @@ kijk() {
           "(\d{4})(\d{2})(\d{2})",
           "$3-$2-$1"
         ),
-        "duration":TAQ/customLayer/c_sko_cl * dayTimeDuration("PT1S") + time("00:00:00"),
+        "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
         "expdate":replace(
-          TAQ/customLayer/c_media_dateexpires * dayTimeDuration("PT1S") + dateTime("1970-01-01T01:00:00"),
+          TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
           "(\d+)-(\d+)-(\d+)T(.+)",
           "$3-$2-$1 $4"
         ),
@@ -750,7 +749,7 @@ info() {
           ),
           "ffmpeg -ss ",
           time(start) - (
-            seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")
+            seconds-from-time(start) mod 30 * duration("PT1S")
           ),
           " -i [url] -ss ",
           seconds-from-time(start) mod 30,
