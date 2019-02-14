@@ -36,6 +36,8 @@ Ondersteunde websites:
   gemi.st
   rtl.nl
   kijk.nl
+  youtube.com
+  youtu.be
 
 Voorbeelden:
   ./bashgemist.sh -f hls-11 https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321
@@ -648,6 +650,163 @@ kijk() {
   ' --output-format=bash)"
 }
 
+youtube() {
+  eval "$(xidel "$1" --xquery '
+    json:=json(
+      //script/extract(
+        .,
+        "ytplayer.config = (.+?\});",
+        1
+      )[.]
+    )/args/{
+      "name":title,
+      "date":format-date(
+        json(player_response)/round(
+          min(streamingData//lastModified) div 1000000
+        ) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":length_seconds * duration("PT1S") + time("00:00:00"),
+      "formats":json(player_response)/streamingData/[
+        for $x at $i in (formats)()
+        order by $x/contentLength
+        count $i
+        return
+        $x/{
+          "format":"pg-"||$i,
+          "container":let $a:=extract(
+            mimeType,
+            "/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",
+            (1 to 3)
+          ) return
+          concat(
+            if ($a[1]="3gpp") then
+              "3gp"
+            else
+              $a[1],
+            "[",
+            if ($a[2]="avc1") then
+              "h264"
+            else
+              $a[2],
+            "+",
+            if ($a[3]="mp4a") then
+              "aac"
+            else
+              $a[3],
+            "]"
+          ),
+          "resolution":concat(
+            width,
+            "x",
+            height
+          ),
+          "bitrate":if (.[itag="43"]) then
+            ()
+          else
+            round(
+              bitrate div 1000
+            )||"k",
+          "url":url
+        },
+        if (dashManifestUrl) then
+          for $x at $i in doc(
+            dashManifestUrl||"/disable_polymer/true"
+          )//Representation
+          order by $x/boolean(@width),
+                   $x/@bandwidth
+          count $i
+          return
+          $x/{
+            "format":"dash-"||$i,
+            "container":concat(
+              substring-after(
+                ../@mimeType,
+                "/"
+              ),
+              "[",
+              substring-before(
+                @codecs,
+                "."
+              ) ! (
+                if (.="mp4a") then
+                  "aac"
+                else if (.="avc1") then
+                  "h264"
+                else
+                  .
+              ),
+              "]"
+            ),
+            "resolution":if (@width) then
+              concat(
+                @width,
+                "x",
+                @height,
+                "@",
+                @frameRate,
+                "fps"
+              )
+            else
+              (),
+            "samplerate":if (@audioSamplingRate) then
+              (@audioSamplingRate div 1000)||"kHz"
+            else
+              (),
+            "bitrate":round(
+              @bandwidth div 1000
+            )||"k",
+            "url":BaseUrl
+          }
+        else
+          for $x at $i in (adaptiveFormats)()
+          order by $x/boolean(width),
+                   $x/bitrate
+          count $i
+          return
+          $x/{
+            "format":"dash-"||$i,
+            "container":let $a:=extract(
+              mimeType,
+              "/(.+);.+?(\w+)(?:\.|"")",
+              (1,2)
+            ) return
+            concat(
+              $a[1],
+              "[",
+              if ($a[2]="mp4a") then
+                "aac"
+              else if ($a[2]="avc1") then
+                "h264"
+              else
+                $a[2],
+              "]"
+            ),
+            "resolution":if (width) then
+              concat(
+                width,
+                "x",
+                height,
+                "@",
+                fps,
+                "fps"
+              )
+            else
+              (),
+            "samplerate":if (audioSampleRate) then
+              (audioSampleRate div 1000)||"kHz"
+            else
+              (),
+            "bitrate":round(
+              bitrate div 1000
+            )||"kbps",
+            "url":url
+          }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 info() {
   xidel - --xquery '
     let $a:={
@@ -863,6 +1022,8 @@ elif [[ $url =~ rtl.nl ]]; then
   rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
+elif [[ $url =~ (youtube.com|youtu.be) ]]; then
+  youtube "$url"
 else
   echo "bashgemist: niet ondersteunde url." 1>&2
   exit 1
