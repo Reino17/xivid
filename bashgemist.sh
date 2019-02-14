@@ -812,9 +812,7 @@ info() {
           "expdate":"Gratis tot:",
           "subtitle":"Ondertiteling:"
         },
-        $b:=$json()[
-          position()<count($json())
-        ] ! .[$json(.)[.]],
+        $b:=$json()[.!="formats"] ! .[$json(.)[.]],
         $c:=max(
           $b ! $a(.) ! string-length(.)
         ) ! (
@@ -829,19 +827,23 @@ info() {
         $e:=[
           {
             "format":"formaat",
-            "extension":"extensie",
+            "container":"container",
             "resolution":"resolutie",
-            "vbitrate":"bitrate"
+            "samplerate":"frequentie",
+            "bitrate":"bitrate"
           },
           $json/(formats)()
         ],
-        $f:=(
-          "format",
-          "extension",
-          "resolution",
-          "vbitrate",
-          "abitrate"
-        ),
+        $f:=$e(1)() ! .[
+          contains(
+            [
+              distinct-values(
+                $json/(formats)()()[.!="url"]
+              )
+            ],
+            .
+          )
+        ],
         $g:=$f ! max(
           $e()(.) ! string-length(.)
         ),
