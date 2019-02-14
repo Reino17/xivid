@@ -470,7 +470,7 @@ kijk() {
           return
           $x/{
             "format":"pg-"||$i,
-            "extension":"mp4",
+            "container":"mp4[h264+aac]",
             "resolution":concat(
               width,
               "x",
@@ -490,8 +490,7 @@ kijk() {
             )
           },{
             "format":"hls-0",
-            "extension":"m3u8",
-            "resolution":"manifest",
+            "container":"m3u8[manifest]",
             "url":$a
           }[url],
           tail(
@@ -501,19 +500,27 @@ kijk() {
             )
           ) ! {
             "format":"hls-"||position(),
-            "extension":"m3u8",
+            "container":if (
+              contains(
+                .,
+                "avc1"
+              )
+            ) then
+              "m3u8[h264+aac]"
+            else
+              "m3u8[aac]",
             "resolution":extract(
               .,
               "RESOLUTION=([\dx]+)",
               1
             ),
-            "vbitrate":round(
+            "bitrate":round(
               extract(
                 .,
                 "BANDWIDTH=(\d+)",
                 1
               ) div 1000
-            )||"k",
+            )||"kbps",
             "url":resolve-uri(
               ".",
               $a
@@ -577,8 +584,7 @@ kijk() {
           )/(
             {
               "format":"hls-0",
-              "extension":"m3u8",
-              "resolution":"manifest",
+              "container":"m3u8[manifest]",
               "url":url
             }[url],
             for $x at $i in tail(
@@ -597,36 +603,32 @@ kijk() {
             ) count $i
             return {
               "format":"hls-"||$i,
-              "extension":"m3u8",
+              "container":if (
+                contains(
+                  $x,
+                  "avc1"
+                )
+              ) then
+                "m3u8[h264+aac]"
+              else
+                "m3u8[aac]",
               "resolution":extract(
                 $x,
                 "RESOLUTION=([\dx]+)",
                 1
-              ) ! (
-                if (.) then
-                  .
-                else
-                  "audiospoor"
-              ),
-              "vbitrate":extract(
+              )[.],
+              "bitrate":let $a:=extract(
                 $x,
-                "video=(\d+)\d{3}",
-                1
-              ) ! (
-                if (.) then
-                  concat(
-                    "v:",
-                    .,
-                    "k"
-                  )
-                else
-                  ""
-              ),
-              "abitrate":replace(
-                $x,
-                ".+audio.+?(\d+)\d{3}.+",
-                "a:$1k","s"
-              ),
+                "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
+                (1,2)
+              ) return
+              join(
+                (
+                  $a[2][.],
+                  $a[1]
+                ),
+                "|"
+              )||"kbps",
               "url":resolve-uri(
                 ".",
                 url
