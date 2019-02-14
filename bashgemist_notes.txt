@@ -594,8 +594,7 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
     "formats":let $a:=.//videohost||.//videopath return [
       {
         "format":"hls-0",
-        "extension":"m3u8",
-        "resolution":"manifest",
+        "container":"m3u8[manifest]",
         "url":$a
       },
       for $x at $i in tail(
@@ -610,36 +609,34 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
       ) count $i
       return {
         "format":"hls-"||$i,
-        "extension":"m3u8",
+        "container":if (
+          contains(
+            $x,
+            "avc1"
+          )
+        ) then
+          "m3u8[h264+aac]"
+        else
+          "m3u8[aac]",
         "resolution":extract(
           $x,
           "RESOLUTION=([\dx]+)",
           1
-        ) ! (
-          if (.) then
-            .
-          else
-            "audiospoor"
-        ),
-        "vbitrate":extract(
+        )[.],
+        "bitrate":let $a:=extract(
           $x,
-          "video=(\d+)\d{3}",
-          1
-        ) ! (
-          if (.) then
-            concat(
-              "v:",
-              .,
-              "k"
+          "audio=(\d+)(?:-video=(\d+)\d{3})?",
+          (1,2)
+        ) return
+        join(
+          (
+            $a[2][.],
+            round(
+              $a[1] div 1000
             )
-          else
-            ""
-        ),
-        "abitrate":replace(
-          $x,
-          ".+audio.+?(\d+)\d{3}.+",
-          "a:$1k","s"
-        ),
+          ),
+          "|"
+        )||"kbps",
         "url":let $b:=extract(
           $x,
           "(.+m3u8)",
@@ -669,40 +666,35 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
   "formats": [
     {
       "format": "hls-0",
-      "extension": "m3u8",
-      "resolution": "manifest",
+      "container": "m3u8[manifest]",
       "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.m3u8"
     },
     {
       "format": "hls-1",
-      "extension": "m3u8",
-      "resolution": "audiospoor",
-      "vbitrate": "",
-      "abitrate": "a:125k",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "125kbps",
       "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437.m3u8"
     },
     {
       "format": "hls-2",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "711x400",
-      "vbitrate": "v:903k",
-      "abitrate": "a:125k",
+      "bitrate": "903|125kbps",
       "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=903000.m3u8"
     },
     {
       "format": "hls-3",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "912x512",
-      "vbitrate": "v:2093k",
-      "abitrate": "a:125k",
+      "bitrate": "2093|125kbps",
       "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=2093000.m3u8"
     },
     {
       "format": "hls-4",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "1280x720",
-      "vbitrate": "v:3805k",
-      "abitrate": "a:125k",
+      "bitrate": "3805|125kbps",
       "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=3805000.m3u8"
     }
   ]

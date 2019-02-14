@@ -350,8 +350,7 @@ rtl() {
       "formats":let $a:=.//videohost||.//videopath return [
         {
           "format":"hls-0",
-          "extension":"m3u8",
-          "resolution":"manifest",
+          "container":"m3u8[manifest]",
           "url":$a
         },
         for $x at $i in tail(
@@ -366,36 +365,34 @@ rtl() {
         ) count $i
         return {
           "format":"hls-"||$i,
-          "extension":"m3u8",
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
           "resolution":extract(
             $x,
             "RESOLUTION=([\dx]+)",
             1
-          ) ! (
-            if (.) then
-              .
-            else
-              "audiospoor"
-          ),
-          "vbitrate":extract(
+          )[.],
+          "bitrate":let $a:=extract(
             $x,
-            "video=(\d+)\d{3}",
-            1
-          ) ! (
-            if (.) then
-              concat(
-                "v:",
-                .,
-                "k"
+            "audio=(\d+)(?:-video=(\d+)\d{3})?",
+            (1,2)
+          ) return
+          join(
+            (
+              $a[2][.],
+              round(
+                $a[1] div 1000
               )
-            else
-              ""
-          ),
-          "abitrate":replace(
-            $x,
-            ".+audio.+?(\d+)\d{3}.+",
-            "a:$1k","s"
-          ),
+            ),
+            "|"
+          )||"kbps",
           "url":let $b:=extract(
             $x,
             "(.+m3u8)",
