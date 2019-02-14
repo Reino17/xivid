@@ -104,10 +104,9 @@ npo() {
         "'$(date "+%d-%m-%Y")'"
       else (
         if (gidsdatum) then
-          replace(
-            gidsdatum,
-            "(\d+)-(\d+)-(\d+)",
-            "$3-$2-$1"
+          format-date(
+            date(gidsdatum),
+            "[D01]-[M01]-[Y]"
           )
         else if (
           matches(
@@ -139,10 +138,9 @@ npo() {
       "start":start,
       "end":eind,
       "expdate":if (publicatie_eind) then
-        replace(
-          publicatie_eind,
-          "(\d+)-(\d+)-(\d+)T([\d:]+).+",
-          "$3-$2-$1 $4"
+        format-dateTime(
+          dateTime(publicatie_eind),
+          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         )
       else
         (),
@@ -337,20 +335,18 @@ rtl() {
         "[&quot;&apos;]",
         "'\'\''"
       ),
-      "date":replace(
+      "date":format-date(
         (material)()/original_date * duration("PT1S") + date("1970-01-01"),
-        "(\d+)-(\d+)-(\d+)",
-        "$3-$2-$1"
+        "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
         time((material)()/duration) + duration("PT0.5S"),
         "[H01]:[m01]:[s01]"
       ),
       "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
-        replace(
+        format-dateTime(
           (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
-          "(\d+)-(\d+)-(\d+)T(.+)",
-          "$3-$2-$1 $4"
+          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         )
       else
         (),
@@ -573,10 +569,9 @@ kijk() {
           "$3-$2-$1"
         ),
         "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
-        "expdate":replace(
+        "expdate":format-dateTime(
           TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
-          "(\d+)-(\d+)-(\d+)T(.+)",
-          "$3-$2-$1 $4"
+          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
         "subtitle":(tracks)()[label=" Nederlands"]/file,
         "formats":[
