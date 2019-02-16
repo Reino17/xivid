@@ -476,9 +476,9 @@ kijk() {
               "x",
               height
             ),
-            "vbitrate":round(
+            "bitrate":round(
               avg_bitrate div 1000
-            )||"k",
+            )||"kbps",
             "url":replace(
               stream_name,
               "mp4:",
@@ -700,7 +700,7 @@ youtube() {
           else
             round(
               bitrate div 1000
-            )||"k",
+            )||"kbps",
           "url":url
         },
         if (dashManifestUrl) then
@@ -749,7 +749,7 @@ youtube() {
               (),
             "bitrate":round(
               @bandwidth div 1000
-            )||"k",
+            )||"kbps",
             "url":BaseUrl
           }
         else

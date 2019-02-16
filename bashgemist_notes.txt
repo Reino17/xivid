@@ -1447,7 +1447,7 @@ $ xidel -s "https://embed.kijk.nl/video/GgO61doGeqZ" --xquery 'x:request({"heade
       "format": "pg-5",
       "container": "mp4[h264+aac]",
       "resolution": "868x488",
-      "vbitrate": "2085k",
+      "bitrate": "2085k",
       "url": "https://vod-bc-prod-1.talpatvcdn.nl/ra/01/98512197192f61fad62fba8d11db7a0c243dff/mp4/sbs6_hartvannederlandvroeg_S2019E11_190115200036985121-bg-1885.mp4"
     },
     {
@@ -1829,64 +1829,56 @@ $ xidel -s "https://embed.kijk.nl/video/yWLXx6VtFuG" --xquery 'if (//video) then
   "formats": [
     {
       "format": "hls-0",
-      "extension": "m3u8",
-      "resolution": "manifest",
+      "container": "m3u8[manifest]",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/1544789330448.m3u8"
     },
     {
       "format": "hls-1",
-      "extension": "m3u8",
-      "resolution": "audiospoor",
-      "vbitrate": "",
-      "abitrate": "a:160k",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000.m3u8"
     },
     {
       "format": "hls-2",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "637x252",
-      "vbitrate": "v:365k",
-      "abitrate": "a:160k",
+      "bitrate": "365|160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=365058.m3u8"
     },
     {
       "format": "hls-3",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "910x360",
-      "vbitrate": "v:730k",
-      "abitrate": "a:160k",
+      "bitrate": "730|160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=730083.m3u8"
     },
     {
       "format": "hls-4",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "1092x432",
-      "vbitrate": "v:1500k",
-      "abitrate": "a:160k",
+      "bitrate": "1500|160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=1500117.m3u8"
     },
     {
       "format": "hls-5",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "1820x720",
-      "vbitrate": "v:3000k",
-      "abitrate": "a:160k",
+      "bitrate": "3000|160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=3000297.m3u8"
     },
     {
       "format": "hls-6",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "2730x1080",
-      "vbitrate": "v:4500k",
-      "abitrate": "a:160k",
+      "bitrate": "4500|160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=4500168.m3u8"
     },
     {
       "format": "hls-7",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "2730x1080",
-      "vbitrate": "v:6000k",
-      "abitrate": "a:160k",
+      "bitrate": "6000|160kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/yWLXx6VtFuG/b3c27c55-80bf-4c16-80dc-e3e057a4d092/Wegmisbruikers_Season_24_Episode_4-index.ism/Wegmisbruikers_Season_24_Episode_4-index-audio=160000-video=6000467.m3u8"
     }
   ]
@@ -1944,56 +1936,49 @@ $ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" --xquery 'if (//video) then
   "formats": [
     {
       "format": "hls-0",
-      "extension": "m3u8",
-      "resolution": "manifest",
+      "container": "m3u8[manifest]",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/1535976944566.m3u8"
     },
     {
       "format": "hls-1",
-      "extension": "m3u8",
-      "resolution": "audiospoor",
-      "vbitrate": "",
-      "abitrate": "a:94k",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "94kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000.m3u8"
     },
     {
       "format": "hls-2",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "320x180",
-      "vbitrate": "v:350k",
-      "abitrate": "a:94k",
+      "bitrate": "350|94kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=350000.m3u8"
     },
     {
       "format": "hls-3",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "512x288",
-      "vbitrate": "v:655k",
-      "abitrate": "a:94k",
+      "bitrate": "655|94kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=655000.m3u8"
     },
     {
       "format": "hls-4",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "640x360",
-      "vbitrate": "v:912k",
-      "abitrate": "a:94k",
+      "bitrate": "912|94kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=912000.m3u8"
     },
     {
       "format": "hls-5",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "768x432",
-      "vbitrate": "v:1214k",
-      "abitrate": "a:94k",
+      "bitrate": "1214|94kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=1214000.m3u8"
     },
     {
       "format": "hls-6",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "868x488",
-      "vbitrate": "v:1898k",
-      "abitrate": "a:94k",
+      "bitrate": "1898|94kbps",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/w7ZW52xLgL5/9dc418ae-e80d-4c2a-b474-f856dd79840a/Peking_Express_Season_1_Episode_1-index.ism/Peking_Express_Season_1_Episode_1-index-audio=94000-video=1898000.m3u8"
     }
   ]
