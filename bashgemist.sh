@@ -647,21 +647,53 @@ kijk() {
 youtube() {
   eval "$(xidel "$1" --xquery '
     json:=json(
-      //script/extract(
-        .,
-        "ytplayer.config = (.+?\});",
-        1
-      )[.]
-    )/args/{
-      "name":title,
+      if (//meta[@property="og:restrictions:age"]) then
+        let $a:=concat(
+          "https://www.youtube.com/get_video_info?video_id=",
+          //meta[@itemprop="videoId"]/@content,
+          "&amp;eurl=",
+          uri-encode(
+            "https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content
+          ),
+          "&amp;sts=",
+          json(
+            doc(
+              "https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content
+            )//script/extract(
+              .,
+              "setConfig\((.+?)\)",
+              1,"*"
+            )[3]
+          )//sts
+        ) return
+        tokenize(
+          uri-decode(
+            doc($a)
+          ),
+          "&amp;"
+        ) ! extract(
+          .,
+          "player_response=(.+)",
+          1
+        )[.]
+      else
+        json(
+          //script/extract(
+            .,
+            "ytplayer.config = (.+?\});",
+            1
+          )[.]
+        )/args/player_response
+    )/{
+      "name":videoDetails/title,
       "date":format-date(
-        json(player_response)/round(
+        round(
           min(streamingData//lastModified) div 1000000
         ) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
         "[D01]-[M01]-[Y]"
       ),
-      "duration":length_seconds * duration("PT1S") + time("00:00:00"),
-      "formats":json(player_response)/streamingData/[
+      "duration":videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),
+      "formats":streamingData/[
         for $x at $i in (formats)()
         order by $x/contentLength
         count $i
