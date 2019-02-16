@@ -550,6 +550,150 @@ https://www.npostart.nl/live/npo-1
   ]
 }
 
+------------------------------------------------------------------------------------------------
+
+De NPO maakt al een tijdje geen gebruik meer van de hier boven uitgewerkte oude "ida.omroep.nl"-methode. Het is maar de vraag hoe lang die nog blijft werken, want met de nieuwe methode/API is het allemaal DRM wat de klok slaat!
+
+https://www.npostart.nl/live/npo-1-extra
+
+$ xidel -s -H "X-Requested-With: XMLHttpRequest" "https://www.npostart.nl/api/token" -e '$json'
+of
+$ xidel -s -e 'x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json'
+{
+  "token": "dXbagD2EBAsa43aAQ1lEDMp1ZvUpQbHs0SEPAByt"
+}
+
+$ xidel -s "https://www.npostart.nl/live/npo-1-extra" -e 'let $a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/token return x:request({"post":"_token="||$a,"url":"https://www.npostart.nl/player/"||//npo-player/@media-id})/json'
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb21zY29yZSI6eyJucG9JbmdlbG9nZCI6Im5vIiwibnBvTG9naW50eXBlIjoiYW5vbmllbSIsIm5wb0xvZ2luSWQiOiIifSwic21hcnR0YWciOnsic2l0ZUlkIjoiNCJ9LCJoYXNTdWJzY3JpcHRpb24iOiIiLCJoYXNQcmVtaXVtU3Vic2NyaXB0aW9uIjoiIiwiZWxlbWVudElkIjoicGxheWVyLUxJX05FREVSTEFORDNfMjIxNjgzIiwibWVkaWFJZCI6IkxJX05FREVSTEFORDNfMjIxNjgzIiwidG9wc3BpbiI6eyJwYXJ0eUlkIjoiIiwicHJvZmlsZUlkIjoiIn0sImhhc1NldHRpbmdzIjoiMCIsImhhc0FkQ29uc2VudCI6IjEiLCJzaGFyZSI6IjEiLCJwYWdlVXJsIjoiIiwic3RlclJlZmVycmFsVXJsIjoiIiwic3RlclNpdGVJZCI6Im5wb3N0YXJ0IiwiaWF0IjoxNTQ5OTA1NzIyLCJuYmYiOjE1NDk5MDU3MjIsImV4cCI6MTU0OTkzNDUyMiwiY29uc3VtZXJJZCI6bnVsbCwiaXNQbGF5bGlzdCI6ZmFsc2UsInJlZmVycmVyVXJsIjpudWxsLCJza2lwQ2F0YWxvZyI6MCwibm9BZHMiOjAsInJlY29tbWVuZGF0aW9ucyI6MSwiaXNzIjoiZXlKcGRpSTZJbU16VUhWVFNFZEVVa1k1VVRkSmRtWk9Xa1ZvUTNjOVBTSXNJblpoYkhWbElqb2lhVnBFTWpkbWJ6WXlkSEIwV0dWSlZqQkVOazVhTms1VldYVTBkbkpwTTNkUGNEQndiMUF4TldSTlUwWXdVa3RTU0hSc2FuRjRjMUJUV0ZKaGFtMDRZU0lzSW0xaFl5STZJakUyTTJGbFltRmlOek16T0RFMFkyUTBZV05rTm1FeU9HSm1ZekpsWlRKaU5XVmxOemN5TTJObU16RXhNVEZsTkRKaE5UWmlaVFpoTkdWak1tTTVNVFVpZlE9PSJ9.36oCP9wM8MQ0AV-FcyJxfmcle7S_-zhv800Q2_S_AzM",
+  "embedUrl": "https://start-player.npo.nl/embed/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb21zY29yZSI6eyJucG9JbmdlbG9nZCI6Im5vIiwibnBvTG9naW50eXBlIjoiYW5vbmllbSIsIm5wb0xvZ2luSWQiOiIifSwic21hcnR0YWciOnsic2l0ZUlkIjoiNCJ9LCJoYXNTdWJzY3JpcHRpb24iOiIiLCJoYXNQcmVtaXVtU3Vic2NyaXB0aW9uIjoiIiwiZWxlbWVudElkIjoicGxheWVyLUxJX05FREVSTEFORDNfMjIxNjgzIiwibWVkaWFJZCI6IkxJX05FREVSTEFORDNfMjIxNjgzIiwidG9wc3BpbiI6eyJwYXJ0eUlkIjoiIiwicHJvZmlsZUlkIjoiIn0sImhhc1NldHRpbmdzIjoiMCIsImhhc0FkQ29uc2VudCI6IjEiLCJzaGFyZSI6IjEiLCJwYWdlVXJsIjoiIiwic3RlclJlZmVycmFsVXJsIjoiIiwic3RlclNpdGVJZCI6Im5wb3N0YXJ0IiwiaWF0IjoxNTQ5OTA1NzIyLCJuYmYiOjE1NDk5MDU3MjIsImV4cCI6MTU0OTkzNDUyMiwiY29uc3VtZXJJZCI6bnVsbCwiaXNQbGF5bGlzdCI6ZmFsc2UsInJlZmVycmVyVXJsIjpudWxsLCJza2lwQ2F0YWxvZyI6MCwibm9BZHMiOjAsInJlY29tbWVuZGF0aW9ucyI6MSwiaXNzIjoiZXlKcGRpSTZJbU16VUhWVFNFZEVVa1k1VVRkSmRtWk9Xa1ZvUTNjOVBTSXNJblpoYkhWbElqb2lhVnBFTWpkbWJ6WXlkSEIwV0dWSlZqQkVOazVhTms1VldYVTBkbkpwTTNkUGNEQndiMUF4TldSTlUwWXdVa3RTU0hSc2FuRjRjMUJUV0ZKaGFtMDRZU0lzSW0xaFl5STZJakUyTTJGbFltRmlOek16T0RFMFkyUTBZV05rTm1FeU9HSm1ZekpsWlRKaU5XVmxOemN5TTJObU16RXhNVEZsTkRKaE5UWmlaVFpoTkdWak1tTTVNVFVpZlE9PSJ9.36oCP9wM8MQ0AV-FcyJxfmcle7S_-zhv800Q2_S_AzM",
+  "embedCode": "<script>var urlForIframe = \"https://start-player.npo.nl/embed/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb21zY29yZSI6eyJucG9JbmdlbG9nZCI6Im5vIiwibnBvTG9naW50eXBlIjoiYW5vbmllbSIsIm5wb0xvZ2luSWQiOiIifSwic21hcnR0YWciOnsic2l0ZUlkIjoiNCJ9LCJoYXNTdWJzY3JpcHRpb24iOiIiLCJoYXNQcmVtaXVtU3Vic2NyaXB0aW9uIjoiIiwiZWxlbWVudElkIjoicGxheWVyLUxJX05FREVSTEFORDNfMjIxNjgzIiwibWVkaWFJZCI6IkxJX05FREVSTEFORDNfMjIxNjgzIiwidG9wc3BpbiI6eyJwYXJ0eUlkIjoiIiwicHJvZmlsZUlkIjoiIn0sImhhc1NldHRpbmdzIjoiMCIsImhhc0FkQ29uc2VudCI6IjEiLCJzaGFyZSI6IjEiLCJwYWdlVXJsIjoiIiwic3RlclJlZmVycmFsVXJsIjoiIiwic3RlclNpdGVJZCI6Im5wb3N0YXJ0IiwiaWF0IjoxNTQ5OTA1NzIyLCJuYmYiOjE1NDk5MDU3MjIsImV4cCI6MTU0OTkzNDUyMiwiY29uc3VtZXJJZCI6bnVsbCwiaXNQbGF5bGlzdCI6ZmFsc2UsInJlZmVycmVyVXJsIjpudWxsLCJza2lwQ2F0YWxvZyI6MCwibm9BZHMiOjAsInJlY29tbWVuZGF0aW9ucyI6MSwiaXNzIjoiZXlKcGRpSTZJbU16VUhWVFNFZEVVa1k1VVRkSmRtWk9Xa1ZvUTNjOVBTSXNJblpoYkhWbElqb2lhVnBFTWpkbWJ6WXlkSEIwV0dWSlZqQkVOazVhTms1VldYVTBkbkpwTTNkUGNEQndiMUF4TldSTlUwWXdVa3RTU0hSc2FuRjRjMUJUV0ZKaGFtMDRZU0lzSW0xaFl5STZJakUyTTJGbFltRmlOek16T0RFMFkyUTBZV05rTm1FeU9HSm1ZekpsWlRKaU5XVmxOemN5TTJObU16RXhNVEZsTkRKaE5UWmlaVFpoTkdWak1tTTVNVFVpZlE9PSJ9.36oCP9wM8MQ0AV-FcyJxfmcle7S_-zhv800Q2_S_AzM\"; var elementId = \"player-LI_NEDERLAND3_221683\"; var mediaId = \"LI_NEDERLAND3_221683\";</script><script src=\"https://start-player.npo.nl/js/embed.js\"></script>"
+}
+
+$ xidel -s "https://www.npostart.nl/live/npo-1-extra" -e 'let $a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/token return x:request({"post":"_token="||$a,"url":"https://www.npostart.nl/player/"||//npo-player/@media-id})/json/json(doc(embedUrl)//script/extract(.,"var video =(.+);",1)[.])'
+{
+  "id": "LI_NEDERLAND3_221683",
+  "type": "livetv",
+  "title": "NPO 1 extra",
+  "subtitles": [],
+  "episodeTitle": "",
+  "franchiseTitle": "",
+  "description": "",
+  "duration": null,
+  "age_rating": null,
+  "still_image_url": "https://www-assets.npo.nl/uploads/tv_channel/281/guide_highlight/regular_NPO1_achtergrond.jpg",
+  "orig_image_url": "https://www-assets.npo.nl/uploads/tv_channel/281/logo/logo_npo1_extra.png",
+  "post_play_url": "https://www-assets.npo.nl/uploads/tv_channel/281/guide_highlight/regular_NPO1_achtergrond.jpg",
+  "share_text": "Bekijk NPO 1 extra op https://www.npostart.nl/LI_NEDERLAND3_221683",
+  "share_url": "https://www.npostart.nl/LI_NEDERLAND3_221683",
+  "broadcasters": [],
+  "broadcastDate": "2019-02-11T17:32:10Z",
+  "nextAsset": null,
+  "qualityOptions": [
+    {
+      "bitrate": "0",
+      "label": "Hoogste",
+      "resolution": "1080p",
+      "platform": "npo"
+    },
+    {
+      "bitrate": "643000",
+      "label": "Hoog",
+      "resolution": "720p",
+      "platform": "npo"
+    },
+    {
+      "bitrate": "491000",
+      "label": "Medium",
+      "resolution": "576p",
+      "platform": "npo"
+    },
+    {
+      "bitrate": "248000",
+      "label": "Laag",
+      "resolution": "360p",
+      "platform": "npo"
+    }
+  ],
+  "visualRadio": null,
+  "episodeNumber": null,
+  "seriesId": null,
+  "net": null,
+  "genres": "",
+  "ster": {
+    "uri": "https://adconfig.ster.nl/adurl/$$identifier$$?ncc=$$ncc$$&cust_params=1%3D1%26programma_titel%3D%26afleverings_titel%3Dnpo1extra%26genre%3D%26subgenre%3D%26video_duur%3D0%26prid%3DLI_NEDERLAND3_221683%26srid%3D%26net%3D%26omroep%3D%26os%3D$$os$$%26osversion%3D$$osversion$$%26player%3D$$player$$%26playerversion%3D$$playerversion$$%26site%3D$$site$$%26ai%3D$$ai$$%26referrer_url%3D$$referrer_url$$%26description_url%3D$$description_url$$",
+    "customParameters": {
+      "prid": "LI_NEDERLAND3_221683",
+      "srid": null
+    },
+    "placeholderValues": {
+      "$$netwerk_id$$": "9233",
+      "$$genre$$": null,
+      "$$subgenre$$": "",
+      "$$video_duur$$": 0,
+      "$$net$$": null,
+      "$$omroep$$": "",
+      "$$programma_titel$$": "",
+      "$$programmanaam$$": "",
+      "$$stationid$$": "npo",
+      "$$afleverings_titel$$": "npo1extra"
+    }
+  },
+  "recommender": "ts-base",
+  "startAt": null,
+  "parentId": null,
+  "channel": null
+}
+
+$ xidel -s "https://www.npostart.nl/live/npo-1-extra" -e 'let $a:=//npo-player/@media-id,$b:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/token return x:request({"post":"_token="||$b,"url":"https://www.npostart.nl/player/"||$a})/json/json(concat("https://start-player.npo.nl/video/",$a,"/streams?profile=smooth&quality=npo&tokenId=",token))'
+{
+  "stream": {
+    "src": "https://nl-ams-p2-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDk5OTM2MTUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvc21vb3RoX3BpZmZcL3RoZW1hLTVcLzBcLzBcLzBcL3RoZW1hLTUuaXNtbCIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.8eQ6hQtuRbU610d_CgDWaUmpGZxsMDpe6PYd5vh3vZs/live/npo/u/npo/drm/smooth_piff/thema-5/0/0/0/thema-5.isml/Manifest",
+    "type": "video/mp4",
+    "keySystemOptions": {
+      "options": {
+        "licenseUrl": "https://npo-drm-gateway.samgcloud.nepworldwide.nl/authentication",
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJucG8iLCJpYXQiOjE1NDk5MDcyMDUsImRybV90eXBlIjoicGxheXJlYWR5IiwibGljZW5zZV9wcm9maWxlIjoid2ViIiwiY2xpZW50X2lwIjoiODAuMTAxLjQ5LjUifQ.YtyJx-jNviC0WZJQsqYYVHosOGbJ5hOgU4rJcKtkpY4"
+      }
+    }
+  },
+  "catchupAvailable": false
+}
+
+$ xidel -s "https://www.npostart.nl/live/npo-1-extra" -e 'let $a:=//npo-player/@media-id,$b:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/token return x:request({"post":"_token="||$b,"url":"https://www.npostart.nl/player/"||$a})/json/json(concat("https://start-player.npo.nl/video/",$a,"/streams?profile=hls&quality=npo&tokenId=",token))'
+{
+  "stream": {
+    "src": "https://nl-ams-p1-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDk5OTI5MzUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvaGxzX2ZhaXJwbGF5XC90aGVtYS01XC8wXC8wXC8wXC90aGVtYS01LmlzbWwiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.Gzo8mKfW-adM26QtAAJdb2HjGFhzDNizlcfZhl0SjjM/live/npo/u/npo/drm/hls_fairplay/thema-5/0/0/0/thema-5.isml/playlist.m3u8",
+    "type": "application/vnd.apple.mpegurl",
+    "protection": {
+      "keySystem": "com.apple.fps.1_0",
+      "certificateUrl": "https://s3-eu-west-1.amazonaws.com/24i-npo-stream/fairplay.cer",
+      "licenseUrl": "https://npo-drm-gateway.samgcloud.nepworldwide.nl/authentication?custom_data=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJucG8iLCJpYXQiOjE1NDk5MDY1MjUsImRybV90eXBlIjoiZmFpcnBsYXkiLCJsaWNlbnNlX3Byb2ZpbGUiOiJ3ZWIiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.3OYPsa9CiErsBu2T4BYBEUGIEzX-34OwU-oQkonR3ME"
+    }
+  },
+  "catchupAvailable": false
+}
+
+$ xidel -s "https://www.npostart.nl/live/npo-1-extra" -f 'let $a:=//npo-player/@media-id,$b:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/token return x:request({"post":"_token="||$b,"url":"https://www.npostart.nl/player/"||$a})/json/json(concat("https://start-player.npo.nl/video/",$a,"/streams?profile=hls&quality=npo&tokenId=",token))/stream/src' -e '$raw'
+[...]
+#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://60f29d98-6526-e8e6-02cd-1a6cc037f599",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
+[...]
+
+$ ffmpeg -hide_banner -i "$(xidel -s "https://www.npostart.nl/live/npo-1-extra" -e 'let $a:=//npo-player/@media-id,$b:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/token return x:request({"post":"_token="||$b,"url":"https://www.npostart.nl/player/"||$a})/json/json(concat("https://start-player.npo.nl/video/",$a,"/streams?profile=hls&quality=npo&tokenId=",token))/stream/src')"
+[hls,applehttp @ 05149680] Opening 'https://nl-ams-p9-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA0Mjc2ODUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvaGxzX2ZhaXJwbGF5XC90aGVtYS01XC8wXC8wXC8wXC90aGVtYS01LmlzbWwiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.sxoYazyXwo49tlV3YsUdIjX_RUTQyn-Zq7H1IcenKA8/live/npo/u/npo/drm/hls_fairplay/thema-5/0/0/0/thema-5.isml/thema-5-audio_nld=128000-video=200000.m3u8' for reading
+[https @ 057c1e80] Opening 'https://nl-ams-p9-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA0Mjc2ODUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvaGxzX2ZhaXJwbGF5XC90aGVtYS01XC8wXC8wXC8wXC90aGVtYS01LmlzbWwiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.sxoYazyXwo49tlV3YsUdIjX_RUTQyn-Zq7H1IcenKA8/live/npo/u/npo/drm/hls_fairplay/thema-5/0/0/0/thema-5.isml/thema-5-audio_nld=128000-video=499968.m3u8' for reading
+[https @ 057c1e80] Opening 'https://nl-ams-p9-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA0Mjc2ODUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvaGxzX2ZhaXJwbGF5XC90aGVtYS01XC8wXC8wXC8wXC90aGVtYS01LmlzbWwiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.sxoYazyXwo49tlV3YsUdIjX_RUTQyn-Zq7H1IcenKA8/live/npo/u/npo/drm/hls_fairplay/thema-5/0/0/0/thema-5.isml/thema-5-audio_nld=128000-video=1000000.m3u8' for reading
+[https @ 057c1e80] Opening 'https://nl-ams-p9-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA0Mjc2ODUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvaGxzX2ZhaXJwbGF5XC90aGVtYS01XC8wXC8wXC8wXC90aGVtYS01LmlzbWwiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.sxoYazyXwo49tlV3YsUdIjX_RUTQyn-Zq7H1IcenKA8/live/npo/u/npo/drm/hls_fairplay/thema-5/0/0/0/thema-5.isml/thema-5-audio_nld=128000-video=1400000.m3u8' for reading
+[https @ 057c1e80] Opening 'https://nl-ams-p9-am3.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA0Mjc2ODUsInVyaSI6IlwvbGl2ZVwvbnBvXC91XC9ucG9cL2RybVwvaGxzX2ZhaXJwbGF5XC90aGVtYS01XC8wXC8wXC8wXC90aGVtYS01LmlzbWwiLCJjbGllbnRfaXAiOiI4MC4xMDEuNDkuNSJ9.sxoYazyXwo49tlV3YsUdIjX_RUTQyn-Zq7H1IcenKA8/live/npo/u/npo/drm/hls_fairplay/thema-5/0/0/0/thema-5.isml/thema-5-audio_nld=128000.m3u8' for reading
+[hls,applehttp @ 05149680] SAMPLE-AES encryption is not supported yet
+[hls,applehttp @ 05149680] Failed to open segment 193792657 of playlist 0
+[hls,applehttp @ 05149680] SAMPLE-AES encryption is not supported yet
+[hls,applehttp @ 05149680] Failed to open segment 193792658 of playlist 0
+[hls,applehttp @ 05149680] SAMPLE-AES encryption is not supported yet
+[hls,applehttp @ 05149680] Failed to open segment 193792659 of playlist 0
+
+Het achterhalen van de video-urls lukt dus nog wel, maar hier houdt het gewoon op. Nederlandse Publieke(?!) Omroep.
+
 ================================================================================================================================
 
 [rtl]
