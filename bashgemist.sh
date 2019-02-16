@@ -38,6 +38,7 @@ Ondersteunde websites:
   kijk.nl
   youtube.com
   youtu.be
+  vimeo.com
 
 Voorbeelden:
   ./bashgemist.sh -f hls-11 https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321
@@ -833,6 +834,93 @@ youtube() {
   ' --output-format=bash)"
 }
 
+vimeo() {
+  eval "$(xidel "$1" --xquery '
+    json:=json(
+      //script/extract(
+        .,
+        "clip_page_config = (.+);",
+        1
+      )[.]
+    )/{
+      "name":clip/title,
+      "date":replace(
+        clip/uploaded_on,
+        "(\d+)-(\d+)-(\d+).+",
+        "$3-$2-$1"
+      ),
+      "duration":clip/duration/formatted,
+      "formats":player/json(config_url)//files/(
+        let $a:=hls/(.//url)[1] return [
+          for $x at $i in (progressive)()
+          order by $x/width
+          count $i
+          return
+          $x/{
+            "format":"pg-"||$i,
+            "container":"mp4[h264+aac]",
+            "resolution":concat(
+              width,
+              "x",
+              height,
+              "@",
+              fps,
+              "fps"
+            ),
+            "url":url
+          },{
+            "format":"hls-0",
+            "container":"m3u8[manifest]",
+            "url":$a
+          },
+          tail(
+            tokenize(
+              unparsed-text($a),
+              "#EXT-X-STREAM-INF:"
+            )
+          ) ! {
+            "format":"hls-"||position(),
+            "container":"m3u8[h264+aac]",
+            "resolution":concat(
+              extract(
+                .,
+                "RESOLUTION=([\dx]+)",
+                1
+              ),
+              "@",
+              round(
+                number(
+                  extract(
+                    .,
+                    "FRAME-RATE=([\d.]+)",
+                    1
+                  )
+                )
+              ),
+              "fps"
+            ),
+            "bitrate":round(
+              extract(
+                .,
+                "BANDWIDTH=(\d+)",
+                1
+              ) div 1000
+            )||"kbps",
+            "url":resolve-uri(
+              extract(
+                .,
+                "(.+m3u8)",
+                1
+              ),
+              $a
+            )
+          }
+        ]
+      )
+    }
+  ' --output-format=bash)"
+}
+
 info() {
   xidel - --xquery '
     let $a:={
@@ -1052,6 +1140,8 @@ elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
+elif [[ $url =~ vimeo.com ]]; then
+  vimeo "$url"
 else
   echo "bashgemist: niet ondersteunde url." 1>&2
   exit 1

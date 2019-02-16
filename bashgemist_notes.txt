@@ -3237,3 +3237,295 @@ Formaten:  formaat  container         resolutie       frequentie  bitrate
     ]
   }
 '
+
+================================================================================================================================
+
+[vimeo]
+
+https://vimeo.com/310786958
+
+$ xidel -s "https://vimeo.com/310786958" -e 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])'
+{
+  "clip": {
+    "id": 310786958,
+    "title": "Staat van het internet 2019",
+    "description": "<p class=\"first\">De nieuwe jaarlijkse lezing de Staat van het internet werd op 15 januari 2019 voor het eerst gehouden bij de centrale OBA in Amsterdam. Een peilmoment voor het internet.</p>\n<p>Sprekers:</p>\n<p>Jos&eacute; van Dijck, hoogleraar media en digitale samenleving aan de Universiteit Utrecht en co-auteur van het boek &#039;The Platform Society. Online values in a connective world&#039;.</p>\n<p>Touria Meliani, wethouder van kunst, cultuur en de digitale stad Amsterdam.</p>\n<p>Marleen Stikker, directeur en mede-oprichter van Waag. Marleen Stikker is een van de pioniers van het internet en was afgelopen zomer te zien in het VPRO-programma Zomergasten waarin ze haar visie deelde op de ontwikkelingen in de technologie en de impact daarvan op de samenleving.</p>\n<p>Met performances van Two Step Flow - een collectief van maatschappelijk ge&iuml;nteresseerde artiesten.</p>\n<p>Waag organiseerde de Staat van het internet 2019 samen met SIDN, XS4ALL, OBA, Gemeente Amsterdam CTO office en UvA - Faculteit der Natuurwetenschappen, Wiskunde en Informatica.</p>",
+    "uploaded_on": "2019-01-11 09:09:52",
+    "uploaded_on_relative": "1 month ago",
+    "uploaded_on_full": "Friday, January 11, 2019 at 9:09 AM EST",
+    "is_spatial": false,
+    "is_hdr": false,
+    "privacy": {
+      "is_public": true,
+      "type": "anybody",
+      "description": "Public"
+    },
+    "duration": {
+      "raw": 6352,
+      "formatted": "01:45:52"
+    },
+    "is_liked": false,
+    "is_unavailable": false,
+    [...]
+    }
+  },
+  [...]
+  "player": {
+    "config_url": "https://player.vimeo.com/video/310786958/config?autopause=1&byline=0&collections=1&context=Vimeo%5CController%5CClipController.main&default_to_hd=1&outro=nothing&portrait=0&share=1&title=0&watch_trailer=0&s=39f391e40bd49862fd15f2753c27754964ac7d30_1550343304",
+    "player_url": "player.vimeo.com",
+    "dimensions": {
+      "height": 540,
+      "width": 960
+    },
+    "poster": {
+      "url": "https://i.vimeocdn.com/video/752205746.jpg?mw=2000&mh=1080&q=70"
+    }
+  },
+  [...]
+}
+
+$ xidel -s "https://vimeo.com/310786958" -e 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])/{"name":clip/title,"date":replace(clip/uploaded_on,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":clip/duration/formatted}'
+{
+  "name": "Staat van het internet 2019",
+  "date": "11-01-2019",
+  "duration": "01:45:52"
+}
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s "https://vimeo.com/310786958" -e 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])/player/json(config_url)'
+{
+  "cdn_url": "https://f.vimeocdn.com",
+  "vimeo_api_url": "api.vimeo.com",
+  "request": {
+    "files": {
+      "dash": {
+        "separate_av": true,
+        "streams": [
+          {
+            "profile": 174,
+            "quality": "720p",
+            "id": 1199579358,
+            "fps": 26
+          },
+          {
+            "profile": 165,
+            "quality": "540p",
+            "id": 1199579362,
+            "fps": 26
+          },
+          {
+            "profile": 164,
+            "quality": "360p",
+            "id": 1199579357,
+            "fps": 26
+          }
+        ],
+        "cdns": {
+          "akfire_interconnect_quic": {
+            "url": "https://159skyfiregce-vimeo.akamaized.net/exp=1550269109~acl=%2F310786958%2F%2A~hmac=10375d26dd2facfbc56f4679bbd499c1c7d247241fcb5ff4625b261938dddedf/310786958/sep/video/1199579357,1199579362,1199579358/master.json?base64_init=1",
+            "origin": "gcs"
+          },
+          "fastly_skyfire": {
+            "url": "https://skyfire.vimeocdn.com/1550269109-0xd8adc2fcdb2097423810a761f7acf027f3d4afa4/310786958/sep/video/1199579357,1199579362,1199579358/master.json?base64_init=1",
+            "origin": "gcs"
+          }
+        },
+        "default_cdn": "fastly_skyfire"
+      },
+      "hls": {
+        "separate_av": false,
+        "default_cdn": "fastly_skyfire",
+        "cdns": {
+          "akfire_interconnect_quic": {
+            "url": "https://159skyfiregce-vimeo.akamaized.net/exp=1550269108~acl=%2F310786958%2F%2A~hmac=3643cf1b938be5abb2c693e938bf6390dcb37920d2f996bbfc0dc8c25f64d038/310786958/video/1199579357,1199579362,1199579358/master.m3u8",
+            "origin": "gcs"
+          },
+          "fastly_skyfire": {
+            "url": "https://skyfire.vimeocdn.com/1550269108-0x21f9d0c98d36eb5ed9d026def87f36013fd94d72/310786958/video/1199579357,1199579362,1199579358/master.m3u8",
+            "origin": "gcs"
+          }
+        }
+      },
+      "progressive": [
+        {
+          "profile": 165,
+          "width": 960,
+          "mime": "video/mp4",
+          "fps": 26,
+          "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/2157/12/310786958/1199579362.mp4?token=1550269108-0xd5a1c4a70f17fc27c438fa905b5826d207716885",
+          "cdn": "fastly",
+          "quality": "540p",
+          "id": 1199579362,
+          "origin": "gcs",
+          "height": 540
+        },
+        {
+          "profile": 174,
+          "width": 1280,
+          "mime": "video/mp4",
+          "fps": 26,
+          "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/2157/12/310786958/1199579358.mp4?token=1550269108-0x0d89a8d1dcc029be78142290df1c12b5c8c2c92e",
+          "cdn": "fastly",
+          "quality": "720p",
+          "id": 1199579358,
+          "origin": "gcs",
+          "height": 720
+        },
+        {
+          "profile": 164,
+          "width": 640,
+          "mime": "video/mp4",
+          "fps": 26,
+          "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/2157/12/310786958/1199579357.mp4?token=1550269108-0x27a090e441f5b0987cbf9c4b75e83aa84265b4b1",
+          "cdn": "fastly",
+          "quality": "360p",
+          "id": 1199579357,
+          "origin": "gcs",
+          "height": 360
+        }
+      ]
+    },
+    [...]
+  },
+  [...]
+
+$ xidel -s "https://vimeo.com/310786958" --xquery 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])/{"name":clip/title,"date":replace(clip/uploaded_on,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":clip/duration/formatted,"formats":player/json(config_url)//files/(let $a:=hls/(.//url)[1] return [for $x at $i in (progressive)() order by $x/width count $i return $x/{"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat(width,"x",height,"@",fps,"fps"),"url":url},{"format":"hls-0","container":"m3u8[manifest]","url":$a},tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract(.,"(.+m3u8)",1),$a)}])}'
+{
+  "name": "Staat van het internet 2019",
+  "date": "11-01-2019",
+  "duration": "01:45:52",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360@26fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/2157/12/310786958/1199579357.mp4?token=1550277909-0x5509ed9ff7059064392a8e7f6127778f58aa3b5f"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "960x540@26fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/2157/12/310786958/1199579362.mp4?token=1550277909-0x50eb52fc75f7f5ef8a5e0c62705e36a26f8d1b25"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720@26fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/2157/12/310786958/1199579358.mp4?token=1550277909-0x5307255fb54122d7117e72518070ea3d2ff5ff13"
+    },
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://159skyfiregce-vimeo.akamaized.net/exp=1550277909~acl=%2F310786958%2F%2A~hmac=5d194025ee5da2844391ddb41493c9b10a0c2e10036f7492d24b636e68e6d646/310786958/video/1199579357,1199579362,1199579358/master.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360@27fps",
+      "bitrate": "720kbps",
+      "url": "https://159skyfiregce-vimeo.akamaized.net/exp=1550277909~acl=%2F310786958%2F%2A~hmac=5d194025ee5da2844391ddb41493c9b10a0c2e10036f7492d24b636e68e6d646/310786958/video/1199579357/playlist.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "960x540@27fps",
+      "bitrate": "1839kbps",
+      "url": "https://159skyfiregce-vimeo.akamaized.net/exp=1550277909~acl=%2F310786958%2F%2A~hmac=5d194025ee5da2844391ddb41493c9b10a0c2e10036f7492d24b636e68e6d646/310786958/video/1199579362/playlist.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720@27fps",
+      "bitrate": "3272kbps",
+      "url": "https://159skyfiregce-vimeo.akamaized.net/exp=1550277909~acl=%2F310786958%2F%2A~hmac=5d194025ee5da2844391ddb41493c9b10a0c2e10036f7492d24b636e68e6d646/310786958/video/1199579358/playlist.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  json(
+    //script/extract(
+      .,
+      "clip_page_config = (.+);",
+      1
+    )[.]
+  )/{
+    "name":clip/title,
+    "date":replace(
+      clip/uploaded_on,
+      "(\d+)-(\d+)-(\d+).+",
+      "$3-$2-$1"
+    ),
+    "duration":clip/duration/formatted,
+    "formats":player/json(config_url)//files/(
+      let $a:=hls/(.//url)[1] return [
+        for $x at $i in (progressive)()
+        order by $x/width
+        count $i
+        return
+        $x/{
+          "format":"pg-"||$i,
+          "container":"mp4[h264+aac]",
+          "resolution":concat(
+            width,
+            "x",
+            height,
+            "@",
+            fps,
+            "fps"
+          ),
+          "url":url
+        },{
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$a
+        },
+        tail(
+          tokenize(
+            unparsed-text($a),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) ! {
+          "format":"hls-"||position(),
+          "container":"m3u8[h264+aac]",
+          "resolution":concat(
+            extract(
+              .,
+              "RESOLUTION=([\dx]+)",
+              1
+            ),
+            "@",
+            round(
+              number(
+                extract(
+                  .,
+                  "FRAME-RATE=([\d.]+)",
+                  1
+                )
+              )
+            ),
+            "fps"
+          ),
+          "bitrate":round(
+            extract(
+              .,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              .,
+              "(.+m3u8)",
+              1
+            ),
+            $a
+          )
+        }
+      ]
+    )
+  }
+'
