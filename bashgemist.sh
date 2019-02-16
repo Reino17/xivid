@@ -256,12 +256,12 @@ npo() {
                 "|"
               )||"kbps",
               "url":resolve-uri(
-                ".",
+                extract(
+                  $x,
+                  "(.+m3u8)",
+                  1
+                ),
                 $b
-              )||extract(
-                $x,
-                "(.+m3u8)",
-                1
               )
             },
             reverse(
@@ -407,9 +407,9 @@ rtl() {
             $b
           else
             resolve-uri(
-              ".",
+              $b,
               $a
-            )||$b
+            )
         }
       ]
     }
@@ -522,12 +522,12 @@ kijk() {
               ) div 1000
             )||"kbps",
             "url":resolve-uri(
-              ".",
+              extract(
+                .,
+                "(.+m3u8)",
+                1
+              ),
               $a
-            )||extract(
-              .,
-              "(.+m3u8)",
-              1
             )
           }
         ]
@@ -630,12 +630,12 @@ kijk() {
                 "|"
               )||"kbps",
               "url":resolve-uri(
-                ".",
+                extract(
+                  $x,
+                  "(.+m3u8)",
+                  1
+                ),
                 url
-              )||extract(
-                $x,
-                "(.+m3u8)",
-                1
               )
             }
           )
