@@ -1041,7 +1041,7 @@ Installeer Xidel a.u.b. om dit script te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
-elif [ $(xidel --version | grep -oP "\.\K\d{4}") -le 5651 ]; then
+elif [[ $(xidel --version | grep -oP "\.\K\d{4}") -le 5651 ]]; then
   cat 1>&2 <<EOF
 BashGemist, een video extractie script.
 Fout: Xidel gevonden, maar versie is te oud!
