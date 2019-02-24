@@ -3535,3 +3535,186 @@ $ xidel -s "https://vimeo.com/310786958" --xquery 'json(//script/extract(.,"clip
     )
   }
 '
+
+================================================================================================================================
+
+[nos]
+
+https://nos.nl/video/2263747-dit-is-waarom-het-internet-zich-zo-druk-maakt-over-artikel-13.html
+
+$ xidel -s "https://nos.nl/video/2263747-dit-is-waarom-het-internet-zich-zo-druk-maakt-over-artikel-13.html" -e '{"name":"NOS: "||//h1[ends-with(@class,"__title")],"date":replace(//@datetime,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"formats":let $a:=x:request({"url"://video//@src}) return [{"format":"hls-0","container":"m3u8[manifest]","url":$a/url},tail(tokenize($a/doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"bitrate":let $a:=extract(.,"audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",(1,2)) return join(($a[2][.],$a[1]),"|")||"kbps","url":resolve-uri(extract(.,"(.+m3u8)",1),$a/url)}]}'
+{
+  "name": "NOS: Dit is waarom het internet zich zo druk maakt over artikel 13",
+  "date": "16-12-2018",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://adaptive-e50c4b.npostreaming.nl/urishieldv2/l27m3bda2873496a69e8005c68a995000000.180e86c3ad607424229d5601884be61e/o/nos/content/video/2018/12/15/230871-d7a0f430ffd58a6afd83c0983ee7a4e1/230871-d7a0f430ffd58a6afd83c0983ee7a4e1.ism/230871-d7a0f430ffd58a6afd83c0983ee7a4e1.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "402|128kbps",
+      "url": "https://adaptive-e50c4b.npostreaming.nl/urishieldv2/l27m3bda2873496a69e8005c68a995000000.180e86c3ad607424229d5601884be61e/o/nos/content/video/2018/12/15/230871-d7a0f430ffd58a6afd83c0983ee7a4e1/230871-d7a0f430ffd58a6afd83c0983ee7a4e1.ism/230871-d7a0f430ffd58a6afd83c0983ee7a4e1-audio_eng=128000-video_eng=402000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "848x480",
+      "bitrate": "899|128kbps",
+      "url": "https://adaptive-e50c4b.npostreaming.nl/urishieldv2/l27m3bda2873496a69e8005c68a995000000.180e86c3ad607424229d5601884be61e/o/nos/content/video/2018/12/15/230871-d7a0f430ffd58a6afd83c0983ee7a4e1/230871-d7a0f430ffd58a6afd83c0983ee7a4e1.ism/230871-d7a0f430ffd58a6afd83c0983ee7a4e1-audio_eng=128000-video_eng=899000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "960x540",
+      "bitrate": "1294|128kbps",
+      "url": "https://adaptive-e50c4b.npostreaming.nl/urishieldv2/l27m3bda2873496a69e8005c68a995000000.180e86c3ad607424229d5601884be61e/o/nos/content/video/2018/12/15/230871-d7a0f430ffd58a6afd83c0983ee7a4e1/230871-d7a0f430ffd58a6afd83c0983ee7a4e1.ism/230871-d7a0f430ffd58a6afd83c0983ee7a4e1-audio_eng=128000-video_eng=1294000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "1795|128kbps",
+      "url": "https://adaptive-e50c4b.npostreaming.nl/urishieldv2/l27m3bda2873496a69e8005c68a995000000.180e86c3ad607424229d5601884be61e/o/nos/content/video/2018/12/15/230871-d7a0f430ffd58a6afd83c0983ee7a4e1/230871-d7a0f430ffd58a6afd83c0983ee7a4e1.ism/230871-d7a0f430ffd58a6afd83c0983ee7a4e1-audio_eng=128000-video_eng=1795000.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://nos.nl/livestream/npo-politiek.html
+
+$ xidel -s "https://nos.nl/livestream/npo-politiek.html" --xquery '{"name":concat("NOS: ",//h1[ends-with(@class,"__title")],if (//video/@data-type="livestream") then " Livestream" else ()),"date":if (//video/@data-type="livestream") then "'$(date "+%d-%m-%Y")'" else replace(//@datetime,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"formats":let $a:=x:request({"url"://video/(.//@src,@data-stream)}) return [{"format":"hls-0","container":"m3u8[manifest]","url":$a/url},for $x at $i in tail(tokenize($a/doc,"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":let $a:=extract($x,"audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",(1,2)) return join(($a[2][.],$a[1]),"|")||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a/url)}]}'
+{
+  "name": "NOS: NPO Politiek Livestream",
+  "date": "17-02-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://smoote2a.omroep.nl/urishieldv2/l2fm5a9ad3376a60dddd005c68afb9000000.3834dd60014701e58b841c9362ed84cc/live/npo/thematv/politiek24/politiek24.isml/politiek24.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "128kbps",
+      "url": "https://smoote2a.omroep.nl/urishieldv2/l2fm5a9ad3376a60dddd005c68afb9000000.3834dd60014701e58b841c9362ed84cc/live/npo/thematv/politiek24/politiek24.isml/politiek24-audio_nld=128000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "384x216",
+      "bitrate": "200|128kbps",
+      "url": "https://smoote2a.omroep.nl/urishieldv2/l2fm5a9ad3376a60dddd005c68afb9000000.3834dd60014701e58b841c9362ed84cc/live/npo/thematv/politiek24/politiek24.isml/politiek24-audio_nld=128000-video=200000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "499|128kbps",
+      "url": "https://smoote2a.omroep.nl/urishieldv2/l2fm5a9ad3376a60dddd005c68afb9000000.3834dd60014701e58b841c9362ed84cc/live/npo/thematv/politiek24/politiek24.isml/politiek24-audio_nld=128000-video=499968.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "768x432",
+      "bitrate": "1000|128kbps",
+      "url": "https://smoote2a.omroep.nl/urishieldv2/l2fm5a9ad3376a60dddd005c68afb9000000.3834dd60014701e58b841c9362ed84cc/live/npo/thematv/politiek24/politiek24.isml/politiek24-audio_nld=128000-video=1000000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1024x576",
+      "bitrate": "1400|128kbps",
+      "url": "https://smoote2a.omroep.nl/urishieldv2/l2fm5a9ad3376a60dddd005c68afb9000000.3834dd60014701e58b841c9362ed84cc/live/npo/thematv/politiek24/politiek24.isml/politiek24-audio_nld=128000-video=1400000.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  {
+    "name":concat(
+      "NOS: ",
+      //h1[ends-with(@class,"__title")],
+      if (//video/@data-type="livestream") then
+        " Livestream"
+      else
+        ()
+    ),
+    "date":if (//video/@data-type="livestream") then
+      "'$(date "+%d-%m-%Y")'"
+    else
+      replace(
+        //@datetime,
+        "(\d+)-(\d+)-(\d+).+",
+        "$3-$2-$1"
+      ),
+    "formats":let $a:=x:request(
+      {
+        "url"://video/(
+          .//@src,
+          @data-stream
+        )
+      }
+    ) return [
+      {
+        "format":"hls-0",
+        "container":"m3u8[manifest]",
+        "url":$a/url
+      },
+      for $x at $i in tail(
+        tokenize(
+          $a/doc,
+          "#EXT-X-STREAM-INF:"
+        )
+      ) order by extract(
+        $x,
+        "BANDWIDTH=(\d+)",
+        1
+      ) count $i
+      return {
+        "format":"hls-"||$i,
+        "container":if (
+          contains(
+            $x,
+            "avc1"
+          )
+        ) then
+          "m3u8[h264+aac]"
+        else
+          "m3u8[aac]",
+        "resolution":extract(
+          $x,
+          "RESOLUTION=([\dx]+)",
+          1
+        )[.],
+        "bitrate":let $a:=extract(
+          $x,
+          "audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",
+          (1,2)
+        ) return
+        join(
+          (
+            $a[2][.],
+            $a[1]
+          ),
+          "|"
+        )||"kbps",
+        "url":resolve-uri(
+          extract(
+            $x,
+            "(.+m3u8)",
+            1
+          ),
+          $a/url
+        )
+      }
+    ]
+  }
+'

@@ -34,6 +34,9 @@ Gebruik: ./bashgemist.sh [optie] url
 Ondersteunde websites:
   npostart.nl
   gemi.st
+  nos.nl
+  tvblik.nl
+  uitzendinggemist.net
   rtl.nl
   kijk.nl
   youtube.com
@@ -308,6 +311,90 @@ npo() {
         $c
       else
         ()
+    }
+  ' --output-format=bash)"
+}
+
+nos() {
+  eval "$(xidel "$1" --xquery '
+    json:={
+      "name":concat(
+        "NOS: ",
+        //h1[ends-with(@class,"__title")],
+        if (//video/@data-type="livestream") then
+          " Livestream"
+        else
+          ()
+      ),
+      "date":if (//video/@data-type="livestream") then
+        "'$(date "+%d-%m-%Y")'"
+      else
+        replace(
+          //@datetime,
+          "(\d+)-(\d+)-(\d+).+",
+          "$3-$2-$1"
+        ),
+      "formats":let $a:=x:request(
+        {
+          "url"://video/(
+            .//@src,
+            @data-stream
+          )
+        }
+      ) return [
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$a/url
+        },
+        for $x at $i in tail(
+          tokenize(
+            $a/doc,
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":let $a:=extract(
+            $x,
+            "audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",
+            (1,2)
+          ) return
+          join(
+            (
+              $a[2][.],
+              $a[1]
+            ),
+            "|"
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $a/url
+          )
+        }
+      ]
     }
   ' --output-format=bash)"
 }
@@ -1122,6 +1209,8 @@ if [[ $url =~ npostart.nl/live ]]; then
   npo "$(xidel "$url" -e '//npo-player/@media-id')"
 elif [[ $url =~ (npostart.nl|gemi.st) ]]; then
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
+elif [[ $url =~ nos.nl ]]; then
+  nos "$url"
 elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
   eval "$(xidel "$url" -e '
     join(
