@@ -1122,14 +1122,13 @@ info() {
           },
           $json/(formats)()
         ],
-        $f:=$e(1)() ! .[
+        $f:=for $x in $e(1)() return
+        distinct-values(
+          $json/(formats)()()[.!="url"]
+        )[
           contains(
-            [
-              distinct-values(
-                $json/(formats)()()[.!="url"]
-              )
-            ],
-            .
+            .,
+            $x
           )
         ],
         $g:=$f ! max(
