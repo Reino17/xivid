@@ -580,18 +580,23 @@ kijk() {
           (sources)()[not(drm) and type="m3u8"][1]/x:request(
             {
               "url":file,
-              "method":"HEAD"
+              "error-handling":"xxx=accept"
             }
-          )/(
+          )[
+            contains(
+              headers[1],
+              "200"
+            )
+          ]/(
             {
               "format":"hls-0",
               "container":"m3u8[manifest]",
               "url":url
-            }[url],
+            },
             for $x at $i in tail(
               tokenize(
                 extract(
-                  unparsed-text(url),
+                  doc,
                   "(#EXT-X-STREAM-INF.+m3u8$)",
                   1,"ms"
                 ),
