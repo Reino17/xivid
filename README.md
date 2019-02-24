@@ -110,23 +110,23 @@ Datum:         01-01-2019
 Tijdsduur:     00:16:06
 Gratis tot:    01-01-2101 00:59:00
 Ondertiteling: http://tt888.omroep.nl/tt888/POW_04059321
-Formaten:      formaat  extensie  resolutie  bitrate
-               pg-1     m4v
-               pg-2     m4v
-               pg-3     m4v
-               hls-0    m3u8      manifest
-               hls-1    m3u8      480x270    v:200k   a:96k
-               hls-2    m3u8      480x270    v:200k   a:128k
-               hls-3    m3u8      480x270    v:200k   a:192k
-               hls-4    m3u8      640x360    v:499k   a:96k
-               hls-5    m3u8      640x360    v:499k   a:128k
-               hls-6    m3u8      640x360    v:499k   a:192k
-               hls-7    m3u8      1024x576   v:1094k  a:96k
-               hls-8    m3u8      1024x576   v:1094k  a:128k
-               hls-9    m3u8      1024x576   v:1094k  a:192k
-               hls-10   m3u8      1024x576   v:1790k  a:96k
-               hls-11   m3u8      1024x576   v:1790k  a:128k
-               hls-12   m3u8      1024x576   v:1790k  a:192k  (best)
+Formaten:      formaat  container       resolutie  bitrate
+               pg-1     m4v[h264+aac]
+               pg-2     m4v[h264+aac]
+               pg-3     m4v[h264+aac]
+               hls-0    m3u8[manifest]
+               hls-1    m3u8[h264+aac]  480x270    200|96kbps
+               hls-2    m3u8[h264+aac]  480x270    200|128kbps
+               hls-3    m3u8[h264+aac]  480x270    200|192kbps
+               hls-4    m3u8[h264+aac]  640x360    499|96kbps
+               hls-5    m3u8[h264+aac]  640x360    499|128kbps
+               hls-6    m3u8[h264+aac]  640x360    499|192kbps
+               hls-7    m3u8[h264+aac]  1024x576   1094|96kbps
+               hls-8    m3u8[h264+aac]  1024x576   1094|128kbps
+               hls-9    m3u8[h264+aac]  1024x576   1094|192kbps
+               hls-10   m3u8[h264+aac]  1024x576   1790|96kbps
+               hls-11   m3u8[h264+aac]  1024x576   1790|128kbps
+               hls-12   m3u8[h264+aac]  1024x576   1790|192kbps  (best)
 ```
 Zonder optie/parameter wordt het formaat `hls-12` gekozen. Als bijv. formaat `hls-8` voor jou ook voldoende is, dan kun je dat met `-f` of `--format` opgeven:
 ```sh
@@ -201,23 +201,23 @@ Begin:         00:55:06
 Einde:         00:57:05
 Gratis tot:    01-01-2101 00:59:00
 Ondertiteling: http://tt888.omroep.nl/tt888/AT_2105785
-Formaten:      formaat  extensie  resolutie  bitrate
-               pg-1     m4v
-               pg-2     m4v
-               pg-3     m4v
-               hls-0    m3u8      manifest
-               hls-1    m3u8      480x270    v:202k   a:96k
-               hls-2    m3u8      480x270    v:202k   a:128k
-               hls-3    m3u8      480x270    v:202k   a:192k
-               hls-4    m3u8      640x360    v:504k   a:96k
-               hls-5    m3u8      640x360    v:504k   a:128k
-               hls-6    m3u8      640x360    v:504k   a:192k
-               hls-7    m3u8      1024x576   v:1109k  a:96k
-               hls-8    m3u8      1024x576   v:1109k  a:128k
-               hls-9    m3u8      1024x576   v:1109k  a:192k
-               hls-10   m3u8      1024x576   v:1813k  a:96k
-               hls-11   m3u8      1024x576   v:1813k  a:128k
-               hls-12   m3u8      1024x576   v:1813k  a:192k  (best)
+Formaten:      formaat  container       resolutie  bitrate
+               pg-1     m4v[h264+aac]
+               pg-2     m4v[h264+aac]
+               pg-3     m4v[h264+aac]
+               hls-0    m3u8[manifest]
+               hls-1    m3u8[h264+aac]  480x270    202|96kbps
+               hls-2    m3u8[h264+aac]  480x270    202|128kbps
+               hls-3    m3u8[h264+aac]  480x270    202|192kbps
+               hls-4    m3u8[h264+aac]  640x360    504|96kbps
+               hls-5    m3u8[h264+aac]  640x360    504|128kbps
+               hls-6    m3u8[h264+aac]  640x360    504|192kbps
+               hls-7    m3u8[h264+aac]  1024x576   1109|96kbps
+               hls-8    m3u8[h264+aac]  1024x576   1109|128kbps
+               hls-9    m3u8[h264+aac]  1024x576   1109|192kbps
+               hls-10   m3u8[h264+aac]  1024x576   1813|96kbps
+               hls-11   m3u8[h264+aac]  1024x576   1813|128kbps
+               hls-12   m3u8[h264+aac]  1024x576   1813|192kbps  (best)
 
 Download:      ffmpeg -ss 00:55:00 -i [url] -ss 00:00:06 -t 00:01:59 [...]
 ```
@@ -238,32 +238,30 @@ BashGemist is een video extractie script en geeft (al dan niet met `-f` of `--fo
   "formats": [
     {
       "format": "pg-1",
-      "extension": "m4v",
+      "container": "m4v[h264+aac]",
       "url": "https://content10c4b.omroep.nl/urishieldv2/l27m6c2ec29c3fcf372e005c276570000000.b055f6717fc4e0b8ea2ae9042d1291e2/ceresodi/h264/p/06/10/10/f7/sb_AT_2105785.m4v"
     },
     {
       "format": "pg-2",
-      "extension": "m4v",
+      "container": "m4v[h264+aac]",
       "url": "https://content10c4c.omroep.nl/urishieldv2/l27m34ec48023fb78477005c276570000000.171fddf89df4a5190ac631f86a056b63/ceresodi/h264/p/06/10/10/f7/bb_AT_2105785.m4v"
     },
     {
       "format": "pg-3",
-      "extension": "m4v",
+      "container": "m4v[h264+aac]",
       "url": "https://content10c4a.omroep.nl/urishieldv2/l27m3187fe3c262e9d50005c276570000000.d1015a8a55fc8f98ef42e675570af912/ceresodi/h264/p/06/10/10/f7/std_AT_2105785.m4v"
     },
     {
       "format": "hls-0",
-      "extension": "m3u8",
-      "resolution": "manifest",
+      "container": "m3u8[manifest]",
       "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785.m3u8"
     },
     [...],
     {
       "format": "hls-12",
-      "extension": "m3u8",
+      "container": "m3u8[h264+aac]",
       "resolution": "1024x576",
-      "vbitrate": "v:1813k",
-      "abitrate": "a:192k",
+      "bitrate": "1813|192kbps",
       "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=1813000.m3u8"
     }
   ]
