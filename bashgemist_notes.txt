@@ -3718,3 +3718,119 @@ $ xidel -s "https://nos.nl/livestream/npo-politiek.html" --xquery '{"name":conca
     ]
   }
 '
+
+================================================================================================================================
+
+[dumpert]
+
+https://www.dumpert.nl/mediabase/7629097/eca3888b/monfils_wint_abn_amro_in_stijl.html
+
+$ xidel -s -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" --xquery '{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//p[@class="dump-pub"]," ") return join((if ($b[1]<10) then '0'||$b[1] else $b[1],$a($b[2]),$b[3]),"-"),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
+{
+  "name": "Dumpert: GOUD. Dafne Schippers wint 200m Bejing!",
+  "date": "28-08-2015",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "flv[h264+aac]",
+      "url": "https://media.dumpert.nl/flv/4301bfad_schippers.mp4.mp4.flv"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "url": "https://media.dumpert.nl/mobile/4301bfad_schippers.mp4.mp4.mp4"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "url": "https://media.dumpert.nl/tablet/4301bfad_schippers.mp4.mp4.mp4"
+    },
+    {
+      "format": "pg-4",
+      "container": "mp4[h264+aac]",
+      "url": "https://media.dumpert.nl/720p/4301bfad_schippers.mp4.mp4.mp4"
+    }
+  ]
+}
+
+https://www.dumpert.nl/embed/6678198/4301bfad/
+
+Gebruik altijd de non-embedded url als bron.
+
+$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/embed/6678198/4301bfad/" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//p[@class="dump-pub"]," ") return join((if ($b[1]<10) then '0'||$b[1] else $b[1],$a($b[2]),$b[3]),"-"),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
+
+https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html (embedded youtube video)
+
+$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/(if (//iframe) then replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1") else {"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//p[@class="dump-pub"]," ") return join((if ($b[1]<10) then '0'||$b[1] else $b[1],$a($b[2]),$b[3]),"-"),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}})'
+https://youtu.be/CZ_9DCl6O4M
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  (
+    if (//body[@id="embed"]) then
+      doc(//meta[@property="og:url"]/@content)
+    else
+      .
+  )/(
+    if (//iframe) then
+      replace(
+        //iframe/@src,
+        ".+/(.+)\?.+",
+        "https://youtu.be/$1"
+      )
+    else {
+      "name":"Dumpert: "||//div[@class="dump-desc"]/h1,
+      "date":let $a:={
+            "januari":"01",
+            "februari":"02",
+            "maart":"03",
+            "april":"04",
+            "mei":"05",
+            "juni":"06",
+            "juli":"07",
+            "augustus":"08",
+            "september":"09",
+            "oktober":"10",
+            "november":"11",
+            "december":"12"
+          },
+          $b:=tokenize(
+            //p[@class="dump-pub"],
+            " "
+          )
+      return
+      join(
+        (
+          if ($b[1]<10) then
+            '0'||$b[1]
+          else
+            $b[1],
+          $a($b[2]),
+          $b[3]
+        ),
+        "-"
+      ),
+      "formats":let $a:=json(
+        binary-to-string(
+          base64Binary(//@data-files)
+        )
+      )
+      for $x at $i in (
+        "flv",
+        "mobile",
+        "tablet",
+        "720p"
+      ) ! $a(.)
+      return {
+        "format":"pg-"||$i,
+        "container":extract(
+          $x,
+          ".+\.(.+)",
+          1
+        )||"[h264+aac]",
+        "url":$x
+      }
+    }
+  )
+'

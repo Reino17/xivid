@@ -39,6 +39,7 @@ Ondersteunde websites:
   uitzendinggemist.net
   rtl.nl
   kijk.nl
+  dumpert.nl
   youtube.com
   youtu.be
   vimeo.com
@@ -737,6 +738,81 @@ kijk() {
   ' --output-format=bash)"
 }
 
+dumpert() {
+  eval "$(xidel "$1" --xquery '
+    json:=(
+      if (//body[@id="embed"]) then
+        doc(//meta[@property="og:url"]/@content)
+      else
+        .
+    )/(
+      if (//iframe) then
+        replace(
+          //iframe/@src,
+          ".+/(.+)\?.+",
+          "https://youtu.be/$1"
+        )
+      else {
+        "name":"Dumpert: "||//div[@class="dump-desc"]/h1,
+        "date":let $a:={
+              "januari":"01",
+              "februari":"02",
+              "maart":"03",
+              "april":"04",
+              "mei":"05",
+              "juni":"06",
+              "juli":"07",
+              "augustus":"08",
+              "september":"09",
+              "oktober":"10",
+              "november":"11",
+              "december":"12"
+            },
+            $b:=tokenize(
+              //p[@class="dump-pub"],
+              " "
+            )
+        return
+        join(
+          (
+            if ($b[1]<10) then
+              '0'||$b[1]
+            else
+              $b[1],
+            $a($b[2]),
+            $b[3]
+          ),
+          "-"
+        ),
+        "formats":let $a:=json(
+          binary-to-string(
+            base64Binary(//@data-files)
+          )
+        )
+        for $x at $i in (
+          "flv",
+          "mobile",
+          "tablet",
+          "720p"
+        ) ! $a(.)
+        return {
+          "format":"pg-"||$i,
+          "container":extract(
+            $x,
+            ".+\.(.+)",
+            1
+          )||"[h264+aac]",
+          "url":$x
+        }
+      }
+    )
+  ' --output-format=bash)"
+
+if [[ $json =~ youtu.be ]]; then
+  youtube "$json"
+fi
+}
+
 youtube() {
   eval "$(xidel "$1" --xquery '
     json:=json(
@@ -1232,6 +1308,8 @@ elif [[ $url =~ rtl.nl ]]; then
   rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
+elif [[ $url =~ dumpert.nl ]]; then
+  dumpert "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
 elif [[ $url =~ vimeo.com ]]; then
