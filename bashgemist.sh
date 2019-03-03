@@ -855,13 +855,19 @@ youtube() {
         )/args/player_response
     )/{
       "name":videoDetails/title,
-      "date":format-date(
-        round(
-          min(streamingData//lastModified) div 1000000
-        ) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),
+      "date":if (videoDetails/isLive) then
+        "'$(date "+%d-%m-%Y")'"
+      else
+        format-date(
+          round(
+            min(streamingData//lastModified) div 1000000
+          ) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
+          "[D01]-[M01]-[Y]"
+        ),
+      "duration":if (videoDetails/isLive) then
+        ()
+      else
+        videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),
       "formats":streamingData/[
         for $x at $i in (formats)()
         order by $x/contentLength
@@ -996,7 +1002,51 @@ youtube() {
               bitrate div 1000
             )||"kbps",
             "url":url
-          }
+          },
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":hlsManifestUrl
+        }[url],
+        tail(
+          tokenize(
+            unparsed-text(hlsManifestUrl),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) ! {
+          "format":"hls-"||position(),
+          "container":"m3u8[h264+aac]",
+          "resolution":concat(
+            extract(
+              .,
+              "RESOLUTION=([\dx]+)",
+              1
+            ),
+            "@",
+            round(
+              number(
+                extract(
+                  .,
+                  "FRAME-RATE=([\d.]+)",
+                  1
+                )
+              )
+            ),
+            "fps"
+          ),
+          "bitrate":round(
+            extract(
+              .,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":extract(
+            .,
+            "(.+m3u8)",
+            1
+          )
+        }
       ]
     }
   ' --output-format=bash)"
