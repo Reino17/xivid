@@ -1210,7 +1210,7 @@ info() {
           string-join(
             for $y at $i in $f return
             substring(
-              $x($y)||$h,
+              $x($y)[.]||$h,
               1,
               $g[$i]+2
             )
