@@ -51,267 +51,193 @@ Voorbeelden:
 EOF
 }
 
-npo() {
-  eval "$(xidel "http://e.omroep.nl/metadata/$1" --xquery '
-    json:=json(
-      extract(
-        $raw,
-        "\((.+)\)",
-        1
-      )
-    )[not(error)]/{
-      "name":if (medium="live") then
-        titel||": Livestream"
-      else
-        replace(
-          concat(
-            if (count(.//naam)=1) then
-              .//naam
-            else
-              join(
-                .//naam,
-                " en "
-              ),
-            ": ",
-            if (ptype="episode") then
-              if (aflevering_titel) then
-                if (
-                  contains(
-                    titel,
-                    aflevering_titel
-                  )
-                ) then
-                  titel
-                else if (
-                  contains(
-                    aflevering_titel,
-                    titel
-                  )
-                ) then
-                  aflevering_titel
-                else
-                  concat(
-                    titel,
-                    " - ",
-                    aflevering_titel
-                  )
-              else
-                titel
-            else
-              concat(
-                .//serie_titel,
-                " - ",
-                titel
-              )
-          ),
-          "[&quot;&apos;]",
-          "'\'\''"
-        ),
-      "date":if (medium="live") then
-        "'$(date "+%d-%m-%Y")'"
-      else (
-        if (gidsdatum) then
-          format-date(
-            date(gidsdatum),
-            "[D01]-[M01]-[Y]"
-          )
-        else if (
-          matches(
-            "'$url'",
-            "\d{2}-\d{2}-\d{4}"
-          )
-        ) then
-          extract(
-            "'$url'",
-            ".+/([\d-]+)",
-            1
-          )
-        else
-          extract(
-            x:request(
-              {
-                "url":"https://www.npostart.nl/'$1'",
-                "method":"HEAD"
-              }
-            )/url,
-            ".+/([\d-]+)",
-            1
-          )
+npo_live() {
+  eval "$(xidel "$1" --xquery '
+    json:={
+      "name":replace(
+        //title,
+        " - Live tv",
+        ": Livestream"
       ),
-      "duration":if (tijdsduur) then
-        tijdsduur
-      else
-        (),
-      "start":start,
-      "end":eind,
-      "expdate":if (publicatie_eind) then
-        format-dateTime(
-          dateTime(publicatie_eind),
-          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+      "date":"'$(date "+%d-%m-%Y")'",
+      "formats":json(
+        concat(
+          "http://ida.omroep.nl/app.php/",
+          //npo-player/@media-id,
+          "?token=",
+          json("http://ida.omroep.nl/app.php/auth")/token
         )
-      else
-        (),
-      "subtitle":if (tt888="ja") then
-        "http://tt888.omroep.nl/tt888/"||prid
-      else
-        (),
-      "formats":let $a:=x:request(
-            {
-              "url":"http://ida.omroep.nl/app.php/'$1'?token="||json(
-                "http://ida.omroep.nl/app.php/auth"
-              )/token,
-              "error-handling":"4xx=accept"
-            }
-          )[
-            contains(
-              headers[1],
-              "200"
-            )
-          ]/json/(items)()(),
-          $b:=$a[format="hls"]/x:request(
-            {
-              "url":replace(
-                url,
-                "jsonp",
-                "json"
-              ),
-              "error-handling":"4xx=accept"
-            }
-          )[
-            contains(
-              headers[1],
-              "200"
-            )
-          ]/(
-            if (json instance of string) then
-              json
-            else
-              json/url
+      )/x:request(
+        {
+          "url":replace(
+            .//url,
+            "jsonp",
+            "json"
           ),
-          $c:=[
-            reverse(
-              $a[contentType="odi"][format="mp4"]
-            )/x:request(
-              {
-                "url":replace(
-                  url,
-                  "jsonp",
-                  "json"
-                ),
-                "error-handling":"4xx=accept"
-              }
-            )[
-              contains(
-                headers[1],
-                "200"
-              )
-            ]/json/substring-before(
-              url,
-              "?"
-            ) ! {
-              "format":"pg-"||position(),
-              "container":"m4v[h264+aac]",
-              "url":.
-            },
-            {
-              "format":"hls-0",
-              "container":"m3u8[manifest]",
-              "url":$b
-            }[url],
-            for $x at $i in tail(
-              tokenize(
-                extract(
-                  unparsed-text($b),
-                  "(#EXT-X-STREAM-INF.+m3u8$)",
-                  1,"ms"
-                ),
-                "#EXT-X-STREAM-INF:"
-              )
-            ) order by extract(
+          "error-handling":"4xx=accept"
+        }
+      )[json]/[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":json
+        },
+        for $x at $i in tail(
+          tokenize(
+            extract(
+              unparsed-text(json),
+              "(#EXT-X-STREAM-INF.+m3u8$)",
+              1,"ms"
+            ),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
               $x,
-              "BANDWIDTH=(\d+)",
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":let $a:=extract(
+            $x,
+            "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
+            (1,2)
+          ) return
+          join(
+            (
+              $a[2][.],
+              $a[1]
+            ),
+            "|"
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
               1
-            ) count $i
-            return {
-              "format":"hls-"||$i,
-              "container":if (
-                contains(
-                  $x,
-                  "avc1"
-                )
-              ) then
-                "m3u8[h264+aac]"
-              else
-                "m3u8[aac]",
-              "resolution":extract(
-                $x,
-                "RESOLUTION=([\dx]+)",
-                1
-              )[.],
-              "bitrate":let $a:=extract(
-                $x,
-                "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
-                (1,2)
-              ) return
-              join(
-                (
-                  $a[2][.],
-                  $a[1]
-                ),
-                "|"
-              )||"kbps",
-              "url":resolve-uri(
-                extract(
-                  $x,
-                  "(.+m3u8)",
-                  1
-                ),
-                $b
-              )
-            },
-            reverse(
-              $a[contentType="url"][format="mp4"]
-            )/x:request(
-              {
-                "url":url,
-                "method":"HEAD",
-                "error-handling":"xxx=accept"
-              }
-            )[
-              some $x in ("200","302") satisfies contains(
-                headers[1],
-                $x
-              )
-            ]/(
-              if (
-                contains(
-                  url,
-                  "content-ip"
-                )
-              ) then
-                x:request(
-                  {
-                    "url":"https://ipv4-api.nos.nl/resolve.php/video?url="||uri-encode(url),
-                    "method":"HEAD"
-                  }
-                )/url
-              else
-                url
-            ) ! {
-              "format":"mp4-"||position(),
-              "container":extract(
-                .,
-                ".+\.(.+)",
-                1
-              )||"[h264+aac]",
-              "url":.
-            }
-          ]
-      return
-      if ($c()) then
-        $c
-      else
-        ()
+            ),
+            json
+          )
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
+npo() {
+  eval "$(xidel --xquery '
+    let $a:=x:request(
+          {
+            "header":"X-Requested-With: XMLHttpRequest",
+            "url":"https://www.npostart.nl/api/token"
+          }
+        )/json/x:request(
+          {
+            "post":"_token="||token,
+            "url":"https://www.npostart.nl/player/'$1'"
+          }
+        )/json,
+        $b:=json(
+          doc($a/embedUrl)//script/extract(
+            .,
+            "var video =(.+);",
+            1
+          )[.]
+        ),
+        $c:=json(
+          concat(
+            "https://start-player.npo.nl/video/'$1'",
+            "/streams?profile=hls&amp;quality=npo&amp;tokenId=",
+            $a/token
+          )
+        )/stream[not(protection)]/src
+    return json:={
+      "name":$b/concat(
+        franchiseTitle,
+        ": ",
+        title
+      ),
+      "date":format-date(
+        dateTime($b/broadcastDate),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        $b/duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "subtitle":$b/(subtitles)()/src,
+      "formats":[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$c
+        }[url],
+        for $x at $i in tail(
+          tokenize(
+            extract(
+              unparsed-text($c),
+              "(#EXT-X-STREAM-INF.+m3u8$)",
+              1,"ms"
+            ),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":let $a:=extract(
+            $x,
+            "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
+            (1,2)
+          ) return
+          join(
+            (
+              $a[2][.],
+              $a[1]
+            ),
+            "|"
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $c
+          )
+        }
+      ]
     }
   ' --output-format=bash)"
 }
@@ -1331,7 +1257,7 @@ while true; do
 done
 
 if [[ $url =~ npostart.nl/live ]]; then
-  npo "$(xidel "$url" -e '//npo-player/@media-id')"
+  npo_live "$url"
 elif [[ $url =~ (npostart.nl|gemi.st) ]]; then
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
 elif [[ $url =~ nos.nl ]]; then
