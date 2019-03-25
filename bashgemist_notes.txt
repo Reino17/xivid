@@ -4226,3 +4226,169 @@ https://youtu.be/CZ_9DCl6O4M
     }
   )
 '
+
+================================================================================================================================
+
+[omrop fryslân]
+
+https://www.omropfryslan.nl/live/omrop-fryslan-tv
+
+$ xidel -s "https://www.omropfryslan.nl/live/omrop-fryslan-tv" -e '//meta[@itemprop="embedURL"]/extract(@content,".+(http.+xml)",1)'
+https://omropfryslan.bbvms.com/mediaclip/2970835.xml
+
+$ xidel -s "https://www.omropfryslan.nl/live/omrop-fryslan-tv" -e '{"name"://meta[@itemprop="name"]/@content||": Livestream","date":"'$(date "+%d-%m-%Y")'","formats":let $a:=doc(//meta[@itemprop="embedURL"]/extract(@content,".+(http.+xml)",1))//asset/@src return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"bitrate":extract(.,"(\d+)/.+m3u8",1)||"kbps","url":resolve-uri(extract(.,"(.+m3u8)",1),$a)}]}'
+{
+  "name": "Omrop Fryslân TV: Livestream",
+  "date": "22-03-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "400kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/400/prog_index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "960x540",
+      "bitrate": "1200kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/1200/prog_index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2000kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/2000/prog_index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700
+
+$ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700" -e '//meta[@itemprop="embedURL"]/extract(@content,"defaultMediaAssetPath=(.+?)&.+clipXmlUrl=(.+?)&",(1,2))'
+https://d3pvma9xb2775h.cloudfront.net
+https://omropfryslan.bbvms.com/mediaclip/3277401.xml
+
+$ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700" --xquery '{"name":"Omrop Fryslân: "||//h1,"date":replace(//meta[@itemprop="dateModified"]/@content,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":duration("P"||//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[let $a:=//meta[@itemprop="embedURL"]/extract(@content,"defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",(1,2)) for $x at $i in doc($a[2])//asset order by $x/@bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/@width,"x",$x/@height),"bitrate":$x/@bandwidth||"kbps","url":resolve-uri($x/@src,$a[1])}]}'
+{
+  "name": "Omrop Fryslân: Fryslân Hjoed fan 21 maart 2019 17:00",
+  "date": "21-03-2019",
+  "duration": "00:28:24",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "480x272",
+      "bitrate": "525kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2019/03/21/Asset_iPOD_FRYSLANHJOED_2019-03-21.mp4"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "720x400",
+      "bitrate": "1126kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2019/03/21/Asset_SD_FRYSLANHJOED_2019-03-21.mp4"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "6142kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2019/03/21/Asset_HD_FRYSLANHJOED_2019-03-21.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+Eén query voor beide videostreams:
+
+$ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700" --xquery 'let $a:=//meta[@itemprop="embedURL"]/extract(@content,"defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",(1,2)),$b:=doc($a[2]) return if ($b//@sourcetype="live") then {"name"://meta[@itemprop="name"]/@content||": Livestream","date":"'$(date "+%d-%m-%Y")'","formats":[{"format":"hls-0","container":"m3u8[manifest]","url":$b//asset/@src},tail(tokenize(unparsed-text($b//asset/@src),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1),"bitrate":extract(.,"(\d+)/.+m3u8",1)||"kbps","url":resolve-uri(extract(.,"(.+m3u8)",1),$b//asset/@src)}]} else {"name":"Omrop Fryslân: "||//h1,"date":replace(//meta[@itemprop="dateModified"]/@content,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":duration("P"||//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in $b//asset order by $x/@bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/@width,"x",$x/@height),"bitrate":$x/@bandwidth||"kbps","url":resolve-uri($x/@src,$a[1])}]}'
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:=//meta[@itemprop="embedURL"]/extract(
+        @content,
+        "defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",
+        (1,2)
+      ),
+      $b:=doc($a[2])
+  return
+  if ($b//@sourcetype="live") then {
+    "name"://meta[@itemprop="name"]/@content||": Livestream",
+    "date":"'$(date "+%d-%m-%Y")'",
+    "formats":[
+      {
+        "format":"hls-0",
+        "container":"m3u8[manifest]",
+        "url":$b//asset/@src
+      },
+      tail(
+        tokenize(
+          unparsed-text($b//asset/@src),
+          "#EXT-X-STREAM-INF:"
+        )
+      ) ! {
+        "format":"hls-"||position(),
+        "container":"m3u8[h264+aac]",
+        "resolution":extract(
+          .,
+          "RESOLUTION=([\dx]+)",
+          1
+        ),
+        "bitrate":extract(
+          .,
+          "(\d+)/.+m3u8",
+          1
+        )||"kbps",
+        "url":resolve-uri(
+          extract(
+            .,
+            "(.+m3u8)",
+            1
+          ),
+          $b//asset/@src
+        )
+      }
+    ]
+  } else {
+    "name":"Omrop Fryslân: "||//h1,
+    "date":replace(
+      //meta[@itemprop="dateModified"]/@content,
+      "(\d+)-(\d+)-(\d+).+",
+      "$3-$2-$1"
+    ),
+    "duration":duration(
+      "P"||//meta[@itemprop="duration"]/@content
+    ) + time("00:00:00"),
+    "formats":[
+      for $x at $i in $b//asset
+      order by $x/@bandwidth
+      count $i
+      return {
+        "format":"pg-"||$i,
+        "container":"mp4[h264+aac]",
+        "resolution":concat(
+          $x/@width,
+          "x",
+          $x/@height
+        ),
+        "bitrate":$x/@bandwidth||"kbps",
+        "url":resolve-uri(
+          $x/@src,
+          $a[1]
+        )
+      }
+    ]
+  }
+'

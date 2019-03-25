@@ -39,6 +39,7 @@ Ondersteunde websites:
   uitzendinggemist.net
   rtl.nl
   kijk.nl
+  omropfryslan.nl
   dumpert.nl
   youtube.com
   youtu.be
@@ -701,6 +702,85 @@ kijk() {
   ' --output-format=bash)"
 }
 
+omropfryslan() {
+  eval "$(xidel "$1" --xquery '
+    let $a:=//meta[@itemprop="embedURL"]/extract(
+          @content,
+          "defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",
+          (1,2)
+        ),
+        $b:=doc($a[2])
+    return
+    json:=if ($b//@sourcetype="live") then {
+      "name"://meta[@itemprop="name"]/@content||": Livestream",
+      "date":"'$(date "+%d-%m-%Y")'",
+      "formats":[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$b//asset/@src
+        },
+        tail(
+          tokenize(
+            unparsed-text($b//asset/@src),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) ! {
+          "format":"hls-"||position(),
+          "container":"m3u8[h264+aac]",
+          "resolution":extract(
+            .,
+            "RESOLUTION=([\dx]+)",
+            1
+          ),
+          "bitrate":extract(
+            .,
+            "(\d+)/.+m3u8",
+            1
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              .,
+              "(.+m3u8)",
+              1
+            ),
+            $b//asset/@src
+          )
+        }
+      ]
+    } else {
+      "name":"Omrop Fryslân: "||//h1,
+      "date":replace(
+        //meta[@itemprop="dateModified"]/@content,
+        "(\d+)-(\d+)-(\d+).+",
+        "$3-$2-$1"
+      ),
+      "duration":duration(
+        "P"||//meta[@itemprop="duration"]/@content
+      ) + time("00:00:00"),
+      "formats":[
+        for $x at $i in $b//asset
+        order by $x/@bandwidth
+        count $i
+        return {
+          "format":"pg-"||$i,
+          "container":"mp4[h264+aac]",
+          "resolution":concat(
+            $x/@width,
+            "x",
+            $x/@height
+          ),
+          "bitrate":$x/@bandwidth||"kbps",
+          "url":resolve-uri(
+            $x/@src,
+            $a[1]
+          )
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 dumpert() {
   eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
     json:=(
@@ -1328,6 +1408,8 @@ elif [[ $url =~ rtl.nl ]]; then
   rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
+elif [[ $url =~ omropfryslan.nl ]]; then
+  omropfryslan "$url"
 elif [[ $url =~ dumpert.nl ]]; then
   dumpert "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
