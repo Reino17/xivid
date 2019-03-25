@@ -1189,25 +1189,33 @@ info() {
           1,
           $c+1
         )||"-",
-      if (start) then (
-        "",
-        concat(
-          substring(
-            "Download:"||$d,
-            1,
-            $c+1
-          ),
-          "ffmpeg -ss ",
-          time(start) - (
-            seconds-from-time(start) mod 30 * duration("PT1S")
-          ),
-          " -i [url] -ss ",
-          seconds-from-time(start) mod 30,
-          " -t ",
-          duration,
-          " [...]"
+      if (start) then
+        let $i:=seconds-from-time(start) mod 30,
+            $j:=time(start) - ($i * duration("PT1S"))
+        return (
+          "",
+          concat(
+            substring(
+              "Download:"||$d,
+              1,
+              $c+1
+            ),
+            "ffmpeg",
+            if ($j="00:00:00") then
+              ()
+            else
+              " -ss "||$j,
+            " -i <url>",
+            if ($i=0) then
+              ()
+            else
+              " -ss "||$i,
+            " -t ",
+            duration,
+            " [...]"
+          )
         )
-      ) else
+      else
         ()
     )
   ' <<< $1
