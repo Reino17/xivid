@@ -702,7 +702,7 @@ kijk() {
 }
 
 dumpert() {
-  eval "$(xidel "$1" --xquery '
+  eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
     json:=(
       if (//body[@id="embed"]) then
         doc(//meta[@property="og:url"]/@content)
