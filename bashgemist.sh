@@ -20,7 +20,7 @@
 
 show_help() {
   cat <<EOF
-BashGemist, een video extractie script.
+BashGemist, een video-url extractie script.
 Gebruik: ./bashgemist.sh [optie] url
 
   -h, --help              Toon deze hulppagina.
@@ -45,9 +45,9 @@ Ondersteunde websites:
   vimeo.com
 
 Voorbeelden:
-  ./bashgemist.sh -f hls-11 https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321
-  ./bashgemist.sh https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd
-  ./bashgemist.sh -i https://www.kijk.nl/video/nHD4my1HMKu
+  ./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2017/POW_03375409
+  ./bashgemist.sh -i https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd
+  ./bashgemist.sh -f hls-6 https://www.kijk.nl/video/nHD4my1HMKu
 EOF
 }
 
@@ -1215,7 +1215,7 @@ info() {
 
 if ! command -v xidel >/dev/null; then
   cat 1>&2 <<EOF
-BashGemist, een video extractie script.
+BashGemist, een video-url extractie script.
 Fout: Xidel niet gevonden!
 Installeer Xidel a.u.b. om dit script te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
@@ -1223,7 +1223,7 @@ EOF
   exit 1
 elif [[ $(xidel --version | xidel -s - -e 'extract($raw,"\.(\d{4})\.",1,"s")') -le 5651 ]]; then
   cat 1>&2 <<EOF
-BashGemist, een video extractie script.
+BashGemist, een video-url extractie script.
 Fout: Xidel gevonden, maar versie is te oud!
 Installeer Xidel 0.9.7.5651 of nieuwer a.u.b.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
@@ -1235,7 +1235,7 @@ user_agent="Mozilla/5.0 Firefox/64.0"
 
 if [[ -z "$@" ]]; then
   cat 1>&2 <<EOF
-BashGemist, een video extractie script.
+BashGemist, een video-url extractie script.
 Gebruik: ./bashgemist.sh [optie] url
 Typ -h of --help voor een lijst van alle opties.
 EOF

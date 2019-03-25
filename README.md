@@ -1,4 +1,4 @@
-BashGemist, een video extractie script.
+BashGemist, een video-url extractie script.
 
 - [Download](#download)
 - [Xidel](#xidel)
@@ -24,7 +24,8 @@ Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#dow
 Installeer vervolgens `openssl`, `openssl-dev` en `libcrypto` zodat Xidel beveiligde https-urls kan openen.
 
 ## Windows
-BashGemist is een Linux Bash script, maar m.b.v. [Cygwin](https://www.cygwin.com/) is dit script ook in Windows te gebruiken.
+BashGemist is een Linux Bash script, maar m.b.v. [Cygwin](https://www.cygwin.com/) is dit script ook in Windows te gebruiken.<br>
+In Windows 10 zou het zelfs zonder Cygwin kunnen door gebruik te maken van Windows Subsystem for Linux (WSL). Ik zelf maak nog geen gebruik van Windows 10, dus informatie hieromtrent is altijd welkom.
 
 Download en installeer [Cygwin](https://cygwin.com/install.html) en download de Xidel [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads).
 
@@ -74,8 +75,8 @@ Gebruik: ./bashgemist.sh [optie] url
   -j, --json              Toon video informatie als JSON.
   -d, --debug             Toon bash debug informatie.
 ```
-(Gebruik `-h` of `--help` voor een actueel overzicht van ondersteunde websites.
-)
+Gebruik `-h` of `--help` voor een actueel overzicht van ondersteunde websites.
+
 ## Linux
 Start de Bash terminal, ga naar de map met `bashgemist.sh` en je kunt van start.
 
@@ -95,45 +96,37 @@ bash.exe -c "./bashgemist.sh %*"
 Standaard verwijst `bashgemist.bat` naar `C:\Cygwin\bin` voor alle Cygwin programma's. Verander dit eerst als je Cygwin ergens anders hebt geïnstalleerd!
 
 # Voorbeelden
-We nemen `https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321`, het NOS Journaal van 1 januari 2019 20:00u, als voorbeeld:
+We nemen `https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558`, het NOS Journaal van 28 februari 2017 20:00u, als voorbeeld:
 ```sh
-./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321
-https://adaptive-e50c3b.npostreaming.nl/urishieldv2/l27m4ed46ff85cb0a64d005c30a3ee000000.65560b094905392c010612d533fbae00/p/2a/10/10/5e/POW_04059321/POW_04059321.ism/POW_04059321-audio=192000-video=1790000.m3u8
+./bashgemist.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
+https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=1109000.m3u8
 ```
 Zonder optie/parameter geeft BashGemist de video-url van het beste formaat terug.
 
 Heb je liever een ander formaat, dan zul je er eerst achter moeten komen welke formaten er allemaal beschikbaar zijn. Daar is de optie/parameter `-i` of `--info` voor:
 ```sh
-./bashgemist.sh -i https://www.npostart.nl/nos-journaal/01-01-2019/POW_04059321
-Naam:          NOS: NOS Journaal
-Datum:         01-01-2019
-Tijdsduur:     00:16:06
-Gratis tot:    01-01-2101 00:59:00
-Ondertiteling: http://tt888.omroep.nl/tt888/POW_04059321
+./bashgemist.sh -i https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
+Naam:          NOS Journaal 20.00 uur
+Datum:         28-02-2017
+Tijdsduur:     00:25:37
+Ondertiteling: https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt
 Formaten:      formaat  container       resolutie  bitrate
-               pg-1     m4v[h264+aac]
-               pg-2     m4v[h264+aac]
-               pg-3     m4v[h264+aac]
                hls-0    m3u8[manifest]
-               hls-1    m3u8[h264+aac]  480x270    200|96kbps
-               hls-2    m3u8[h264+aac]  480x270    200|128kbps
-               hls-3    m3u8[h264+aac]  480x270    200|192kbps
-               hls-4    m3u8[h264+aac]  640x360    499|96kbps
-               hls-5    m3u8[h264+aac]  640x360    499|128kbps
-               hls-6    m3u8[h264+aac]  640x360    499|192kbps
-               hls-7    m3u8[h264+aac]  1024x576   1094|96kbps
-               hls-8    m3u8[h264+aac]  1024x576   1094|128kbps
-               hls-9    m3u8[h264+aac]  1024x576   1094|192kbps
-               hls-10   m3u8[h264+aac]  1024x576   1790|96kbps
-               hls-11   m3u8[h264+aac]  1024x576   1790|128kbps
-               hls-12   m3u8[h264+aac]  1024x576   1790|192kbps  (best)
+               hls-1    m3u8[aac]                  64kbps
+               hls-2    m3u8[aac]                  128kbps
+               hls-3    m3u8[h264+aac]  480x270    203|64kbps
+               hls-4    m3u8[h264+aac]  640x360    506|128kbps
+               hls-5    m3u8[h264+aac]  768x432    707|128kbps
+               hls-6    m3u8[h264+aac]  1024x576   1109|128kbps  (best)
 ```
-Zonder optie/parameter wordt het formaat `hls-12` gekozen. Als bijv. formaat `hls-8` voor jou ook voldoende is, dan kun je dat met `-f` of `--format` opgeven:
+Zonder optie/parameter wordt het formaat `hls-6` gekozen. Als bijv. formaat `hls-4` voor jou ook voldoende is, dan kun je dat met `-f` of `--format` opgeven:
 ```sh
-./bashgemist.sh -f hls-8 https://www.npostart.nl/POW_04059321
-https://adaptive-e50c3b.npostreaming.nl/urishieldv2/l27m4ed46ff85cb0a64d005c30a3ee000000.65560b094905392c010612d533fbae00/p/2a/10/10/5e/POW_04059321/POW_04059321.ism/POW_04059321-audio=128000-video=1094000.m3u8
+./bashgemist.sh -f hls-4 https://www.npostart.nl/POW_03375558
+https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=506000.m3u8
 ```
-(BashGemist accepteert ook verkorte NPO programma-urls: `https://www.npostart.nl/[PRID]`)
+(BashGemist accepteert ook verkorte NPO programma-urls: `https://www.npostart.nl/<PRID>`)
+
+Ik heb in dit geval het NOS Journaal van een paar jaar geleden als voorbeeld genomen, omdat dit het laatste onversleutelde NOS Journaal is. Alle uitzendingen daarna (en waarschijnlijk alle video's op npostart.nl vanaf 01-03-2017) zijn versleuteld en beveiligd met DRM (Digital Rights Manangement) en zijn daardoor niet te downloaden.<br>
 
 # Video rechtstreeks bekijken
 ## Linux
@@ -159,9 +152,9 @@ bashgemist.bat https://www.npostart.nl/live/npo-1 | clip
 ...en MPC-HC handmatig starten, waarbij `clip` de video-url naar het klembord kopieert.
 
 # Video downloaden
-De progressieve videostreams (de formaten `pg-#` hierboven) kun je zo met je browser downloaden.<br>
-Voor de dynamische (of adaptieve) videostreams (de formaten `hls-#` hierboven) heb je [FFmpeg](https://ffmpeg.org/) nodig om ze te kunnen downloaden.<br>
-Toch zou ik adviseren om alle video's met FFMpeg te downloaden. Ten eerste omdat sommige smart tv's niet alle m4v/mp4-bestanden goed af kunnen spelen en ten tweede vanwege '[overhead](https://nl.wikipedia.org/wiki/Overhead_%28informatica%29)'. Dit kan wel tot een 7% kleinere bestandsgrootte leiden.
+Progressieve videostreams (`pg-#`) kun je zo met je browser downloaden.<br>
+Dynamische (of adaptieve) videostreams (`hls-#` / `dash-#`) zijn strikt gezien afspeellijsten, en dus tekstbestanden, die verwijzen naar de video opgedeeld in allerlei fragmenten van 5 tot 10 seconden. Voor deze videostreams heb je [FFmpeg](https://ffmpeg.org/) nodig om ze te kunnen downloaden.<br>
+Toch zou ik adviseren om ook de progressieve videostreams met FFMpeg te downloaden. Ten eerste omdat sommige smart tv's niet alle gedownloade mp4-bestanden goed af kunnen spelen en ten tweede vanwege '[overhead](https://nl.wikipedia.org/wiki/Overhead_%28informatica%29)'. Dit kan wel tot een 7% kleinere bestandsgrootte leiden.
 
 We nemen `https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd`, het RTL Nieuws van 1 januari 2019 19:30u, als voorbeeld.
 
@@ -191,78 +184,73 @@ Wat voor Xidel geldt, geldt ook voor FFmpeg. Als FFmpeg niet is gecompileerd met
 De download commando's blijven gewoon hetzelfde.
 
 # Videofragment downloaden
-We nemen `https://www.npostart.nl/de-laatste-minuten/17-12-2018/POMS_AT_15009224`, een videofragment uit de laatste aflevering van het 3e seizoen van Hunted, als voorbeeld:
+We nemen `https://www.npostart.nl/tekenaar-dick-bruna-89-overleden/17-02-2017/POMS_NOS_7332480`, een videofragment uit het NOS Journaal van 17-02-2017, als voorbeeld:
 ```sh
-./bashgemist.sh -i https://www.npostart.nl/de-laatste-minuten/17-12-2018/POMS_AT_15009224
-Naam:          AVROTROS: Hunted - De laatste minuten...
-Datum:         17-12-2018
-Tijdsduur:     00:01:59
-Begin:         00:55:06
-Einde:         00:57:05
-Gratis tot:    01-01-2101 00:59:00
-Ondertiteling: http://tt888.omroep.nl/tt888/AT_2105785
+./bashgemist.sh -i https://www.npostart.nl/rotterdam-wil-verborgen-armoede-in-kaart-brengen/17-02-2017/POMS_NOS_7332481
+Naam:          NOS Journaal: Rotterdam wil verborgen armoede in kaart brengen
+Datum:         17-02-2017
+Tijdsduur:     00:01:14
+Begin:         00:06:28
+Einde:         00:07:42
+Ondertiteling: https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt
 Formaten:      formaat  container       resolutie  bitrate
-               pg-1     m4v[h264+aac]
-               pg-2     m4v[h264+aac]
-               pg-3     m4v[h264+aac]
                hls-0    m3u8[manifest]
-               hls-1    m3u8[h264+aac]  480x270    202|96kbps
-               hls-2    m3u8[h264+aac]  480x270    202|128kbps
-               hls-3    m3u8[h264+aac]  480x270    202|192kbps
-               hls-4    m3u8[h264+aac]  640x360    504|96kbps
-               hls-5    m3u8[h264+aac]  640x360    504|128kbps
-               hls-6    m3u8[h264+aac]  640x360    504|192kbps
-               hls-7    m3u8[h264+aac]  1024x576   1109|96kbps
-               hls-8    m3u8[h264+aac]  1024x576   1109|128kbps
-               hls-9    m3u8[h264+aac]  1024x576   1109|192kbps
-               hls-10   m3u8[h264+aac]  1024x576   1813|96kbps
-               hls-11   m3u8[h264+aac]  1024x576   1813|128kbps
-               hls-12   m3u8[h264+aac]  1024x576   1813|192kbps  (best)
+               hls-1    m3u8[aac]                  64kbps
+               hls-2    m3u8[aac]                  128kbps
+               hls-3    m3u8[h264+aac]  480x270    202|64kbps
+               hls-4    m3u8[h264+aac]  640x360    502|128kbps
+               hls-5    m3u8[h264+aac]  768x432    702|128kbps
+               hls-6    m3u8[h264+aac]  1024x576   1004|128kbps  (best)
 
-Download:      ffmpeg -ss 00:55:00 -i [url] -ss 00:00:06 -t 00:01:59 [...]
+Download:      ffmpeg -ss 00:06:00 -i <url> -ss 28 -t 00:01:14 [...]
 ```
-Als je deze video op npostart.nl terugkijkt, dan bekijk je een videofragment van bijna 2 minuten lang die begint op iets meer dan 55 minuten vanaf het begin. Echter, de video-urls (van alle formaten) zijn die van de hele aflevering. Gelukkig kun je met FFmpeg een begintijd en een tijdsduur opgeven om op die manier een videofragment eruit te knippen.<br>
+Als je deze video op npostart.nl bekijkt, dan zie je een videofragment van een dikke minuut lang die begint op 6½ minuut vanaf het begin. De video-urls (van alle formaten) echter zijn die van de hele aflevering. Gelukkig kun je met FFmpeg een begintijd en een tijdsduur opgeven om op die manier een videofragment eruit te knippen.<br>
 In dit geval willen we ook de ondertiteling graag meenemen **in** het videobestand en deze de voorgestelde naam + datum geven.
 
-BashGemist is een video extractie script en geeft (al dan niet met `-f` of `--format`) alleen de video-url terug. Toch zijn er met de optie/parameter `-j` of `--json` meer mogelijkheden. De video informatie hierboven wordt hiermee teruggegeven als [JSON](https://nl.wikipedia.org/wiki/JSON); het formaat waarin BashGemist ook alles verwerkt (hieronder iets ingekort):
+BashGemist is een video-url extractie script en geeft (al dan niet met `-f` of `--format`) alleen de video-url terug. Toch zijn er met de optie/parameter `-j` of `--json` meer mogelijkheden. De video informatie hierboven wordt hiermee teruggegeven als [JSON](https://nl.wikipedia.org/wiki/JSON); het formaat waarin BashGemist ook alles verwerkt (hieronder iets ingekort):
 ```sh
-./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224
+./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481
 {
-  "name": "AVROTROS: Hunted - De laatste minuten...",
-  "date": "17-12-2018",
-  "duration": "00:01:59",
-  "start": "00:55:06",
-  "end": "00:57:05",
-  "expdate": "01-01-2101 00:59:00",
-  "subtitle": "http://tt888.omroep.nl/tt888/AT_2105785",
+  "name": "NOS Journaal: Rotterdam wil verborgen armoede in kaart brengen",
+  "date": "17-02-2017",
+  "duration": "00:01:14",
+  "start": "00:06:28",
+  "end": "00:07:42",
+  "subtitle": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt",
   "formats": [
-    {
-      "format": "pg-1",
-      "container": "m4v[h264+aac]",
-      "url": "https://content10c4b.omroep.nl/urishieldv2/l27m6c2ec29c3fcf372e005c276570000000.b055f6717fc4e0b8ea2ae9042d1291e2/ceresodi/h264/p/06/10/10/f7/sb_AT_2105785.m4v"
-    },
-    {
-      "format": "pg-2",
-      "container": "m4v[h264+aac]",
-      "url": "https://content10c4c.omroep.nl/urishieldv2/l27m34ec48023fb78477005c276570000000.171fddf89df4a5190ac631f86a056b63/ceresodi/h264/p/06/10/10/f7/bb_AT_2105785.m4v"
-    },
-    {
-      "format": "pg-3",
-      "container": "m4v[h264+aac]",
-      "url": "https://content10c4a.omroep.nl/urishieldv2/l27m3187fe3c262e9d50005c276570000000.d1015a8a55fc8f98ef42e675570af912/ceresodi/h264/p/06/10/10/f7/std_AT_2105785.m4v"
-    },
     {
       "format": "hls-0",
       "container": "m3u8[manifest]",
-      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785.m3u8"
+      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/playlist.m3u8"
     },
-    [...],
     {
-      "format": "hls-12",
+      "format": "hls-1",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "64kbps",
+      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=64000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "128kbps",
+      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=128000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "202|64kbps",
+      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=64000-video=202000.m3u8"
+    },
+    [...]
+    {
+      "format": "hls-6",
       "container": "m3u8[h264+aac]",
       "resolution": "1024x576",
-      "bitrate": "1813|192kbps",
-      "url": "https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=1813000.m3u8"
+      "bitrate": "1004|128kbps",
+      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=128000-video=1004000.m3u8"
     }
   ]
 }
@@ -280,17 +268,17 @@ xidel -s - -e '
     duration,
     start,
     subtitle,
-    (formats)()[format="hls-12"]/url
+    (formats)()[format="hls-6"]/url
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
-AVROTROS: Hunted - De laatste minuten...
-17-12-2018
-00:01:59
-00:55:06
-http://tt888.omroep.nl/tt888/AT_2105785
-https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=1813000.m3u8
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
+NOS Journaal: Rotterdam wil verborgen armoede in kaart brengen
+17-02-2017
+00:01:14
+00:06:28
+https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt
+https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=128000-video=1004000.m3u8
 ```
-In een bestandsnaam mag geen `:` voorkomen, dus die vervangen we voor een `-`. Daar plakken we de datum achter met haakjes er omheen, maar zonder streepjes. Vervolgens splitten we de begintijd nog in tweeën; de begintijd afgerond op 30 seconden en de resterende seconden. (Met de `00:55:00` vóór FFmpeg's input `-i [url]` slaat FFmpeg de eerste 55 minuten **snel** over. Met de `00:00:06` (of `6`) daarna zoekt FFmpeg de resterende 6 seconden **nauwkeurig** naar het juiste punt.)
+In een bestandsnaam mag geen `:` voorkomen, dus die vervangen we voor een `-`. Daar plakken we de datum achter met haakjes er omheen, maar zonder streepjes. Vervolgens splitten we de begintijd nog in tweeën; de begintijd afgerond op 30 seconden en de resterende seconden. (Met de `-ss 00:06:00` vóór FFmpeg's input `-i <url>` slaat FFmpeg de eerste 6 minuten over en begint dan met lezen. Met de `-ss 00:00:28` (of `28`) daarna zoekt FFmpeg de resterende 28 seconden **nauwkeurig** naar het juiste beginpunt. Met `-t 00:01:14` zal FFmpeg na 1 minuut en 14 seconden stoppen met lezen/verwerken.)
 ```sh
 xidel -s - -e '
   $json/(
@@ -312,15 +300,15 @@ xidel -s - -e '
     time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),
     seconds-from-time(start) mod 30,
     subtitle,
-    (formats)()[format="hls-12"]/url
+    (formats)()[format="hls-6"]/url
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
-AVROTROS- Hunted - De laatste minuten... (17122018)
-00:01:59
-00:55:00
-6
-http://tt888.omroep.nl/tt888/AT_2105785
-https://adaptive-e10c4a.npostreaming.nl/urishieldv2/l27m1f18e65b7d86dd64005c276570000000.3ef7e652a756367aa5d38a4933f1a866/p/06/10/10/5d/AT_2105785/AT_2105785.ism/AT_2105785-audio=192000-video=1813000.m3u8
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
+NOS Journaal- Rotterdam wil verborgen armoede in kaart brengen (17022017)
+00:01:14
+00:06:00
+28
+https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt
+https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=128000-video=1004000.m3u8
 ```
 Met deze informatie kun je nu een FFmpeg commando samenstellen. Dit kan op 3 manieren:
 - Exporteer de informatie als variabelen en raadpleeg die daarna in een aparte FFmpeg commando:
@@ -345,9 +333,9 @@ eval "$(xidel -s - -e '
     ss1:=time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),
     ss2:=seconds-from-time(start) mod 30,
     sub:=subtitle,
-    url:=(formats)()[format="hls-12"]/url
+    url:=(formats)()[format="hls-6"]/url
   )
-' --output-format=bash <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224))"
+' --output-format=bash <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481))"
 
 ffmpeg \
 -ss $ss1 -i $url \
@@ -361,14 +349,14 @@ ffmpeg \
 De FFmpeg commando vertaalt dus naar:
 ```sh
 ffmpeg \
--ss 00:55:00 -i https://adaptive-e10c4a.npostreaming.nl/urishieldv2/[...].m3u8 \
--ss 00:55:00 -i http://tt888.omroep.nl/tt888/AT_2105785 \
--ss 6 -t 00:01:59 \
+-ss 00:06:00 -i https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/POW_03372926_v4-audio=128000-video=1004000.m3u8 \
+-ss 00:06:00 -i https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt \
+-ss 28 -t 00:01:14 \
 -c copy \
 -c:s srt -metadata:s:s language=dut \
-"AVROTROS- Hunted - De laatste minuten... (17122018).mkv"
+"NOS Journaal- Rotterdam wil verborgen armoede in kaart brengen (17022017).mkv"
 ```
-FFmpeg opent de video-url en de ondertiteling-url en slaat de eerste 55 minuten en 6 seconden over. Na 1 minuut en 59 seconden gaat weer de schaar erin. De audio- en videostream worden gekopieerd. De ondertiteling wordt geconverteerd van webvtt naar subrip en wordt gelabeld als Nederlands. Ten slotte wordt alles in een mkv-container gestopt.
+FFmpeg opent de video-url en de ondertiteling-url en slaat de eerste 6 minuten en 28 seconden over. Na 1 minuut en 14 seconden gaat weer de schaar erin. De audio- en videostream worden gekopieerd. De ondertiteling wordt geconverteerd van webvtt naar subrip en wordt gelabeld als Nederlands. Ten slotte wordt alles in een mkv-container gestopt.
 
 ---
 - Gebruik interne variabelen en gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen:
@@ -393,7 +381,7 @@ xidel -s - -e '
         $ss1:=time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),
         $ss2:=seconds-from-time(start) mod 30,
         $sub:=subtitle,
-        $url:=(formats)()[format="hls-12"]/url
+        $url:=(formats)()[format="hls-6"]/url
     return
     system(
       x"bash -c ""ffmpeg \
@@ -406,7 +394,7 @@ xidel -s - -e '
       """
     )
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
 ```
 - Gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen met alle informatie rechtstreeks uit de JSON:
 ```sh
@@ -415,7 +403,7 @@ xidel -s - -e '
     system(
       x"bash -c ""ffmpeg \
         -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))} \
-        -i  {(formats)()[format="hls-12"]/url} \
+        -i  {(formats)()[format="hls-6"]/url} \
         -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))} \
         -i  {subtitle} \
         -ss {seconds-from-time(start) mod 30} \
@@ -441,13 +429,13 @@ xidel -s - -e '
       """
     )
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_AT_15009224)
+' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
 ```
 
 ## Windows
 - Exporteer de informatie als variabelen en raadpleeg die daarna in een aparte FFmpeg commando:
 ```bat
-FOR /F "delims=" %A IN ('bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 ^| xidel.exe -s - -e ^"
+FOR /F "delims=" %A IN ('bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 ^| xidel.exe -s - -e ^"
   $json/^(
     name:^=concat^(
       replace^(
@@ -467,7 +455,7 @@ FOR /F "delims=" %A IN ('bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009
     ss1:^=time^(start^) - ^(seconds-from-time^(start^) mod 30 * dayTimeDuration^('PT1S'^)^)^,
     ss2:^=seconds-from-time^(start^) mod 30^,
     sub:^=subtitle^,
-    url:^=^(formats^)^(^)[format^='hls-12']/url
+    url:^=^(formats^)^(^)[format^='hls-6']/url
   ^)
 ^" --output-format^=cmd') DO %A
 
@@ -481,7 +469,7 @@ ffmpeg.exe ^
 ```
 - Gebruik interne variabelen en gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen:
 ```bat
-bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^" ^
+bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^" ^
   $json/( ^
     let $name:=concat( ^
           replace( ^
@@ -501,7 +489,7 @@ bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^
         $ss1:=time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration('PT1S')), ^
         $ss2:=seconds-from-time(start) mod 30, ^
         $sub:=subtitle, ^
-        $url:=(formats)()[format='hls-12']/url ^
+        $url:=(formats)()[format='hls-6']/url ^
     return ^
     system( ^
       x'ffmpeg.exe ^
@@ -517,12 +505,12 @@ bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^
 ```
 - Gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen met alle informatie rechtstreeks uit de JSON:
 ```sh
-bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^" ^
+bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^" ^
   $json/( ^
     system( ^
       x'ffmpeg.exe ^
       -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration('PT1S'))} ^
-      -i  {(formats)()[format='hls-12']/url} ^
+      -i  {(formats)()[format='hls-6']/url} ^
       -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration('PT1S'))} ^
       -i  {subtitle} ^
       -ss {seconds-from-time(start) mod 30} ^
@@ -551,4 +539,4 @@ bashgemist.bat -j https://www.npostart.nl/POMS_AT_15009224 | xidel.exe -s - -e ^
 ```
 
 # Disclaimer
-Omdat ik een Windows gebruiker ben kan het zijn dat niet alle informatie hierboven omtrent Linux klopt, of niet volledig is. Laat me dat gerust weten mocht dat het geval zijn.
+Omdat ik een Windows gebruiker ben kan het zijn dat de informatie hierboven omtrent Linux niet allemaal klopt, of niet volledig is. Laat het me gerust weten mocht dat het geval zijn.
