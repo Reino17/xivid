@@ -168,8 +168,15 @@ npo() {
     return json:={
       "name":$b/concat(
         franchiseTitle,
-        ": ",
-        title
+        if (
+          contains(
+            franchiseTitle,
+            title
+          )
+        ) then
+          ()
+        else
+          ": "||title
       ),
       "date":format-date(
         dateTime($b/broadcastDate),
@@ -179,7 +186,37 @@ npo() {
         $b/duration * duration("PT1S"),
         "[H01]:[m01]:[s01]"
       ),
-      "subtitle":$b/(subtitles)()/src,
+      "start":if ($b/startAt) then
+        format-time(
+          $b/startAt * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        )
+      else
+        (),
+      "end":if ($b/startAt) then
+        format-time(
+          ($b/duration + $b/startAt) * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        )
+      else
+        (),
+      "subtitle":if ($b/parentId) then
+        x:request(
+          {
+            "url":concat(
+              "https://rs.poms.omroep.nl/v1/api/subtitles/",
+              $b/parentId,
+              "/nl_NL/CAPTION.vtt"
+            )
+          }
+        )[
+          contains(
+            headers[1],
+            "200"
+          )
+        ]/url
+      else
+        $b/(subtitles)()/src,
       "formats":[
         {
           "format":"hls-0",
