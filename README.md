@@ -184,7 +184,7 @@ Wat voor Xidel geldt, geldt ook voor FFmpeg. Als FFmpeg niet is gecompileerd met
 De download commando's blijven gewoon hetzelfde.
 
 # Videofragment downloaden
-We nemen `https://www.npostart.nl/tekenaar-dick-bruna-89-overleden/17-02-2017/POMS_NOS_7332480`, een videofragment uit het NOS Journaal van 17-02-2017, als voorbeeld:
+We nemen `https://www.npostart.nl/rotterdam-wil-verborgen-armoede-in-kaart-brengen/17-02-2017/POMS_NOS_7332481`, een videofragment uit het NOS Journaal van 17-02-2017, als voorbeeld:
 ```sh
 ./bashgemist.sh -i https://www.npostart.nl/rotterdam-wil-verborgen-armoede-in-kaart-brengen/17-02-2017/POMS_NOS_7332481
 Naam:          NOS Journaal: Rotterdam wil verborgen armoede in kaart brengen
