@@ -109,7 +109,7 @@ Heb je liever een ander formaat, dan zul je er eerst achter moeten komen welke f
 Naam:          NOS Journaal 20.00 uur
 Datum:         28-02-2017
 Tijdsduur:     00:25:37
-Ondertiteling: https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt
+Ondertiteling: webvtt
 Formaten:      formaat  container       resolutie  bitrate
                hls-0    m3u8[manifest]
                hls-1    m3u8[aac]                  64kbps
@@ -192,7 +192,7 @@ Datum:         17-02-2017
 Tijdsduur:     00:01:14
 Begin:         00:06:28
 Einde:         00:07:42
-Ondertiteling: https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt
+Ondertiteling: webvtt
 Formaten:      formaat  container       resolutie  bitrate
                hls-0    m3u8[manifest]
                hls-1    m3u8[aac]                  64kbps
@@ -216,7 +216,10 @@ BashGemist is een video-url extractie script en geeft (al dan niet met `-f` of `
   "duration": "00:01:14",
   "start": "00:06:28",
   "end": "00:07:42",
-  "subtitle": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt",
+  "subtitle": {
+    "format": "webvtt",
+    "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt"
+  },
   "formats": [
     {
       "format": "hls-0",
@@ -267,7 +270,7 @@ De door BashGemist gegenereerde JSON 'pipen' we naar Xidel en deze geeft alle in
     date,
     duration,
     start,
-    subtitle,
+    subtitle/url,
     (formats)()[format="hls-6"]/url
   )
 '
@@ -299,7 +302,7 @@ In een bestandsnaam mag geen `:` voorkomen, dus die vervangen we voor een `-`. D
     duration,
     time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),
     seconds-from-time(start) mod 30,
-    subtitle,
+    subtitle/url,
     (formats)()[format="hls-6"]/url
   )
 '
@@ -332,7 +335,7 @@ eval "$(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s -
     t:=duration,
     ss1:=time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),
     ss2:=seconds-from-time(start) mod 30,
-    sub:=subtitle,
+    sub:=subtitle/url,
     url:=(formats)()[format="hls-6"]/url
   )
 ' --output-format=bash)"
@@ -380,7 +383,7 @@ FFmpeg opent de video-url en de ondertiteling-url en slaat de eerste 6 minuten e
         $t:=duration,
         $ss1:=time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S")),
         $ss2:=seconds-from-time(start) mod 30,
-        $sub:=subtitle,
+        $sub:=subtitle/url,
         $url:=(formats)()[format="hls-6"]/url
     return
     system(
@@ -405,7 +408,7 @@ FFmpeg opent de video-url en de ondertiteling-url en slaat de eerste 6 minuten e
         -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))} \
         -i  {(formats)()[format="hls-6"]/url} \
         -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration("PT1S"))} \
-        -i  {subtitle} \
+        -i  {subtitle/url} \
         -ss {seconds-from-time(start) mod 30} \
         -t  {duration} \
         -c copy \
@@ -454,7 +457,7 @@ FOR /F "delims=" %A IN ('bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332
     t:^=duration^,
     ss1:^=time^(start^) - ^(seconds-from-time^(start^) mod 30 * dayTimeDuration^('PT1S'^)^)^,
     ss2:^=seconds-from-time^(start^) mod 30^,
-    sub:^=subtitle^,
+    sub:^=subtitle/url^,
     url:^=^(formats^)^(^)[format^='hls-6']/url
   ^)
 ^" --output-format^=cmd') DO %A
@@ -488,7 +491,7 @@ bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^
         $t:=duration, ^
         $ss1:=time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration('PT1S')), ^
         $ss2:=seconds-from-time(start) mod 30, ^
-        $sub:=subtitle, ^
+        $sub:=subtitle/url, ^
         $url:=(formats)()[format='hls-6']/url ^
     return ^
     system( ^
@@ -504,7 +507,7 @@ bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^
 "
 ```
 - Gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen met alle informatie rechtstreeks uit de JSON:
-```sh
+```bat
 bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^" ^
   $json/( ^
     system( ^
@@ -512,7 +515,7 @@ bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^
       -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration('PT1S'))} ^
       -i  {(formats)()[format='hls-6']/url} ^
       -ss {time(start) - (seconds-from-time(start) mod 30 * dayTimeDuration('PT1S'))} ^
-      -i  {subtitle} ^
+      -i  {subtitle/url} ^
       -ss {seconds-from-time(start) mod 30} ^
       -t  {duration} ^
       -c copy ^
