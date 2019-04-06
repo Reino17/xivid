@@ -16,21 +16,21 @@ git clone https://github.com/Reino17/bashgemist.git
 Of download de [tarball](https://github.com/Reino17/bashgemist/archive/master.zip).
 
 # Xidel
-BashGemist heeft [Xidel](http://videlibri.sourceforge.net/xidel.html) nodig om te kunnen functioneren.<br>
+BashGemist heeft [Xidel](http://videlibri.sourceforge.net/xidel.html) nodig om te kunnen functioneren.  
 Minimale vereiste is revisie `5651` `(xidel-0.9.7.20170825.5651.23300832bcbe)`.
 
 ## Linux
-Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#downloads) en installeer Xidel in `/usr/bin`.<br>
+Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#downloads) en installeer Xidel in `/usr/bin`.  
 Installeer vervolgens `openssl`, `openssl-dev` en `libcrypto` zodat Xidel beveiligde https-urls kan openen.
 
 ## Windows
-BashGemist is een Linux Bash script, maar m.b.v. [Cygwin](https://www.cygwin.com/) is dit script ook in Windows te gebruiken.<br>
+BashGemist is een Linux Bash script, maar m.b.v. [Cygwin](https://www.cygwin.com/) is dit script ook in Windows te gebruiken.  
 In Windows 10 zou het zelfs zonder Cygwin kunnen door gebruik te maken van Windows Subsystem for Linux (WSL). Ik zelf maak nog geen gebruik van Windows 10, dus informatie hieromtrent is altijd welkom.
 
 Download en installeer [Cygwin](https://cygwin.com/install.html) en download de Xidel [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads).
 
-Stel je hebt Cygwin geïnstalleerd in `C:\Cygwin\`, dan is het in principe genoeg om `xidel.exe` in `C:\Cygwin\bin` uit te pakken zodat BashGemist er gebruik van kan maken.<br>
-Bewaar je `xidel.exe` liever ergens anders, omdat je er misschien zelf ook gebruik van wilt maken, dan kun je ook gebruik maken van een soort snelkoppeling die naar `xidel.exe` op die andere locatie verwijst.<br>
+Stel je hebt Cygwin geÃ¯nstalleerd in `C:\Cygwin\`, dan is het in principe genoeg om `xidel.exe` in `C:\Cygwin\bin` uit te pakken zodat BashGemist er gebruik van kan maken.  
+Bewaar je `xidel.exe` liever ergens anders, omdat je er misschien zelf ook gebruik van wilt maken, dan kun je ook gebruik maken van een soort snelkoppeling die naar `xidel.exe` op die andere locatie verwijst.  
 Stel `xidel.exe` bevindt zich in `D:\Software\Binaries\`, start dan `C:\Cygwin\Cygwin.bat` om de Bash terminal te openen en voer vervolgens het volgende in:
 ```sh
 cat > /usr/bin/xidel <<EOF
@@ -43,7 +43,7 @@ In `/usr/bin` (of `C:\Cygwin\bin`) is hierdoor het bestand `xidel` aangemaakt, m
 #!/bin/bash
 "/cygdrive/d/Storage/Binaries/xidel.exe" "$@"
 ```
-Deze snelkoppeling, dit bestand `xidel`, kun je nu voortaan gebruiken om Xidel te starten.<br>
+Deze snelkoppeling, dit bestand `xidel`, kun je nu voortaan gebruiken om Xidel te starten.  
 Echter, als je dat nu de eerste keer probeert te doen, dan zul je het volgende zien:
 ```sh
 xidel
@@ -59,8 +59,8 @@ Voor Windows XP gelden een aantal extra instructies.
 
 Download en installeer [deze Cygwin](http://cygwin-xp.portfolis.net/setup/setup-x86.exe). Dit is, voor zover ik weet, de laatst werkende versie voor Windows XP.
 
-Download de Xidel (**openssl**) [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads).<br>
-Steeds meer websites maken gebruik van TLS 1.2 encryptie/versleuteling. In Windows XP gaat de ondersteuning hiervoor niet verder dan TLS 1.0. Http**s**-urls openen met de standaard Xidel Windows binary gaat in Windows XP daarom niet lukken. Met deze speciale Xidel binary omzeil je dit probleem door gebruik te maken van een andere beveiligingsbibliotheek (OpenSSL i.p.v. Windows's SChannel).<br>
+Download de Xidel (**openssl**) [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads).  
+Steeds meer websites maken gebruik van TLS 1.2 encryptie/versleuteling. In Windows XP gaat de ondersteuning hiervoor niet verder dan TLS 1.0. Http**s**-urls openen met de standaard Xidel Windows binary gaat in Windows XP daarom niet lukken. Met deze speciale Xidel binary omzeil je dit probleem door gebruik te maken van een andere beveiligingsbibliotheek (OpenSSL i.p.v. Windows's SChannel).  
 Deze `xidel.exe` vereist de dll-bestanden `libeay32.dll` en `ssleay32.dll` uit de OpenSSL **1.0.2** reeks. Deze heb ik zelf gecompileerd en kun je op [mijn website](http://rwijnsma.home.xs4all.nl/files/other/) downloaden.
 
 # Gebruik en opties
@@ -83,8 +83,8 @@ Start de Bash terminal, ga naar de map met `bashgemist.sh` en je kunt van start.
 ## Windows
 Start de Bash terminal (`C:\Cygwin\Cygwin.bat`), ga naar de map met `bashgemist.sh` (in mijn geval `cd /cygdrive/d/Storage/Binaries/`) en ook hier kun je dan van start.
 
-Als alternatief heb ik `bashgemist.bat` toegevoegd, waardoor je niet per se de Bash terminal hoeft te gebruiken. Hiermee worden Bash en `bashgemist.sh` op de achtergrond uitgevoerd.<br>
-Start de Windows Command Prompt (`cmd.exe`) en ga naar de map met `bashgemist.bat` en `bashgemist.sh` (in mijn geval `D:` en `cd Storage\Binaries`).<br>
+Als alternatief heb ik `bashgemist.bat` toegevoegd, waardoor je niet per se de Bash terminal hoeft te gebruiken. Hiermee worden Bash en `bashgemist.sh` op de achtergrond uitgevoerd.  
+Start de Windows Command Prompt (`cmd.exe`) en ga naar de map met `bashgemist.bat` en `bashgemist.sh` (in mijn geval `D:` en `cd Storage\Binaries`).  
 Het gebruik is dan vervolgens: `bashgemist.bat [optie] url`.
 
 **\[Belangrijk\]** `bashgemist.bat`:
@@ -93,7 +93,7 @@ Het gebruik is dan vervolgens: `bashgemist.bat [optie] url`.
 SET PATH=C:\Cygwin\bin;%PATH%
 bash.exe -c "./bashgemist.sh %*"
 ```
-Standaard verwijst `bashgemist.bat` naar `C:\Cygwin\bin` voor alle Cygwin programma's. Verander dit eerst als je Cygwin ergens anders hebt geïnstalleerd!
+Standaard verwijst `bashgemist.bat` naar `C:\Cygwin\bin` voor alle Cygwin programma's. Verander dit eerst als je Cygwin ergens anders hebt geÃ¯nstalleerd!
 
 # Voorbeelden
 We nemen `https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558`, het NOS Journaal van 28 februari 2017 20:00u, als voorbeeld:
@@ -126,7 +126,7 @@ https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb6
 ```
 (BashGemist accepteert ook verkorte NPO programma-urls: `https://www.npostart.nl/<PRID>`)
 
-Ik heb in dit geval het NOS Journaal van een paar jaar geleden als voorbeeld genomen, omdat dit het laatste onversleutelde NOS Journaal is. Alle uitzendingen daarna (en waarschijnlijk alle video's op npostart.nl vanaf 01-03-2017) zijn versleuteld en beveiligd met DRM (Digital Rights Manangement) en zijn daardoor niet te downloaden.<br>
+Ik heb in dit geval het NOS Journaal van een paar jaar geleden als voorbeeld genomen, omdat dit het laatste onversleutelde NOS Journaal is. Alle uitzendingen daarna (en waarschijnlijk alle video's op npostart.nl vanaf 01-03-2017) zijn versleuteld en beveiligd met DRM (Digital Rights Manangement) en zijn daardoor niet te downloaden.
 
 # Video rechtstreeks bekijken
 ## Linux
@@ -136,7 +136,7 @@ vlc $(./bashgemist.sh https://www.npostart.nl/live/npo-1)
 ```
 
 ## Windows
-We nemen `https://www.npostart.nl/live/npo-1`, de livestream van NPO 1, en [Media Player Classic - Home Cinema](https://github.com/clsid2/mpc-hc/releases) (welke in `C:\Program Files\Media\MPC-HC` is geïnstalleerd) als voorbeeld.<br>
+We nemen `https://www.npostart.nl/live/npo-1`, de livestream van NPO 1, en [Media Player Classic - Home Cinema](https://github.com/clsid2/mpc-hc/releases) (welke in `C:\Program Files\Media\MPC-HC` is geÃ¯nstalleerd) als voorbeeld.
 #### Bash:
 ```sh
 /cygdrive/c/Program\ Files/Media/MPC-HC/mpc-hc.exe $(./bashgemist.sh https://www.npostart.nl/live/npo-1)
@@ -152,8 +152,8 @@ bashgemist.bat https://www.npostart.nl/live/npo-1 | clip
 ...en MPC-HC handmatig starten, waarbij `clip` de video-url naar het klembord kopieert.
 
 # Video downloaden
-Progressieve videostreams (`pg-#`) kun je zo met je browser downloaden.<br>
-Dynamische (of adaptieve) videostreams (`hls-#` / `dash-#`) zijn strikt gezien afspeellijsten, en dus tekstbestanden, die verwijzen naar de video opgedeeld in allerlei fragmenten van 5 tot 10 seconden. Voor deze videostreams heb je [FFmpeg](https://ffmpeg.org/) nodig om ze te kunnen downloaden.<br>
+Progressieve videostreams (`pg-#`) kun je zo met je browser downloaden.  
+Dynamische (of adaptieve) videostreams (`hls-#` / `dash-#`) zijn strikt gezien afspeellijsten, en dus tekstbestanden, die verwijzen naar de video opgedeeld in allerlei fragmenten van 5 tot 10 seconden. Voor deze videostreams heb je [FFmpeg](https://ffmpeg.org/) nodig om ze te kunnen downloaden.  
 Toch zou ik adviseren om ook de progressieve videostreams met FFMpeg te downloaden. Ten eerste omdat sommige smart tv's niet alle gedownloade mp4-bestanden goed af kunnen spelen en ten tweede vanwege '[overhead](https://nl.wikipedia.org/wiki/Overhead_%28informatica%29)'. Dit kan wel tot een 7% kleinere bestandsgrootte leiden.
 
 We nemen `https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd`, het RTL Nieuws van 1 januari 2019 19:30u, als voorbeeld.
@@ -165,7 +165,7 @@ ffmpeg -i $(./bashgemist.sh https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1
 ```
 
 ## Windows
-Download [FFmpeg](http://ffmpeg.zeranoe.com/builds/).<br>
+Download [FFmpeg](http://ffmpeg.zeranoe.com/builds/).  
 #### Bash:
 ```sh
 ./ffmpeg.exe -i $(./bashgemist.sh https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd) -c copy bestandsnaam.mp4
@@ -176,7 +176,7 @@ FOR /F %A IN ('bashgemist.bat https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1
 ```
 
 ## Windows XP
-Wat voor Xidel geldt, geldt ook voor FFmpeg. Als FFmpeg niet is gecompileerd met een andere beveiligingsbibliotheek, dan kun je geen https-urls met TLS 1.2 encryptie/versleuteling openen. Daarnaast wordt Windows XP officieel ook niet meer ondersteund door FFmpeg. Sinds voorjaar 2017 ben ik daarom zelf FFmpeg gaan compileren. Mijn binaries zijn gecompileerd met [mbedTLS](https://tls.mbed.org/), zijn Windows XP compatible én werken op oude cpu's zonder SSE2 ondersteuning.
+Wat voor Xidel geldt, geldt ook voor FFmpeg. Als FFmpeg niet is gecompileerd met een andere beveiligingsbibliotheek, dan kun je geen https-urls met TLS 1.2 encryptie/versleuteling openen. Daarnaast wordt Windows XP officieel ook niet meer ondersteund door FFmpeg. Sinds voorjaar 2017 ben ik daarom zelf FFmpeg gaan compileren. Mijn binaries zijn gecompileerd met [mbedTLS](https://tls.mbed.org/), zijn Windows XP compatible Ã©n werken op oude cpu's zonder SSE2 ondersteuning.
 - Github repo: https://github.com/Reino17/ffmpeg-windows-build-helpers
 - Zeranoe forum thread: https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=3572
 - Te downloaden van mijn eigen website: http://rwijnsma.home.xs4all.nl/files/ffmpeg
@@ -204,7 +204,7 @@ Formaten:      formaat  container       resolutie  bitrate
 
 Download:      ffmpeg -ss 00:06:00 -i <url> -ss 28 -t 00:01:14 [...]
 ```
-Als je deze video op npostart.nl bekijkt, dan zie je een videofragment van een dikke minuut lang die begint op 6½ minuut vanaf het begin. De video-urls (van alle formaten) echter zijn die van de hele aflevering. Gelukkig kun je met FFmpeg een begintijd en een tijdsduur opgeven om op die manier een videofragment eruit te knippen.<br>
+Als je deze video op npostart.nl bekijkt, dan zie je een videofragment van een dikke minuut lang die begint op 6Â½ minuut vanaf het begin. De video-urls (van alle formaten) echter zijn die van de hele aflevering. Gelukkig kun je met FFmpeg een begintijd en een tijdsduur opgeven om op die manier een videofragment eruit te knippen.  
 In dit geval willen we ook de ondertiteling graag meenemen **in** het videobestand en deze de voorgestelde naam + datum geven.
 
 BashGemist is een video-url extractie script en geeft (al dan niet met `-f` of `--format`) alleen de video-url terug. Toch zijn er met de optie/parameter `-j` of `--json` meer mogelijkheden. De video informatie hierboven wordt hiermee teruggegeven als [JSON](https://nl.wikipedia.org/wiki/JSON); het formaat waarin BashGemist ook alles verwerkt (hieronder iets ingekort):
@@ -281,7 +281,7 @@ NOS Journaal: Rotterdam wil verborgen armoede in kaart brengen
 https://rs.poms.omroep.nl/v1/api/subtitles/POW_03372926/nl_NL/CAPTION.vtt
 https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTM1NTkxMDYsInVyaSI6Ilwvdm9kXC9ucG9cL3VzcFwvbnBvXC9obHNfdW5lbmNyeXB0ZWRcL1BPV18wMzM3MjkyNlwvUE9XXzAzMzcyOTI2X3Y0LmlzbSIsImNsaWVudF9pcCI6IjgwLjEwMS40OS41In0.MusH2x9u7kI47-yXgM6YKBW6F9Y0uvfAbxhPwFm_iQU/vod/npo/usp/npo/hls_unencrypted/POW_03372926/POW_03372926_v4.ism/POW_03372926_v4-audio=128000-video=1004000.m3u8
 ```
-In een bestandsnaam mag geen `:` voorkomen, dus die vervangen we voor een `-`. Daar plakken we de datum achter met haakjes er omheen, maar zonder streepjes. Vervolgens splitten we de begintijd nog in tweeën; de begintijd afgerond op 30 seconden en de resterende seconden. (Met de `-ss 00:06:00` vóór FFmpeg's input `-i <url>` slaat FFmpeg de eerste 6 minuten over en begint dan met lezen. Met de `-ss 00:00:28` (of `28`) daarna zoekt FFmpeg de resterende 28 seconden **nauwkeurig** naar het juiste beginpunt. Met `-t 00:01:14` zal FFmpeg na 1 minuut en 14 seconden stoppen met lezen/verwerken.)
+In een bestandsnaam mag geen `:` voorkomen, dus die vervangen we voor een `-`. Daar plakken we de datum achter met haakjes er omheen, maar zonder streepjes. Vervolgens splitten we de begintijd nog in tweeÃ«n; de begintijd afgerond op 30 seconden en de resterende seconden. (Met de `-ss 00:06:00` vÃ³Ã³r FFmpeg's input `-i <url>` slaat FFmpeg de eerste 6 minuten over en begint dan met lezen. Met de `-ss 00:00:28` (of `28`) daarna zoekt FFmpeg de resterende 28 seconden **nauwkeurig** naar het juiste beginpunt. Met `-t 00:01:14` zal FFmpeg na 1 minuut en 14 seconden stoppen met lezen/verwerken.)
 ```sh
 ./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
@@ -571,10 +571,10 @@ Formaten:      formaat  container         resolutie        frequentie  bitrate
                dash-16  webm[vp9]         1920x1080@25fps              2882kbps
                dash-17  mp4[h264]         1920x1080@25fps              4826kbps  (best)
 ```
-I.t.t. bij vele andere websites zijn bij Youtube de DASH audio- en videostreams gescheiden van elkaar. Tenzij je genoegen neemt met de `pg-#` videostreams zul je ze dus moeten combineren. We willen de 1080p H.264 videostream graag combineren met de AAC audiostream.<br>
+I.t.t. bij vele andere websites zijn bij Youtube de DASH audio- en videostreams gescheiden van elkaar. Tenzij je genoegen neemt met de `pg-#` videostreams zul je ze dus moeten combineren. We willen de 1080p H.264 videostream graag combineren met de AAC audiostream.  
 De documentaire is nederlands-, duits- en engelstalig en heeft geen "hardsubs" (ondertiteling als onderdeel van het videobeeld zelf), maar wel "softsubs" (een aparte ondertitelingstream). Deze pakken we dus ook mee.
 
-De ondertiteling is in dit geval van het type [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). FFmpeg ondersteunt dit op XML gebaseerde formaat (nog) niet. Xidel daarentegen is hier bij uitstek geschikt voor. Waar Youtube-dl hier flink wat regels aan code voor nodig heeft is het voor Xidel en een simpele query zo gepiept om deze ondertiteling te converteren naar het meest gangbare [SRT](https://nl.wikipedia.org/wiki/SubRip) formaat. Voordat we de audio- en videostream erbij pakken moet dit dus eerst.<br>
+De ondertiteling is in dit geval van het type [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). FFmpeg ondersteunt dit op XML gebaseerde formaat (nog) niet. Xidel daarentegen is hier bij uitstek geschikt voor. Waar Youtube-dl hier flink wat regels aan code voor nodig heeft is het voor Xidel en een simpele query zo gepiept om deze ondertiteling te converteren naar het meest gangbare [SRT](https://nl.wikipedia.org/wiki/SubRip) formaat. Voordat we de audio- en videostream erbij pakken moet dit dus eerst.  
 De door BashGemist gegenereerde JSON 'pipen' we naar Xidel. Xidel opent de TTML ondertiteling-url en converteert deze naar SRT. Xidel's uitvoer slaan we op als `ondertiteling.srt`:
 ```sh
 ./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g | xidel -s - --xquery '

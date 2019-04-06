@@ -750,7 +750,7 @@ omropfryslan() {
         }
       ]
     } else {
-      "name":"Omrop Frysl‚n: "||//h1,
+      "name":"Omrop Frysl√¢n: "||//h1,
       "date":replace(
         //meta[@itemprop="dateModified"]/@content,
         "(\d+)-(\d+)-(\d+).+",
