@@ -7,6 +7,7 @@ BashGemist, een video-url extractie script.
 - [Video rechtstreeks bekijken](#video-rechtstreeks-bekijken)
 - [Video downloaden](#video-downloaden)
 - [Videofragment downloaden](#videofragment-downloaden)
+- [Youtube video downloaden](#youtube-video-downloaden)
 - [Disclaimer](#disclaimer)
 
 # Download
@@ -575,9 +576,13 @@ I.t.t. bij vele andere websites zijn bij Youtube de DASH audio- en videostreams 
 De documentaire is nederlands-, duits- en engelstalig en heeft geen "hardsubs" (ondertiteling als onderdeel van het videobeeld zelf), maar wel "softsubs" (een aparte ondertitelingstream). Deze pakken we dus ook mee.
 
 De ondertiteling is in dit geval van het type [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). FFmpeg ondersteunt dit op XML gebaseerde formaat (nog) niet. Xidel daarentegen is hier bij uitstek geschikt voor. Waar Youtube-dl hier flink wat regels aan code voor nodig heeft is het voor Xidel en een simpele query zo gepiept om deze ondertiteling te converteren naar het meest gangbare [SRT](https://nl.wikipedia.org/wiki/SubRip) formaat. Voordat we de audio- en videostream erbij pakken moet dit dus eerst.  
-De door BashGemist gegenereerde JSON 'pipen' we naar Xidel. Xidel opent de TTML ondertiteling-url en converteert deze naar SRT. Xidel's uitvoer slaan we op als `ondertiteling.srt`:
+Om BashGemist maar één keer aan te hoeven roepen wijzen we een variabele toe aan de gegenereerde JSON:
 ```sh
-./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g | xidel -s - --xquery '
+bg_json=$(./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g)
+```
+We '[pipen](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29)' deze JSON naar Xidel. Xidel opent de TTML ondertiteling-url en converteert deze naar SRT. Xidel's uitvoer slaan we op als `ondertiteling.srt`:
+```sh
+printf '%s' $bg_json | xidel -s - --xquery '
   for $x at $i in $json/subtitle/doc(url)//text
   return (
     $i,
@@ -597,21 +602,26 @@ De door BashGemist gegenereerde JSON 'pipen' we naar Xidel. Xidel opent de TTML 
   )
 ' > ondertiteling.srt
 ```
-Vervolgens exporteren we de naam, de video-url en de audio-url als variabelen. FFmpeg opent de 2 urls Tn de net geconverteerde `ondertiteling.srt`. Deze laatste wordt gelabeld als Nederlands. Ten slotte wordt alles met `-c copy` (een zogenaamde streamcopy en dus zonder kwaliteitsverlies) in een mkv-container gestopt, met `The Uncertainty Has Settled (Full film).mkv` als resultaat.
+Als alternatief kun je ook een here-string en Xidel's `file:write-text-lines()`-functie gebruiken:
 ```sh
-eval "$(./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g | xidel -s - -e '
+<<< $bg_json xidel -s - --xquery '
+  file:write-text-lines(
+    "ondertiteling.srt",
+    for $x [...]
+  )
+'
+```
+We 'pipen' de JSON weer naar Xidel en exporteren vervolgens de naam en de gewenste video- en audio-url als variabelen:
+```sh
+eval "$(printf '%s' $bg_json | xidel -s - -e '
   name:=$json/name,
   v_url:=$json/(formats)()[format="dash-17"]/url,
   a_url:=$json/(formats)()[format="dash-3"]/url
 ' --output-format=bash)"
-
-ffmpeg \
--i $v_url \
--i $a_url \
--i ondertiteling.srt \
--c copy \
--metadata:s:s language=dut \
-"$name.mkv"
+```
+Als laatste roepen we FFmpeg aan. We openen de video- en audio-url én de zojuist geconverteerde `ondertiteling.srt`. De ondertiteling wordt gelabeld als "Dutch". Met `-c copy` voeren we een zogenaamde [stream-copy](https://ffmpeg.org/ffmpeg.html#Stream-copy) uit waarbij geen kwaliteitsverlies optreedt. Met `"$name.mkv"` als uitvoer zal `The Uncertainty Has Settled (Full film).mkv` het resultaat zijn:
+```sh
+ffmpeg -i $v_url -i $a_url -i ondertiteling.srt -c copy -metadata:s:s language=dut "$name.mkv"
 ```
 
 # Disclaimer
