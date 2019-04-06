@@ -917,6 +917,10 @@ youtube() {
         ()
       else
         videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),
+      "subtitle":{
+        "format":"ttml",
+        "url":(.//captionTracks)()[languageCode="nl"]/baseUrl
+      }[url],
       "formats":streamingData/[
         for $x at $i in (formats)()
         order by $x/contentLength

@@ -3212,11 +3212,171 @@ $ xidel -s "https://www.youtube.com/watch?v=sN6bdk6pmrU" --xquery 'json(//script
 
 ------------------------------------------------------------------------------------------------
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'json(if (//meta[@property="og:restrictions:age"]) then let $a:=concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) return tokenize(uri-decode(doc($a)),"&amp;") ! extract(.,"player_response=(.+)",1)[.] else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)/{"name":videoDetails/title,"date":if (videoDetails/isLive) then "'$(date "+%d-%m-%Y")'" else format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"[D01]-[M01]-[Y]"),"duration":if (videoDetails/isLive) then () else videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),"formats":streamingData/[for $x at $i in (formats)() order by $x/contentLength count $i return $x/{"format":"pg-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":if (.[itag="43"]) then () else round(bitrate div 1000)||"kbps","url":url},if (dashManifestUrl) then for $x at $i in doc(dashManifestUrl||"/disable_polymer/true")//Representation order by $x/boolean(@width),$x/@bandwidth count $i return $x/{"format":"dash-"||$i,"container":concat(substring-after(../@mimeType,"/"),"[",extract(@codecs,"(^[\w]+)",1) ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":if (@width) then concat(@width,"x",@height,"@",@frameRate,"fps") else (),"samplerate":if (@audioSamplingRate) then (@audioSamplingRate div 1000)||"kHz" else (),"bitrate":round(@bandwidth div 1000)||"kbps","url":BaseUrl} else for $x at $i in (adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return $x/{"format":"dash-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)(?:\.|"")",(1,2)) return concat($a[1],"[",if ($a[2]="mp4a") then "aac" else if ($a[2]="avc1") then "h264" else $a[2],"]"),"resolution":if (width) then concat(width,"x",height,"@",fps,"fps") else (),"samplerate":if (audioSampleRate) then (audioSampleRate div 1000)||"kHz" else (),"bitrate":round(bitrate div 1000)||"kbps","url":url},{"format":"hls-0","container":"m3u8[manifest]","url":hlsManifestUrl}[url],tail(tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+https://www.youtube.com/watch?v=GuoxLggqI_g (video met ondertiteling)
+
+$ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" -e 'json(json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)'
+{
+  "playabilityStatus": {
+    "status": "OK",
+    "playableInEmbed": true
+  },
+  "streamingData": {
+    [...]
+  },
+  "captions": {
+    "playerCaptionsTracklistRenderer": {
+      "captionTracks": [
+        {
+          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&kind=asr&lang=de",
+          "name": {
+            "simpleText": "Duits (automatisch gegenereerd)"
+          },
+          "vssId": "a.de",
+          "languageCode": "de",
+          "kind": "asr",
+          "isTranslatable": true
+        },
+        {
+          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=de",
+          "name": {
+            "simpleText": "Duits"
+          },
+          "vssId": ".de",
+          "languageCode": "de",
+          "isTranslatable": true
+        },
+        {
+          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=en",
+          "name": {
+            "simpleText": "Engels"
+          },
+          "vssId": ".en",
+          "languageCode": "en",
+          "isTranslatable": true
+        },
+        {
+          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=nl",
+          "name": {
+            "simpleText": "Nederlands"
+          },
+          "vssId": ".nl",
+          "languageCode": "nl",
+          "isTranslatable": true
+        },
+        {
+          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=es",
+          "name": {
+            "simpleText": "Spaans"
+          },
+          "vssId": ".es",
+          "languageCode": "es",
+          "isTranslatable": true
+        }
+      ],
+      "audioTracks": [
+        {
+          "captionTrackIndices": [1, 2, 3, 4, 0],
+          "defaultCaptionTrackIndex": 3,
+          "visibility": "UNKNOWN",
+          "hasDefaultTrack": true
+        }
+      ],
+      "translationLanguages": [
+        {
+          "languageCode": "af",
+          "languageName": {
+            "simpleText": "Afrikaans"
+          }
+        },
+        [...]
+        {
+          "languageCode": "sv",
+          "languageName": {
+            "simpleText": "Zweeds"
+          }
+        }
+      ],
+      "defaultAudioTrackIndex": 0,
+      "contribute": {
+        "captionsMetadataRenderer": {
+          "addSubtitlesText": {
+            "runs": [
+              {
+                "text": "Ondertiteling toevoegen",
+                "navigationEndpoint": {
+                  "clickTrackingParams": "CAMQu2kiEwj8rL_atazhAhVXGeAKHb1jA_oo-B0=",
+                  "urlEndpoint": {
+                    "url": "/timedtext_video?ref=watch&v=GuoxLggqI_g"
+                  }
+                }
+              }
+            ]
+          },
+          "noSubtitlesText": {
+            "simpleText": "Deze video heeft nog geen ondertiteling."
+          },
+          "promoSubtitlesText": {
+            "simpleText": "Dien voor deze video ondertiteling in in je eigen taal, zodat deze meer mensen bereikt."
+          }
+        }
+      }
+    }
+  },
+  [...]
+}
+
+$ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'json(json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)/{"name":videoDetails/title,"date":format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"[D01]-[M01]-[Y]"),"duration":videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),"subtitle":{"format":"ttml","url":(.//captionTracks)()[languageCode="nl"]/baseUrl}[url],"formats":streamingData/[for $x at $i in (formats)() order by $x/contentLength count $i return $x/{"format":"pg-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":if (.[itag="43"]) then () else round(bitrate div 1000)||"kbps","url":url},for $x at $i in (adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return $x/{"format":"dash-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)(?:\.|"")",(1,2)) return concat($a[1],"[",if ($a[2]="mp4a") then "aac" else if ($a[2]="avc1") then "h264" else $a[2],"]"),"resolution":if (width) then concat(width,"x",height,"@",fps,"fps") else (),"samplerate":if (audioSampleRate) then (audioSampleRate div 1000)||"kHz" else (),"bitrate":round(bitrate div 1000)||"kbps","url":url}]}'
+{
+  "name": "The Uncertainty Has Settled (Full film)",
+  "date": "08-11-2018",
+  "duration": "01:28:26",
+  "subtitle": {
+    "format": "ttml",
+    "url": "https://www.youtube.com/api/timedtext?signature=58A4AC37ECDA87DE86A23874251DE4637A1C76D4.10AF6160BD774F066D3B593F8BD95A34701B3901&key=yttt1&asr_langs=de%2Cko%2Cit%2Cen%2Cja%2Cfr%2Ces%2Cru%2Cnl%2Cpt&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&expire=1554093938&caps=asr&hl=nl&lang=nl"
+  },
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "452kbps",
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&key=yt6&initcwndbps=1578750&txp=5531432&expire=1554072167&mt=1554050479&pl=15&itag=18&ms=au%2Crdu&requiressl=yes&mime=video%2Fmp4&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5306.015&mm=31%2C29&ip=x.x.x.x&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&c=WEB&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&lmt=1541631987878336&ipbits=0&mv=m&gir=yes&ratebypass=yes&clen=299745842&fvip=2&source=youtube&signature=856F444955E20D91CA2DF196EA1F18EAA341EFB0.841E759BD3C06B85718393D058361A62AB2DB9DF"
+    },
+    [...]
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "825kbps",
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&lmt=1541644163348912&key=yt6&txp=5531432&initcwndbps=1578750&ipbits=0&mv=m&source=youtube&expire=1554072167&ratebypass=yes&mt=1554050479&pl=15&itag=22&ms=au%2Crdu&requiressl=yes&mime=video%2Fmp4&fvip=2&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5306.015&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&mm=31%2C29&ip=x.x.x.x&signature=3657430445B4D81612CC6EFA4F6DC51BDBDE1A12.7D7ECC503C407847F5954AC8CA069E0184FD483A&c=WEB&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire"
+    },
+    {
+      "format": "dash-1",
+      "container": "webm[opus]",
+      "resolution": null,
+      "samplerate": "48kHz",
+      "bitrate": "91kbps",
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&key=yt6&keepalive=yes&initcwndbps=1578750&txp=5511222&expire=1554072167&mt=1554050479&pl=15&itag=249&ms=au%2Crdu&requiressl=yes&mime=audio%2Fwebm&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5305.981&mm=31%2C29&ip=x.x.x.x&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&c=WEB&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&lmt=1541656049253798&ipbits=0&mv=m&gir=yes&clen=31280788&fvip=2&source=youtube&signature=33F399C8CACBEBBB4E3E4CAD401329FE701613C1.CBEEA9E070772A0CE8E92325FA20761B13BDF7F5"
+    },
+    [...]
+    {
+      "format": "dash-17",
+      "container": "mp4[h264]",
+      "resolution": "1920x1080@25fps",
+      "samplerate": null,
+      "bitrate": "4826kbps",
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&key=yt6&keepalive=yes&initcwndbps=1578750&txp=5533432&expire=1554072167&mt=1554050479&pl=15&itag=137&ms=au%2Crdu&requiressl=yes&mime=video%2Fmp4&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5305.960&aitags=133%2C134%2C135%2C136%2C137%2C160%2C242%2C243%2C244%2C247%2C248%2C278&mm=31%2C29&ip=x.x.x.x&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&c=WEB&sparams=aitags%2Cclen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&lmt=1541643237721896&ipbits=0&mv=m&gir=yes&clen=740553746&fvip=2&source=youtube&signature=72C2D3D09CE5F58080B7EC3A8F8B9C0E420CF487.AC50F49D5B79904B09EEF477513721672EAF0512"
+    }
+  ]
+}
+------------------------------------------------------------------------------------------------
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'json(if (//meta[@property="og:restrictions:age"]) then let $a:=concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) return tokenize(uri-decode(doc($a)),"&amp;") ! extract(.,"player_response=(.+)",1)[.] else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)/{"name":videoDetails/title,"date":if (videoDetails/isLive) then "'$(date "+%d-%m-%Y")'" else format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),"[D01]-[M01]-[Y]"),"duration":if (videoDetails/isLive) then () else videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),"subtitle":{"format":"ttml","url":(.//captionTracks)()[languageCode="nl"]/baseUrl}[url],"formats":streamingData/[for $x at $i in (formats)() order by $x/contentLength count $i return $x/{"format":"pg-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":if (.[itag="43"]) then () else round(bitrate div 1000)||"kbps","url":url},if (dashManifestUrl) then for $x at $i in doc(dashManifestUrl||"/disable_polymer/true")//Representation order by $x/boolean(@width),$x/@bandwidth count $i return $x/{"format":"dash-"||$i,"container":concat(substring-after(../@mimeType,"/"),"[",extract(@codecs,"(^[\w]+)",1) ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":if (@width) then concat(@width,"x",@height,"@",@frameRate,"fps") else (),"samplerate":if (@audioSamplingRate) then (@audioSamplingRate div 1000)||"kHz" else (),"bitrate":round(@bandwidth div 1000)||"kbps","url":BaseUrl} else for $x at $i in (adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return $x/{"format":"dash-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)(?:\.|"")",(1,2)) return concat($a[1],"[",if ($a[2]="mp4a") then "aac" else if ($a[2]="avc1") then "h264" else $a[2],"]"),"resolution":if (width) then concat(width,"x",height,"@",fps,"fps") else (),"samplerate":if (audioSampleRate) then (audioSampleRate div 1000)||"kHz" else (),"bitrate":round(bitrate div 1000)||"kbps","url":url},{"format":"hls-0","container":"m3u8[manifest]","url":hlsManifestUrl}[url],tail(tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
 {
   "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
   "date": "01-02-2019",
   "duration": "00:18:13",
+  "subtitle": null,
   "formats": [
     {
       "format": "pg-1",
@@ -3373,6 +3533,7 @@ $ xidel -s "https://www.youtube.com/watch?v=5jOjwN_uJt0" --xquery '[...]'
   "name": "Delta Impuls 1 - De Treffers '70 2 (Noordelijke 2e Divisie, 07-02-2014)",
   "date": "08-09-2015",
   "duration": "00:18:47",
+  "subtitle": null,
   "formats": [
     {
       "format": "pg-1",
@@ -3414,6 +3575,7 @@ $ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" --xquery '[...]'
   "name": "Allow embedding, Age restriction",
   "date": "18-09-2018",
   "duration": "00:00:20",
+  "subtitle": null,
   "formats": [
     {
       "format": "pg-1",
@@ -3455,6 +3617,7 @@ $ xidel -s "https://www.youtube.com/watch?v=sN6bdk6pmrU" --xquery '[...]'
   "name": "NK Tafeltennis 2019 - Finale dag",
   "date": "03-03-2019",
   "duration": null,
+  "subtitle": null,
   "formats": [
     {
       "format": "dash-1",
@@ -3570,6 +3733,10 @@ Formaten:  formaat  container         resolutie       frequentie  bitrate
       ()
     else
       videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),
+    "subtitle":{
+      "format":"ttml",
+      "url":(.//captionTracks)()[languageCode="nl"]/baseUrl
+    }[url],
     "formats":streamingData/[
       for $x at $i in (formats)()
       order by $x/contentLength
@@ -3753,6 +3920,61 @@ Formaten:  formaat  container         resolutie       frequentie  bitrate
     ]
   }
 '
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+https://www.youtube.com/watch?v=GuoxLggqI_g (TTML naar SRT)
+
+https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=nl:
+----------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8" ?><transcript><text start="49.76" dur="4.28">Ik geloof dat ik voor een paar
+dagen de stad moet ontvluchten.</text><text start="56.36" dur="1.84">Het heeft niets met
+[...]
+niets over in de mainstream media?</text><text start="5114.4" dur="3.88">Je vraag is je antwoord!</text><text start="5182.68" dur="1.72">Daar sta ik dan...</text><text start="5184.56" dur="3.2">…net zo slim als toen ik begon.</text></transcript>
+----------------------------------------------------------------
+
+$ xidel -s "<TTML-url>" -e '//text[contains(.,"&")][1]'
+&#39;s avonds ben ik ook erg
+aan mijn bed toe.
+
+$ xidel -s "<TTML-url>" -e '//text[contains(.,"&")][1] ! parse-xml(.)'
+'s avonds ben ik ook erg
+aan mijn bed toe.
+
+$ xidel -s "<TTML-url>" --xquery '
+  for $x at $i in //text
+  return (
+    $i,
+    concat(
+      format-time(
+        $x/@start * duration("PT1S"),
+        "[H01]:[m01]:[s01],[f001]"
+      ),
+      " --> ",
+      format-time(
+        $x/(@start + @dur) * duration("PT1S"),
+        "[H01]:[m01]:[s01],[f001]"
+      )
+    ),
+    parse-xml($x),
+    ""
+  )
+'
+1
+00:00:49,760 --> 00:00:54,040
+Ik geloof dat ik voor een paar
+dagen de stad moet ontvluchten.
+
+2
+00:00:56,360 --> 00:00:58,200
+Het heeft niets met
+geld of tijd te maken.
+
+[...]
+
+896
+01:26:24,560 --> 01:26:27,760
+…net zo slim als toen ik begon.
 
 ================================================================================================================================
 
