@@ -969,9 +969,10 @@ youtube() {
                 "/"
               ),
               "[",
-              substring-before(
+              extract(
                 @codecs,
-                "."
+                "(^[\w]+)",
+                1
               ) ! (
                 if (.="mp4a") then
                   "aac"
