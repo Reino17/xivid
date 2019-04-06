@@ -261,7 +261,7 @@ Dit is waar je Xidel heel goed voor kunt gebruiken.
 ## Linux
 De door BashGemist gegenereerde JSON 'pipen' we naar Xidel en deze geeft alle informatie terug van de JSON attributen die we opgeven:
 ```sh
-xidel -s - -e '
+./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
     name,
     date,
@@ -270,7 +270,7 @@ xidel -s - -e '
     subtitle,
     (formats)()[format="hls-6"]/url
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
+'
 NOS Journaal: Rotterdam wil verborgen armoede in kaart brengen
 17-02-2017
 00:01:14
@@ -280,7 +280,7 @@ https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ
 ```
 In een bestandsnaam mag geen `:` voorkomen, dus die vervangen we voor een `-`. Daar plakken we de datum achter met haakjes er omheen, maar zonder streepjes. Vervolgens splitten we de begintijd nog in tweeën; de begintijd afgerond op 30 seconden en de resterende seconden. (Met de `-ss 00:06:00` vóór FFmpeg's input `-i <url>` slaat FFmpeg de eerste 6 minuten over en begint dan met lezen. Met de `-ss 00:00:28` (of `28`) daarna zoekt FFmpeg de resterende 28 seconden **nauwkeurig** naar het juiste beginpunt. Met `-t 00:01:14` zal FFmpeg na 1 minuut en 14 seconden stoppen met lezen/verwerken.)
 ```sh
-xidel -s - -e '
+./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
     concat(
       replace(
@@ -302,7 +302,7 @@ xidel -s - -e '
     subtitle,
     (formats)()[format="hls-6"]/url
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
+'
 NOS Journaal- Rotterdam wil verborgen armoede in kaart brengen (17022017)
 00:01:14
 00:06:00
@@ -313,7 +313,7 @@ https://nl-ams-p6-am5.cdn.streamgate.nl/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ
 Met deze informatie kun je nu een FFmpeg commando samenstellen. Dit kan op 3 manieren:
 - Exporteer de informatie als variabelen en raadpleeg die daarna in een aparte FFmpeg commando:
 ```sh
-eval "$(xidel -s - -e '
+eval "$(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
     name:=concat(
       replace(
@@ -335,7 +335,7 @@ eval "$(xidel -s - -e '
     sub:=subtitle,
     url:=(formats)()[format="hls-6"]/url
   )
-' --output-format=bash <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481))"
+' --output-format=bash)"
 
 ffmpeg \
 -ss $ss1 -i $url \
@@ -361,7 +361,7 @@ FFmpeg opent de video-url en de ondertiteling-url en slaat de eerste 6 minuten e
 ---
 - Gebruik interne variabelen en gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen:
 ```sh
-xidel -s - -e '
+./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
     let $name:=concat(
           replace(
@@ -394,11 +394,11 @@ xidel -s - -e '
       """
     )
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
+'
 ```
 - Gebruik Xidel's `system()` om FFmpeg vanuit Xidel aan te roepen met alle informatie rechtstreeks uit de JSON:
 ```sh
-xidel -s - -e '
+./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
     system(
       x"bash -c ""ffmpeg \
@@ -429,7 +429,7 @@ xidel -s - -e '
       """
     )
   )
-' <<< $(./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481)
+'
 ```
 
 ## Windows
