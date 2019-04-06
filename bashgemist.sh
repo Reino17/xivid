@@ -1248,7 +1248,10 @@ info() {
           1,
           $c+1
         ),
-        $json(.)
+        if ($json(.) instance of string) then
+          $json(.)
+        else
+          $json(.)/format
       ),
       if ($e(2)) then
         for $x at $i in $e() return
