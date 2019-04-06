@@ -32,18 +32,13 @@ Gebruik: ./bashgemist.sh [optie] url
   -d, --debug             Toon bash debug informatie.
 
 Ondersteunde websites:
-  npostart.nl
-  gemi.st
-  nos.nl
-  tvblik.nl
-  uitzendinggemist.net
-  rtl.nl
-  kijk.nl
-  omropfryslan.nl
-  dumpert.nl
-  youtube.com
-  youtu.be
-  vimeo.com
+  npostart.nl             omropfryslan.nl
+  gemi.st                 rtvnoord.nl
+  nos.nl                  rtvdrenthe.nl
+  tvblik.nl               dumpert.nl
+  uitzendinggemist.net    youtube.com
+  rtl.nl                  youtu.be
+  kijk.nl                 vimeo.com
 
 Voorbeelden:
   ./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2017/POW_03375409
@@ -787,6 +782,82 @@ omropfryslan() {
   ' --output-format=bash)"
 }
 
+rtvnoord() {
+  eval "$(xidel "$1" --xquery '
+    let $a:=json(
+          resolve-uri(//@data-media-url)
+        ),
+        $b:=$a/resolve-uri(
+          clipData/src,
+          publicationData/defaultMediaAssetPath
+        )
+    return
+    json:=if ($a/clipData/id="Tv") then {
+      "name":$a/publicationData/label||": Livestream",
+      "date":"'$(date "+%d-%m-%Y")'",
+      "formats":[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$b
+        },
+        for $x at $i in tail(
+          tokenize(
+            unparsed-text($b),
+            "#EXT-X-STREAM-INF:"
+          )
+        )
+        order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":"m3u8[h264+aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          ),
+          "bitrate":round(
+            extract(
+              $x,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $b
+          )
+        }
+      ]
+    } else {
+      "name":concat(
+        $a/publicationData/label,
+        ": ",
+        (//h3,//h1)
+      ),
+      "date":format-date(
+        dateTime($a/clipData/publisheddate),
+        "[D01]-[M01]-[Y]"
+      ),
+      "formats":[
+        {
+          "format":"pg-1",
+          "container":"mp4[h264+aac]",
+          "url":$b
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 dumpert() {
   eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
     json:=(
@@ -1424,6 +1495,8 @@ elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then
   omropfryslan "$url"
+elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl) ]]; then
+  rtvnoord "$url"
 elif [[ $url =~ dumpert.nl ]]; then
   dumpert "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then

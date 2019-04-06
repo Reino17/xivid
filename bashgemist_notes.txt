@@ -4742,3 +4742,231 @@ $ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2
     ]
   }
 '
+
+================================================================================================================================
+
+[rtv noord & rtv drenthe]
+
+https://www.rtvnoord.nl/televisie
+
+$ xidel -s "https://www.rtvnoord.nl/televisie" -f '//@data-media-url' --xquery '{"name":$json/publicationData/label||": Livestream","date":"'$(date "+%d-%m-%Y")'","formats":let $a:=$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath) return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}]}'
+{
+  "name": "RTV Noord: Livestream",
+  "date": "30-03-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "426x240",
+      "bitrate": "528kbps",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/6a46cbb2-57ee-4192-b55a-de7b4575b19b/index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "854x480",
+      "bitrate": "1027kbps",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/44463833-a0d8-4702-9e7b-d40fa4dc9f27/index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "4128kbps",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/3e8fe3c1-0868-49b0-b2f3-7dd6eb30651f/index.m3u8"
+    }
+  ]
+}
+
+https://www.rtvdrenthe.nl/tv
+
+$ xidel -s "https://www.rtvdrenthe.nl/tv" -f '//@data-media-url' --xquery '[...]'
+{
+  "name": "RTV Drenthe: Livestream",
+  "date": "31-03-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "1192kbps",
+      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/360p/prog_index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "960x540",
+      "bitrate": "2192kbps",
+      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/540p/prog_index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "3192kbps",
+      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/720p/prog_index.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "5192kbps",
+      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/1080p/prog_index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811
+
+$ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811" -e 'let $a:=json(resolve-uri(//@data-media-url)) return {"name":concat($a/publicationData/label,": ",//h3),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)}]}'
+{
+  "name": "RTV Noord: Noord Vandaag",
+  "date": "29-03-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://media.rtvnoord.nl/video/2019/190329/190329_NVREC_XHQ.mp4"
+    }
+  ]
+}
+
+https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/42540
+
+$ xidel -s "https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/42540" -e '[...]'
+{
+  "name": "RTV Drenthe: Drenthe Nu",
+  "date": "31-03-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://av.rtvdrenthe.nl/media/drnl20190331-hhuitz.mp4"
+    }
+  ]
+}
+
+https://www.rtvnoord.nl/nieuws/206728/Bewoners-De-Wijert-zijn-ringweg-werkzaamheden-meer-dan-zat
+
+$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e 'let $a:=json(resolve-uri(//@data-media-url)) return {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)}]}'
+{
+  "name": "RTV Noord: Bewoners De Wijert zijn ringweg-werkzaamheden meer dan zat",
+  "date": "30-03-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://media.rtvnoord.nl/video/2019/190330/190330_wijertbbq_XHQ.mp4"
+    }
+  ]
+}
+
+https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk
+
+$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e '[...]'
+{
+  "name": "RTV Drenthe: Ondernemen in Drenthe: Duurzaam handwerken bij Wol zo eerlijk",
+  "date": "31-03-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://av.rtvdrenthe.nl/media/nws20190331-ondernemen_in_drenthe_website_0002.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+Eén query voor beide videostreams:
+
+$ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811" --xquery 'let $a:=json(resolve-uri(//@data-media-url)),$b:=$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath) return if ($a/clipData/id="Tv") then {"name":$a/publicationData/label||": Livestream","date":"'$(date "+%d-%m-%Y")'","formats":[{"format":"hls-0","container":"m3u8[manifest]","url":$b},for $x at $i in tail(tokenize(unparsed-text($b),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$b)}]} else {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$b}]}'
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:=json(
+        resolve-uri(//@data-media-url)
+      ),
+      $b:=$a/resolve-uri(
+        clipData/src,
+        publicationData/defaultMediaAssetPath
+      )
+  return
+  if ($a/clipData/id="Tv") then {
+    "name":$a/publicationData/label||": Livestream",
+    "date":"'$(date "+%d-%m-%Y")'",
+    "formats":[
+      {
+        "format":"hls-0",
+        "container":"m3u8[manifest]",
+        "url":$b
+      },
+      for $x at $i in tail(
+        tokenize(
+          unparsed-text($b),
+          "#EXT-X-STREAM-INF:"
+        )
+      )
+      order by extract(
+        $x,
+        "BANDWIDTH=(\d+)",
+        1
+      ) count $i
+      return {
+        "format":"hls-"||$i,
+        "container":"m3u8[h264+aac]",
+        "resolution":extract(
+          $x,
+          "RESOLUTION=([\dx]+)",
+          1
+        ),
+        "bitrate":round(
+          extract(
+            $x,
+            "BANDWIDTH=(\d+)",
+            1
+          ) div 1000
+        )||"kbps",
+        "url":resolve-uri(
+          extract(
+            $x,
+            "(.+m3u8)",
+            1
+          ),
+          $b
+        )
+      }
+    ]
+  } else {
+    "name":concat(
+      $a/publicationData/label,
+      ": ",
+      (//h3,//h1)
+    ),
+    "date":format-date(
+      dateTime($a/clipData/publisheddate),
+      "[D01]-[M01]-[Y]"
+    ),
+    "formats":[
+      {
+        "format":"pg-1",
+        "container":"mp4[h264+aac]",
+        "resolution":"1920x1080",
+        "url":$b
+      }
+    ]
+  }
+'
