@@ -201,23 +201,26 @@ npo() {
         )
       else
         (),
-      "subtitle":if ($b/parentId) then
-        x:request(
-          {
-            "url":concat(
-              "https://rs.poms.omroep.nl/v1/api/subtitles/",
-              $b/parentId,
-              "/nl_NL/CAPTION.vtt"
+      "subtitle":{
+        "format":"webvtt",
+        "url":if ($b/parentId) then
+          x:request(
+            {
+              "url":concat(
+                "https://rs.poms.omroep.nl/v1/api/subtitles/",
+                $b/parentId,
+                "/nl_NL/CAPTION.vtt"
+              )
+            }
+          )[
+            contains(
+              headers[1],
+              "200"
             )
-          }
-        )[
-          contains(
-            headers[1],
-            "200"
-          )
-        ]/url
-      else
-        $b/(subtitles)()/src,
+          ]/url
+        else
+          $b/(subtitles)()/src
+      }[url],
       "formats":[
         {
           "format":"hls-0",
@@ -627,7 +630,10 @@ kijk() {
           TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
-        "subtitle":(tracks)()[label=" Nederlands"]/file,
+        "subtitle":{
+          "format":"webvtt",
+          "url":(tracks)()[label=" Nederlands"]/file
+        }[url],
         "formats":[
           (sources)()[not(drm) and type="m3u8"][1]/x:request(
             {
