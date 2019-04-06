@@ -541,5 +541,78 @@ bashgemist.bat -j https://www.npostart.nl/POMS_NOS_7332481 | xidel.exe -s - -e ^
 "
 ```
 
+# Youtube video downloaden
+We nemen `https://www.youtube.com/watch?v=GuoxLggqI_g`, een documentaire, als voorbeeld:
+```sh
+./bashgemist.sh -i https://www.youtube.com/watch?v=GuoxLggqI_g
+Naam:          The Uncertainty Has Settled (Full film)
+Datum:         08-11-2018
+Tijdsduur:     01:28:26
+Ondertiteling: ttml
+Formaten:      formaat  container         resolutie        frequentie  bitrate
+               pg-1     mp4[h264+aac]     640x360                      452kbps
+               pg-2     webm[vp8+vorbis]  640x360
+               pg-3     mp4[h264+aac]     1280x720                     825kbps
+               dash-1   webm[opus]                         48kHz       91kbps
+               dash-2   webm[opus]                         48kHz       109kbps
+               dash-3   mp4[aac]                           44.1kHz     135kbps
+               dash-4   webm[vorbis]                       44.1kHz     145kbps
+               dash-5   webm[opus]                         48kHz       176kbps
+               dash-6   webm[vp9]         256x144@25fps                102kbps
+               dash-7   mp4[h264]         256x144@25fps                115kbps
+               dash-8   webm[vp9]         426x240@25fps                233kbps
+               dash-9   mp4[h264]         426x240@25fps                337kbps
+               dash-10  webm[vp9]         640x360@25fps                431kbps
+               dash-11  mp4[h264]         640x360@25fps                740kbps
+               dash-12  webm[vp9]         854x480@25fps                776kbps
+               dash-13  mp4[h264]         854x480@25fps                1357kbps
+               dash-14  webm[vp9]         1280x720@25fps               1619kbps
+               dash-15  mp4[h264]         1280x720@25fps               2402kbps
+               dash-16  webm[vp9]         1920x1080@25fps              2882kbps
+               dash-17  mp4[h264]         1920x1080@25fps              4826kbps  (best)
+```
+I.t.t. bij vele andere websites zijn bij Youtube de DASH audio- en videostreams gescheiden van elkaar. Tenzij je genoegen neemt met de `pg-#` videostreams zul je ze dus moeten combineren. We willen de 1080p H.264 videostream graag combineren met de AAC audiostream.<br>
+De documentaire is nederlands-, duits- en engelstalig en heeft geen "hardsubs" (ondertiteling als onderdeel van het videobeeld zelf), maar wel "softsubs" (een aparte ondertitelingstream). Deze pakken we dus ook mee.
+
+De ondertiteling is in dit geval van het type [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). FFmpeg ondersteunt dit op XML gebaseerde formaat (nog) niet. Xidel daarentegen is hier bij uitstek geschikt voor. Waar Youtube-dl hier flink wat regels aan code voor nodig heeft is het voor Xidel en een simpele query zo gepiept om deze ondertiteling te converteren naar het meest gangbare [SRT](https://nl.wikipedia.org/wiki/SubRip) formaat. Voordat we de audio- en videostream erbij pakken moet dit dus eerst.<br>
+De door BashGemist gegenereerde JSON 'pipen' we naar Xidel. Xidel opent de TTML ondertiteling-url en converteert deze naar SRT. Xidel's uitvoer slaan we op als `ondertiteling.srt`:
+```sh
+./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g | xidel -s - --xquery '
+  for $x at $i in $json/subtitle/doc(url)//text
+  return (
+    $i,
+    concat(
+      format-time(
+        $x/@start * duration("PT1S"),
+        "[H01]:[m01]:[s01],[f001]"
+      ),
+      " --> ",
+      format-time(
+        $x/(@start + @dur) * duration("PT1S"),
+        "[H01]:[m01]:[s01],[f001]"
+      )
+    ),
+    parse-xml($x),
+    ""
+  )
+' > ondertiteling.srt
+```
+Vervolgens exporteren we de naam, de video-url en de audio-url als variabelen. FFmpeg opent de 2 urls Tn de net geconverteerde `ondertiteling.srt`. Deze laatste wordt gelabeld als Nederlands. Ten slotte wordt alles met `-c copy` (een zogenaamde streamcopy en dus zonder kwaliteitsverlies) in een mkv-container gestopt, met `The Uncertainty Has Settled (Full film).mkv` als resultaat.
+```sh
+eval "$(./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g | xidel -s - -e '
+  name:=$json/name,
+  v_url:=$json/(formats)()[format="dash-17"]/url,
+  a_url:=$json/(formats)()[format="dash-3"]/url
+' --output-format=bash)"
+
+ffmpeg \
+-i $v_url \
+-i $a_url \
+-i ondertiteling.srt \
+-c copy \
+-metadata:s:s language=dut \
+"$name.mkv"
+```
+
 # Disclaimer
 Omdat ik een Windows gebruiker ben kan het zijn dat de informatie hierboven omtrent Linux niet allemaal klopt, of niet volledig is. Laat het me gerust weten mocht dat het geval zijn.
