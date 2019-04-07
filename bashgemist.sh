@@ -182,20 +182,14 @@ npo() {
         $b/duration * duration("PT1S"),
         "[H01]:[m01]:[s01]"
       ),
-      "start":if ($b/startAt) then
-        format-time(
-          $b/startAt * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
-      "end":if ($b/startAt) then
-        format-time(
-          ($b/duration + $b/startAt) * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
+      "start":format-time(
+        $b[startAt]/startAt * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "end":format-time(
+        $b[startAt]/(duration + startAt) * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
       "subtitle":{
         "format":"webvtt",
         "url":if ($b/parentId) then
@@ -392,13 +386,10 @@ rtl() {
         time((material)()/duration) + duration("PT0.5S"),
         "[H01]:[m01]:[s01]"
       ),
-      "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
-        format-dateTime(
-          (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
-          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
-        )
-      else
-        (),
+      "expdate":format-dateTime(
+        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
+        "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+      ),
       "formats":let $a:=.//videohost||.//videopath return [
         {
           "format":"hls-0",
@@ -985,10 +976,7 @@ youtube() {
           ) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
           "[D01]-[M01]-[Y]"
         ),
-      "duration":if (videoDetails/isLive) then
-        ()
-      else
-        videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),
+      "duration":videoDetails[not(isLive)]/lengthSeconds * duration("PT1S") + time("00:00:00"),
       "subtitle":{
         "format":"ttml",
         "url":(.//captionTracks)()[languageCode="nl"]/baseUrl
