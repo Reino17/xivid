@@ -55,7 +55,7 @@ npo_live() {
         " - Live tv",
         ": Livestream"
       ),
-      "date":"'$(date "+%d-%m-%Y")'",
+      "date":"'$(date +%d-%m-%Y)'",
       "formats":json(
         concat(
           "http://ida.omroep.nl/app.php/",
@@ -290,7 +290,7 @@ nos() {
           ()
       ),
       "date":if (//video/@data-type="livestream") then
-        "'$(date "+%d-%m-%Y")'"
+        "'$(date +%d-%m-%Y)'"
       else
         replace(
           //@datetime,
@@ -363,6 +363,7 @@ nos() {
 }
 
 rtl() {
+  tz=$(date +%::z)
   eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" --xquery '
     json:=$json[
       not(
@@ -384,7 +385,7 @@ rtl() {
         "'\'\''"
       ),
       "date":format-date(
-        (material)()/original_date * duration("PT1S") + date("1970-01-01"),
+        (material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -393,7 +394,7 @@ rtl() {
       ),
       "expdate":if ((.//ddr_timeframes)()[model="AVOD"]/stop) then
         format-dateTime(
-          (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
+          (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         )
       else
@@ -622,7 +623,7 @@ kijk() {
         ),
         "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
         "expdate":format-dateTime(
-          TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
+          TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
         "subtitle":{
@@ -714,7 +715,7 @@ omropfryslan() {
     return
     json:=if ($b//@sourcetype="live") then {
       "name"://meta[@itemprop="name"]/@content||": Livestream",
-      "date":"'$(date "+%d-%m-%Y")'",
+      "date":"'$(date +%d-%m-%Y)'",
       "formats":[
         {
           "format":"hls-0",
@@ -794,7 +795,7 @@ rtvnoord() {
     return
     json:=if ($a/clipData/id="Tv") then {
       "name":$a/publicationData/label||": Livestream",
-      "date":"'$(date "+%d-%m-%Y")'",
+      "date":"'$(date +%d-%m-%Y)'",
       "formats":[
         {
           "format":"hls-0",
@@ -976,12 +977,12 @@ youtube() {
     )/{
       "name":videoDetails/title,
       "date":if (videoDetails/isLive) then
-        "'$(date "+%d-%m-%Y")'"
+        "'$(date +%d-%m-%Y)'"
       else
         format-date(
           round(
             min(streamingData//lastModified) div 1000000
-          ) * duration("PT1S") + dateTime("1970-01-01T01:00:00"),
+          ) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
           "[D01]-[M01]-[Y]"
         ),
       "duration":if (videoDetails/isLive) then
