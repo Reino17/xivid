@@ -5026,3 +5026,168 @@ $ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/
     ]
   }
 '
+
+================================================================================================================================
+
+[nh nieuws]
+
+https://www.nhnieuws.nl/tv
+
+$ xidel -s "https://www.nhnieuws.nl/tv" -e '{"name":"NH Nieuws: Livestream","date":"'$(date +%d-%m-%Y)'","formats":x:request({"url":json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+{
+  "name": "NH Nieuws: Livestream",
+  "date": "06-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/playlist.m3u8?token=-ldEgDxG4CToIPkgGvWrMQ&time=1554595001"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "1153kbps",
+      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/chunklist_b1048576.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2307kbps",
+      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/chunklist_b2097152.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3487kbps",
+      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/chunklist_b3170304.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur
+
+$ xidel -s "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur" -e 'json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/{"name":(.//media)(1)/concat(source,": ",title),"date":format-date(.//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"formats":x:request({"url":(.//media)()/videoUrl})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+{
+  "name": "NH Nieuws: Koeien aan de wandel in Kortenhoef",
+  "date": "06-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://wos.cr1.streamzilla.xlcdn.com/session/0ccdf5595c46e2be29f3f00ad1856208/vod/_definst_/sz/nhnieuws/2019/04/06/5ca8b8ac665d65ca8b8ac66611.smil/playlist.m3u8?token=MY5sgN56qVH3sjrKyrx6GQ&time=1554596909"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "568x320",
+      "bitrate": "649kbps",
+      "url": "https://wos.cr1.streamzilla.xlcdn.com/session/0ccdf5595c46e2be29f3f00ad1856208/vod/_definst_/sz/nhnieuws/2019/04/06/5ca8b8ac665d65ca8b8ac66611.smil/chunklist_b589824.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "854x480",
+      "bitrate": "1257kbps",
+      "url": "https://wos.cr1.streamzilla.xlcdn.com/session/0ccdf5595c46e2be29f3f00ad1856208/vod/_definst_/sz/nhnieuws/2019/04/06/5ca8b8ac665d65ca8b8ac66611.smil/chunklist_b1142784.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2451kbps",
+      "url": "https://wos.cr1.streamzilla.xlcdn.com/session/0ccdf5595c46e2be29f3f00ad1856208/vod/_definst_/sz/nhnieuws/2019/04/06/5ca8b8ac665d65ca8b8ac66611.smil/chunklist_b2228224.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "5907kbps",
+      "url": "https://wos.cr1.streamzilla.xlcdn.com/session/0ccdf5595c46e2be29f3f00ad1856208/vod/_definst_/sz/nhnieuws/2019/04/06/5ca8b8ac665d65ca8b8ac66611.smil/chunklist_b5369856.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+Eén query voor beide videostreams:
+
+$ xidel -s "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur" -e 'let $a:=json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.]) return {"name":if ($a) then ($a//media)(1)/concat(source,": ",title) else "NH Nieuws: Livestream","date":if ($a) then format-date($a//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]") else "'$(date +%d-%m-%Y)'","formats":x:request({"url":if ($a) then ($a//media)()/videoUrl else json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+
+------------------------------------------------------------------------------------------------
+
+-e '
+  let $a:=json(
+    //script/extract(
+      .,
+      "INITIAL_PROPS__ = (.+)",
+      1
+    )[.]
+  ) return {
+    "name":if ($a) then
+      ($a//media)(1)/concat(
+        source,
+        ": ",
+        title
+      )
+    else
+      "NH Nieuws: Livestream",
+    "date":if ($a) then
+      format-date(
+        $a//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+        "[D01]-[M01]-[Y]"
+      )
+    else
+      "'$(date +%d-%m-%Y)'",
+    "formats":x:request(
+      {
+        "url":if ($a) then
+          ($a//media)()/videoUrl
+        else
+          json(
+            //script/extract(
+              .,
+              "INIT_DATA__ = (.+)",
+              1
+            )[.]
+          )/videoStream
+      }
+    )/[
+      {
+        "format":"hls-0",
+        "container":"m3u8[manifest]",
+        "url":url
+      }[url],
+      tail(
+        tokenize(
+          doc,
+          "#EXT-X-STREAM-INF:"
+        )
+      ) ! {
+        "format":"hls-"||position(),
+        "container":"m3u8[h264+aac]",
+        "resolution":extract(
+          .,
+          "RESOLUTION=([\dx]+)",
+          1
+        )[.],
+        "bitrate":round(
+          extract(
+            .,
+            "BANDWIDTH=(\d+)",
+            1
+          ) div 1000
+        )||"kbps",
+        "url":extract(
+          .,
+          "(.+m3u8)",
+          1
+        )
+      }
+    ]
+  }
+'

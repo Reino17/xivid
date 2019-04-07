@@ -850,6 +850,80 @@ rtvnoord() {
   ' --output-format=bash)"
 }
 
+nhnieuws() {
+  eval "$(xidel "$1" -e '
+    let $a:=json(
+      //script/extract(
+        .,
+        "INITIAL_PROPS__ = (.+)",
+        1
+      )[.]
+    ) return json:={
+      "name":if ($a) then
+        ($a//media)(1)/concat(
+          source,
+          ": ",
+          title
+        )
+      else
+        "NH Nieuws: Livestream",
+      "date":if ($a) then
+        format-date(
+          $a//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+          "[D01]-[M01]-[Y]"
+        )
+      else
+        "'$(date +%d-%m-%Y)'",
+      "formats":x:request(
+        {
+          "url":if ($a) then
+            ($a//media)()/videoUrl
+          else
+            json(
+              //script/extract(
+                .,
+                "INIT_DATA__ = (.+)",
+                1
+              )[.]
+            )/videoStream
+        }
+      )/[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":url
+        }[url],
+        tail(
+          tokenize(
+            doc,
+            "#EXT-X-STREAM-INF:"
+          )
+        ) ! {
+          "format":"hls-"||position(),
+          "container":"m3u8[h264+aac]",
+          "resolution":extract(
+            .,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":round(
+            extract(
+              .,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":extract(
+            .,
+            "(.+m3u8)",
+            1
+          )
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 dumpert() {
   eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
     json:=(
@@ -1489,6 +1563,8 @@ elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then
   omropfryslan "$url"
+elif [[ $url =~ nhnieuws.nl ]]; then
+  nhnieuws "$url"
 elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl) ]]; then
   rtvnoord "$url"
 elif [[ $url =~ dumpert.nl ]]; then
