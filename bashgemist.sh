@@ -1037,7 +1037,12 @@ youtube() {
         if (dashManifestUrl) then
           for $x at $i in doc(
             dashManifestUrl||"/disable_polymer/true"
-          )//Representation
+          )//Representation[
+            matches(
+              @id,
+              "\d+"
+            )
+          ]
           order by $x/boolean(@width),
                    $x/@bandwidth
           count $i
