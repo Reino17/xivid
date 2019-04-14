@@ -32,13 +32,13 @@ Gebruik: ./bashgemist.sh [optie] url
   -d, --debug             Toon bash debug informatie.
 
 Ondersteunde websites:
-  npostart.nl             omropfryslan.nl
-  gemi.st                 rtvnoord.nl
+  npostart.nl             omropfryslan.nl       youtu.be
+  gemi.st                 rtvnoord.nl           vimeo.com
   nos.nl                  rtvdrenthe.nl
-  tvblik.nl               dumpert.nl
-  uitzendinggemist.net    youtube.com
-  rtl.nl                  youtu.be
-  kijk.nl                 vimeo.com
+  tvblik.nl               nhnieuws.nl
+  uitzendinggemist.net    omroepflevoland.nl
+  rtl.nl                  dumpert.nl
+  kijk.nl                 youtube.com
 
 Voorbeelden:
   ./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2017/POW_03375409
@@ -837,6 +837,115 @@ nhnieuws() {
   ' --output-format=bash)"
 }
 
+omroep_fll() {
+  eval "$(xidel "$1" --xquery '
+    let $a:=//div[
+      ends-with(
+        @class,
+        "videoplayer"
+      )
+    ] return
+    json:=if ($a/@data-page-type="home") then {
+      "name":"Omroep Flevoland: Livestream",
+      "date":"'$(date +%d-%m-%Y)'",
+      "formats":[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$a/@data-file
+        },
+        for $x at $i in tail(
+          tokenize(
+            unparsed-text($a/@data-file),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":"m3u8[h264+aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          ),
+          "bitrate":extract(
+            $x,
+            "BANDWIDTH=(\d+)\d{3}",
+            1
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $a/@data-file
+          )
+        }
+      ]
+    } else {
+      "name":"Omroep Flevoland: "||//h2,
+      "date":if ($a/@data-page-type="missed") then
+        substring(
+          //span[
+            starts-with(
+              @class,
+              "t--red"
+            )
+          ],
+          4
+        )
+      else
+        let $a:={
+              "januari":"01",
+              "februari":"02",
+              "maart":"03",
+              "april":"04",
+              "mei":"05",
+              "juni":"06",
+              "juli":"07",
+              "augustus":"08",
+              "september":"09",
+              "oktober":"10",
+              "november":"11",
+              "december":"12"
+            },
+            $b:=tokenize(
+              //span[@class="d--block--sm"],
+              " "
+            )[.]
+        return
+        join(
+          (
+            if ($b[3]<10) then
+              '0'||$b[3]
+            else
+              $b[3],
+            $a($b[4]),
+            $b[5]
+          ),
+          "-"
+        ),
+      "formats":[
+        {
+          "format":"pg-1",
+          "container":"mp4[h264+aac]",
+          "url"://div[
+            ends-with(
+              @class,
+              "videoplayer"
+            )
+          ]/@data-file
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 dumpert() {
   eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
     json:=(
@@ -1478,10 +1587,12 @@ elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then
   omropfryslan "$url"
-elif [[ $url =~ nhnieuws.nl ]]; then
-  nhnieuws "$url"
 elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl) ]]; then
   rtvnoord "$url"
+elif [[ $url =~ nhnieuws.nl ]]; then
+  nhnieuws "$url"
+elif [[ $url =~ omroepflevoland.nl ]]; then
+  omroep_fll "$url"
 elif [[ $url =~ dumpert.nl ]]; then
   dumpert "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
