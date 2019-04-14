@@ -32,13 +32,13 @@ Gebruik: ./bashgemist.sh [optie] url
   -d, --debug             Toon bash debug informatie.
 
 Ondersteunde websites:
-  npostart.nl             omropfryslan.nl       youtu.be
-  gemi.st                 rtvnoord.nl           vimeo.com
-  nos.nl                  rtvdrenthe.nl
+  npostart.nl             omropfryslan.nl       youtube.com
+  gemi.st                 rtvnoord.nl           youtu.be
+  nos.nl                  rtvdrenthe.nl         vimeo.com
   tvblik.nl               nhnieuws.nl
   uitzendinggemist.net    omroepflevoland.nl
-  rtl.nl                  dumpert.nl
-  kijk.nl                 youtube.com
+  rtl.nl                  rtvoost.nl
+  kijk.nl                 dumpert.nl
 
 Voorbeelden:
   ./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2017/POW_03375409
@@ -608,7 +608,7 @@ kijk() {
   ' --output-format=bash)"
 }
 
-omropfryslan() {
+omrop_frl() {
   eval "$(xidel "$1" --xquery '
     let $a:=//meta[@itemprop="embedURL"]/extract(
           @content,
@@ -687,14 +687,22 @@ omropfryslan() {
   ' --output-format=bash)"
 }
 
-rtvnoord() {
+rtv_ndo() {
   eval "$(xidel "$1" --xquery '
     let $a:=json(
           resolve-uri(//@data-media-url)
         ),
-        $b:=$a/resolve-uri(
-          clipData/src,
-          publicationData/defaultMediaAssetPath
+        $b:=x:request(
+          {
+            "url":$a/resolve-uri(
+              clipData/src,
+              publicationData/defaultMediaAssetPath
+            ),
+            "method":if ($a/clipData/id="Tv") then
+              "GET"
+            else
+              "HEAD"
+          }
         )
     return
     json:=if ($a/clipData/id="Tv") then {
@@ -704,15 +712,14 @@ rtvnoord() {
         {
           "format":"hls-0",
           "container":"m3u8[manifest]",
-          "url":$b
+          "url":$b/url
         },
         for $x at $i in tail(
           tokenize(
-            unparsed-text($b),
+            $b/doc,
             "#EXT-X-STREAM-INF:"
           )
-        )
-        order by extract(
+        ) order by extract(
           $x,
           "BANDWIDTH=(\d+)",
           1
@@ -738,7 +745,7 @@ rtvnoord() {
               "(.+m3u8)",
               1
             ),
-            $b
+            $b/url
           )
         }
       ]
@@ -756,14 +763,14 @@ rtvnoord() {
         {
           "format":"pg-1",
           "container":"mp4[h264+aac]",
-          "url":$b
+          "url":$b/url
         }
       ]
     }
   ' --output-format=bash)"
 }
 
-nhnieuws() {
+nh_nieuws() {
   eval "$(xidel "$1" -e '
     let $a:=json(
       //script/extract(
@@ -1586,11 +1593,11 @@ elif [[ $url =~ rtl.nl ]]; then
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then
-  omropfryslan "$url"
-elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl) ]]; then
-  rtvnoord "$url"
+  omrop_frl "$url"
+elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl) ]]; then
+  rtv_ndo "$url"
 elif [[ $url =~ nhnieuws.nl ]]; then
-  nhnieuws "$url"
+  nh_nieuws "$url"
 elif [[ $url =~ omroepflevoland.nl ]]; then
   omroep_fll "$url"
 elif [[ $url =~ dumpert.nl ]]; then

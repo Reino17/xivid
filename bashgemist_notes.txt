@@ -4722,7 +4722,7 @@ $ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2
 
 ================================================================================================================================
 
-[rtv noord,rtv drenthe]
+[rtv noord, drenthe en oost]
 
 https://www.rtvnoord.nl/televisie
 
@@ -4803,6 +4803,49 @@ $ xidel -s "https://www.rtvdrenthe.nl/tv" -f '//@data-media-url' --xquery '[...]
   ]
 }
 
+https://www.rtvoost.nl/tv
+
+$ xidel -s "https://www.rtvoost.nl/tv" -f '//@data-media-url' -e '$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)'
+https://streams.rtvoost.nl/video/tv/hls.m3u8
+
+Admin@corone /cygdrive/d/Storage/Media/Binaries
+$ xidel -s "https://www.rtvoost.nl/tv" -f '//@data-media-url' -f '$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)' -e '$url'
+https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8
+
+$ xidel -s "https://www.rtvoost.nl/tv" -f '//@data-media-url' --xquery '{"name":$json/publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":let $a:=x:request({"url":$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)}) return [{"format":"hls-0","container":"m3u8[manifest]","url":$a/url},for $x at $i in tail(tokenize($a/doc,"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a/url)}]}'
+{
+  "name": "RTV Oost: Livestream",
+  "date": "14-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "416x234",
+      "bitrate": "613kbps",
+      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/e8a15a5f-a530-432e-a025-6dffc1426309/index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1024x576",
+      "bitrate": "1589kbps",
+      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/bc0f880f-dbe0-4de2-825d-ec01d960f7fc/index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2566kbps",
+      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/46ce631a-6155-4fcc-ac24-2b2e252f4f94/index.m3u8"
+    }
+  ]
+}
+
 ------------------------------------------------------------------------------------------------
 
 https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811
@@ -4835,24 +4878,9 @@ $ xidel -s "https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/4254
   ]
 }
 
-https://www.rtvnoord.nl/nieuws/206728/Bewoners-De-Wijert-zijn-ringweg-werkzaamheden-meer-dan-zat
-
-$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e 'let $a:=json(resolve-uri(//@data-media-url)) return {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)}]}'
-{
-  "name": "RTV Noord: Bewoners De Wijert zijn ringweg-werkzaamheden meer dan zat",
-  "date": "30-03-2019",
-  "formats": [
-    {
-      "format": "pg-1",
-      "container": "mp4[h264+aac]",
-      "url": "https://media.rtvnoord.nl/video/2019/190330/190330_wijertbbq_XHQ.mp4"
-    }
-  ]
-}
-
 https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk
 
-$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e '[...]'
+$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e 'let $a:=json(resolve-uri(//@data-media-url)) return {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)}]}'
 {
   "name": "RTV Drenthe: Ondernemen in Drenthe: Duurzaam handwerken bij Wol zo eerlijk",
   "date": "31-03-2019",
@@ -4865,11 +4893,32 @@ $ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurza
   ]
 }
 
+https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428
+
+$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" -f '//@data-media-url' -e '$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)'
+https://tvarchief.rtvoost.nl/hi/503428.mp4
+
+$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" -f '//@data-media-url' -f '{"url":$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath),"method":"HEAD"}' -e '$url'
+https://mediacdn.rtvoost.nl/tvarchief/hi/503428.mp4
+
+$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" -e 'let $a:=json(resolve-uri(//@data-media-url)) return {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":x:request({"url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath),"method":"HEAD"})/url}]}'
+{
+  "name": "RTV Oost: Overijssel Vandaag",
+  "date": "13-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://mediacdn.rtvoost.nl/tvarchief/hi/503428.mp4"
+    }
+  ]
+}
+
 ------------------------------------------------------------------------------------------------
 
 Eén query voor beide videostreams:
 
-$ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811" --xquery 'let $a:=json(resolve-uri(//@data-media-url)),$b:=$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath) return if ($a/clipData/id="Tv") then {"name":$a/publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":[{"format":"hls-0","container":"m3u8[manifest]","url":$b},for $x at $i in tail(tokenize(unparsed-text($b),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$b)}]} else {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$b}]}'
+$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" --xquery 'let $a:=json(resolve-uri(//@data-media-url)),$b:=x:request({"url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath),"method":if ($a/clipData/id="Tv") then "GET" else "HEAD"}) return if ($a/clipData/id="Tv") then {"name":$a/publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":[{"format":"hls-0","container":"m3u8[manifest]","url":$b/url},for $x at $i in tail(tokenize($b/doc,"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$b/url)}]} else {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$b/url}]}'
 
 ------------------------------------------------------------------------------------------------
 
@@ -4877,9 +4926,17 @@ $ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/
   let $a:=json(
         resolve-uri(//@data-media-url)
       ),
-      $b:=$a/resolve-uri(
-        clipData/src,
-        publicationData/defaultMediaAssetPath
+      $b:=x:request(
+        {
+          "url":$a/resolve-uri(
+            clipData/src,
+            publicationData/defaultMediaAssetPath
+          ),
+          "method":if ($a/clipData/id="Tv") then
+            "GET"
+          else
+            "HEAD"
+        }
       )
   return
   if ($a/clipData/id="Tv") then {
@@ -4889,15 +4946,14 @@ $ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/
       {
         "format":"hls-0",
         "container":"m3u8[manifest]",
-        "url":$b
+        "url":$b/url
       },
       for $x at $i in tail(
         tokenize(
-          unparsed-text($b),
+          $b/doc,
           "#EXT-X-STREAM-INF:"
         )
-      )
-      order by extract(
+      ) order by extract(
         $x,
         "BANDWIDTH=(\d+)",
         1
@@ -4923,7 +4979,7 @@ $ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/
             "(.+m3u8)",
             1
           ),
-          $b
+          $b/url
         )
       }
     ]
@@ -4941,8 +4997,7 @@ $ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/
       {
         "format":"pg-1",
         "container":"mp4[h264+aac]",
-        "resolution":"1920x1080",
-        "url":$b
+        "url":$b/url
       }
     ]
   }
