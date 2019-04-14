@@ -47,93 +47,6 @@ Voorbeelden:
 EOF
 }
 
-npo_live() {
-  eval "$(xidel "$1" --xquery '
-    json:={
-      "name":replace(
-        //title,
-        " - Live tv",
-        ": Livestream"
-      ),
-      "date":"'$(date +%d-%m-%Y)'",
-      "formats":json(
-        concat(
-          "http://ida.omroep.nl/app.php/",
-          //npo-player/@media-id,
-          "?token=",
-          json("http://ida.omroep.nl/app.php/auth")/token
-        )
-      )/x:request(
-        {
-          "url":replace(
-            .//url,
-            "jsonp",
-            "json"
-          ),
-          "error-handling":"4xx=accept"
-        }
-      )[json]/[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":json
-        },
-        for $x at $i in tail(
-          tokenize(
-            extract(
-              unparsed-text(json),
-              "(#EXT-X-STREAM-INF.+m3u8$)",
-              1,"ms"
-            ),
-            "#EXT-X-STREAM-INF:"
-          )
-        ) order by extract(
-          $x,
-          "BANDWIDTH=(\d+)",
-          1
-        ) count $i
-        return {
-          "format":"hls-"||$i,
-          "container":if (
-            contains(
-              $x,
-              "avc1"
-            )
-          ) then
-            "m3u8[h264+aac]"
-          else
-            "m3u8[aac]",
-          "resolution":extract(
-            $x,
-            "RESOLUTION=([\dx]+)",
-            1
-          )[.],
-          "bitrate":let $a:=extract(
-            $x,
-            "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
-            (1,2)
-          ) return
-          join(
-            (
-              $a[2][.],
-              $a[1]
-            ),
-            "|"
-          )||"kbps",
-          "url":resolve-uri(
-            extract(
-              $x,
-              "(.+m3u8)",
-              1
-            ),
-            json
-          )
-        }
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 npo() {
   eval "$(xidel --xquery '
     let $a:=x:request(
@@ -1534,9 +1447,11 @@ while true; do
   shift
 done
 
-if [[ $url =~ npostart.nl/live ]]; then
-  npo_live "$url"
-elif [[ $url =~ (npostart.nl|gemi.st) ]]; then
+if [[ $url =~ (npostart.nl|gemi.st) ]]; then
+  if [[ $url =~ npostart.nl/live ]]; then
+    echo "bashgemist: niet ondersteunde url." 1>&2
+    exit 1
+  fi
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
 elif [[ $url =~ nos.nl ]]; then
   nos "$url"

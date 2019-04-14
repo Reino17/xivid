@@ -131,24 +131,24 @@ Ik heb in dit geval het NOS Journaal van een paar jaar geleden als voorbeeld gen
 
 # Video rechtstreeks bekijken
 ## Linux
-We nemen `https://www.npostart.nl/live/npo-1`, de livestream van NPO 1, en [VLC media player](https://www.videolan.org/) als voorbeeld:
+We nemen `https://www.omropfryslan.nl/live/omrop-fryslan-tv`, de livestream van Omrop Fryslân, en [VLC media player](https://www.videolan.org/) als voorbeeld:
 ```sh
-vlc $(./bashgemist.sh https://www.npostart.nl/live/npo-1)
+vlc $(./bashgemist.sh https://www.omropfryslan.nl/live/omrop-fryslan-tv)
 ```
 
 ## Windows
-We nemen `https://www.npostart.nl/live/npo-1`, de livestream van NPO 1, en [Media Player Classic - Home Cinema](https://github.com/clsid2/mpc-hc/releases) (welke in `C:\Program Files\Media\MPC-HC` is geïnstalleerd) als voorbeeld.
+We nemen `https://www.omropfryslan.nl/live/omrop-fryslan-tv`, de livestream van Omrop Fryslân, en [Media Player Classic - Home Cinema](https://github.com/clsid2/mpc-hc/releases) (welke in `C:\Program Files\Media\MPC-HC` is geïnstalleerd) als voorbeeld.
 #### Bash:
 ```sh
-/cygdrive/c/Program\ Files/Media/MPC-HC/mpc-hc.exe $(./bashgemist.sh https://www.npostart.nl/live/npo-1)
+/cygdrive/c/Program\ Files/Media/MPC-HC/mpc-hc.exe $(./bashgemist.sh https://www.omropfryslan.nl/live/omrop-fryslan-tv)
 ```
 #### CMD:
 ```bat
-FOR /F %A IN ('bashgemist.bat https://www.npostart.nl/live/npo-1') DO "C:\Program Files\Media\MPC-HC\mpc-hc.exe" %A
+FOR /F %A IN ('bashgemist.bat https://www.omropfryslan.nl/live/omrop-fryslan-tv') DO "C:\Program Files\Media\MPC-HC\mpc-hc.exe" %A
 ```
 Of natuurlijk...
 ```bat
-bashgemist.bat https://www.npostart.nl/live/npo-1 | clip
+bashgemist.bat https://www.omropfryslan.nl/live/omrop-fryslan-tv | clip
 ```
 ...en MPC-HC handmatig starten, waarbij `clip` de video-url naar het klembord kopieert.
 
@@ -263,7 +263,7 @@ BashGemist is een video-url extractie script en geeft (al dan niet met `-f` of `
 Dit is waar je Xidel heel goed voor kunt gebruiken.
 
 ## Linux
-De door BashGemist gegenereerde JSON 'pipen' we naar Xidel en deze geeft alle informatie terug van de JSON attributen die we opgeven:
+De door BashGemist gegenereerde JSON '[pipen](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29)' we naar Xidel en deze geeft alle informatie terug van de JSON attributen die we opgeven:
 ```sh
 ./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332481 | xidel -s - -e '
   $json/(
@@ -580,7 +580,7 @@ Om BashGemist maar één keer aan te hoeven roepen wijzen we een variabele toe a
 ```sh
 bg_json=$(./bashgemist.sh -j https://www.youtube.com/watch?v=GuoxLggqI_g)
 ```
-We '[pipen](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29)' deze JSON naar Xidel. Xidel opent de TTML ondertiteling-url en converteert deze naar SRT. Xidel's uitvoer slaan we op als `ondertiteling.srt`:
+We 'pipen' deze JSON naar Xidel. Xidel opent de TTML ondertiteling-url en converteert deze naar SRT. Xidel's uitvoer slaan we op als `ondertiteling.srt`:
 ```sh
 printf '%s' $bg_json | xidel -s - --xquery '
   for $x at $i in $json/subtitle/doc(url)//text
