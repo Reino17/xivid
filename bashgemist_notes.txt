@@ -5761,3 +5761,299 @@ $ xidel -s "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilm
     ]
   }
 '
+
+================================================================================================================================
+
+[omroep west, rtv rijnmond]
+
+https://www.omroepwest.nl/tv
+
+$ xidel -s "https://www.omroepwest.nl/tv" -f '//@data-media-url' --xquery 'json(extract($raw,"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":let $a:="https:"||clipData/(assets)()[mediatype="MP4_MAIN"]/src return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}]}'
+{
+  "name": "Omroep West: Livestream",
+  "date": "22-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "712x400",
+      "bitrate": "571kbps",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b531072.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "712x400",
+      "bitrate": "1451kbps",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b1331072.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "4227kbps",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b4227072.m3u8"
+    }
+  ]
+}
+
+https://www.rijnmond.nl/tv
+
+$ xidel -s "https://www.rijnmond.nl/tv" -f '//@data-media-url' --xquery 'json(extract($raw,"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":let $a:="https:"||clipData/(assets)()[mediatype="MP4_MAIN" or "MP4_HLS"]/src return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}]}'
+{
+  "name": "RTV Rijnmond: Livestream",
+  "date": "28-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "142kbps",
+      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/1554291007-au-index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "772kbps",
+      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/1554291007-fast-640-360-600000-index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3817kbps",
+      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/1554291007-faster-1920-1080-3500000-index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.omroepwest.nl/tv/programma/170000115/TV-West-Nieuws/aflevering/170285899
+
+$ xidel -s "https://www.omroepwest.nl/tv/programma/170000115/TV-West-Nieuws/aflevering/170285899" -f '//@data-media-url' --xquery 'json(extract($raw,"var opts = (.+);",1))/{"name":concat(publicationData/label,": ",clipData/programmanaam),"date":format-date(dateTime(clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[for $x at $i in clipData/(assets)() order by $x/bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,publicationData/defaultMediaAssetPath)}]}'
+{
+  "name": "Omroep West: TV West Nieuws",
+  "date": "19-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "300kbps",
+      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/19/170285899_300.mp4"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "1024x576",
+      "bitrate": "1000kbps",
+      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/19/170285899_1000.mp4"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2000kbps",
+      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/19/170285899_2000.mp4"
+    }
+  ]
+}
+
+https://www.omroepwest.nl/nieuws/3825225/Files-naar-Keukenhof-Het-is-het-allemaal-waard
+
+$ xidel -s "https://www.omroepwest.nl/nieuws/3825225/Files-naar-Keukenhof-Het-is-het-allemaal-waard" -f '//@data-media-url' --xquery 'json(extract($raw,"var opts = (.+);",1))/{"name":concat(publicationData/label,": ",clipData/(programmanaam,title)[1]),"date":format-date(dateTime(clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[for $x at $i in clipData/(assets)() order by $x/bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,publicationData/defaultMediaAssetPath)}]}'
+{
+  "name": "Omroep West: Keukenhof: 'Kies een andere dag voor een bezoek aan het park'",
+  "date": "21-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "300kbps",
+      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/21/3825182_300.mp4"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "1024x576",
+      "bitrate": "1000kbps",
+      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/21/3825182_1000.mp4"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2000kbps",
+      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/21/3825182_2000.mp4"
+    }
+  ]
+}
+
+https://www.rijnmond.nl/tv/programma/27/Rijnmond-Nieuws/aflevering/16972
+
+$ xidel -s "https://www.rijnmond.nl/tv/programma/27/Rijnmond-Nieuws/aflevering/16972" -f '//@data-media-url' --xquery 'json(extract($raw,"var opts = (.+);",1))/{"name":concat(publicationData/label,": ",clipData/(programmanaam,title)[1]),"date":format-date(dateTime(clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[for $x at $i in clipData/(assets)() order by $x/bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,protocol||substring-after(publicationData/defaultMediaAssetPath,"//"))}]}'
+{
+  "name": "RTV Rijnmond: Rijnmond Nieuws - 26 april 2019",
+  "date": "26-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "600kbps",
+      "url": "https://dcur8bjarl5c2.cloudfront.net/2019/video/nwsvr260419_vlq.mp4"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3603kbps",
+      "url": "https://dcur8bjarl5c2.cloudfront.net/rijnmond/media/2019/04/26/3300832.mp4"
+    }
+  ]
+}
+
+https://www.rijnmond.nl/nieuws/181081/Koningsdag-in-Maassluis-hoofd-schouder-knie-en-teen-als-opwarmer-van-de-aubade
+
+$ xidel -s "https://www.rijnmond.nl/nieuws/181081/Koningsdag-in-Maassluis-hoofd-schouder-knie-en-teen-als-opwarmer-van-de-aubade" -f '//@data-media-url' --xquery '[...]'
+{
+  "name": "RTV Rijnmond: Koningsdag in Maassluis: tompoezen, de aubade en de vrijmarkt",
+  "date": "27-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "600kbps",
+      "url": "https://dcur8bjarl5c2.cloudfront.net/2019/video/nmaassluis28_04_19_T_AA3E6C56FE0CFFA6C12583E90031D6DB_vlq.mp4"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3607kbps",
+      "url": "https://dcur8bjarl5c2.cloudfront.net/upload/rijnmond/nmaassluis28_04_19_T_AA3E6C56FE0CFFA6C12583E90031D6DB.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+Eén query voor beide videostreams:
+
+$ xidel -s "https://www.omroepwest.nl/nieuws/3825225/Files-naar-Keukenhof-Het-is-het-allemaal-waard" -f '//@data-media-url' --xquery 'json(extract($raw,"var opts = (.+);",1))/(if (clipData/sourcetype="live") then {"name":publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":let $a:="https:"||clipData/(assets)()[mediatype="MP4_MAIN" or "MP4_HLS"]/src return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}]} else {"name":concat(publicationData/label,": ",clipData/(programmanaam,title)[1]),"date":format-date(dateTime(clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[for $x at $i in clipData/(assets)() order by $x/bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,protocol||substring-after(publicationData/defaultMediaAssetPath,"//"))}]})'
+
+------------------------------------------------------------------------------------------------
+
+-f '//@data-media-url'
+--xquery '
+  json(
+    extract(
+      $raw,
+      "var opts = (.+);",
+      1
+    )
+  )/(
+    if (clipData/sourcetype="live") then {
+      "name":publicationData/label||": Livestream",
+      "date":"'$(date +%d-%m-%Y)'",
+      "formats":let $a:="https:"||clipData/(assets)()[mediatype="MP4_MAIN" or "MP4_HLS"]/src return [
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$a
+        },
+        for $x at $i in tail(
+          tokenize(
+            unparsed-text($a),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":round(
+            extract(
+              $x,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $a
+          )
+        }
+      ]
+    } else {
+      "name":concat(
+        publicationData/label,
+        ": ",
+        clipData/(
+          programmanaam,
+          title
+        )[1]
+      ),
+      "date":format-date(
+        dateTime(clipData/publisheddate),
+        "[D01]-[M01]-[Y]"
+      ),
+      "formats":[
+        for $x at $i in clipData/(assets)()
+        order by $x/bandwidth
+        count $i
+        return {
+          "format":"pg-"||$i,
+          "container":"mp4[h264+aac]",
+          "resolution":concat(
+            $x/width,
+            "x",
+            $x/height
+          ),
+          "bitrate":$x/bandwidth||"kbps",
+          "url":resolve-uri(
+            $x/src,
+            protocol||substring-after(
+              publicationData/defaultMediaAssetPath,
+              "//"
+            )
+          )
+        }
+      ]
+    }
+  )
+'
