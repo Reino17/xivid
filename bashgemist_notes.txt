@@ -5371,3 +5371,301 @@ $ xidel -s "https://www.omroepflevoland.nl/" --xquery 'let $a:=//div[ends-with(@
     ]
   }
 '
+
+================================================================================================================================
+
+[telegraaf]
+
+https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd
+
+$ xidel -s "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd" -e 'concat("https://content.tmgvideo.nl/playlist/item=",json(//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")'
+https://content.tmgvideo.nl/playlist/item=cCQFDoebv5A0/playlist.json
+
+$ xidel -s "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd" -f 'concat("https://content.tmgvideo.nl/playlist/item=",json(//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")' -e '$json'
+{
+  "items": [
+    {
+      "id": "cCQFDoebv5A0",
+      "account": "Kx1PKc",
+      "audioonly": false,
+      "live": false,
+      "title": "Kamikaze-actie op N377",
+      "description": "Een motorrijder neemt op de provinciale weg in Drenthe de meest grote risico's om op tijd op z'n bestemming te komen. Ook iets gefilmd op de weg? Mail het de redactie via verkeer@telegraaf.nl.",
+      "poster": "//content.tmgvideo.nl/img/account=Kx1PKc/item=cCQFDoebv5A0/thumbid=2/image.jpg?v=20190412202826",
+      "datecreated": "2019-04-12 20:26:34",
+      "duration": 34,
+      "locations": {
+        "progressive": [
+          {
+            "label": "1080p",
+            "height": 1080,
+            "width": 1920,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YLRECscb9lIw/cCQFDoebv5A0.mp4"
+              }
+            ]
+          },
+          {
+            "label": "720p",
+            "height": 720,
+            "width": 1280,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YoAMCo4bv9M0/cCQFDoebv5A0.mp4"
+              }
+            ]
+          },
+          {
+            "label": "480p",
+            "height": 480,
+            "width": 854,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YiRND4KZvwEQ/cCQFDoebv5A0.mp4"
+              }
+            ]
+          },
+          {
+            "label": "360p",
+            "height": 360,
+            "width": 640,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4oIELuOJtkIQ/cCQFDoebv5A0.mp4"
+              }
+            ]
+          },
+          {
+            "label": "270p",
+            "height": 270,
+            "width": 480,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4JAEDuMLtlIQ/cCQFDoebv5A0.mp4"
+              }
+            ]
+          }
+        ],
+        "adaptive": [
+          {
+            "type": "application/dash+xml",
+            "src": "https://media.tmgvideo.nl/dash/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0.mpd?v=20190412202826_5"
+          },
+          {
+            "type": "application/x-mpegURL",
+            "src": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0.m3u8?v=20190412202826_5"
+          }
+        ]
+      },
+      [...]
+    }
+  ]
+}
+
+$ xidel -s "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd" --xquery 'let $a:=json(concat("https://content.tmgvideo.nl/playlist/item=",json(//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")),$b:=$a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1) return {"name":"Telegraaf: "||$a//title,"date":replace($a//datecreated,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time($a//duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[$a//locations/reverse((progressive)())/{"format":"pg-"||position(),"container":"mp4[h264+aac]","resolution":concat(width,"x",height),"url":.//src},{"format":"hls-0","container":"m3u8[manifest]","url":$b},for $x at $i in tail(tokenize(extract(unparsed-text($b),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":let $a:=extract($x,"audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",(1,2)) return join(($a[2][.],$a[1]),"|")||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$b)}]}'
+{
+  "name": "Telegraaf: Kamikaze-actie op N377",
+  "date": "12-04-2019",
+  "duration": "00:00:34",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "480x270",
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4JAEDuMLtlIQ/cCQFDoebv5A0.mp4"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4oIELuOJtkIQ/cCQFDoebv5A0.mp4"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "854x480",
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YiRND4KZvwEQ/cCQFDoebv5A0.mp4"
+    },
+    {
+      "format": "pg-4",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YoAMCo4bv9M0/cCQFDoebv5A0.mp4"
+    },
+    {
+      "format": "pg-5",
+      "container": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YLRECscb9lIw/cCQFDoebv5A0.mp4"
+    },
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "64kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=64000.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "128kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=128000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "320|64kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=64000-video=320000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "768|128kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=128000-video=768000.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "854x480",
+      "bitrate": "1200|128kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=128000-video=1200000.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2200|128kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=128000-video=2200000.m3u8"
+    },
+    {
+      "format": "hls-7",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3600|128kbps",
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=128000-video=3600000.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:=json(
+        concat(
+          "https://content.tmgvideo.nl/playlist/item=",
+          json(
+            //script/extract(
+              .,
+              "APOLLO_STATE__=(.+);",
+              1
+            )[.]
+          )/(.//videoId)[1],
+          "/playlist.json"
+        )
+      ),
+      $b:=$a//locations/(adaptive)()[
+        ends-with(
+          type,
+          "x-mpegURL"
+        )
+      ]/extract(
+        src,
+        "(.+m3u8)",
+        1
+      )
+  return {
+    "name":"Telegraaf: "||$a//title,
+    "date":replace(
+      $a//datecreated,
+      "(\d+)-(\d+)-(\d+).+",
+      "$3-$2-$1"
+    ),
+    "duration":format-time(
+      $a//duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      $a//locations/reverse(
+        (progressive)()
+      )/{
+        "format":"pg-"||position(),
+        "container":"mp4[h264+aac]",
+        "resolution":concat(
+          width,
+          "x",
+          height
+        ),
+        "url":.//src
+      },{
+        "format":"hls-0",
+        "container":"m3u8[manifest]",
+        "url":$b
+      },
+      for $x at $i in tail(
+        tokenize(
+          extract(
+            unparsed-text($b),
+            "(#EXT-X-STREAM-INF.+m3u8$)",
+            1,"ms"
+          ),
+          "#EXT-X-STREAM-INF:"
+        )
+      ) order by extract(
+        $x,
+        "BANDWIDTH=(\d+)",
+        1
+      ) count $i
+      return {
+        "format":"hls-"||$i,
+        "container":if (
+          contains(
+            $x,
+            "avc1"
+          )
+        ) then
+          "m3u8[h264+aac]"
+        else
+          "m3u8[aac]",
+        "resolution":extract(
+          $x,
+          "RESOLUTION=([\dx]+)",
+          1
+        )[.],
+        "bitrate":let $a:=extract(
+          $x,
+          "audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",
+          (1,2)
+        ) return
+        join(
+          (
+            $a[2][.],
+            $a[1]
+          ),
+          "|"
+        )||"kbps",
+        "url":resolve-uri(
+          extract(
+            $x,
+            "(.+m3u8)",
+            1
+          ),
+          $b
+        )
+      }
+    ]
+  }
+'

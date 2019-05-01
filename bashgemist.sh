@@ -32,13 +32,19 @@ Gebruik: ./bashgemist.sh [optie] url
   -d, --debug             Toon bash debug informatie.
 
 Ondersteunde websites:
-  npostart.nl             omropfryslan.nl       youtube.com
-  gemi.st                 rtvnoord.nl           youtu.be
-  nos.nl                  rtvdrenthe.nl         vimeo.com
+  npostart.nl             omropfryslan.nl
+  gemi.st                 rtvnoord.nl
+  nos.nl                  rtvdrenthe.nl
   tvblik.nl               nhnieuws.nl
   uitzendinggemist.net    omroepflevoland.nl
   rtl.nl                  rtvoost.nl
-  kijk.nl                 dumpert.nl
+  kijk.nl
+
+  dumpert.nl
+  telegraaf.nl
+  youtube.com
+  youtu.be
+  vimeo.com
 
 Voorbeelden:
   ./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2017/POW_03375409
@@ -1028,6 +1034,115 @@ if [[ $json =~ youtu.be ]]; then
 fi
 }
 
+telegraaf() {
+  eval "$(xidel "$1" --xquery '
+    let $a:=json(
+          concat(
+            "https://content.tmgvideo.nl/playlist/item=",
+            json(
+              //script/extract(
+                .,
+                "APOLLO_STATE__=(.+);",
+                1
+              )[.]
+            )/(.//videoId)[1],
+            "/playlist.json"
+          )
+        ),
+        $b:=$a//locations/(adaptive)()[
+          ends-with(
+            type,
+            "x-mpegURL"
+          )
+        ]/extract(
+          src,
+          "(.+m3u8)",
+          1
+        )
+    return json:={
+      "name":"Telegraaf: "||$a//title,
+      "date":replace(
+        $a//datecreated,
+        "(\d+)-(\d+)-(\d+).+",
+        "$3-$2-$1"
+      ),
+      "duration":format-time(
+        $a//duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "formats":[
+        $a//locations/reverse(
+          (progressive)()
+        )/{
+          "format":"pg-"||position(),
+          "container":"mp4[h264+aac]",
+          "resolution":concat(
+            width,
+            "x",
+            height
+          ),
+          "url":.//src
+        },{
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$b
+        },
+        for $x at $i in tail(
+          tokenize(
+            extract(
+              unparsed-text($b),
+              "(#EXT-X-STREAM-INF.+m3u8$)",
+              1,"ms"
+            ),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":let $a:=extract(
+            $x,
+            "audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",
+            (1,2)
+          ) return
+          join(
+            (
+              $a[2][.],
+              $a[1]
+            ),
+            "|"
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $b
+          )
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 youtube() {
   eval "$(xidel "$1" --xquery '
     json:=json(
@@ -1602,6 +1717,8 @@ elif [[ $url =~ omroepflevoland.nl ]]; then
   omroep_fll "$url"
 elif [[ $url =~ dumpert.nl ]]; then
   dumpert "$url"
+elif [[ $url =~ telegraaf.nl ]]; then
+  telegraaf "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
 elif [[ $url =~ vimeo.com ]]; then
