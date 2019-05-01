@@ -179,7 +179,7 @@ FOR /F %A IN ('bashgemist.bat https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1
 ## Windows XP
 Wat voor Xidel geldt, geldt ook voor FFmpeg. Als FFmpeg niet is gecompileerd met een andere beveiligingsbibliotheek, dan kun je geen https-urls met TLS 1.2 encryptie/versleuteling openen. Daarnaast wordt Windows XP officieel ook niet meer ondersteund door FFmpeg. Sinds voorjaar 2017 ben ik daarom zelf FFmpeg gaan compileren. Mijn binaries zijn gecompileerd met [mbedTLS](https://tls.mbed.org/), zijn Windows XP compatible én werken op oude cpu's zonder SSE2 ondersteuning.
 - Github repo: https://github.com/Reino17/ffmpeg-windows-build-helpers
-- Zeranoe forum thread: https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=3572
+- Zeranoe forum thread: https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=6930
 - Te downloaden van mijn eigen website: http://rwijnsma.home.xs4all.nl/files/ffmpeg
 
 De download commando's blijven gewoon hetzelfde.
