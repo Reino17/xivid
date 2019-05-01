@@ -4722,7 +4722,7 @@ $ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2
 
 ================================================================================================================================
 
-[rtv noord, drenthe en oost]
+[rtv noord, drenthe, oost en omroep gelderland]
 
 https://www.rtvnoord.nl/televisie
 
@@ -4808,7 +4808,6 @@ https://www.rtvoost.nl/tv
 $ xidel -s "https://www.rtvoost.nl/tv" -f '//@data-media-url' -e '$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)'
 https://streams.rtvoost.nl/video/tv/hls.m3u8
 
-Admin@corone /cygdrive/d/Storage/Media/Binaries
 $ xidel -s "https://www.rtvoost.nl/tv" -f '//@data-media-url' -f '$json/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath)' -e '$url'
 https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8
 
@@ -4846,6 +4845,27 @@ $ xidel -s "https://www.rtvoost.nl/tv" -f '//@data-media-url' --xquery '{"name":
   ]
 }
 
+https://www.omroepgelderland.nl/tvx # Via Google gevonden. Kopje "Live TV" verwijst vreemd genoeg https://www.omroepgelderland.nl/tv.
+
+$ xidel -s "https://www.omroepgelderland.nl/tvx" -f '//@data-media-url' --xquery '[...]'
+{
+  "name": "Omroep Gelderland: Livestream",
+  "date": "28-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/304370bd56340c8246aab2abb5868726/sz/omroepgelderland/wowza4/live/livetv/playlist.m3u8?token=nw0E8DqmVNvMagzw-3fIQg&time=1556673255"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2633kbps",
+      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/304370bd56340c8246aab2abb5868726/sz/omroepgelderland/wowza4/live/livetv/chunklist.m3u8"
+    }
+  ]
+}
 ------------------------------------------------------------------------------------------------
 
 https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811
@@ -4914,17 +4934,57 @@ $ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering
   ]
 }
 
+https://www.omroepgelderland.nl/tv/programma/232488309/GLD-Nieuws/aflevering/39012
+
+$ xidel -s "https://www.omroepgelderland.nl/tv/programma/232488309/GLD-Nieuws/aflevering/39012" -e '[...]'
+{
+  "name": "Omroep Gelderland: GLD Nieuws",
+  "date": "28-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://d2od87akyl46nm.cloudfront.net/epg/prod/media/videos/JkevaDM7lXm.mp4"
+    }
+  ]
+}
+
+https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders
+
+$ xidel -s "https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders" -e '//@data-accept'
+<iframe src="/media/player/30018" style="width:100%;" frameborder="0" allowfullscreen="true"></iframe>
+
+$ xidel -s "https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders" -e 'let $a:=json(resolve-uri((//@data-media-url,doc(parse-html(//@data-accept)//@src)//@data-media-url))) return {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":x:request({"url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath),"method":"HEAD"})/url}]}'
+{
+  "name": "Omroep Gelderland: UPDATE | Dramatisch einde Koningsdagfeest Doetinchem: auto schept feestvierders",
+  "date": "28-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://d2od87akyl46nm.cloudfront.net/items/video/2019/04/Feestgangers_geschept_WEB.mp4"
+    }
+  ]
+}
+
 ------------------------------------------------------------------------------------------------
 
 Eén query voor beide videostreams:
 
-$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" --xquery 'let $a:=json(resolve-uri(//@data-media-url)),$b:=x:request({"url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath),"method":if ($a/clipData/id="Tv") then "GET" else "HEAD"}) return if ($a/clipData/id="Tv") then {"name":$a/publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":[{"format":"hls-0","container":"m3u8[manifest]","url":$b/url},for $x at $i in tail(tokenize($b/doc,"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$b/url)}]} else {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$b/url}]}'
+$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" --xquery 'let $a:=json(resolve-uri((//@data-media-url,doc(parse-html(//@data-accept)//@src)//@data-media-url))),$b:=x:request({"url":$a/resolve-uri(clipData/src,publicationData/defaultMediaAssetPath),"method":if ($a/clipData/id="Tv") then "GET" else "HEAD"}) return if ($a/clipData/id="Tv") then {"name":$a/publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":[{"format":"hls-0","container":"m3u8[manifest]","url":$b/url},for $x at $i in tail(tokenize($b/doc,"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$b/url)}]} else {"name":concat($a/publicationData/label,": ",(//h3,//h1)),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$b/url}]}'
 
 ------------------------------------------------------------------------------------------------
 
 --xquery '
   let $a:=json(
-        resolve-uri(//@data-media-url)
+        resolve-uri(
+          (
+            //@data-media-url,
+            doc(
+              parse-html(//@data-accept)//@src
+            )//@data-media-url
+          )
+        )
       ),
       $b:=x:request(
         {

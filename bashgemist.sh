@@ -35,7 +35,7 @@ Ondersteunde websites:
   npostart.nl             omropfryslan.nl       omroepwest.nl
   gemi.st                 rtvnoord.nl           rijnmond.nl
   nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
-  tvblik.nl               nhnieuws.nl
+  tvblik.nl               nhnieuws.nl           omroepgelderland.nl
   uitzendinggemist.net    at5.nl
   rtl.nl                  omroepflevoland.nl
   kijk.nl                 rtvoost.nl
@@ -693,10 +693,17 @@ omrop_frl() {
   ' --output-format=bash)"
 }
 
-rtv_ndo() {
+omroep_gdog() {
   eval "$(xidel "$1" --xquery '
     let $a:=json(
-          resolve-uri(//@data-media-url)
+          resolve-uri(
+            (
+              //@data-media-url,
+              doc(
+                parse-html(//@data-accept)//@src
+              )//@data-media-url
+            )
+          )
         ),
         $b:=x:request(
           {
@@ -1918,8 +1925,8 @@ elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then
   omrop_frl "$url"
-elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl) ]]; then
-  rtv_ndo "$url"
+elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepgelderland.nl) ]]; then
+  omroep_gdog "$url"
 elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then
   omroep_nh "$url"
 elif [[ $url =~ omroepflevoland.nl ]]; then
