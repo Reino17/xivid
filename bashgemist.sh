@@ -36,9 +36,9 @@ Ondersteunde websites:
   gemi.st                 rtvnoord.nl
   nos.nl                  rtvdrenthe.nl
   tvblik.nl               nhnieuws.nl
-  uitzendinggemist.net    omroepflevoland.nl
-  rtl.nl                  rtvoost.nl
-  kijk.nl
+  uitzendinggemist.net    at5.nl
+  rtl.nl                  omroepflevoland.nl
+  kijk.nl                 rtvoost.nl
 
   dumpert.nl
   telegraaf.nl
@@ -776,7 +776,7 @@ rtv_ndo() {
   ' --output-format=bash)"
 }
 
-nh_nieuws() {
+omroep_nh() {
   eval "$(xidel "$1" -e '
     let $a:=json(
       //script/extract(
@@ -784,18 +784,29 @@ nh_nieuws() {
         "INITIAL_PROPS__ = (.+)",
         1
       )[.]
-    ) return json:={
+    )/pageData
+    return json:={
       "name":if ($a) then
-        ($a//media)(1)/concat(
-          source,
-          ": ",
-          title
-        )
+        if ($a/(media)(1)/title) then
+          $a/(media)(1)/concat(
+            source,
+            ": ",
+            title
+          )
+        else
+          concat(
+            $a/(media)(1)/source,
+            ": ",
+            $a/title
+          )
       else
-        "NH Nieuws: Livestream",
+        substring-after(
+          //title,
+          "- "
+        )||": Livestream",
       "date":if ($a) then
         format-date(
-          $a//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+          $a/updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
           "[D01]-[M01]-[Y]"
         )
       else
@@ -803,7 +814,7 @@ nh_nieuws() {
       "formats":x:request(
         {
           "url":if ($a) then
-            ($a//media)()/videoUrl
+            $a/(media)()/videoUrl
           else
             json(
               //script/extract(
@@ -1711,8 +1722,8 @@ elif [[ $url =~ omropfryslan.nl ]]; then
   omrop_frl "$url"
 elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl) ]]; then
   rtv_ndo "$url"
-elif [[ $url =~ nhnieuws.nl ]]; then
-  nh_nieuws "$url"
+elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then
+  omroep_nh "$url"
 elif [[ $url =~ omroepflevoland.nl ]]; then
   omroep_fll "$url"
 elif [[ $url =~ dumpert.nl ]]; then

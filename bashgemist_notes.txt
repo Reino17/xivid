@@ -5005,7 +5005,7 @@ $ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering
 
 ================================================================================================================================
 
-[nh nieuws]
+[nh nieuws, at5]
 
 https://www.nhnieuws.nl/tv
 
@@ -5039,6 +5039,42 @@ $ xidel -s "https://www.nhnieuws.nl/tv" -e '{"name":"NH Nieuws: Livestream","dat
       "resolution": "1920x1080",
       "bitrate": "3487kbps",
       "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/chunklist_b3170304.m3u8"
+    }
+  ]
+}
+
+https://www.at5.nl/tv
+
+$ xidel -s "https://www.at5.nl/tv" -e '{"name":substring-after(//title,"- ")||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":x:request({"url":json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+{
+  "name": "AT5: Livestream",
+  "date": "28-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/da0bb837c8a60cd2a854e5100324cc68/sz/atvijf/wowza4/live/live.smil/playlist.m3u8?token=UAx9rGaNEH2WCUT-Zc01Kw&time=1556494972"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x512",
+      "bitrate": "1153kbps",
+      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/da0bb837c8a60cd2a854e5100324cc68/sz/atvijf/wowza4/live/live.smil/chunklist_b1048576.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "768x608",
+      "bitrate": "2307kbps",
+      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/da0bb837c8a60cd2a854e5100324cc68/sz/atvijf/wowza4/live/live.smil/chunklist_b2097152.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1536",
+      "bitrate": "3460kbps",
+      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/da0bb837c8a60cd2a854e5100324cc68/sz/atvijf/wowza4/live/live.smil/chunklist_b3145728.m3u8"
     }
   ]
 }
@@ -5088,11 +5124,56 @@ $ xidel -s "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-korten
   ]
 }
 
+https://www.at5.nl/artikelen/e27519/zaterdag-27-april
+
+$ xidel -s "https://www.at5.nl/artikelen/e27519/zaterdag-27-april" -e 'json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/pageData/{"name":if ((media)(1)/title) then (media)(1)/concat(source,": ",title) else concat((media)(1)/source,": ",title),"date":format-date(updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"formats":x:request({"url":(media)()/videoUrl})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+{
+  "name": "AT5: Zaterdag 27 april",			# Niet ideaal, geen "Nieuws" in de 'title'. AT5 hun schuld. Hoort gewoon in de 'title'.
+  "date": "27-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/db4039541a7405529ebb15a26faea396/vod/_definst_/sz/atvijf/2019/04/27/5cc477789eb145cc477789eb50.smil/playlist.m3u8?token=CBzIq2r8A8Vo00YTx9C4Ow&time=1556496434"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "568x320",
+      "bitrate": "649kbps",
+      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/db4039541a7405529ebb15a26faea396/vod/_definst_/sz/atvijf/2019/04/27/5cc477789eb145cc477789eb50.smil/chunklist_b589824.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "854x480",
+      "bitrate": "1257kbps",
+      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/db4039541a7405529ebb15a26faea396/vod/_definst_/sz/atvijf/2019/04/27/5cc477789eb145cc477789eb50.smil/chunklist_b1142784.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2451kbps",
+      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/db4039541a7405529ebb15a26faea396/vod/_definst_/sz/atvijf/2019/04/27/5cc477789eb145cc477789eb50.smil/chunklist_b2228224.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "5923kbps",
+      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/db4039541a7405529ebb15a26faea396/vod/_definst_/sz/atvijf/2019/04/27/5cc477789eb145cc477789eb50.smil/chunklist_b5384192.m3u8"
+    }
+  ]
+}
+
+https://www.at5.nl/artikelen/193611/manager-coffeeshop-siberie-ik-hoop-dat-het-een-koningsdag-grap-was
+
 ------------------------------------------------------------------------------------------------
 
 Eén query voor beide videostreams:
 
-$ xidel -s "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur" -e 'let $a:=json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.]) return {"name":if ($a) then ($a//media)(1)/concat(source,": ",title) else "NH Nieuws: Livestream","date":if ($a) then format-date($a//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]") else "'$(date +%d-%m-%Y)'","formats":x:request({"url":if ($a) then ($a//media)()/videoUrl else json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
+$ xidel -s "https://www.at5.nl/artikelen/e27519/zaterdag-27-april" -e 'let $a:=json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/pageData return {"name":if ($a) then if ($a/(media)(1)/title) then $a/(media)(1)/concat(source,": ",title) else concat($a/(media)(1)/source,": ",$a/title) else substring-after(//title,"- ")||": Livestream","date":if ($a) then format-date($a/updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]") else "'$(date +%d-%m-%Y)'","formats":x:request({"url":if ($a) then $a/(media)()/videoUrl else json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream})/[{"format":"hls-0","container":"m3u8[manifest]","url":url}[url],tail(tokenize(doc,"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
 
 ------------------------------------------------------------------------------------------------
 
@@ -5103,18 +5184,29 @@ $ xidel -s "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-korten
       "INITIAL_PROPS__ = (.+)",
       1
     )[.]
-  ) return {
+  )/pageData
+  return {
     "name":if ($a) then
-      ($a//media)(1)/concat(
-        source,
-        ": ",
-        title
-      )
+      if ($a/(media)(1)/title) then
+        $a/(media)(1)/concat(
+          source,
+          ": ",
+          title
+        )
+      else
+        concat(
+          $a/(media)(1)/source,
+          ": ",
+          $a/title
+        )
     else
-      "NH Nieuws: Livestream",
+      substring-after(
+        //title,
+        "- "
+      )||": Livestream",
     "date":if ($a) then
       format-date(
-        $a//updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+        $a/updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
         "[D01]-[M01]-[Y]"
       )
     else
@@ -5122,7 +5214,7 @@ $ xidel -s "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-korten
     "formats":x:request(
       {
         "url":if ($a) then
-          ($a//media)()/videoUrl
+          $a/(media)()/videoUrl
         else
           json(
             //script/extract(
