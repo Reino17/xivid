@@ -6057,3 +6057,192 @@ $ xidel -s "https://www.omroepwest.nl/nieuws/3825225/Files-naar-Keukenhof-Het-is
     }
   )
 '
+
+================================================================================================================================
+
+[rtv utrecht]
+
+https://www.rtvutrecht.nl/live/rtvutrecht/
+
+$ xidel -s "https://www.rtvutrecht.nl/live/rtvutrecht/" -f '//script[@async]/@src' --xquery 'json(extract($raw,"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":let $a:=clipData/(assets)()[mediatype="MP4_HLS"]/src return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}]}'
+{
+  "name": "RTV Utrecht: Livestream",
+  "date": "28-04-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "142kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1552353688-au-index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "320x180",
+      "bitrate": "457kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1552353688-fast-320-180-300000-index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "480x272",
+      "bitrate": "982kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1552353688-fast-480-272-800000-index.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "1822kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1552353688-fast-640-360-1600000-index.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3030kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1552353688-faster-1920-1080-2750000-index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/
+
+$ xidel -s "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",substring-before(//h3[@class="article-title"]," -")),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
+{
+  "name": "RTV Utrecht: UNieuws",
+  "date": "27-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://content.omroep.nl/rtvutrecht/uitzendinggemist/rtvutrecht/2019/04/27/RTV1889856_MQ.mp4"
+    }
+  ]
+}
+
+https://www.rtvutrecht.nl/nieuws/1908421/
+
+$ xidel -s "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(//h3[@class="article-title"]," -")[.],//h1[@class="article-title"])[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
+{
+  "name": "RTV Utrecht: Fantastische energie en geen wanklank: trotse burgemeester is tevreden over Koningsdag Amersfoort",
+  "date": "27-04-2019",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://content.omroep.nl/rtvutrecht/reportages/video/2019/04/27/2188794_MQ.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+Eén query voor beide videostreams:
+
+$ xidel -s "https://www.rtvutrecht.nl/nieuws/1908421/" --xquery 'if (//script[@async]) then json(extract(doc(//script[@async]/@src),"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":"'$(date +%d-%m-%Y)'","formats":let $a:=clipData/(assets)()[mediatype="MP4_HLS"]/src return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}]} else let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(//h3[@class="article-title"]," -")[.],//h1[@class="article-title"])[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  if (//script[@async]) then
+    json(
+      extract(
+        doc(//script[@async]/@src),
+        "var opts = (.+);",
+        1
+      )
+    )/{
+      "name":publicationData/label||": Livestream",
+      "date":"'$(date +%d-%m-%Y)'",
+      "formats":let $a:=clipData/(assets)()[mediatype="MP4_HLS"]/src return [
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$a
+        },
+        for $x at $i in tail(
+          tokenize(
+            unparsed-text($a),
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":round(
+            extract(
+              $x,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $a
+          )
+        }
+      ]
+    }
+  else
+    let $a:=json(
+      //script/extract(
+        .,
+        "setup\((.+)\)",
+        1,"s"
+      )[.]
+    )//file return {
+      "name":concat(
+        //meta[@name="publisher"]/@content,
+        ": ",
+        (
+          substring-before(
+            //h3[@class="article-title"],
+            " -"
+          )[.],
+          //h1[@class="article-title"]
+        )[1]
+      ),
+      "date":replace(
+        $a,
+        ".+?(\d+)/(\d+)/(\d+).+",
+        "$3-$2-$1"
+      ),
+      "formats":[
+        {
+          "format":"pg-1",
+          "container":"mp4[h264+aac]",
+          "url":$a
+        }
+      ]
+    }
+'
