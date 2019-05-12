@@ -18,7 +18,7 @@ Of download de [tarball](https://github.com/Reino17/bashgemist/archive/master.zi
 
 # Xidel
 BashGemist heeft [Xidel](http://videlibri.sourceforge.net/xidel.html) nodig om te kunnen functioneren.  
-Minimale vereiste is revisie `5651` `(xidel-0.9.7.20170825.5651.23300832bcbe)`.
+Minimale vereiste versie is `0.9.8`.
 
 ## Linux
 Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#downloads) en installeer Xidel in `/usr/bin`.  

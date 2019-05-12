@@ -1822,11 +1822,11 @@ Installeer Xidel a.u.b. om dit script te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
-elif [[ $(xidel --version | xidel -s - -e 'extract($raw,"\.(\d{4})\.",1,"s")') -le 5651 ]]; then
+elif [[ $(xidel --version | xidel -s - -e 'boolean(extract($raw,"Xidel (.+)",1) < "0.9.8")') = true ]]; then
   cat 1>&2 <<EOF
 BashGemist, een video-url extractie script.
 Fout: Xidel gevonden, maar versie is te oud!
-Installeer Xidel 0.9.7.5651 of nieuwer a.u.b.
+Installeer Xidel 0.9.8 of nieuwer a.u.b.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
