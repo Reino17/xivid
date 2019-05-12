@@ -4170,6 +4170,96 @@ $ xidel -s "https://vimeo.com/310786958" --xquery 'json(//script/extract(.,"clip
 
 ------------------------------------------------------------------------------------------------
 
+https://vimeo.com/195782736
+
+$ xidel -s "https://vimeo.com/195782736" --xquery 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])/{"name":clip/title,"date":replace(clip/uploaded_on,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":clip/duration/formatted,"formats":player/json(config_url)//files/(let $a:=hls/(.//url)[1] return [for $x at $i in (progressive)() order by $x/width count $i return $x/{"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat(width,"x",height,"@",fps,"fps"),"url":url},{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":"m3u8[h264+aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1),"@",round(number(extract($x,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":resolve-uri(extract($x,"(.+m3u8)",1),$a)}])}'
+{
+  "name": "Sony Cyber-shot RX100 V sample movie: Daylight handheld / 4k / 24p",
+  "date": "15-12-2016",
+  "duration": "00:19",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360@23fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588398.mp4?token=1557057306-0xe4d74f7f91b38c9657527adf6aea84c3d5883e19"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "resolution": "960x540@23fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588334.mp4?token=1557057306-0xd8aa53dc1d55fa66a3fb0dd0ab5f4173e227101b"
+    },
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720@23fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588395.mp4?token=1557057306-0x51e774c2bb318b7986a7b36063f7d3d6af32cc6e"
+    },
+    {
+      "format": "pg-4",
+      "container": "mp4[h264+aac]",
+      "resolution": "1920x1080@23fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588355.mp4?token=1557057306-0x538e0ebc8a50082dec34d97b90e593140b25e866"
+    },
+    {
+      "format": "pg-5",
+      "container": "mp4[h264+aac]",
+      "resolution": "2560x1440@23fps",
+      "url": "https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588401.mp4?token=1557057306-0x84c24dabd000029ec0370b62f32fbc1d19b1cc2e"
+    },
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588398,656588401,656588395,656588393,656588355,656588334/master.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360@24fps",
+      "bitrate": "640kbps",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588398/playlist.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "960x540@24fps",
+      "bitrate": "1788kbps",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588334/playlist.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720@24fps",
+      "bitrate": "2860kbps",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588395/playlist.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1920x1080@24fps",
+      "bitrate": "5019kbps",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588355/playlist.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "2560x1440@24fps",
+      "bitrate": "12840kbps",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588401/playlist.m3u8"
+    },
+    {
+      "format": "hls-6",
+      "container": "m3u8[h264+aac]",
+      "resolution": "3840x2160@24fps",
+      "bitrate": "22273kbps",
+      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1557057306~acl=%2F195782736%2F%2A~hmac=1b7942a7fe450ced090d3b9db2213066fba0b451bab3ef88bce8dfedee3453f2/195782736/video/656588393/playlist.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 --xquery '
   json(
     //script/extract(
@@ -4208,17 +4298,22 @@ $ xidel -s "https://vimeo.com/310786958" --xquery 'json(//script/extract(.,"clip
           "container":"m3u8[manifest]",
           "url":$a
         },
-        tail(
+        for $x at $i in tail(
           tokenize(
             unparsed-text($a),
             "#EXT-X-STREAM-INF:"
           )
-        ) ! {
-          "format":"hls-"||position(),
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
           "container":"m3u8[h264+aac]",
           "resolution":concat(
             extract(
-              .,
+              $x,
               "RESOLUTION=([\dx]+)",
               1
             ),
@@ -4226,7 +4321,7 @@ $ xidel -s "https://vimeo.com/310786958" --xquery 'json(//script/extract(.,"clip
             round(
               number(
                 extract(
-                  .,
+                  $x,
                   "FRAME-RATE=([\d.]+)",
                   1
                 )
@@ -4236,14 +4331,14 @@ $ xidel -s "https://vimeo.com/310786958" --xquery 'json(//script/extract(.,"clip
           ),
           "bitrate":round(
             extract(
-              .,
+              $x,
               "BANDWIDTH=(\d+)",
               1
             ) div 1000
           )||"kbps",
           "url":resolve-uri(
             extract(
-              .,
+              $x,
               "(.+m3u8)",
               1
             ),

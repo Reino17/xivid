@@ -1617,17 +1617,22 @@ vimeo() {
             "container":"m3u8[manifest]",
             "url":$a
           },
-          tail(
+          for $x at $i in tail(
             tokenize(
               unparsed-text($a),
               "#EXT-X-STREAM-INF:"
             )
-          ) ! {
-            "format":"hls-"||position(),
+          ) order by extract(
+            $x,
+            "BANDWIDTH=(\d+)",
+            1
+          ) count $i
+          return {
+            "format":"hls-"||$i,
             "container":"m3u8[h264+aac]",
             "resolution":concat(
               extract(
-                .,
+                $x,
                 "RESOLUTION=([\dx]+)",
                 1
               ),
@@ -1635,7 +1640,7 @@ vimeo() {
               round(
                 number(
                   extract(
-                    .,
+                    $x,
                     "FRAME-RATE=([\d.]+)",
                     1
                   )
@@ -1645,14 +1650,14 @@ vimeo() {
             ),
             "bitrate":round(
               extract(
-                .,
+                $x,
                 "BANDWIDTH=(\d+)",
                 1
               ) div 1000
             )||"kbps",
             "url":resolve-uri(
               extract(
-                .,
+                $x,
                 "(.+m3u8)",
                 1
               ),
