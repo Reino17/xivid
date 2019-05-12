@@ -36,9 +36,9 @@ Ondersteunde websites:
   gemi.st                 rtvnoord.nl           rijnmond.nl
   nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
   tvblik.nl               nhnieuws.nl           omroepgelderland.nl
-  uitzendinggemist.net    at5.nl
-  rtl.nl                  omroepflevoland.nl
-  kijk.nl                 rtvoost.nl
+  uitzendinggemist.net    at5.nl                omroepzeeland.nl
+  rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
+  kijk.nl                 rtvoost.nl            l1.nl
 
   dumpert.nl
   telegraaf.nl
@@ -614,7 +614,7 @@ kijk() {
   ' --output-format=bash)"
 }
 
-omrop_frl() {
+regio_frl() {
   eval "$(xidel "$1" --xquery '
     let $a:=//meta[@itemprop="embedURL"]/extract(
           @content,
@@ -693,97 +693,7 @@ omrop_frl() {
   ' --output-format=bash)"
 }
 
-omroep_gdog() {
-  eval "$(xidel "$1" --xquery '
-    let $a:=json(
-          resolve-uri(
-            (
-              //@data-media-url,
-              doc(
-                parse-html(//@data-accept)//@src
-              )//@data-media-url
-            )
-          )
-        ),
-        $b:=x:request(
-          {
-            "url":$a/resolve-uri(
-              clipData/src,
-              publicationData/defaultMediaAssetPath
-            ),
-            "method":if ($a/clipData/id="Tv") then
-              "GET"
-            else
-              "HEAD"
-          }
-        )
-    return
-    json:=if ($a/clipData/id="Tv") then {
-      "name":$a/publicationData/label||": Livestream",
-      "date":"'$(date +%d-%m-%Y)'",
-      "formats":[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$b/url
-        },
-        for $x at $i in tail(
-          tokenize(
-            $b/doc,
-            "#EXT-X-STREAM-INF:"
-          )
-        ) order by extract(
-          $x,
-          "BANDWIDTH=(\d+)",
-          1
-        ) count $i
-        return {
-          "format":"hls-"||$i,
-          "container":"m3u8[h264+aac]",
-          "resolution":extract(
-            $x,
-            "RESOLUTION=([\dx]+)",
-            1
-          ),
-          "bitrate":round(
-            extract(
-              $x,
-              "BANDWIDTH=(\d+)",
-              1
-            ) div 1000
-          )||"kbps",
-          "url":resolve-uri(
-            extract(
-              $x,
-              "(.+m3u8)",
-              1
-            ),
-            $b/url
-          )
-        }
-      ]
-    } else {
-      "name":concat(
-        $a/publicationData/label,
-        ": ",
-        (//h3,//h1)
-      ),
-      "date":format-date(
-        dateTime($a/clipData/publisheddate),
-        "[D01]-[M01]-[Y]"
-      ),
-      "formats":[
-        {
-          "format":"pg-1",
-          "container":"mp4[h264+aac]",
-          "url":$b/url
-        }
-      ]
-    }
-  ' --output-format=bash)"
-}
-
-omroep_nh() {
+regio_nh() {
   eval "$(xidel "$1" -e '
     let $a:=json(
       //script/extract(
@@ -868,7 +778,7 @@ omroep_nh() {
   ' --output-format=bash)"
 }
 
-omroep_fll() {
+regio_fll() {
   eval "$(xidel "$1" --xquery '
     let $a:=//div[
       ends-with(
@@ -977,108 +887,7 @@ omroep_fll() {
   ' --output-format=bash)"
 }
 
-omroep_zh() {
-  eval "$(xidel "$1" -f '//@data-media-url' --xquery '
-    json:=json(
-      extract(
-        $raw,
-        "var opts = (.+);",
-        1
-      )
-    )/(
-      if (clipData/sourcetype="live") then {
-        "name":publicationData/label||": Livestream",
-        "date":"'$(date +%d-%m-%Y)'",
-        "formats":let $a:="https:"||clipData/(assets)()[mediatype="MP4_MAIN" or "MP4_HLS"]/src return [
-          {
-            "format":"hls-0",
-            "container":"m3u8[manifest]",
-            "url":$a
-          },
-          for $x at $i in tail(
-            tokenize(
-              unparsed-text($a),
-              "#EXT-X-STREAM-INF:"
-            )
-          ) order by extract(
-            $x,
-            "BANDWIDTH=(\d+)",
-            1
-          ) count $i
-          return {
-            "format":"hls-"||$i,
-            "container":if (
-              contains(
-                $x,
-                "avc1"
-              )
-            ) then
-              "m3u8[h264+aac]"
-            else
-              "m3u8[aac]",
-            "resolution":extract(
-              $x,
-              "RESOLUTION=([\dx]+)",
-              1
-            )[.],
-            "bitrate":round(
-              extract(
-                $x,
-                "BANDWIDTH=(\d+)",
-                1
-              ) div 1000
-            )||"kbps",
-            "url":resolve-uri(
-              extract(
-                $x,
-                "(.+m3u8)",
-                1
-              ),
-              $a
-            )
-          }
-        ]
-      } else {
-        "name":concat(
-          publicationData/label,
-          ": ",
-          clipData/(
-            programmanaam,
-            title
-          )[1]
-        ),
-        "date":format-date(
-          dateTime(clipData/publisheddate),
-          "[D01]-[M01]-[Y]"
-        ),
-        "formats":[
-          for $x at $i in clipData/(assets)()
-          order by $x/bandwidth
-          count $i
-          return {
-            "format":"pg-"||$i,
-            "container":"mp4[h264+aac]",
-            "resolution":concat(
-              $x/width,
-              "x",
-              $x/height
-            ),
-            "bitrate":$x/bandwidth||"kbps",
-            "url":resolve-uri(
-              $x/src,
-              protocol||substring-after(
-                publicationData/defaultMediaAssetPath,
-                "//"
-              )
-            )
-          }
-        ]
-      }
-    )
-  ' --output-format=bash)"
-}
-
-omroep_utr() {
+regio_utr() {
   eval "$(xidel "$1" --xquery '
     json:=if (//script[@async]) then
       json(
@@ -1172,6 +981,170 @@ omroep_utr() {
           }
         ]
       }
+  ' --output-format=bash)"
+}
+
+regio() {
+  eval "$(xidel "$1"   --xquery '
+    let $a:=doc(
+          parse-html(
+            //div[
+              starts-with(
+                @class,
+                "inlinemedia"
+              )
+            ]/@data-accept
+          )//@src
+        ),
+        $b:=x:request(
+          {
+            "url":(
+              (.,$a)//@data-media-url,
+              //div[@class="bbwLive-player"]//@src,
+              resolve-uri(
+                doc(//iframe/@src)//@src
+              ),
+              //div[@class="bbw bbwVideo"]/concat(
+                "https://l1.bbvms.com/p/video/c/",
+                @data-id,
+                ".json"
+              )
+            )
+          }
+        )/(
+          .[json]/json,
+          .[doc]/json(
+            extract(
+              raw,
+              "var opts = (.+);",
+              1
+            )
+          )
+        ),
+        $c:=$b/clipData/(assets)(1)[
+          ends-with(
+            src,
+            "m3u8"
+          )
+        ]/x:request(
+          {
+            "url":if (
+              starts-with(
+                src,
+                "//"
+              )
+            ) then
+              $b/protocol||substring-after(
+                src,
+                "//"
+              )
+            else
+              resolve-uri(
+                src,
+                $b/publicationData/defaultMediaAssetPath
+              )
+          }
+        )
+    return
+    json:=if ($c) then {
+      "name":$b/publicationData/label||": Livestream",
+      "date":"'$(date +%d-%m-%Y)'",
+      "formats":[
+        {
+          "format":"hls-0",
+          "container":"m3u8[manifest]",
+          "url":$c/url
+        },
+        for $x at $i in tail(
+          tokenize(
+            $c/doc,
+            "#EXT-X-STREAM-INF:"
+          )
+        ) order by extract(
+          $x,
+          "BANDWIDTH=(\d+)",
+          1
+        ) count $i
+        return {
+          "format":"hls-"||$i,
+          "container":if (
+            contains(
+              $x,
+              "avc1"
+            )
+          ) then
+            "m3u8[h264+aac]"
+          else
+            "m3u8[aac]",
+          "resolution":extract(
+            $x,
+            "RESOLUTION=([\dx]+)",
+            1
+          )[.],
+          "bitrate":round(
+            extract(
+              $x,
+              "BANDWIDTH=(\d+)",
+              1
+            ) div 1000
+          )||"kbps",
+          "url":resolve-uri(
+            extract(
+              $x,
+              "(.+m3u8)",
+              1
+            ),
+            $c/url
+          )
+        }
+      ]
+    } else {
+      "name":concat(
+        $b/publicationData/label,
+        ": ",
+        normalize-space(
+          (
+            //div[@class="media-details"]/h3,
+            (.,$a)//div[@class="video-title"],
+            replace(
+              //div[@class="overlay"]/h1,
+              "(.+) -.+",
+              "$1"
+            )
+          )
+        )
+      ),
+      "date":format-date(
+        dateTime($b/clipData/publisheddate),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":$b/clipData/(
+        (assets)(1)/length,
+        length
+      )[.][1] * duration("PT1S") + time("00:00:00"),
+      "formats":[
+        for $x at $i in $b/clipData/(assets)()
+        order by $x/bandwidth
+        count $i
+        return {
+          "format":"pg-"||$i,
+          "container":"mp4[h264+aac]",
+          "resolution":concat(
+            $x/width,
+            "x",
+            $x/height
+          ),
+          "bitrate":$x/bandwidth||"kbps",
+          "url":resolve-uri(
+            $x/src,
+            $b/protocol||substring-after(
+              $b/publicationData/defaultMediaAssetPath,
+              "//"
+            )
+          )
+        }
+      ]
+    }
   ' --output-format=bash)"
 }
 
@@ -1924,17 +1897,15 @@ elif [[ $url =~ rtl.nl ]]; then
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then
-  omrop_frl "$url"
-elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepgelderland.nl) ]]; then
-  omroep_gdog "$url"
+  regio_frl "$url"
 elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then
-  omroep_nh "$url"
+  regio_nh "$url"
 elif [[ $url =~ omroepflevoland.nl ]]; then
-  omroep_fll "$url"
-elif [[ $url =~ (omroepwest.nl|rijnmond.nl) ]]; then
-  omroep_zh "$url"
+  regio_fll "$url"
 elif [[ $url =~ rtvutrecht.nl ]]; then
-  omroep_utr "$url"
+  regio_utr "$url"
+elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepgelderland.nl|omroepwest.nl|rijnmond.nl|omroepzeeland.nl|omroepbrabant.nl|l1.nl) ]]; then
+  regio "$url"
 elif [[ $url =~ dumpert.nl ]]; then
   dumpert "$url"
 elif [[ $url =~ telegraaf.nl ]]; then
