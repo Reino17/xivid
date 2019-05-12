@@ -547,13 +547,13 @@ We nemen `https://www.youtube.com/watch?v=GuoxLggqI_g`, een documentaire, als vo
 ```sh
 ./bashgemist.sh -i https://www.youtube.com/watch?v=GuoxLggqI_g
 Naam:          The Uncertainty Has Settled (Full film)
-Datum:         08-11-2018
+Datum:         07-11-2018
 Tijdsduur:     01:28:26
 Ondertiteling: ttml
 Formaten:      formaat  container         resolutie        frequentie  bitrate
-               pg-1     mp4[h264+aac]     640x360                      452kbps
+               pg-1     mp4[h264+aac]     640x360
                pg-2     webm[vp8+vorbis]  640x360
-               pg-3     mp4[h264+aac]     1280x720                     825kbps
+               pg-3     mp4[h264+aac]     1280x720
                dash-1   webm[opus]                         48kHz       91kbps
                dash-2   webm[opus]                         48kHz       109kbps
                dash-3   mp4[aac]                           44.1kHz     135kbps

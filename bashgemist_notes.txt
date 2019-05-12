@@ -2689,36 +2689,6 @@ kijk GgO61doGeqZ
 
 [youtube]
 
-https://www.youtube.com/watch?v=nG_LtCRRZ20 (normaal toegankelijke video)
-
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/(videoDetails/title,streamingData//lastModified,videoDetails/lengthSeconds)'
-Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
-1548978611083579
-1548978609684393
-1548979118812685
-1548978611887433
-1548982696251964
-1548978905736975
-1548978905736975
-1548978905736975
-1548978905731670
-1548978905736975
-1548978905736975
-1548978771474489
-1093
-
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/(videoDetails/title,min(streamingData//lastModified),videoDetails/lengthSeconds)'
-Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
-1548978609684393
-1093
-
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/(videoDetails/title,decimal(round(min(streamingData//lastModified) div 1000000)),videoDetails/lengthSeconds)'
-Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
-1548978610
-1093
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 "The Unix epoch (or Unix time or POSIX time or Unix timestamp) is the number of seconds that have elapsed since January 1, 1970."
 
 $ xidel -s -e '1548978610 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
@@ -2783,13 +2753,285 @@ $ xidel -s -e 'let $a:={"updated":1548978610} return {"a":"'$(date +%d-%m-%Y)'",
   "b": "01-02-2019"
 }
 
+Update 10-05-2019: Vanwege een api update is bovenstaande niet meer van toepassing op Youtube.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/{"name":videoDetails/title,"date":format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00")}'
+https://www.youtube.com/watch?v=nG_LtCRRZ20 (normaal toegankelijke video)
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e '(//meta[@property="og:title"]/@content,//meta[@itemprop="datePublished"]/@content,//meta[@itemprop="duration"]/@content)'
+Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
+2019-02-01
+PT18M13S
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e '{"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00")}'
 {
   "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
   "date": "01-02-2019",
   "duration": "00:18:13"
+}
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args return (tokenize($a/url_encoded_fmt_stream_map,","),tokenize($a/fmt_list,","))'
+itag=22&quality=hd720&type=video%2Fmp4%3B+codecs%3D%22avc1.64001F%2C+mp4a.40.2%22&url=https%3A%2F%2Fr4---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]
+itag=43&quality=medium&type=video%2Fwebm%3B+codecs%3D%22vp8.0%2C+vorbis%22&url=https%3A%2F%2Fr4---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]
+itag=18&quality=medium&type=video%2Fmp4%3B+codecs%3D%22avc1.42001E%2C+mp4a.40.2%22&url=https%3A%2F%2Fr4---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]
+22/1280x720
+43/640x360
+18/640x360
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=tokenize($a/url_encoded_fmt_stream_map,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return ($b,tokenize($a/fmt_list,",") ! substring-after(.,"/"))'
+{
+  "itag": "22",
+  "quality": "hd720",
+  "type": "video/mp4; codecs=\"avc1.64001F, mp4a.40.2\"",
+  "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=22[...]"
+}
+{
+  "itag": "43",
+  "quality": "medium",
+  "type": "video/webm; codecs=\"vp8.0, vorbis\"",
+  "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=43[...]"
+}
+{
+  "itag": "18",
+  "quality": "medium",
+  "type": "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"",
+  "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=18[...]"
+}
+1280x720
+640x360
+640x360
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=tokenize($a/url_encoded_fmt_stream_map,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return [for $x at $i in reverse($b) return {"format":"pg-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":reverse(tokenize($a/fmt_list,",") ! substring-after(.,"/"))[$i],"url":$x/url}]'
+[
+  {
+    "format": "pg-1",
+    "container": "mp4[h264+aac]",
+    "resolution": "640x360",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=18[...]"
+  },
+  {
+    "format": "pg-2",
+    "container": "webm[vp8+vorbis]",
+    "resolution": "640x360",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=43[...]"
+  },
+  {
+    "format": "pg-3",
+    "container": "mp4[h264+aac]",
+    "resolution": "1280x720",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=22[...]"
+  }
+]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args return $a/json(player_response)/streamingData/dashManifestUrl'
+https://manifest.googlevideo.com/api/manifest/dash/[...]
+
+Zonder "disable_polymer" (doc(dashManifestUrl||"/disable_polymer/true")) waren de DASH streams tot voor kort niet te openen met FFmpeg, of MPC-HC (zie https://github.com/rg3/youtube-dl/issues/14083). Dat lijkt nu niet meer het geval te zijn.
+Bij lang niet alle Youtube video's is een dashmanifest aanwezig. Daarom geef ik de voorkeur aan het ontleden van de "adaptive_fmts" query-string in de "ytplayer.config"-json (hier onder). Toch is hier voor de volledigheid de query voor het ontleden van de dashmanifest.
+Sorteer op de aanwezigheid van @width, zodat de audio-only streams bovenaan komen, én vervolgens op @bandwidth.
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args return [for $x at $i in doc($a/json(player_response)/streamingData/dashManifestUrl)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"format":"dash-"||$i,"container":concat(substring-after($x/../@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/BaseUrl}]'
+[
+  {
+    "format": "dash-1",
+    "container": "mp4[aac]",
+    "resolution": null,
+    "samplerate": "22.05kHz",
+    "bitrate": "51kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/139/[...]"
+  },
+  {
+    "format": "dash-2",
+    "container": "mp4[aac]",
+    "resolution": null,
+    "samplerate": "44.1kHz",
+    "bitrate": "131kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/140/[...]"
+  },
+  [...]
+  {
+    "format": "dash-14",
+    "container": "mp4[h264]",
+    "resolution": "1280x720@50fps",
+    "samplerate": null,
+    "bitrate": "2866kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/298/[...]"
+  }
+]
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args return tokenize($a/adaptive_fmts,",")'
+fps=25&itag=136&url=https%3A%2F%2Fr4---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]&index=0-0&stream_type=3&xtags=&projection_type=1&type=video%2Fmp4%3B+codecs%3D%22avc1.4d4016%22&clen=0&quality_label=720p&init=0-0&lmt=1548978905736975&size=1280x720&bitrate=2310000
+fps=25&itag=247&url=https%3A%2F%2Fr4---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]&index=0-0&stream_type=3&xtags=&projection_type=1&type=video%2Fwebm%3B+codecs%3D%22vp9%22&clen=0&quality_label=720p&init=0-0&lmt=1548978905736975&size=1280x720&bitrate=1505280
+fps=50&itag=298&url=https%3A%2F%2Fr4---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]&index=764-3363&xtags=&projection_type=1&type=video%2Fmp4%3B+codecs%3D%22avc1.4d4020%22&clen=214600383&quality_label=720p50&init=0-763&lmt=1548978905736975&size=1280x720&bitrate=2866450
+[...]
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=tokenize($a/adaptive_fmts,",")) ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return $b'
+{
+  "fps": "25",
+  "itag": "136",
+  "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=136[...]",
+  "index": "0-0",
+  "stream_type": "3",
+  "xtags": "",
+  "projection_type": "1",
+  "type": "video/mp4; codecs=\"avc1.4d4016\"",
+  "clen": "0",
+  "quality_label": "720p",
+  "init": "0-0",
+  "lmt": "1548978905736975",
+  "size": "1280x720",
+  "bitrate": "2310000"
+}
+[...]
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return [for $x at $i in $b order by $x/boolean(size),$x/bitrate count $i return {"format":"dash-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)(?:\.|"")",(1,2)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/size ! concat(.,"@",$x/fps,"fps"),"samplerate":$x/audio_sample_rate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]'
+[
+  {
+    "format": "dash-1",
+    "container": "mp4[aac]",
+    "resolution": null,
+    "samplerate": "44.1kHz",
+    "bitrate": "131kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=140[...]"
+  },
+  {
+    "format": "dash-2",
+    "container": "webm[vp9]",
+    "resolution": "256x144@25fps",
+    "samplerate": null,
+    "bitrate": "95kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=278[...]"
+  },
+  {
+    "format": "dash-3",
+    "container": "mp4[h264]",
+    "resolution": "256x144@25fps",
+    "samplerate": null,
+    "bitrate": "108kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=160[...]"
+  },
+  {
+    "format": "dash-4",
+    "container": "webm[vp9]",
+    "resolution": "426x240@25fps",
+    "samplerate": null,
+    "bitrate": "221kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=242[...]"
+  },
+  {
+    "format": "dash-5",
+    "container": "mp4[h264]",
+    "resolution": "426x240@25fps",
+    "samplerate": null,
+    "bitrate": "242kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=133[...]"
+  },
+  {
+    "format": "dash-6",
+    "container": "webm[vp9]",
+    "resolution": "640x360@25fps",
+    "samplerate": null,
+    "bitrate": "406kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=243[...]"
+  },
+  {
+    "format": "dash-7",
+    "container": "mp4[h264]",
+    "resolution": "640x360@25fps",
+    "samplerate": null,
+    "bitrate": "613kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=134[...]"
+  },
+  {
+    "format": "dash-8",
+    "container": "webm[vp9]",
+    "resolution": "854x480@25fps",
+    "samplerate": null,
+    "bitrate": "753kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=244[...]"
+  },
+  {
+    "format": "dash-9",
+    "container": "mp4[h264]",
+    "resolution": "854x480@25fps",
+    "samplerate": null,
+    "bitrate": "1155kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=135[...]"
+  },
+  {
+    "format": "dash-10",
+    "container": "webm[vp9]",
+    "resolution": "1280x720@25fps",
+    "samplerate": null,
+    "bitrate": "1505kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=247[...]"
+  },
+  {
+    "format": "dash-11",
+    "container": "mp4[h264]",
+    "resolution": "1280x720@25fps",
+    "samplerate": null,
+    "bitrate": "2310kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=136[...]"
+  },
+  {
+    "format": "dash-12",
+    "container": "webm[vp9]",
+    "resolution": "1280x720@50fps",
+    "samplerate": null,
+    "bitrate": "2646kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=302[...]"
+  },
+  {
+    "format": "dash-13",
+    "container": "mp4[h264]",
+    "resolution": "1280x720@50fps",
+    "samplerate": null,
+    "bitrate": "2866kbps",
+    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=298[...]"
+  }
+]
+
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/(url_encoded_fmt_stream_map,adaptive_fmts) ! tokenize(.,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in reverse($b[quality]) return {"format":"pg-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":reverse(tokenize($a/fmt_list,",") ! substring-after(.,"/"))[$i],"url":$x/url},for $x at $i in $b[index] order by $x/boolean(size),$x/bitrate count $i return {"format":"dash-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)(?:\.|"")",(1,2)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/size ! concat(.,"@",$x/fps,"fps"),"samplerate":$x/audio_sample_rate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
+{
+  "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
+  "date": "01-02-2019",
+  "duration": "00:18:13",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=18[...]"
+    },
+    [...]
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=22[...]"
+    },
+    {
+      "format": "dash-1",
+      "container": "mp4[aac]",
+      "resolution": null,
+      "samplerate": "44.1kHz",
+      "bitrate": "131kbps",
+      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=140[...]"
+    },
+    [...]
+    {
+      "format": "dash-13",
+      "container": "mp4[h264]",
+      "resolution": "1280x720@50fps",
+      "samplerate": null,
+      "bitrate": "2866kbps",
+      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=298[...]"
+    }
+  ]
 }
 
 ------------------------------------------------------------------------------------------------
@@ -2799,525 +3041,130 @@ https://www.youtube.com/watch?v=2U5mf_fEKiU (leeftijds beperkte video) (https://
 $ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" -e 'outer-html(//meta[@property="og:restrictions:age"])'
 <meta property="og:restrictions:age" content="18+">
 
-$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" -e 'if (//meta[@property="og:restrictions:age"]) then concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response'
+$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" -e 'concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)'
 https://www.youtube.com/get_video_info?video_id=2U5mf_fEKiU&eurl=https%3A%2F%2Fyoutube.googleapis.com%2Fv%2F2U5mf_fEKiU&sts=17940
 
-Wat deze url teruggeeft is volledig url-encoded. Url-decode(), tokenize op "&" en vervolgens is daar de json "player_response" weer:
+Wat deze url teruggeeft is een volledige url-encoded "ytplayer.config"-json in query-string formaat (application/x-www-form-urlencoded). Om daar eerst weer de json van te maken:
 
-$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" -e 'json(if (//meta[@property="og:restrictions:age"]) then let $a:=concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) return tokenize(uri-decode(doc($a)),"&") ! extract(.,"player_response=(.+)",1)[.] else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)'
-{
-  "playabilityStatus": {
-    "status": "OK",
-    "playableInEmbed": true
-  },
-  "streamingData": {
-    [...]
-  },
-  [...]
-}
+$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" --xquery 'let $a:=concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) return {|for $x in tokenize(unparsed-text($a),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|}'
 
-$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" -e 'json(if (//meta[@property="og:restrictions:age"]) then let $a:=concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) return tokenize(uri-decode(doc($a)),"&") ! extract(.,"player_response=(.+)",1)[.] else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)/{"name":videoDetails/title,"date":format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00")}'
+$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/(url_encoded_fmt_stream_map,adaptive_fmts) ! tokenize(.,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in reverse($b[quality]) return {"format":"pg-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":reverse(tokenize($a/fmt_list,",") ! substring-after(.,"/"))[$i],"url":$x/url},for $x at $i in $b[index] order by $x/boolean(size),$x/bitrate count $i return {"format":"dash-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)(?:\.|"")",(1,2)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/size ! concat(.,"@",$x/fps,"fps"),"samplerate":$x/audio_sample_rate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
 {
   "name": "Allow embedding, Age restriction",
   "date": "18-09-2018",
-  "duration": "00:00:20"
+  "duration": "00:00:21",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?itag=18[...]"
+    },
+    [...]
+    {
+      "format": "pg-3",
+      "container": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?itag=22[...]"
+    },
+    {
+      "format": "dash-1",
+      "container": "mp4[aac]",
+      "resolution": null,
+      "samplerate": "44.1kHz",
+      "bitrate": "130kbps",
+      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?itag=140[...]"
+    },
+    [...]
+    {
+      "format": "dash-17",
+      "container": "mp4[h264]",
+      "resolution": "1920x1080@60fps",
+      "samplerate": null,
+      "bitrate": "5809kbps",
+      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?itag=299[...]"
+    }
+  ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1822: "# bitrate for itag 43 is always 2147483647".
-Negeren dus. En sorteren op bestandsgrootte. Anders komt "pg-4" met "bitrate": "2147484kbps" onderaan.
+https://www.youtube.com/watch?v=MdC976o12a4 (live videostream)
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/streamingData/[for $x at $i in (formats)() order by $x/contentLength count $i return $x/{"format":"pg-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":if (.[itag="43"]) then () else round(bitrate div 1000)||"kbps","url":url}]'
-[
-  {
-    "format": "pg-1",
-    "container": "3gp[mp4v+aac]",
-    "resolution": "176x144",
-    "bitrate": "82kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "pg-2",
-    "container": "3gp[mp4v+aac]",
-    "resolution": "320x180",
-    "bitrate": "226kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "pg-3",
-    "container": "mp4[h264+aac]",
-    "resolution": "640x360",
-    "bitrate": "489kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "pg-4",
-    "container": "webm[vp8+vorbis]",
-    "resolution": "640x360",
-    "bitrate": null,
-    "url": "<url>"
-  },
-  {
-    "format": "pg-5",
-    "container": "mp4[h264+aac]",
-    "resolution": "1280x720",
-    "bitrate": "1603kbps",
-    "url": "<url>"
-  }
-]
+$ xidel -s "https://www.youtube.com/watch?v=MdC976o12a4" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args return if ($a/livestream="1") then $a/json(player_response)/streamingData/hlsManifestUrl else ()'
+https://manifest.googlevideo.com/api/manifest/hls_variant/[...]/index.m3u8
 
-------------------------------------------------------------------------------------------------
-
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/streamingData/dashManifestUrl'
-https://manifest.googlevideo.com/api/manifest/dash/mv/m/ipbits/0/expire/1549179524/id/9c6fcbb42451676d/mn/sn-mn4vg5aa-5hns%2Csn-5hne6ns6/mm/31%2C29/ms/au%2Crdu/sparams/as%2Cei%2Chfr%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cplayback_host%2Crequiressl%2Csource%2Cexpire/source/youtube/pl/15/itag/0/key/yt6/ip/x.x.x.x/initcwndbps/1607500/hfr/all/requiressl/yes/fvip/1/ei/JEZWXKbuHNGh8gOLipXoBw/as/fmp4_audio_clear%2Cfmp4_sd_hd_clear/playback_host/r4---sn-mn4vg5aa-5hns.googlevideo.com/mt/1549157740/signature/7CD75240ECBD2EA2A037A50EB7A8D6A8BECE1959.5A728D695D4624475A812F9818D5953BD84544DB
-
-Zonder "disable_polymer" zijn de DASH streams vreemd genoeg helemaal niet te openen (met FFmpeg, of MPC-HC) (zie https://github.com/rg3/youtube-dl/issues/14083).
-Sorteer op de aanwezigheid van @width, zodat de audio-only streams bovenaan komen, én vervolgens op @bandwidth.
-
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/streamingData/[for $x at $i in doc(dashManifestUrl||"/disable_polymer/true")//Representation[matches(@id,"\d+")] order by $x/boolean(@width),$x/@bandwidth count $i return $x/{"format":"dash-"||$i,"container":concat(substring-after(../@mimeType,"/"),"[",extract(@codecs,"(^[\w]+)",1) ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":if (@width) then concat(@width,"x",@height,"@",@frameRate,"fps") else (),"samplerate":if (@audioSamplingRate) then (@audioSamplingRate div 1000)||"kHz" else (),"bitrate":round(@bandwidth div 1000)||"kbps","url":BaseUrl}]'
-[
-  {
-    "format": "dash-1",
-    "container": "mp4[aac]",
-    "resolution": null,
-    "samplerate": "22.05kHz",
-    "bitrate": "51kbps",
-    "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/139/source/youtube/requiressl/yes/mv/m/ms/au,rdu/ei/2iZeXPboPM-R1gKsjbnQAQ/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/pl/15/mm/31,29/initcwndbps/1453750/ratebypass/yes/mime/audio%2Fmp4/otfp/1/gir/yes/clen/6663680/lmt/1548978770075323/dur/1092.684/mt/1549674036/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549695803/sparams/ip,ipbits,expire,id,itag,source,requiressl,mv,ms,ei,mn,pl,mm,initcwndbps,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/25FA0E634366E6B671774E784B593771DA201605.80AC248E5977BF50197BE7BA31D39AFC2AD6D88F/key/dg_yt0/"
-  },
-  {
-    "format": "dash-2",
-    "container": "mp4[aac]",
-    "resolution": null,
-    "samplerate": "44.1kHz",
-    "bitrate": "131kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-3",
-    "container": "webm[vp9]",
-    "resolution": "256x144@25fps",
-    "samplerate": null,
-    "bitrate": "95kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-4",
-    "container": "mp4[h264]",
-    "resolution": "256x144@25fps",
-    "samplerate": null,
-    "bitrate": "108kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-5",
-    "container": "webm[vp9]",
-    "resolution": "426x240@25fps",
-    "samplerate": null,
-    "bitrate": "221kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-6",
-    "container": "mp4[h264]",
-    "resolution": "426x240@25fps",
-    "samplerate": null,
-    "bitrate": "242kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-7",
-    "container": "webm[vp9]",
-    "resolution": "640x360@25fps",
-    "samplerate": null,
-    "bitrate": "406kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-8",
-    "container": "mp4[h264]",
-    "resolution": "640x360@25fps",
-    "samplerate": null,
-    "bitrate": "613kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-9",
-    "container": "webm[vp9]",
-    "resolution": "854x480@25fps",
-    "samplerate": null,
-    "bitrate": "753kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-10",
-    "container": "mp4[h264]",
-    "resolution": "854x480@25fps",
-    "samplerate": null,
-    "bitrate": "1155kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-11",
-    "container": "webm[vp9]",
-    "resolution": "1280x720@25fps",
-    "samplerate": null,
-    "bitrate": "1505kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-12",
-    "container": "mp4[h264]",
-    "resolution": "1280x720@25fps",
-    "samplerate": null,
-    "bitrate": "2310kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-13",
-    "container": "webm[vp9]",
-    "resolution": "1280x720@50fps",
-    "samplerate": null,
-    "bitrate": "2646kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-14",
-    "container": "mp4[h264]",
-    "resolution": "1280x720@50fps",
-    "samplerate": null,
-    "bitrate": "2866kbps",
-    "url": "<url>"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-https://www.youtube.com/watch?v=5jOjwN_uJt0 (geen DASH manifest)
-
-"&disable_polymer=true" is blijkt hier niet nodig te zijn.
-
-$ xidel -s "https://www.youtube.com/watch?v=5jOjwN_uJt0" --xquery 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/streamingData/[for $x at $i in (adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return $x/{"format":"dash-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)(?:\.|"")",(1,2)) return concat($a[1],"[",if ($a[2]="mp4a") then "aac" else if ($a[2]="avc1") then "h264" else $a[2],"]"),"resolution":if (width) then concat(width,"x",height,"@",fps,"fps") else (),"samplerate":if (audioSampleRate) then (audioSampleRate div 1000)||"kHz" else (),"bitrate":round(bitrate div 1000)||"kbps","url":url}]'
-[
-  {
-    "format": "dash-1",
-    "container": "webm[opus]",
-    "resolution": null,
-    "samplerate": "48kHz",
-    "bitrate": "53kbps",
-    "url": "https://r3---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?lmt=1441752806379607&expire=1549693637&fvip=1&keepalive=yes&requiressl=yes&gir=yes&mime=audio%2Fwebm&source=youtube&clen=6884987&signature=82DF7076702F74EB8FA0B1791BB802B1571A8501.42F558484EBCCA329E6C3499B2B751364B17BB20&ei=ZR5eXLrkIIuMgAflzJCQCw&c=WEB&key=yt6&ipbits=0&mv=m&dur=1127.101&mt=1549671941&itag=249&ms=au%2Crdu&initcwndbps=1740000&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&id=o-AHTPT0WYgpXcvEYrmwRNTDi_kSOvrOBSUgqV-1Z3eXJq&mn=sn-mn4vg5aa-5hns%2Csn-5hne6nsr&ip=x.x.x.x&mm=31%2C29&pl=15"
-  },
-  {
-    "format": "dash-2",
-    "container": "webm[opus]",
-    "resolution": null,
-    "samplerate": "48kHz",
-    "bitrate": "69kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-3",
-    "container": "webm[vorbis]",
-    "resolution": null,
-    "samplerate": "44.1kHz",
-    "bitrate": "126kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-4",
-    "container": "mp4[aac]",
-    "resolution": null,
-    "samplerate": "44.1kHz",
-    "bitrate": "129kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-5",
-    "container": "webm[opus]",
-    "resolution": null,
-    "samplerate": "48kHz",
-    "bitrate": "136kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-6",
-    "container": "webm[vp9]",
-    "resolution": "256x144@13fps",
-    "samplerate": null,
-    "bitrate": "102kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-7",
-    "container": "mp4[h264]",
-    "resolution": "256x144@13fps",
-    "samplerate": null,
-    "bitrate": "116kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-8",
-    "container": "webm[vp9]",
-    "resolution": "426x240@25fps",
-    "samplerate": null,
-    "bitrate": "239kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-9",
-    "container": "mp4[h264]",
-    "resolution": "426x240@25fps",
-    "samplerate": null,
-    "bitrate": "250kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-10",
-    "container": "webm[vp9]",
-    "resolution": "640x360@25fps",
-    "samplerate": null,
-    "bitrate": "441kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-11",
-    "container": "mp4[h264]",
-    "resolution": "640x360@25fps",
-    "samplerate": null,
-    "bitrate": "602kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-12",
-    "container": "webm[vp9]",
-    "resolution": "854x480@25fps",
-    "samplerate": null,
-    "bitrate": "732kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-13",
-    "container": "mp4[h264]",
-    "resolution": "854x480@25fps",
-    "samplerate": null,
-    "bitrate": "1108kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-14",
-    "container": "webm[vp9]",
-    "resolution": "1280x720@25fps",
-    "samplerate": null,
-    "bitrate": "1454kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-15",
-    "container": "mp4[h264]",
-    "resolution": "1280x720@25fps",
-    "samplerate": null,
-    "bitrate": "2211kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-16",
-    "container": "webm[vp9]",
-    "resolution": "1280x720@50fps",
-    "samplerate": null,
-    "bitrate": "2340kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "dash-17",
-    "container": "mp4[h264]",
-    "resolution": "1280x720@50fps",
-    "samplerate": null,
-    "bitrate": "3307kbps",
-    "url": "<url>"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-https://www.youtube.com/watch?v=sN6bdk6pmrU (live videostream)
-
-$ xidel -s "https://www.youtube.com/watch?v=sN6bdk6pmrU" --xquery 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/streamingData/hlsManifestUrl'
-https://manifest.googlevideo.com/api/manifest/hls_variant/dover/11/gcr/nl/hfr/1/ratebypass/yes/ipbits/0/sparams/ei%2Cgcr%2Cgo%2Chfr%2Cid%2Cip%2Cipbits%2Citag%2Cmaudio%2Cplaylist_type%2Cratebypass%2Crequiressl%2Csource%2Cexpire/ip/x.x.x.x/key/yt6/itag/0/source/yt_live_broadcast/signature/76A88A6E089761D9E6EA6C66D7FB0F75C2B5D68D.16502FB14EA61F50A4BE76F389C1FDE9722CF181/maudio/1/ei/4t97XLn1Doyt1wKgzqDIBw/requiressl/yes/playlist_type/DVR/id/sN6bdk6pmrU.1/keepalive/yes/go/1/expire/1551643714/file/index.m3u8
-
-$ xidel -s "https://www.youtube.com/watch?v=sN6bdk6pmrU" --xquery 'json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/json(player_response)/streamingData/[{"format":"hls-0","container":"m3u8[manifest]","url":hlsManifestUrl},tail(tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]'
-[
-  {
-    "format": "hls-0",
-    "container": "m3u8[manifest]",
-    "url": "<url>"
-  },
-  {
-    "format": "hls-1",
-    "container": "m3u8[h264+aac]",
-    "resolution": "256x144@30fps",
-    "bitrate": "197kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "hls-2",
-    "container": "m3u8[h264+aac]",
-    "resolution": "426x240@30fps",
-    "bitrate": "338kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "hls-3",
-    "container": "m3u8[h264+aac]",
-    "resolution": "640x360@30fps",
-    "bitrate": "830kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "hls-4",
-    "container": "m3u8[h264+aac]",
-    "resolution": "854x480@30fps",
-    "bitrate": "1381kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "hls-5",
-    "container": "m3u8[h264+aac]",
-    "resolution": "1280x720@30fps",
-    "bitrate": "2594kbps",
-    "url": "<url>"
-  },
-  {
-    "format": "hls-6",
-    "container": "m3u8[h264+aac]",
-    "resolution": "1920x1080@30fps",
-    "bitrate": "4716kbps",
-    "url": "<url>"
-  }
-]
+$ xidel -s "https://www.youtube.com/watch?v=MdC976o12a4" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/(url_encoded_fmt_stream_map,adaptive_fmts) ! tokenize(.,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return if ($a/livestream="1") then {"name"://meta[@property="og:title"]/@content,"date":"'$(date +%d-%m-%Y)'","formats":$a/json(player_response)/streamingData/[{"format":"hls-0","container":"m3u8[manifest]","url":hlsManifestUrl},tail(tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]} else {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in reverse($b[quality]) return {"format":"pg-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":reverse(tokenize($a/fmt_list,",") ! substring-after(.,"/"))[$i],"url":$x/url},for $x at $i in $b[index] order by $x/boolean(size),$x/bitrate count $i return {"format":"dash-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)(?:\.|"")",(1,2)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/size ! concat(.,"@",$x/fps,"fps"),"samplerate":$x/audio_sample_rate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
+{
+  "name": "2019 ITTF Slovenia Open | Day 5 Morning",
+  "date": "12-05-2019",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://manifest.googlevideo.com/api/manifest/hls_variant/[...]/itag/0/[...]/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "256x144@30fps",
+      "bitrate": "197kbps",
+      "url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/[...]/itag/91/[...]/index.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "426x240@30fps",
+      "bitrate": "338kbps",
+      "url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/[...]/itag/92/[...]/index.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "640x360@30fps",
+      "bitrate": "830kbps",
+      "url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/[...]/itag/93/[...]/index.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "854x480@30fps",
+      "bitrate": "1381kbps",
+      "url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/[...]/itag/94/[...]/index.m3u8"
+    },
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720@30fps",
+      "bitrate": "2594kbps",
+      "url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/[...]/itag/95/[...]/index.m3u8"
+    }
+  ]
+}
 
 ------------------------------------------------------------------------------------------------
 
 https://www.youtube.com/watch?v=GuoxLggqI_g (video met ondertiteling)
 
-$ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" -e 'json(json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)'
+$ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args return $a/(json(player_response)//captionTracks)()[languageCode="nl"]'
 {
-  "playabilityStatus": {
-    "status": "OK",
-    "playableInEmbed": true
+  "baseUrl": "https://www.youtube.com/api/timedtext?[...]&lang=nl",
+  "name": {
+    "simpleText": "Nederlands"
   },
-  "streamingData": {
-    [...]
-  },
-  "captions": {
-    "playerCaptionsTracklistRenderer": {
-      "captionTracks": [
-        {
-          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&kind=asr&lang=de",
-          "name": {
-            "simpleText": "Duits (automatisch gegenereerd)"
-          },
-          "vssId": "a.de",
-          "languageCode": "de",
-          "kind": "asr",
-          "isTranslatable": true
-        },
-        {
-          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=de",
-          "name": {
-            "simpleText": "Duits"
-          },
-          "vssId": ".de",
-          "languageCode": "de",
-          "isTranslatable": true
-        },
-        {
-          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=en",
-          "name": {
-            "simpleText": "Engels"
-          },
-          "vssId": ".en",
-          "languageCode": "en",
-          "isTranslatable": true
-        },
-        {
-          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=nl",
-          "name": {
-            "simpleText": "Nederlands"
-          },
-          "vssId": ".nl",
-          "languageCode": "nl",
-          "isTranslatable": true
-        },
-        {
-          "baseUrl": "https://www.youtube.com/api/timedtext?caps=asr&hl=nl&expire=1554061864&asr_langs=en%2Cpt%2Cja%2Cnl%2Cko%2Cde%2Cfr%2Cit%2Cru%2Ces&key=yttt1&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&signature=C31F8CB502DDDD71B899B7E7DBBF686343242D80.DE18CA58A9CDB7BA6342A8E098C3BB98CFF69D14&lang=es",
-          "name": {
-            "simpleText": "Spaans"
-          },
-          "vssId": ".es",
-          "languageCode": "es",
-          "isTranslatable": true
-        }
-      ],
-      "audioTracks": [
-        {
-          "captionTrackIndices": [1, 2, 3, 4, 0],
-          "defaultCaptionTrackIndex": 3,
-          "visibility": "UNKNOWN",
-          "hasDefaultTrack": true
-        }
-      ],
-      "translationLanguages": [
-        {
-          "languageCode": "af",
-          "languageName": {
-            "simpleText": "Afrikaans"
-          }
-        },
-        [...]
-        {
-          "languageCode": "sv",
-          "languageName": {
-            "simpleText": "Zweeds"
-          }
-        }
-      ],
-      "defaultAudioTrackIndex": 0,
-      "contribute": {
-        "captionsMetadataRenderer": {
-          "addSubtitlesText": {
-            "runs": [
-              {
-                "text": "Ondertiteling toevoegen",
-                "navigationEndpoint": {
-                  "clickTrackingParams": "CAMQu2kiEwj8rL_atazhAhVXGeAKHb1jA_oo-B0=",
-                  "urlEndpoint": {
-                    "url": "/timedtext_video?ref=watch&v=GuoxLggqI_g"
-                  }
-                }
-              }
-            ]
-          },
-          "noSubtitlesText": {
-            "simpleText": "Deze video heeft nog geen ondertiteling."
-          },
-          "promoSubtitlesText": {
-            "simpleText": "Dien voor deze video ondertiteling in in je eigen taal, zodat deze meer mensen bereikt."
-          }
-        }
-      }
-    }
-  },
-  [...]
+  "vssId": ".nl",
+  "languageCode": "nl",
+  "isTranslatable": true
 }
 
-$ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'json(json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)/{"name":videoDetails/title,"date":format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":videoDetails/lengthSeconds * duration("PT1S") + time("00:00:00"),"subtitle":{"format":"ttml","url":(.//captionTracks)()[languageCode="nl"]/baseUrl}[url],"formats":streamingData/[for $x at $i in (formats)() order by $x/contentLength count $i return $x/{"format":"pg-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":if (.[itag="43"]) then () else round(bitrate div 1000)||"kbps","url":url},for $x at $i in (adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return $x/{"format":"dash-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)(?:\.|"")",(1,2)) return concat($a[1],"[",if ($a[2]="mp4a") then "aac" else if ($a[2]="avc1") then "h264" else $a[2],"]"),"resolution":if (width) then concat(width,"x",height,"@",fps,"fps") else (),"samplerate":if (audioSampleRate) then (audioSampleRate div 1000)||"kHz" else (),"bitrate":round(bitrate div 1000)||"kbps","url":url}]}'
+$ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/(url_encoded_fmt_stream_map,adaptive_fmts) ! tokenize(.,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return if ($a/livestream="1") then {"name"://meta[@property="og:title"]/@content,"date":"'$(date +%d-%m-%Y)'","formats":$a/json(player_response)/streamingData/[{"format":"hls-0","container":"m3u8[manifest]","url":hlsManifestUrl},tail(tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]} else {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"subtitle":{"format":"ttml","url":$a/(json(player_response)//captionTracks)()[languageCode="nl"]/baseUrl}[url],"formats":[for $x at $i in reverse($b[quality]) return {"format":"pg-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":reverse(tokenize($a/fmt_list,",") ! substring-after(.,"/"))[$i],"url":$x/url},for $x at $i in $b[index] order by $x/boolean(size),$x/bitrate count $i return {"format":"dash-"||$i,"container":let $a:=extract($x/type,"/(.+);.+""(\w+)(?:\.|"")",(1,2)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/size ! concat(.,"@",$x/fps,"fps"),"samplerate":$x/audio_sample_rate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
 {
   "name": "The Uncertainty Has Settled (Full film)",
-  "date": "08-11-2018",
+  "date": "07-11-2018",
   "duration": "01:28:26",
   "subtitle": {
     "format": "ttml",
-    "url": "https://www.youtube.com/api/timedtext?signature=58A4AC37ECDA87DE86A23874251DE4637A1C76D4.10AF6160BD774F066D3B593F8BD95A34701B3901&key=yttt1&asr_langs=de%2Cko%2Cit%2Cen%2Cja%2Cfr%2Ces%2Cru%2Cnl%2Cpt&v=GuoxLggqI_g&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&expire=1554093938&caps=asr&hl=nl&lang=nl"
+    "url": "https://www.youtube.com/api/timedtext?[...]&lang=nl"
   },
   "formats": [
     {
@@ -3325,7 +3172,7 @@ $ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'json(json(//s
       "container": "mp4[h264+aac]",
       "resolution": "640x360",
       "bitrate": "452kbps",
-      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&key=yt6&initcwndbps=1578750&txp=5531432&expire=1554072167&mt=1554050479&pl=15&itag=18&ms=au%2Crdu&requiressl=yes&mime=video%2Fmp4&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5306.015&mm=31%2C29&ip=x.x.x.x&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&c=WEB&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&lmt=1541631987878336&ipbits=0&mv=m&gir=yes&ratebypass=yes&clen=299745842&fvip=2&source=youtube&signature=856F444955E20D91CA2DF196EA1F18EAA341EFB0.841E759BD3C06B85718393D058361A62AB2DB9DF"
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=18[...]"
     },
     [...]
     {
@@ -3333,7 +3180,7 @@ $ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'json(json(//s
       "container": "mp4[h264+aac]",
       "resolution": "1280x720",
       "bitrate": "825kbps",
-      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&lmt=1541644163348912&key=yt6&txp=5531432&initcwndbps=1578750&ipbits=0&mv=m&source=youtube&expire=1554072167&ratebypass=yes&mt=1554050479&pl=15&itag=22&ms=au%2Crdu&requiressl=yes&mime=video%2Fmp4&fvip=2&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5306.015&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&mm=31%2C29&ip=x.x.x.x&signature=3657430445B4D81612CC6EFA4F6DC51BDBDE1A12.7D7ECC503C407847F5954AC8CA069E0184FD483A&c=WEB&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire"
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=22[...]"
     },
     {
       "format": "dash-1",
@@ -3341,7 +3188,7 @@ $ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'json(json(//s
       "resolution": null,
       "samplerate": "48kHz",
       "bitrate": "91kbps",
-      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&key=yt6&keepalive=yes&initcwndbps=1578750&txp=5511222&expire=1554072167&mt=1554050479&pl=15&itag=249&ms=au%2Crdu&requiressl=yes&mime=audio%2Fwebm&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5305.981&mm=31%2C29&ip=x.x.x.x&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&c=WEB&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&lmt=1541656049253798&ipbits=0&mv=m&gir=yes&clen=31280788&fvip=2&source=youtube&signature=33F399C8CACBEBBB4E3E4CAD401329FE701613C1.CBEEA9E070772A0CE8E92325FA20761B13BDF7F5"
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=249[...]"
     },
     [...]
     {
@@ -3350,521 +3197,113 @@ $ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'json(json(//s
       "resolution": "1920x1080@25fps",
       "samplerate": null,
       "bitrate": "4826kbps",
-      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?ei=Bu6gXNO2OJmPgAfMlqHwBQ&key=yt6&keepalive=yes&initcwndbps=1578750&txp=5533432&expire=1554072167&mt=1554050479&pl=15&itag=137&ms=au%2Crdu&requiressl=yes&mime=video%2Fmp4&id=o-AH8HVeIyZTVB9ZvFhtWhggu94_f0ZfjXcKje2FLd_FmB&dur=5305.960&aitags=133%2C134%2C135%2C136%2C137%2C160%2C242%2C243%2C244%2C247%2C248%2C278&mm=31%2C29&ip=x.x.x.x&mn=sn-mn4vg5aa-5hns%2Csn-5hne6ns6&c=WEB&sparams=aitags%2Cclen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&lmt=1541643237721896&ipbits=0&mv=m&gir=yes&clen=740553746&fvip=2&source=youtube&signature=72C2D3D09CE5F58080B7EC3A8F8B9C0E420CF487.AC50F49D5B79904B09EEF477513721672EAF0512"
+      "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?itag=137[...]"
     }
   ]
 }
+
 ------------------------------------------------------------------------------------------------
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'json(if (//meta[@property="og:restrictions:age"]) then let $a:=concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts) return tokenize(uri-decode(doc($a)),"&amp;") ! extract(.,"player_response=(.+)",1)[.] else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args/player_response)/{"name":videoDetails/title,"date":if (videoDetails/isLive) then "'$(date +%d-%m-%Y)'" else format-date(round(min(streamingData//lastModified) div 1000000) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":videoDetails[not(isLive)]/lengthSeconds * duration("PT1S") + time("00:00:00"),"subtitle":{"format":"ttml","url":(.//captionTracks)()[languageCode="nl"]/baseUrl}[url],"formats":streamingData/[for $x at $i in (formats)() order by $x/contentLength count $i return $x/{"format":"pg-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":if (.[itag="43"]) then () else round(bitrate div 1000)||"kbps","url":url},if (dashManifestUrl) then for $x at $i in doc(dashManifestUrl||"/disable_polymer/true")//Representation[matches(@id,"\d+")] order by $x/boolean(@width),$x/@bandwidth count $i return $x/{"format":"dash-"||$i,"container":concat(substring-after(../@mimeType,"/"),"[",extract(@codecs,"(^[\w]+)",1) ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":if (@width) then concat(@width,"x",@height,"@",@frameRate,"fps") else (),"samplerate":if (@audioSamplingRate) then (@audioSamplingRate div 1000)||"kHz" else (),"bitrate":round(@bandwidth div 1000)||"kbps","url":BaseUrl} else for $x at $i in (adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return $x/{"format":"dash-"||$i,"container":let $a:=extract(mimeType,"/(.+);.+?(\w+)(?:\.|"")",(1,2)) return concat($a[1],"[",if ($a[2]="mp4a") then "aac" else if ($a[2]="avc1") then "h264" else $a[2],"]"),"resolution":if (width) then concat(width,"x",height,"@",fps,"fps") else (),"samplerate":if (audioSampleRate) then (audioSampleRate div 1000)||"kHz" else (),"bitrate":round(bitrate div 1000)||"kbps","url":url},{"format":"hls-0","container":"m3u8[manifest]","url":hlsManifestUrl}[url],tail(tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")) ! {"format":"hls-"||position(),"container":"m3u8[h264+aac]","resolution":concat(extract(.,"RESOLUTION=([\dx]+)",1),"@",round(number(extract(.,"FRAME-RATE=([\d.]+)",1))),"fps"),"bitrate":round(extract(.,"BANDWIDTH=(\d+)",1) div 1000)||"kbps","url":extract(.,"(.+m3u8)",1)}]}'
-{
-  "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
-  "date": "01-02-2019",
-  "duration": "00:18:13",
-  "subtitle": null,
-  "formats": [
-    {
-      "format": "pg-1",
-      "container": "3gp[mp4v+aac]",
-      "resolution": "176x144",
-      "bitrate": "82kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?dur=1092.684&initcwndbps=1631250&pl=15&source=youtube&requiressl=yes&gir=yes&fvip=1&expire=1549758822&mime=video%2F3gpp&key=yt6&ipbits=0&lmt=1548978611083579&itag=17&mt=1549737053&mv=m&signature=D4947A55DF7DE68D594096B061A10448C00BFB11.079C5D1BEAF718E9CF890403F321EA329FE5A6F8&ms=au%2Crdu&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7s&c=WEB&id=o-AOyLIyOLt8i8cS-JrnCzTKic5_eCabEe3qqKf1KmLHZu&txp=2211222&clen=11222522&ip=x.x.x.x&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&ei=Bh1fXLCiJ4nPgQek5Y-4Bg"
-    },
-    {
-      "format": "pg-2",
-      "container": "3gp[mp4v+aac]",
-      "resolution": "320x180",
-      "bitrate": "226kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?dur=1092.684&initcwndbps=1631250&pl=15&source=youtube&requiressl=yes&gir=yes&fvip=1&expire=1549758822&mime=video%2F3gpp&key=yt6&ipbits=0&lmt=1548978611887433&itag=36&mt=1549737053&mv=m&signature=337E7434E41F0684B85C3EC347F7C4B9566AF318.9DB23D65CF8375B64AF747CA897DE1D7D05F29B6&ms=au%2Crdu&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7s&c=WEB&id=o-AOyLIyOLt8i8cS-JrnCzTKic5_eCabEe3qqKf1KmLHZu&txp=2211222&clen=30802449&ip=x.x.x.x&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&ei=Bh1fXLCiJ4nPgQek5Y-4Bg"
-    },
-    {
-      "format": "pg-3",
-      "container": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "489kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?dur=1092.661&initcwndbps=1631250&pl=15&source=youtube&ratebypass=yes&requiressl=yes&gir=yes&fvip=1&expire=1549758822&mime=video%2Fmp4&key=yt6&ipbits=0&lmt=1548978609684393&itag=18&mt=1549737053&mv=m&signature=CF12F8D7E99F8881BAE60768442B7BAC4D0AAE45.68C82F9E2D6176079BBCEC5ABC696A854F16667F&ms=au%2Crdu&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7s&c=WEB&id=o-AOyLIyOLt8i8cS-JrnCzTKic5_eCabEe3qqKf1KmLHZu&txp=2211222&clen=66756108&ip=x.x.x.x&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&ei=Bh1fXLCiJ4nPgQek5Y-4Bg"
-    },
-    {
-      "format": "pg-4",
-      "container": "webm[vp8+vorbis]",
-      "resolution": "640x360",
-      "bitrate": null,
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?dur=0.000&initcwndbps=1631250&pl=15&source=youtube&ratebypass=yes&requiressl=yes&gir=yes&fvip=1&expire=1549758822&mime=video%2Fwebm&key=yt6&ipbits=0&lmt=1548982696251964&itag=43&mt=1549737053&mv=m&signature=F114DF1FDA12F510E245D6AC22B9FC45C89995.ACC70506FD614DD314E24CE490FCB8CF3AD47F9E&ms=au%2Crdu&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7s&c=WEB&id=o-AOyLIyOLt8i8cS-JrnCzTKic5_eCabEe3qqKf1KmLHZu&txp=2201222&clen=104456295&ip=x.x.x.x&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&ei=Bh1fXLCiJ4nPgQek5Y-4Bg"
-    },
-    {
-      "format": "pg-5",
-      "container": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "1603kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?dur=1092.638&initcwndbps=1631250&pl=15&source=youtube&ratebypass=yes&mv=m&signature=7C6F1FB2F7D6C88227CB0063987199B83B4863B0.7BFC2A609AD9C16A6DE3E920C789FE21D7FEA1CC&ms=au%2Crdu&mm=31%2C29&requiressl=yes&c=WEB&ipbits=0&fvip=1&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7s&id=o-AOyLIyOLt8i8cS-JrnCzTKic5_eCabEe3qqKf1KmLHZu&txp=2216222&expire=1549758822&mime=video%2Fmp4&key=yt6&ip=x.x.x.x&mt=1549737053&lmt=1548979118812685&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&ei=Bh1fXLCiJ4nPgQek5Y-4Bg&itag=22"
-    },
-    {
-      "format": "dash-1",
-      "container": "mp4[aac]",
-      "resolution": null,
-      "samplerate": "22.05kHz",
-      "bitrate": "51kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/139/source/youtube/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/audio%2Fmp4/otfp/1/gir/yes/clen/6663680/lmt/1548978770075323/dur/1092.684/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/20CFECEFFDA4974E8EF9ADA8F3D464B97E34F538.1D18EBF41FCF1BD41C9568D3D20C3DFB74112ADB/key/dg_yt0/"
-    },
-    {
-      "format": "dash-2",
-      "container": "mp4[aac]",
-      "resolution": null,
-      "samplerate": "44.1kHz",
-      "bitrate": "131kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/140/source/youtube/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/audio%2Fmp4/otfp/1/gir/yes/clen/17683882/lmt/1548978771474489/dur/1092.638/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/7634564956B37D2C680A27D629304EC0631E3534.3BE34846B67FFA9B81C0634DE7AC4959012FDE12/key/dg_yt0/"
-    },
-    {
-      "format": "dash-3",
-      "container": "webm[vp9]",
-      "resolution": "256x144@25fps",
-      "samplerate": null,
-      "bitrate": "95kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/278/source/yt_otf/requiressl/yes/pl/15/initcwndbps/1782500/mv/m/ms/au,rdu/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/mm/31,29/ei/KfigXNaKCpWdgAf6rKaQBQ/ratebypass/yes/mime/video%2Fwebm/otfp/1/otf/1/lmt/1548978905736975/mt/1554053060/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1554074761/sparams/ip,ipbits,expire,id,itag,source,requiressl,pl,initcwndbps,mv,ms,mn,mm,ei,ratebypass,mime,otfp,otf,lmt/signature/1E9C278CD31E1E130FEEEF373FE8309D17A3AB3F.1B2A763DF8BC81A48A3DA39962FE1DB7C9C52012/key/dg_yt0/"
-    },
-    {
-      "format": "dash-4",
-      "container": "mp4[h264]",
-      "resolution": "256x144@25fps",
-      "samplerate": null,
-      "bitrate": "108kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/160/source/yt_otf/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/video%2Fmp4/otfp/1/otf/1/lmt/1548978905736975/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,otf,lmt/signature/104EB8B8D9DF68CDEC2FB85C2BE7B932CCC4C43F.601C57AD4676CE4917E891298311635E29F3B3BE/key/dg_yt0/"
-    },
-    {
-      "format": "dash-5",
-      "container": "webm[vp9]",
-      "resolution": "426x240@25fps",
-      "samplerate": null,
-      "bitrate": "221kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/242/source/yt_otf/requiressl/yes/pl/15/initcwndbps/1782500/mv/m/ms/au,rdu/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/mm/31,29/ei/KfigXNaKCpWdgAf6rKaQBQ/ratebypass/yes/mime/video%2Fwebm/otfp/1/otf/1/lmt/1548978905736975/mt/1554053060/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1554074761/sparams/ip,ipbits,expire,id,itag,source,requiressl,pl,initcwndbps,mv,ms,mn,mm,ei,ratebypass,mime,otfp,otf,lmt/signature/115C02CAD4F13E67A7276D380B01F0692575F25E.616DE04E5CB65324A9620F77CB581771CD4369BF/key/dg_yt0/"
-    },
-    {
-      "format": "dash-6",
-      "container": "mp4[h264]",
-      "resolution": "426x240@25fps",
-      "samplerate": null,
-      "bitrate": "242kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/133/source/yt_otf/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/video%2Fmp4/otfp/1/otf/1/lmt/1548978905736975/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,otf,lmt/signature/3E73EDB00FC2CBBACCB01F5B9238EB23D0986D24.193D84ABA7735F1EE5C47944AA46C3B4744C8076/key/dg_yt0/"
-    },
-    {
-      "format": "dash-7",
-      "container": "webm[vp9]",
-      "resolution": "640x360@25fps",
-      "samplerate": null,
-      "bitrate": "406kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/243/source/yt_otf/requiressl/yes/pl/15/initcwndbps/1782500/mv/m/ms/au,rdu/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/mm/31,29/ei/KfigXNaKCpWdgAf6rKaQBQ/ratebypass/yes/mime/video%2Fwebm/otfp/1/otf/1/lmt/1548978905736975/mt/1554053060/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1554074761/sparams/ip,ipbits,expire,id,itag,source,requiressl,pl,initcwndbps,mv,ms,mn,mm,ei,ratebypass,mime,otfp,otf,lmt/signature/5DE358D01B3BA2C0271221DCCCA61071F972BC61.1EC71AF5AD77C8548CC071DCD6CF4F0084411E54/key/dg_yt0/"
-    },
-    {
-      "format": "dash-8",
-      "container": "mp4[h264]",
-      "resolution": "640x360@25fps",
-      "samplerate": null,
-      "bitrate": "613kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/134/source/youtube/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/video%2Fmp4/otfp/1/gir/yes/clen/43381806/lmt/1548978905731670/dur/1092.600/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/808FA1B02B5FA26F8EF5C201EAEFBD3BACC2220D.3E7B4F85D2F6A586D4E22EAF29C95FEE924B8F97/key/dg_yt0/"
-    },
-    {
-      "format": "dash-9",
-      "container": "webm[vp9]",
-      "resolution": "854x480@25fps",
-      "samplerate": null,
-      "bitrate": "753kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/244/source/yt_otf/requiressl/yes/pl/15/initcwndbps/1782500/mv/m/ms/au,rdu/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/mm/31,29/ei/KfigXNaKCpWdgAf6rKaQBQ/ratebypass/yes/mime/video%2Fwebm/otfp/1/otf/1/lmt/1548978905736975/mt/1554053060/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1554074761/sparams/ip,ipbits,expire,id,itag,source,requiressl,pl,initcwndbps,mv,ms,mn,mm,ei,ratebypass,mime,otfp,otf,lmt/signature/0D9EA7B4641A0D501C127DCA3654B9ACCA286532.612685B4DFD4D0C43131F39145DFEFCED5B0A1EB/key/dg_yt0/"
-    },
-    {
-      "format": "dash-10",
-      "container": "mp4[h264]",
-      "resolution": "854x480@25fps",
-      "samplerate": null,
-      "bitrate": "1155kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/135/source/yt_otf/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/video%2Fmp4/otfp/1/otf/1/lmt/1548978905736975/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,otf,lmt/signature/604E9621CE0583CEB7B775BC6F1CC85294BE2B0E.18630B3226A21DDF03D1AD2CFC7FEAB5DD3E7736/key/dg_yt0/"
-    },
-    {
-      "format": "dash-11",
-      "container": "webm[vp9]",
-      "resolution": "1280x720@25fps",
-      "samplerate": null,
-      "bitrate": "1505kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/247/source/yt_otf/requiressl/yes/pl/15/initcwndbps/1782500/mv/m/ms/au,rdu/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/mm/31,29/ei/KfigXNaKCpWdgAf6rKaQBQ/ratebypass/yes/mime/video%2Fwebm/otfp/1/otf/1/lmt/1548978905736975/mt/1554053060/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1554074761/sparams/ip,ipbits,expire,id,itag,source,requiressl,pl,initcwndbps,mv,ms,mn,mm,ei,ratebypass,mime,otfp,otf,lmt/signature/6DE7F5F8A8EA7CA6D8DB018551B29D291EA52D16.01A102B1F08EF934D9A0E9E77A2C30977D849860/key/dg_yt0/"
-    },
-    {
-      "format": "dash-12",
-      "container": "mp4[h264]",
-      "resolution": "1280x720@25fps",
-      "samplerate": null,
-      "bitrate": "2310kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/136/source/yt_otf/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/video%2Fmp4/otfp/1/otf/1/lmt/1548978905736975/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,otf,lmt/signature/76355BA9C8CE0E3F1CA8C802E54FE7E70352D9B8.2DD87F8AA56BF3B0A5D2E20A518E5BE01304C842/key/dg_yt0/"
-    },
-    {
-      "format": "dash-13",
-      "container": "webm[vp9]",
-      "resolution": "1280x720@50fps",
-      "samplerate": null,
-      "bitrate": "2646kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/302/source/yt_otf/requiressl/yes/pl/15/initcwndbps/1782500/mv/m/ms/au,rdu/mn/sn-mn4vg5aa-5hns,sn-5hne6ns6/mm/31,29/ei/KfigXNaKCpWdgAf6rKaQBQ/ratebypass/yes/mime/video%2Fwebm/otfp/1/otf/1/lmt/1548978905736975/mt/1554053060/fvip/1/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1554074761/sparams/ip,ipbits,expire,id,itag,source,requiressl,pl,initcwndbps,mv,ms,mn,mm,ei,ratebypass,mime,otfp,otf,lmt/signature/4240FEFBC7BC64801EB73BB5DFC0055B559A4D56.82FCA06BB520869F5389CAA452AD62C0D33D4390/key/dg_yt0/"
-    },
-    {
-      "format": "dash-14",
-      "container": "mp4[h264]",
-      "resolution": "1280x720@50fps",
-      "samplerate": null,
-      "bitrate": "2866kbps",
-      "url": "https://r4---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/id/9c6fcbb42451676d/itag/298/source/youtube/requiressl/yes/initcwndbps/1631250/pl/15/mv/m/ms/au,rdu/mm/31,29/mn/sn-mn4vg5aa-5hns,sn-5hnekn7s/ei/Bh1fXLCiJ4nPgQek5Y-4Bg/ratebypass/yes/mime/video%2Fmp4/otfp/1/gir/yes/clen/214600383/lmt/1548978905736975/dur/1092.580/fvip/1/mt/1549737053/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1549758822/sparams/ip,ipbits,expire,id,itag,source,requiressl,initcwndbps,pl,mv,ms,mm,mn,ei,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/2D0A6E57DE795D101CBB7AB42812BF4D59080D38.575112699B6ADAF94ABA0B32B19FE42F47260F3C/key/dg_yt0/"
-    }
-  ]
-}
-
-$ xidel -s "https://www.youtube.com/watch?v=5jOjwN_uJt0" --xquery '[...]'
-{
-  "name": "Delta Impuls 1 - De Treffers '70 2 (Noordelijke 2e Divisie, 07-02-2014)",
-  "date": "08-09-2015",
-  "duration": "00:18:47",
-  "subtitle": null,
-  "formats": [
-    {
-      "format": "pg-1",
-      "container": "3gp[mp4v+aac]",
-      "resolution": "176x144",
-      "bitrate": "83kbps",
-      "url": "https://r3---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?pl=15&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&source=youtube&initcwndbps=1236250&c=WEB&id=o-AIstRAa6K6c0Hm-q7F9gUeY5HJ7bxWiOTOc1giJZutlF&expire=1549742862&ip=x.x.x.x&lmt=1441749284641801&ei=rt5eXOq0ItTMgAebxbaYBw&dur=1127.235&mt=1549721136&mv=m&ms=au%2Crdu&key=yt6&signature=79D5955FF71BD16F5A95547851BA5BC02A6823A8.35423E399281706935B525009BDA6E596D30E5F0&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7d&itag=17&gir=yes&clen=11635486&mm=31%2C29&mime=video%2F3gpp&ipbits=0&fvip=1&requiressl=yes"
-    },
-    [...]
-    {
-      "format": "pg-5",
-      "container": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "3kbps",
-      "url": "https://r3---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?dur=1127.166&pl=15&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&source=youtube&initcwndbps=1236250&mv=m&ms=au%2Crdu&key=yt6&signature=13AC49E30F4678DC1D7D0DF4178FD64E68987469.6AAFDFB9FB1138E08F9D7F1145D32B135A91E409&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7d&itag=22&c=WEB&mm=31%2C29&mime=video%2Fmp4&id=o-AIstRAa6K6c0Hm-q7F9gUeY5HJ7bxWiOTOc1giJZutlF&expire=1549742862&ipbits=0&fvip=1&ip=x.x.x.x&lmt=1471212014981809&requiressl=yes&ratebypass=yes&mt=1549721136&ei=rt5eXOq0ItTMgAebxbaYBw"
-    },
-    {
-      "format": "dash-1",
-      "container": "webm[opus]",
-      "resolution": null,
-      "samplerate": "48kHz",
-      "bitrate": "53kbps",
-      "url": "https://r3---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?pl=15&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&source=youtube&initcwndbps=1236250&keepalive=yes&c=WEB&id=o-AIstRAa6K6c0Hm-q7F9gUeY5HJ7bxWiOTOc1giJZutlF&expire=1549742862&ip=x.x.x.x&lmt=1441752806379607&ei=rt5eXOq0ItTMgAebxbaYBw&dur=1127.101&mt=1549721136&mv=m&ms=au%2Crdu&key=yt6&signature=D68D7638F50EBB2ADE96D7A6B1FA4E8217615D7F.314D24819328E12B854E6F5FF6B4DA889E4D6EF0&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7d&itag=249&gir=yes&clen=6884987&mm=31%2C29&mime=audio%2Fwebm&ipbits=0&fvip=1&requiressl=yes"
-    },
-    [...]
-    {
-      "format": "dash-17",
-      "container": "mp4[h264]",
-      "resolution": "1280x720@50fps",
-      "samplerate": null,
-      "bitrate": "3307kbps",
-      "url": "https://r3---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?pl=15&sparams=aitags%2Cclen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&source=youtube&initcwndbps=1236250&keepalive=yes&c=WEB&id=o-AIstRAa6K6c0Hm-q7F9gUeY5HJ7bxWiOTOc1giJZutlF&aitags=133%2C134%2C135%2C136%2C160%2C242%2C243%2C244%2C247%2C278%2C298%2C302&ip=x.x.x.x&lmt=1441750875452025&ei=rt5eXOq0ItTMgAebxbaYBw&dur=1127.100&mt=1549721136&mv=m&ms=au%2Crdu&key=yt6&signature=C355EBFEE568DC3D179C9ADC3D916CA1BF632056.14A6B00BE2C5C7013B3BC78B60047740997173AB&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7d&itag=298&gir=yes&clen=356351764&mm=31%2C29&mime=video%2Fmp4&expire=1549742862&ipbits=0&fvip=1&requiressl=yes"
-    }
-  ]
-}
-
-$ xidel -s "https://www.youtube.com/watch?v=2U5mf_fEKiU" --xquery '[...]'
-{
-  "name": "Allow embedding, Age restriction",
-  "date": "18-09-2018",
-  "duration": "00:00:20",
-  "subtitle": null,
-  "formats": [
-    {
-      "format": "pg-1",
-      "container": "3gp[mp4v+aac]",
-      "resolution": "176x144",
-      "bitrate": "81kbps",
-      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?signature=2C60ECB9B0094C16061450E092B4CAC44988604A.6ABA0842F4873DCB4720AEE1E26353E92D77E7D3&ei=LEJoXKqgGcyd1gKm6KOYDQ&mn=sn-mn4vg5aa-5hnl%2Csn-5hnekn7l&mm=31%2C29&ipbits=0&mv=m&mt=1550336458&ms=au%2Crdu&clen=203274&expire=1550358156&requiressl=yes&initcwndbps=1436250&gir=yes&pl=20&source=youtube&txp=2211222&c=WEB&mime=video%2F3gpp&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&fvip=3&key=yt6&ip=x.x.x.x&lmt=1537272334217807&dur=20.108&itag=17&beids=9466587&id=o-AKZV_W9mJl51PdfsI3DvehEKv9F4VY3djNy2b5dURdn4"
-    },
-    [...]
-    {
-      "format": "pg-5",
-      "container": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2697kbps",
-      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?mime=video%2Fmp4&signature=E0A1C34D64CC0E94027E54EBD173261EEBADBA8B.DEAC54ACD3933B6E70EB4B710D6716B72A182917&requiressl=yes&mn=sn-mn4vg5aa-5hnl%2Csn-5hnekn7l&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&fvip=3&ipbits=0&mv=m&txp=2211222&mt=1550336458&ms=au%2Crdu&dur=20.085&ei=LEJoXKqgGcyd1gKm6KOYDQ&expire=1550358156&initcwndbps=1436250&key=yt6&ip=x.x.x.x&itag=22&lmt=1537272423660508&source=youtube&ratebypass=yes&pl=20&beids=9466587&id=o-AKZV_W9mJl51PdfsI3DvehEKv9F4VY3djNy2b5dURdn4&mm=31%2C29&c=WEB"
-    },
-    {
-      "format": "dash-1",
-      "container": "mp4[aac]",
-      "resolution": null,
-      "samplerate": "22.05kHz",
-      "bitrate": "49kbps",
-      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback/id/d94e667ff7c42a25/itag/139/source/youtube/requiressl/yes/mn/sn-mn4vg5aa-5hnl,sn-5hnekn7l/mv/m/ms/au,rdu/ei/LEJoXKqgGcyd1gKm6KOYDQ/initcwndbps/1436250/pl/20/mm/31,29/ratebypass/yes/mime/audio%2Fmp4/otfp/1/gir/yes/clen/121176/lmt/1537272325927074/dur/20.154/fvip/3/mt/1550336458/beids/9466587/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1550358156/sparams/ip,ipbits,expire,id,itag,source,requiressl,mn,mv,ms,ei,initcwndbps,pl,mm,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/2A5F24AC506C0E051E4CE89646283083EAE42EA4.7FBB667AD8F95B3383324B18FBBBCEB4C056DA62/key/dg_yt0/"
-    },
-    [...]
-    {
-      "format": "dash-10",
-      "container": "mp4[h264]",
-      "resolution": "1920x1080@60fps",
-      "samplerate": null,
-      "bitrate": "5813kbps",
-      "url": "https://r1---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback/id/d94e667ff7c42a25/itag/299/source/youtube/requiressl/yes/mn/sn-mn4vg5aa-5hnl,sn-5hnekn7l/mv/m/ms/au,rdu/ei/LEJoXKqgGcyd1gKm6KOYDQ/initcwndbps/1436250/pl/20/mm/31,29/ratebypass/yes/mime/video%2Fmp4/otfp/1/gir/yes/clen/13961574/lmt/1537272379096048/dur/20.019/fvip/3/mt/1550336458/beids/9466587/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1550358156/sparams/ip,ipbits,expire,id,itag,source,requiressl,mn,mv,ms,ei,initcwndbps,pl,mm,ratebypass,mime,otfp,gir,clen,lmt,dur/signature/069489D4B0EEB19615692CD20A37FDB9161C07C5.228054DA8CC672AA874A0527BD4956C262A61BE2/key/dg_yt0/"
-    }
-  ]
-}
-
-$ xidel -s "https://www.youtube.com/watch?v=sN6bdk6pmrU" --xquery '[...]'
-{
-  "name": "NK Tafeltennis 2019 - Finale dag",
-  "date": "03-03-2019",
-  "duration": null,
-  "subtitle": null,
-  "formats": [
-    {
-      "format": "dash-1",
-      "container": "mp4[aac]",
-      "resolution": null,
-      "samplerate": "24kHz",
-      "bitrate": "64kbps",
-      "url": "https://r1---sn-mn4vg5aa-5hnz.googlevideo.com/videoplayback/id/sN6bdk6pmrU.1/itag/139/source/yt_live_broadcast/requiressl/yes/ei/k-B7XMjGL42KgAf40pe4CQ/gcr/nl/playlist_type/DVR/ratebypass/yes/cmbypass/yes/mime/audio%2Fmp4/live/1/gir/yes/noclen/1/dur/5.000/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1551643891/sparams/cmbypass,dur,ei,expire,gcr,gir,id,initcwndbps,ip,ipbits,itag,live,mime,mm,mn,ms,mv,noclen,pl,playlist_type,ratebypass,requiressl,source/signature/78F449B46C09ED183256B21701D6EEDF450F2004.5E483737D68850C1BE57E990E976285BBED62154/key/cms1/initcwndbps/11430/mm/32/mn/sn-mn4vg5aa-5hnz/ms/lv/mt/1551622169/mv/m/pl/15/"
-    },
-    [...]
-    {
-      "format": "dash-8",
-      "container": "mp4[h264]",
-      "resolution": "1920x1080@30fps",
-      "samplerate": null,
-      "bitrate": "4347kbps",
-      "url": "https://r1---sn-mn4vg5aa-5hnz.googlevideo.com/videoplayback/id/sN6bdk6pmrU.1/itag/137/source/yt_live_broadcast/requiressl/yes/ei/k-B7XMjGL42KgAf40pe4CQ/gcr/nl/playlist_type/DVR/ratebypass/yes/cmbypass/yes/mime/video%2Fmp4/live/1/gir/yes/noclen/1/dur/5.000/disable_polymer/true/ip/x.x.x.x/ipbits/0/expire/1551643891/sparams/cmbypass,dur,ei,expire,gcr,gir,id,initcwndbps,ip,ipbits,itag,live,mime,mm,mn,ms,mv,noclen,pl,playlist_type,ratebypass,requiressl,source/signature/3265E98D1F4533543D11C1E2EF2B8EAB35CB6AE4.164AD248B3A084838DE6CAFE02D26BB53DCBCE24/key/cms1/initcwndbps/11430/mm/32/mn/sn-mn4vg5aa-5hnz/ms/lv/mt/1551622169/mv/m/pl/15/"
-    },
-    {
-      "format": "hls-0",
-      "container": "m3u8[manifest]",
-      "url": "https://manifest.googlevideo.com/api/manifest/hls_variant/maudio/1/keepalive/yes/dover/11/key/yt6/ip/x.x.x.x/signature/CF761F4EFF9E65B65DA0C83B30E08E8929DAE8CB.E23634A005C3130C93F295E0F6E05469A303F0B5/ratebypass/yes/ipbits/0/sparams/ei%2Cgcr%2Cgo%2Chfr%2Cid%2Cip%2Cipbits%2Citag%2Cmaudio%2Cplaylist_type%2Cratebypass%2Crequiressl%2Csource%2Cexpire/hfr/1/ei/k-B7XMjGL42KgAf40pe4CQ/id/sN6bdk6pmrU.1/itag/0/gcr/nl/expire/1551643891/go/1/source/yt_live_broadcast/playlist_type/DVR/requiressl/yes/file/index.m3u8"
-    },
-    [...]
-    {
-      "format": "hls-6",
-      "container": "m3u8[h264+aac]",
-      "resolution": "1920x1080@30fps",
-      "bitrate": "4716kbps",
-      "url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/id/sN6bdk6pmrU.1/itag/96/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/cmbypass/yes/goi/160/sgoap/gir%3Dyes%3Bitag%3D140/sgovp/gir%3Dyes%3Bitag%3D137/hls_chunk_host/r1---sn-mn4vg5aa-5hnz.googlevideo.com/ei/k-B7XMjGL42KgAf40pe4CQ/gcr/nl/playlist_type/DVR/initcwndbps/11430/mm/32/mn/sn-mn4vg5aa-5hnz/ms/lv/mv/m/pl/15/dover/11/keepalive/yes/mt/1551622169/ip/x.x.x.x/ipbits/0/expire/1551643891/sparams/ip,ipbits,expire,id,itag,source,requiressl,ratebypass,live,cmbypass,goi,sgoap,sgovp,hls_chunk_host,ei,gcr,playlist_type,initcwndbps,mm,mn,ms,mv,pl/signature/90DB35EC3855A2A45C42034F62925C2D74672769.88AF73E778B0469A0339DD9D3AF17DA33BE973B1/key/dg_yt0/playlist/index.m3u8"
-    }
-  ]
-}
-
-$ ./bashgemist.sh -i https://www.youtube.com/watch?v=nG_LtCRRZ20
-Naam:      Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
-Datum:     01-02-2019
-Tijdsduur: 00:18:13
-Formaten:  formaat  container         resolutie       frequentie  bitrate
-           pg-1     3gp[mp4v+aac]     176x144                     82kbps
-           pg-2     3gp[mp4v+aac]     320x180                     226kbps
-           pg-3     mp4[h264+aac]     640x360                     489kbps
-           pg-4     webm[vp8+vorbis]  640x360
-           pg-5     mp4[h264+aac]     1280x720                    1603kbps
-           dash-1   mp4[aac]                          22.05kHz    51kbps
-           dash-2   mp4[aac]                          44.1kHz     131kbps
-           dash-3   webm[vp9]         256x144@25fps               95kbps
-           dash-4   mp4[h264]         256x144@25fps               108kbps
-           dash-5   webm[vp9]         426x240@25fps               221kbps
-           dash-6   mp4[h264]         426x240@25fps               242kbps
-           dash-7   webm[vp9]         640x360@25fps               406kbps
-           dash-8   mp4[h264]         640x360@25fps               613kbps
-           dash-9   webm[vp9]         854x480@25fps               753kbps
-           dash-10  mp4[h264]         854x480@25fps               1155kbps
-           dash-11  webm[vp9]         1280x720@25fps              1505kbps
-           dash-12  mp4[h264]         1280x720@25fps              2310kbps
-           dash-13  webm[vp9]         1280x720@50fps              2646kbps
-           dash-14  mp4[h264]         1280x720@50fps              2866kbps  (best)
+$ ./bashgemist.sh -i https://www.youtube.com/watch?v=GuoxLggqI_g
+Naam:          The Uncertainty Has Settled (Full film)
+Datum:         07-11-2018
+Tijdsduur:     01:28:26
+Ondertiteling: ttml
+Formaten:      formaat  container         resolutie        frequentie  bitrate
+               pg-1     mp4[h264+aac]     640x360
+               pg-2     webm[vp8+vorbis]  640x360
+               pg-3     mp4[h264+aac]     1280x720
+               dash-1   webm[opus]                         48kHz       91kbps
+               dash-2   webm[opus]                         48kHz       109kbps
+               dash-3   mp4[aac]                           44.1kHz     135kbps
+               dash-4   webm[vorbis]                       44.1kHz     145kbps
+               dash-5   webm[opus]                         48kHz       176kbps
+               dash-6   webm[vp9]         256x144@25fps                102kbps
+               dash-7   mp4[h264]         256x144@25fps                115kbps
+               dash-8   webm[vp9]         426x240@25fps                233kbps
+               dash-9   mp4[h264]         426x240@25fps                337kbps
+               dash-10  webm[vp9]         640x360@25fps                431kbps
+               dash-11  mp4[h264]         640x360@25fps                740kbps
+               dash-12  webm[vp9]         854x480@25fps                776kbps
+               dash-13  mp4[h264]         854x480@25fps                1357kbps
+               dash-14  webm[vp9]         1280x720@25fps               1619kbps
+               dash-15  mp4[h264]         1280x720@25fps               2402kbps
+               dash-16  webm[vp9]         1920x1080@25fps              2882kbps
+               dash-17  mp4[h264]         1920x1080@25fps              4826kbps  (best)
 
 ------------------------------------------------------------------------------------------------
 
 --xquery '
-  json(
-    if (//meta[@property="og:restrictions:age"]) then
-      let $a:=concat(
-        "https://www.youtube.com/get_video_info?video_id=",
-        //meta[@itemprop="videoId"]/@content,
-        "&amp;eurl=",
-        uri-encode(
-          "https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content
-        ),
-        "&amp;sts=",
-        json(
-          doc(
-            "https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content
-          )//script/extract(
-            .,
-            "setConfig\((.+?)\)",
-            1,"*"
-          )[3]
-        )//sts
-      ) return
-      tokenize(
-        uri-decode(
-          doc($a)
-        ),
-        "&amp;"
-      ) ! extract(
-        .,
-        "player_response=(.+)",
-        1
-      )[.]
-    else
-      json(
-        //script/extract(
-          .,
-          "ytplayer.config = (.+?\});",
-          1
-        )[.]
-      )/args/player_response
-  )/{
-    "name":videoDetails/title,
-    "date":if (videoDetails/isLive) then
-      "'$(date +%d-%m-%Y)'"
-    else
-      format-date(
-        round(
-          min(streamingData//lastModified) div 1000000
-        ) * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
-        "[D01]-[M01]-[Y]"
-      ),
-    "duration":videoDetails[not(isLive)]/lengthSeconds * duration("PT1S") + time("00:00:00"),
-    "subtitle":{
-      "format":"ttml",
-      "url":(.//captionTracks)()[languageCode="nl"]/baseUrl
-    }[url],
-    "formats":streamingData/[
-      for $x at $i in (formats)()
-      order by $x/contentLength
-      count $i
-      return
-      $x/{
-        "format":"pg-"||$i,
-        "container":let $a:=extract(
-          mimeType,
-          "/(.+);.+?(\w+)\..+ (\w+)(?:\.|"")",
-          (1 to 3)
-        ) return
-        concat(
-          if ($a[1]="3gpp") then
-            "3gp"
-          else
-            $a[1],
-          "[",
-          if ($a[2]="avc1") then
-            "h264"
-          else
-            $a[2],
-          "+",
-          if ($a[3]="mp4a") then
-            "aac"
-          else
-            $a[3],
-          "]"
-        ),
-        "resolution":concat(
-          width,
-          "x",
-          height
-        ),
-        "bitrate":if (.[itag="43"]) then
-          ()
-        else
-          round(
-            bitrate div 1000
-          )||"kbps",
-        "url":url
-      },
-      if (dashManifestUrl) then
-        for $x at $i in doc(
-          dashManifestUrl||"/disable_polymer/true"
-        )//Representation[
-          matches(
-            @id,
-            "\d+"
+  let $a:=if (//meta[@property="og:restrictions:age"]) then
+        {|
+          for $x in tokenize(
+            unparsed-text(
+              concat(
+                "https://www.youtube.com/get_video_info?video_id=",
+                //meta[@itemprop="videoId"]/@content,
+                "&amp;eurl=",
+                uri-encode(
+                  "https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content
+                ),
+                "&amp;sts=",
+                json(
+                  doc(
+                    "https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content
+                  )//script/extract(
+                    .,
+                    "setConfig\((.+?)\)",
+                    1,"*"
+                  )[3]
+                )//sts
+              )
+            ),
+            "&amp;"
           )
-        ]
-        order by $x/boolean(@width),
-                 $x/@bandwidth
-        count $i
-        return
-        $x/{
-          "format":"dash-"||$i,
-          "container":concat(
-            substring-after(
-              ../@mimeType,
-              "/"
-            ),
-            "[",
-            extract(
-              @codecs,
-              "(^[\w]+)",
-              1
-            ) ! (
-              if (.="mp4a") then
-                "aac"
-              else if (.="avc1") then
-                "h264"
-              else
-                .
-            ),
-            "]"
-          ),
-          "resolution":if (@width) then
-            concat(
-              @width,
-              "x",
-              @height,
-              "@",
-              @frameRate,
-              "fps"
-            )
-          else
-            (),
-          "samplerate":if (@audioSamplingRate) then
-            (@audioSamplingRate div 1000)||"kHz"
-          else
-            (),
-          "bitrate":round(
-            @bandwidth div 1000
-          )||"kbps",
-          "url":BaseUrl
-        }
+          let $a:=tokenize(
+            $x,
+            "="
+          )
+          return {
+            $a[1]:uri-decode($a[2])
+          }
+        |}
       else
-        for $x at $i in (adaptiveFormats)()
-        order by $x/boolean(width),
-                 $x/bitrate
-        count $i
-        return
-        $x/{
-          "format":"dash-"||$i,
-          "container":let $a:=extract(
-            mimeType,
-            "/(.+);.+?(\w+)(?:\.|"")",
-            (1,2)
-          ) return
-          concat(
-            $a[1],
-            "[",
-            if ($a[2]="mp4a") then
-              "aac"
-            else if ($a[2]="avc1") then
-              "h264"
-            else
-              $a[2],
-            "]"
-          ),
-          "resolution":if (width) then
-            concat(
-              width,
-              "x",
-              height,
-              "@",
-              fps,
-              "fps"
-            )
-          else
-            (),
-          "samplerate":if (audioSampleRate) then
-            (audioSampleRate div 1000)||"kHz"
-          else
-            (),
-          "bitrate":round(
-            bitrate div 1000
-          )||"kbps",
-          "url":url
-        },
+        json(
+          //script/extract(
+            .,
+            "ytplayer.config = (.+?\});",
+            1
+          )[.]
+        )/args,
+      $b:=$a/(
+        url_encoded_fmt_stream_map,
+        adaptive_fmts
+      ) ! tokenize(
+        .,
+        ","
+      ) ! {|
+        for $x in tokenize(
+          .,
+          "&amp;"
+        )
+        let $a:=tokenize(
+          $x,
+          "="
+        )
+        return {
+          $a[1]:uri-decode($a[2])
+        }
+      |}
+  return
+  if ($a/livestream="1") then {
+    "name"://meta[@property="og:title"]/@content,
+    "date":"'$(date +%d-%m-%Y)'",
+    "formats":$a/json(player_response)/streamingData/[
       {
         "format":"hls-0",
         "container":"m3u8[manifest]",
         "url":hlsManifestUrl
-      }[url],
+      },
       tail(
         tokenize(
           unparsed-text(hlsManifestUrl),
@@ -3903,6 +3342,94 @@ Formaten:  formaat  container         resolutie       frequentie  bitrate
           "(.+m3u8)",
           1
         )
+      }
+    ]
+  } else {
+    "name"://meta[@property="og:title"]/@content,
+    "date":format-date(
+      date(//meta[@itemprop="datePublished"]/@content),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),
+    "subtitle":{
+      "format":"ttml",
+      "url":$a/(json(player_response)//captionTracks)()[languageCode="nl"]/baseUrl
+    }[url],
+    "formats":[
+      for $x at $i in reverse($b[quality]) return {
+        "format":"pg-"||$i,
+        "container":let $a:=extract(
+          $x/type,
+          "/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",
+          (1 to 3)
+        ) return
+        concat(
+          if ($a[1]="3gpp") then
+            "3gp"
+          else
+            $a[1],
+          "[",
+          if ($a[2]="avc1") then
+            "h264"
+          else
+            $a[2],
+          "+",
+          if ($a[3]="mp4a") then
+            "aac"
+          else
+            $a[3],
+          "]"
+        ),
+        "resolution":reverse(
+          tokenize(
+            $a/fmt_list,
+            ","
+          ) ! substring-after(
+            .,
+            "/"
+          )
+        )[$i],
+        "url":$x/url
+      },
+      for $x at $i in $b[index]
+      order by $x/boolean(size),
+               $x/bitrate
+      count $i
+      return {
+        "format":"dash-"||$i,
+        "container":let $a:=extract(
+          $x/type,
+          "/(.+);.+""(\w+)(?:\.|"")",
+          (1,2)
+        ) return
+        concat(
+          if ($a[1]="3gpp") then
+            "3gp"
+          else
+            $a[1],
+          "[",
+          if ($a[2]="avc1") then
+            "h264"
+          else if ($a[2]="mp4a") then
+            "aac"
+          else
+            $a[2],
+          "]"
+        ),
+        "resolution":$x/size ! concat(
+          .,
+          "@",
+          $x/fps,
+          "fps"
+        ),
+        "samplerate":$x/audio_sample_rate ! concat(
+          . div 1000,
+          "kHz"
+        ),
+        "bitrate":round(
+          $x/bitrate div 1000
+        )||"kbps",
+        "url":$x/url
       }
     ]
   }
