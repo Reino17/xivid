@@ -892,7 +892,7 @@ regio_utr() {
     json:=if (//script[@async]) then
       json(
         extract(
-          doc(//script[@async]/@src),
+          unparsed-text(//script[@async]/@src),
           "var opts = (.+);",
           1
         )
