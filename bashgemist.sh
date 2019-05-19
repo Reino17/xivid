@@ -279,23 +279,17 @@ rtl() {
   tz=$(date +%::z)
   eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" --xquery '
     json:=$json[
-      not(
-        meta/nr_of_videos_total=0
-      )
+      meta/nr_of_videos_total > 0
     ]/{
-      "name":replace(
-        concat(
-          .//station,
-          ": ",
-          abstracts/name,
-          " - ",
-          if (.//classname="uitzending") then
-            episodes/name
-          else
-            .//title
-        ),
-        "[&quot;&apos;]",
-        "'\'\''"
+      "name":concat(
+        .//station,
+        ": ",
+        abstracts/name,
+        " - ",
+        if (.//classname="uitzending") then
+          episodes/name
+        else
+          .//title
       ),
       "date":format-date(
         (material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
@@ -343,7 +337,7 @@ rtl() {
           )[.],
           "bitrate":let $a:=extract(
             $x,
-            "audio=(\d+)(?:-video=(\d+)\d{3})?",
+            "audio.+?(\d+)(?:-video=(\d+)\d{3})?",
             (1,2)
           ) return
           join(
@@ -355,23 +349,11 @@ rtl() {
             ),
             "|"
           )||"kbps",
-          "url":let $b:=extract(
+          "url":extract(
             $x,
             "(.+m3u8)",
             1
-          ) return
-          if (
-            starts-with(
-              $b,
-              "http"
-            )
-          ) then
-            $b
-          else
-            resolve-uri(
-              $b,
-              $a
-            )
+          )
         }
       ]
     }
@@ -1857,6 +1839,8 @@ elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
   ')"
 elif [[ $url =~ rtl.nl ]]; then
   rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
+elif [[ $url =~ rtlnieuws.nl ]]; then
+  rtl "$(xidel "$url" -e '//@data-uuid')"
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
 elif [[ $url =~ omropfryslan.nl ]]; then

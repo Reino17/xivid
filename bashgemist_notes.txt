@@ -982,30 +982,213 @@ $ xidel -s --xquery 'let $prid:="POMS_NOS_7332480",$a:=x:request({"header":"X-Re
 
 [rtl]
 
-https://www.rtl.nl/video/143d56f6-816e-3757-961d-eba686183076
+https://www.rtl.nl/video/d4e31e66-e403-33d5-8f44-a3886e42be51/ (RTL Nieuws van 18-11-2017 met expiredate 19-11-2018 05:48:44, zie BatchGemist notes)
 
-$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-961d-eba686183076/fmt=adaptive/" --xquery '
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=d4e31e66-e403-33d5-8f44-a3886e42be51/fmt=adaptive/" -e '$json'
+{
+  "meta": {
+    [...]
+    "nr_of_videos_total": 0,
+    "nr_of_videos_onpage": 0,
+    [...]
+  },
+  [...]
+}
+
+https://www.rtl.nl/video/cefbd40f-34a0-3f94-b3d8-1705119c79f4/ (RTL Nieuws van 18-05-2019)
+
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total > 0]/(material)()/(original_date,duration)'
+1.5582006E9
+00:19:06.040
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+"The Unix epoch (or Unix time or POSIX time or Unix timestamp) is the number of seconds that have elapsed since January 1, 1970." (https://www.epochconverter.com/)
+
+$ xidel -s -e 'integer(1.5582006E9)'
+1558200600
+
+$ xidel -s -e '1.5582006E9 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
+2019-05-18T17:30:00
+
+$ xidel -s -e '1.5582006E9 * duration("PT1S") + dateTime("1970-01-01T02:00:00")'			# Vanwege onze tijdzone CET (Central European Time, GMT+1) + zomertijd (GMT+2): "02:00:00".
+2019-05-18T19:30:00
+
+$ date +%::z
++02:00:00
+$ date +%::z | cut -d + -f 2
+02:00:00
+$ date +%::z | tr -d +
+02:00:00
+$ date +%::z | tail -c +2			# Positionering is beter, omdat de tijdzones westelijk van het Verenigd Koninkrijk met "-" beginnen.
+02:00:00
+
+$ xidel -s -e '1.5582006E9 * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'")'
+2019-05-18T19:30:00
+
+$ tz=$(date +%::z)
+$ echo ${tz:1}
+02:00:00
+$ xidel -s -e '1.5582006E9 * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'")'
+2019-05-18T19:30:00
+
+$ xidel -s -e 'format-date(1.5582006E9 * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),"[D01]-[M01]-[Y]")'
+18-05-2019
+
+----------------------------------------------------------------
+$ date -d @1558200600 +%FT%T
+2019-05-18T19:30:00
+
+$ date -d @1558200600 +%d-%m-%Y
+18-05-2019
+
+$ date -d 2019-05-18T19:30:00 +%s
+1558200600
+
+$ xidel -s -e 'let $a:=1.5582006E9 return{"a":"'$(date +%FT%T)'","b":x:lines(system(x"date -d @{integer($a)} +%FT%T"))[1]}'
+{
+  "a": "2019-05-19T14:04:21",
+  "b": "2019-05-18T19:30:00"
+}
+
+$ xidel -s -e 'let $a:=1.5582006E9 return {"a":current-dateTime(),"b":$a * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'")}'
+{
+  "a": "2019-05-19T14:04:21.109",
+  "b": "2019-05-18T19:30:00"
+}
+
+$ xidel -s -e 'let $a:=1.5582006E9 return {"a":"'$(date +%d-%m-%Y)'","b":x:lines(system(x"date -d @{integer($a)} +%d-%m-%Y"))[1]}'
+{
+  "a": "19-05-2019",
+  "b": "18-05-2019"
+}
+
+$ xidel -s -e 'let $a:=1.5582006E9 return {"a":format-date(current-dateTime(),"[D01]-[M01]-[Y]"),"b":format-date($a * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]")}'
+{
+  "a": "19-05-2019",
+  "b": "18-05-2019"
+}
+----------------------------------------------------------------
+
+$ xidel -s -e 'format-time(time("00:19:06.040"),"[H01]:[m01]:[s01]")'
+00:19:06
+
+$ xidel -s -e 'format-time(time("00:19:06.540"),"[H01]:[m01]:[s01]")'
+00:19:06
+
+$ xidel -s -e 'format-time(time("00:19:06.540") + duration("PT0.5S"),"[H01]:[m01]:[s01]")'
+00:19:07
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total > 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]")}'
+{
+  "name": "RTL4: RTL Nieuws - 19:30 uur",
+  "date": "18-05-2019",
+  "duration": "00:19:06",
+  "expdate": "18-05-2020 06:52:29"
+}
+
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" --xquery '$json[meta/nr_of_videos_total > 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":let $a:=.//videohost||.//videopath return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":let $a:=extract($x,"audio=(\d+)(?:-video=(\d+)\d{3})?",(1,2)) return join(($a[2][.],round($a[1] div 1000)),"|")||"kbps","url":extract($x,"(.+m3u8)",1)}]}'
+{
+  "name": "RTL4: RTL Nieuws - 19:30 uur",
+  "date": "18-05-2019",
+  "duration": "00:19:06",
+  "expdate": "18-05-2020 06:52:29",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ism/cefbd40f-34a0-3f94-b3d8-1705119c79f4-audio=125437.m3u8"
+    },
+    {
+      "format": "hls-2",
+      "container": "m3u8[h264+aac]",
+      "resolution": "711x400",
+      "bitrate": "1124|125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ism/cefbd40f-34a0-3f94-b3d8-1705119c79f4-audio=125437-video=1124000.m3u8"
+    },
+    {
+      "format": "hls-3",
+      "container": "m3u8[h264+aac]",
+      "resolution": "912x512",
+      "bitrate": "2300|125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ism/cefbd40f-34a0-3f94-b3d8-1705119c79f4-audio=125437-video=2300000.m3u8"
+    },
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "4117|125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ism/cefbd40f-34a0-3f94-b3d8-1705119c79f4-audio=125437-video=4117000.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.rtlnieuws.nl/nieuws/laatste-videos-nieuws/video/4694701/game-thrones-dubbelganger-droomt-van-het-witte-doek
+
+$ xidel -s "https://www.rtlnieuws.nl/nieuws/laatste-videos-nieuws/video/4694701/game-thrones-dubbelganger-droomt-van-het-witte-doek" -e '//@data-uuid'
+ed3d420a-4741-4ea9-afdf-8dc8271ff9c9
+
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e '$json[meta/nr_of_videos_total > 0]/unparsed-text(.//videohost||.//videopath)'
+#EXTM3U
+#EXT-X-VERSION:1
+## Created with Unified Streaming Platform(version=1.6.6)
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1272447,CODECS="mp4a.40.2,avc1.77.31",RESOLUTION=711x400
+http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ssm/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ism/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9-audio_eng=125422-video=1075000.m3u8
+[...]
+
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" --xquery '$json[meta/nr_of_videos_total > 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":let $a:=.//videohost||.//videopath return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tail(tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")) order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":let $a:=extract($x,"audio.+?(\d+)(?:-video=(\d+)\d{3})?",(1,2)) return join(($a[2][.],round($a[1] div 1000)),"|")||"kbps","url":extract($x,"(.+m3u8)",1)}]}'
+{
+  "name": "RTL4: RTL Nieuws - Game of Thrones-dubbelganger droomt van het witte doek",
+  "date": "29-04-2019",
+  "duration": "00:01:33",
+  "expdate": null,
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/415972/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ssm/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.m3u8"
+    },
+    [...]
+    {
+      "format": "hls-4",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "3733|125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ssm/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ism/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9-audio_eng=125422-video=3733000.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ tz=$(date +%::z)
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" --xquery '
   $json[
-    not(
-      meta/nr_of_videos_total=0
-    )
+    meta/nr_of_videos_total > 0
   ]/{
-    "name":replace(
-      concat(
-        .//station,
-        ": ",
-        abstracts/name,
-        " - ",
-        if (.//classname="uitzending") then
-          episodes/name
-        else
-          .//title
-      ),
-      "[&quot;&apos;]",
-      "'\'\''"
+    "name":concat(
+      .//station,
+      ": ",
+      abstracts/name,
+      " - ",
+      if (.//classname="uitzending") then
+        episodes/name
+      else
+        .//title
     ),
     "date":format-date(
-      (material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+      (material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
       "[D01]-[M01]-[Y]"
     ),
     "duration":format-time(
@@ -1013,7 +1196,7 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
       "[H01]:[m01]:[s01]"
     ),
     "expdate":format-dateTime(
-      (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+      (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
       "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
     ),
     "formats":let $a:=.//videohost||.//videopath return [
@@ -1050,7 +1233,7 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
         )[.],
         "bitrate":let $a:=extract(
           $x,
-          "audio=(\d+)(?:-video=(\d+)\d{3})?",
+          "audio.+?(\d+)(?:-video=(\d+)\d{3})?",
           (1,2)
         ) return
         join(
@@ -1062,68 +1245,15 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=143d56f6-816e-3757-9
           ),
           "|"
         )||"kbps",
-        "url":let $b:=extract(
+        "url":extract(
           $x,
           "(.+m3u8)",
           1
-        ) return
-        if (
-          starts-with(
-            $b,
-            "http"
-          )
-        ) then
-          $b
-        else
-          resolve-uri(
-            $b,
-            $a
-          )
+        )
       }
     ]
   }
 '
-{
-  "name": "RTL4: RTL Nieuws - 19:30 uur",
-  "date": "11-12-2018",
-  "duration": "00:20:18",
-  "expdate": "12-12-2019 06:35:25",
-  "formats": [
-    {
-      "format": "hls-0",
-      "container": "m3u8[manifest]",
-      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.m3u8"
-    },
-    {
-      "format": "hls-1",
-      "container": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437.m3u8"
-    },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "711x400",
-      "bitrate": "903|125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=903000.m3u8"
-    },
-    {
-      "format": "hls-3",
-      "container": "m3u8[h264+aac]",
-      "resolution": "912x512",
-      "bitrate": "2093|125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=2093000.m3u8"
-    },
-    {
-      "format": "hls-4",
-      "container": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "3805|125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/390575/143d56f6-816e-3757-961d-eba686183076.ssm/143d56f6-816e-3757-961d-eba686183076.ism/143d56f6-816e-3757-961d-eba686183076-audio=125437-video=3805000.m3u8"
-    }
-  ]
-}
 
 ================================================================================================================================
 
@@ -2688,74 +2818,6 @@ kijk GgO61doGeqZ
 ================================================================================================================================
 
 [youtube]
-
-"The Unix epoch (or Unix time or POSIX time or Unix timestamp) is the number of seconds that have elapsed since January 1, 1970."
-
-$ xidel -s -e '1548978610 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
-2019-01-31T23:50:10
-
-$ xidel -s -e '1548978610 * duration("PT1S") + dateTime("1970-01-01T01:00:00")'			# Vanwege CEST (GMT+1): "01:00:00".
-2019-02-01T00:50:10
-
-$ date +%::z
-+01:00:00
-$ date +%::z | cut -d + -f 2
-01:00:00
-$ date +%::z | tr -d +
-01:00:00
-$ date +%::z | tail -c +2			# Positionering is beter, omdat de tijdzones westelijk van het Verenigd Koninkrijk met "-" beginnen.
-01:00:00
-
-$ xidel -s -e '1548978610 * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'")'
-2019-02-01T00:50:10
-
-$ xidel -s -e 'format-date(1548978610 * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]")'
-01-02-2019
-
-$ tz=$(date +%::z)
-$ echo ${tz:1}
-01:00:00
-$ xidel -s -e '1548978610 * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'")'
-2019-02-01T00:50:10
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-$ date -d @1548978610 +%FT%T
-2019-02-01T00:50:10
-
-$ date -d 2019-02-01T00:50:10 +%s
-1548978610
-
-$ date -d @1548978610 +%d-%m-%Y
-01-02-2019
-
-$ xidel -s -e 'let $a:={"updated":1548978610} return {"a":"'$(date +%FT%T)'","b":system(x"date -d @{$a/updated} +%FT%T")}'
-{
-  "a": "2019-02-09T21:03:36",
-  "b": "2019-02-01T00:50:10\n"
-}
-
-$ xidel -s -e 'let $a:={"updated":1548978610} return {"a":"'$(date +%FT%T)'","b":x:lines(system(x"date -d @{$a/updated} +%FT%T"))[1]}'
-{
-  "a": "2019-02-09T21:03:36",
-  "b": "2019-02-01T00:50:10"
-}
-
-$ xidel -s -e 'let $a:={"updated":1548978610} return {"a":"'$(date +%d-%m-%Y)'","b":x:lines(system(x"date -d @{$a/updated} +%d-%m-%Y"))[1]}'
-{
-  "a": "09-02-2019",
-  "b": "01-02-2019"
-}
-
-$ xidel -s -e 'let $a:={"updated":1548978610} return {"a":"'$(date +%d-%m-%Y)'","b":format-date($a/updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),"[D01]-[M01]-[Y]")}'
-{
-  "a": "09-02-2019",
-  "b": "01-02-2019"
-}
-
-Update 10-05-2019: Vanwege een api update is bovenstaande niet meer van toepassing op Youtube.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 https://www.youtube.com/watch?v=nG_LtCRRZ20 (normaal toegankelijke video)
 
