@@ -407,7 +407,7 @@ kijk() {
           "(\d+)-(\d+)-(\d+) ([\d:]+).*",
           "$3-$2-$1 $4"
         ),
-        "formats":let $a:=(sources)()[size=0]/src return [
+        "formats":let $a:=(sources)()[size = 0]/src return [
           for $x at $i in (sources)()[stream_name]
           order by $x/size
           count $i
@@ -488,18 +488,18 @@ kijk() {
           upper-case(customLayer/c_media_station),
           ": ",
           customLayer/c_media_ispartof,
-          if (dataLayer/media_program_season!=0 and dataLayer/media_program_episodenumber<=99) then
+          if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then
             concat(
               " S",
               dataLayer/media_program_season ! (
-                if (.<10) then
+                if (. < 10) then
                   "0"||.
                 else
                   .
               ),
               "E",
               dataLayer/media_program_episodenumber ! (
-                if (.<10) then
+                if (. < 10) then
                   "0"||.
                 else
                   .
@@ -844,8 +844,8 @@ regio_fll() {
         return
         join(
           (
-            if ($b[3]<10) then
-              '0'||$b[3]
+            if ($b[3] < 10) then
+              "0"||$b[3]
             else
               $b[3],
             $a($b[4]),
@@ -1167,8 +1167,8 @@ dumpert() {
         return
         join(
           (
-            if ($b[1]<10) then
-              '0'||$b[1]
+            if ($b[1] < 10) then
+              "0"||$b[1]
             else
               $b[1],
             $a($b[2]),
@@ -1625,13 +1625,13 @@ info() {
         $c:=max(
           $b ! $a(.) ! string-length(.)
         ) ! (
-          if (.>9) then
+          if (. > 9) then
             .
           else
             9
         ),
         $d:=string-join(
-          (1 to $c+1) ! " "
+          (1 to $c + 1) ! " "
         ),
         $e:=[
           {
@@ -1663,7 +1663,7 @@ info() {
         substring(
           $a(.)||$d,
           1,
-          $c+1
+          $c + 1
         ),
         if ($json(.) instance of string) then
           $json(.)
@@ -1673,11 +1673,11 @@ info() {
       if ($e(2)) then
         for $x at $i in $e() return
         concat(
-          if ($i=1) then
+          if ($i = 1) then
             substring(
               "Formaten:"||$d,
               1,
-              $c+1
+              $c + 1
             )
           else
             $d,
@@ -1686,10 +1686,10 @@ info() {
             substring(
               $x($y)[.]||$h,
               1,
-              $g[$i]+2
+              $g[$i] + 2
             )
           ),
-          if ($i=count($e())) then
+          if ($i = count($e())) then
             "(best)"
           else
             ()
@@ -1698,7 +1698,7 @@ info() {
         substring(
           "Formaten:"||$d,
           1,
-          $c+1
+          $c + 1
         )||"-",
       if (start) then
         let $i:=seconds-from-time(start) mod 30,
@@ -1709,7 +1709,7 @@ info() {
             substring(
               "Download:"||$d,
               1,
-              $c+1
+              $c + 1
             ),
             "ffmpeg",
             if ($j="00:00:00") then
@@ -1717,7 +1717,7 @@ info() {
             else
               " -ss "||$j,
             " -i <url>",
-            if ($i=0) then
+            if ($i = 0) then
               ()
             else
               " -ss "||$i,
