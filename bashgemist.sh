@@ -374,7 +374,7 @@ kijk() {
                 )
               ]/@src
             ),
-            "policyKey:""(.+?)""",
+            "policyKey:&quot;(.+?)&quot;",
             1
           ),
           "url":concat(
@@ -1442,7 +1442,7 @@ youtube() {
           "format":"pg-"||$i,
           "container":let $a:=extract(
             $x/type,
-            "/(.+);.+""(\w+)\..+ (\w+)(?:\.|"")",
+            "/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",
             (1 to 3)
           ) return
           concat(
@@ -1481,7 +1481,7 @@ youtube() {
           "format":"dash-"||$i,
           "container":let $a:=extract(
             $x/type,
-            "/(.+);.+""(\w+)(?:\.|"")",
+            "/(.+);.+&quot;(\w+)(?:\.|&quot;)",
             (1,2)
           ) return
           concat(
