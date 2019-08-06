@@ -333,22 +333,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
         4
       ^)
     else
-      let $a:^={
-            'januari':'01'^,'februari':'02'^,'maart':'03'^,
-            'april':'04'^,'mei':'05'^,'juni':'06'^,
-            'juli':'07'^,'augustus':'08'^,'september':'09'^,
-            'oktober':'10'^,'november':'11'^,'december':'12'
-          }^,
-          $b:^=tokenize^(//span[@class^='d--block--sm']^,' '^)[.]
-      return
-      join^(
-        ^(
-          if ^($b[3] ^< 10^) then '0'^|^|$b[3] else $b[3]^,
-          $a^($b[4]^)^,
-          $b[5]
-        ^)^,
-        '-'
-      ^)^,
+      xivid:txt-to-date^(//span[@class^='d--block--sm']^)^,
     'formats':[
       {
         'format':'pg-1'^,
@@ -480,22 +465,7 @@ FOR /F "delims=" %%A IN ('xidel -H "Cookie: nsfw=1;cpc=10" "%~1" --xquery ^"
       replace^(//iframe/@src^,'.+/^(.+^)\?.+'^,'https://youtu.be/$1'^)
     else {
       'name':'Dumpert: '^|^|//div[@class^='dump-desc']/h1^,
-      'date':let $a:^={
-            'januari':'01'^,'februari':'02'^,'maart':'03'^,
-            'april':'04'^,'mei':'05'^,'juni':'06'^,
-            'juli':'07'^,'augustus':'08'^,'september':'09'^,
-            'oktober':'10'^,'november':'11'^,'december':'12'
-          }^,
-          $b:^=tokenize^(//p[@class^='dump-pub']^,' '^)
-      return
-      join^(
-        ^(
-          if ^($b[1] ^< 10^) then '0'^|^|$b[1] else $b[1]^,
-          $a^($b[2]^)^,
-          $b[3]
-        ^)^,
-        '-'
-      ^)^,
+      'date':xivid:txt-to-date^(//p[@class^='dump-pub']^)^,
       'formats':let $a:^=json^(
         binary-to-string^(base64Binary^(//@data-files^)^)
       ^)

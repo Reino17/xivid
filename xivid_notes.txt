@@ -128,6 +128,62 @@ FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control
 
 ------------------------------------------------------------------------------------------------
 
+Tekst naar datum:
+
+$ xidel -s -e 'x:parse-date("17 february 2019  7:45","dd mmmm yyyy")'
+2019-02-17
+
+$ xidel -s -e 'x:parse-dateTime("17 february 2019  7:45","dd mmmm yyyy  h:nn")'
+2019-02-17T07:45:00
+
+Het Pascal format komt heel precies, MAAR Xidel ondersteunt (op dit moment) alleen Engels en Duits:
+
+$ xidel -s -e 'x:parse-date("17 februari 2019  7:45","dd mmmm yyyy")'
+Error:
+err:FORG0001: Invalid conversion from 17 februari 2019  7:45 to date format dd mmmm yyyy
+
+Het kan ook handmatig:
+
+$ xidel -s -e 'tokenize("17 februari 2019  7:45","\s+")'
+17
+februari
+2019
+7:45
+
+$ xidel -s -e 'extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))'
+17
+februari
+2019
+
+$ xidel -s -e 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return (if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3])'
+17
+02
+2019
+
+$ xidel -s -e 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return join((if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-")'
+17-02-2019
+
+declare function txt-to-date ($txt as xs:string) as xs:string {
+  let $a:={
+        "januari":"01","februari":"02","maart":"03",
+        "april":"04","mei":"05","juni":"06",
+        "juli":"07","augustus":"08","september":"09",
+        "oktober":"10","november":"11","december":"12"
+      },
+      $b:=extract($txt,"(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))
+  return
+  join(
+    (
+      if ($b[1] < 10) then "0"||$b[1] else $b[1],
+      $a($b[2]),
+      $b[3]
+    ),
+    "-"
+  )
+};
+
+------------------------------------------------------------------------------------------------
+
 Afronden:
 
 $ xidel -s -e 'format-time(time("00:19:06.040"),"[H01]:[m01]:[s01]")'
@@ -3851,7 +3907,7 @@ $ xidel -s --module=xivid.xq "https://nos.nl/livestream/npo-politiek.html" -e '{
 
 https://www.dumpert.nl/mediabase/7629097/eca3888b/monfils_wint_abn_amro_in_stijl.html
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" --xquery '{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//p[@class="dump-pub"]," ") return join((if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-"),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
+$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" --xquery '{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
 {
   "name": "Dumpert: GOUD. Dafne Schippers wint 200m Bejing!",
   "date": "28-08-2015",
@@ -3883,11 +3939,11 @@ https://www.dumpert.nl/embed/6678198/4301bfad/
 
 Gebruik altijd de non-embedded url als bron.
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/embed/6678198/4301bfad/" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//p[@class="dump-pub"]," ") return join((if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-"),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
+$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/embed/6678198/4301bfad/" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
 
 https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html (embedded youtube video)
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/(if (//iframe) then replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1") else {"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//p[@class="dump-pub"]," ") return join((if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-"),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}})'
+$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/(if (//iframe) then replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1") else {"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}})'
 https://youtu.be/CZ_9DCl6O4M
 
 ------------------------------------------------------------------------------------------------
@@ -3900,22 +3956,7 @@ https://youtu.be/CZ_9DCl6O4M
       replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1")
     else {
       "name":"Dumpert: "||//div[@class="dump-desc"]/h1,
-      "date":let $a:={
-            "januari":"01","februari":"02","maart":"03",
-            "april":"04","mei":"05","juni":"06",
-            "juli":"07","augustus":"08","september":"09",
-            "oktober":"10","november":"11","december":"12"
-          },
-          $b:=tokenize(//p[@class="dump-pub"]," ")
-      return
-      join(
-        (
-          if ($b[1] < 10) then "0"||$b[1] else $b[1],
-          $a($b[2]),
-          $b[3]
-        ),
-        "-"
-      ),
+      "date":xivid:txt-to-date(//p[@class="dump-pub"]),
       "formats":let $a:=json(
         binary-to-string(base64Binary(//@data-files))
       )
@@ -5102,7 +5143,7 @@ $ xidel -s "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorp
 
         </span>
 
-$ xidel -s "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e '{"name":"Omroep Flevoland: "||//h2,"date":let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//span[@class="d--block--sm"]," ")[.] return join((if ($b[3] < 10) then "0"||$b[3] else $b[3],$a($b[4]),$b[5]),"-"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e '{"name":"Omroep Flevoland: "||//h2,"date":xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
 {
   "name": "Omroep Flevoland: Team De Corner wint dorpenloop",
   "date": "13-04-2019",
@@ -5119,7 +5160,7 @@ $ xidel -s "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorp
 
 Eén query voor beide videostreams:
 
-$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e 'let $a:=//div[ends-with(@class,"videoplayer")] return if ($a/@data-page-type="home") then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/@data-file)} else {"name":"Omroep Flevoland: "||//h2,"date":if ($a/@data-page-type="missed") then substring(//span[starts-with(@class,"t--red")],4) else let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=tokenize(//span[@class="d--block--sm"]," ")[.] return join((if ($b[3] < 10) then "0"||$b[3] else $b[3],$a($b[4]),$b[5]),"-"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e 'let $a:=//div[ends-with(@class,"videoplayer")] return if ($a/@data-page-type="home") then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/@data-file)} else {"name":"Omroep Flevoland: "||//h2,"date":if ($a/@data-page-type="missed") then substring(//span[starts-with(@class,"t--red")],4) else xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
 
 ------------------------------------------------------------------------------------------------
 
@@ -5137,22 +5178,7 @@ $ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e 'let $a:=//div
         4
       )
     else
-      let $a:={
-            "januari":"01","februari":"02","maart":"03",
-            "april":"04","mei":"05","juni":"06",
-            "juli":"07","augustus":"08","september":"09",
-            "oktober":"10","november":"11","december":"12"
-          },
-          $b:=tokenize(//span[@class="d--block--sm"]," ")[.]
-      return
-      join(
-        (
-          if ($b[3] < 10) then "0"||$b[3] else $b[3],
-          $a($b[4]),
-          $b[5]
-        ),
-        "-"
-      ),
+      xivid:txt-to-date(//span[@class="d--block--sm"]),
     "formats":[
       {
         "format":"pg-1",

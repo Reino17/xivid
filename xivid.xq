@@ -44,6 +44,25 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
     ()
 };
 
+declare function xivid:txt-to-date ($txt as xs:string) as xs:string {
+  let $a:={
+        "januari":"01","februari":"02","maart":"03",
+        "april":"04","mei":"05","juni":"06",
+        "juli":"07","augustus":"08","september":"09",
+        "oktober":"10","november":"11","december":"12"
+      },
+      $b:=extract($txt,"(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))
+  return
+  join(
+    (
+      if ($b[1] < 10) then "0"||$b[1] else $b[1],
+      $a($b[2]),
+      $b[3]
+    ),
+    "-"
+  )
+};
+
 declare function xivid:shex-to-dec ($shex as xs:string) as xs:integer {
   let $a:=x:integer($shex),
       $b:=x:integer-to-base($a,2)
