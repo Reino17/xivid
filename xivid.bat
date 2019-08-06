@@ -260,7 +260,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
     'date':format-date^(current-date^(^)^,'[D01]-[M01]-[Y]'^)^,
     'formats':xivid:m3u8-to-json^($b//asset/@src^)
   } else {
-    'name':'Omrop Fryslân: '^|^|//h1^,
+    'name':'Omrop Fryslân: '^|^|normalize-space^(//h1^)^,
     'date':replace^(
       //meta[@itemprop^='dateModified']/@content^,
       '^(\d+^)-^(\d+^)-^(\d+^).+'^,
