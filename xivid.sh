@@ -688,23 +688,22 @@ info() {
         )
       else
         substring("Formaten:"||$d,1,$c + 1)||"-",
-      if (start) then
-        let $i:=seconds-from-time(start) mod 30,
-            $j:=time(start) - ($i * duration("PT1S"))
+      $json[start]/(
+        let $i:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))
         return (
           "",
           concat(
             substring("Download:"||$d,1,$c + 1),
             "ffmpeg",
-            if ($j="00:00:00") then () else " -ss "||$j,
+            ($i[1] - $i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
             " -i <url>",
-            if ($i = 0) then () else " -ss "||$i, " -t ",
-            duration,
+            ($i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+            " -t ",
+            $i[2],
             " [...]"
           )
         )
-      else
-        ()
+      )
     )
   ' <<< $1
 }
