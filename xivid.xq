@@ -43,3 +43,13 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
   else
     ()
 };
+
+declare function xivid:shex-to-dec ($shex as xs:string) as xs:integer {
+  let $a:=x:integer($shex),
+      $b:=x:integer-to-base($a,2)
+  return
+  if (string-length($b) > 31) then
+    $a - integer(math:pow(2,string-length($b)))
+  else
+    $a
+};

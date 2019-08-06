@@ -125,6 +125,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 EXIT /B
 
 :rtl
+CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=%~1/fmt=adaptive/" -e ^"
   json:^=$json[meta/nr_of_videos_total ^> 0]/{
     'name':concat^(
@@ -135,7 +136,7 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
       if ^(.//classname^='uitzending'^) then episodes/name else .//title
     ^)^,
     'date':format-date^(
-      ^(material^)^(^)/original_date * duration^('PT1S'^) + date^('1970-01-01'^)^,
+      ^(material^)^(^)/original_date * duration^('PT1S'^) + duration^('%tz%'^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -143,7 +144,7 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
       '[H01]:[m01]:[s01]'
     ^)^,
     'expdate':format-dateTime^(
-      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/stop * duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
+      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/stop * duration^('PT1S'^) + duration^('%tz%'^) + dateTime^('1970-01-01T00:00:00'^)^,
       '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
     ^)^,
     'formats':xivid:m3u8-to-json^(.//videohost^|^|.//videopath^)
@@ -152,6 +153,7 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
 EXIT /B
 
 :kijk
+CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" -e ^"
   json:^=if ^(//video^) then
     x:request^({
@@ -216,7 +218,7 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" -e ^"
       'date':replace^(TAQ/customLayer/c_sko_dt^,'^(\d{4}^)^(\d{2}^)^(\d{2}^)'^,'$3-$2-$1'^)^,
       'duration':TAQ/customLayer/c_sko_cl * duration^('PT1S'^) + time^('00:00:00'^)^,
       'expdate':format-dateTime^(
-        TAQ/customLayer/c_media_dateexpires * duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
+        TAQ/customLayer/c_media_dateexpires * duration^('PT1S'^) + duration^('%tz%'^) + dateTime^('1970-01-01T00:00:00'^)^,
         '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
       ^)^,
       'subtitle':{
@@ -284,6 +286,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 EXIT /B
 
 :regio_nh
+CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
   let $a:^=json^(
     //script/extract^(.^,'INITIAL_PROPS__ ^= ^(.+^)'^,1^)[.]
@@ -298,7 +301,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       substring-after^(//title^,'- '^)^|^|': Livestream'^,
     'date':if ^($a^) then
       format-date^(
-        $a/updated * duration^('PT1S'^) + date^('1970-01-01'^)^,
+        $a/updated * duration^('PT1S'^) + duration^('%tz%'^) + date^('1970-01-01'^)^,
         '[D01]-[M01]-[Y]'
       ^)
     else
@@ -767,15 +770,7 @@ EXIT /B
 
 :timezone
 FOR /F "skip=4 tokens=3" %%A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO (
-  FOR /F "delims=" %%B IN ('xidel -e ^"
-    let $a:^=x:integer^('%A'^)^,
-        $b:^=x:integer-to-base^($a^,2^)
-    return tz:^=^(
-      if ^(string-length^($b^) ^> 31^) then
-        $a - integer^(math:pow^(2^,string-length^($b^)^)^)
-      else
-        $a
-    ^) * duration^('-PT1M'^)^" --output-format^=cmd') DO %%B
+  FOR /F "delims=" %%B IN ('xidel -e "tz:=xivid:shex-to-dec('%%A') * duration('-PT1M')" --output-format^=cmd') DO %%B
 )
 EXIT /B
 

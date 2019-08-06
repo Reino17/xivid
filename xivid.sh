@@ -118,7 +118,7 @@ nos() {
         if (//video/@data-type="livestream") then " Livestream" else ()
       ),
       "date":if (//video/@data-type="livestream") then
-        "'$(date +%d-%m-%Y)'"
+        format-date(current-date(),"[D01]-[M01]-[Y]")
       else
         replace(//@datetime,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),
       "formats":xivid:m3u8-to-json(//video/(.//@src,@data-stream))
@@ -127,7 +127,6 @@ nos() {
 }
 
 rtl() {
-  tz=$(date +%::z)
   eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" -e '
     json:=$json[meta/nr_of_videos_total > 0]/{
       "name":concat(
@@ -138,7 +137,7 @@ rtl() {
         if (.//classname="uitzending") then episodes/name else .//title
       ),
       "date":format-date(
-        (material)()/original_date * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
+        (material)()/original_date * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -146,7 +145,8 @@ rtl() {
         "[H01]:[m01]:[s01]"
       ),
       "expdate":format-dateTime(
-        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
+        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") +
+        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
         "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
       ),
       "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
@@ -219,7 +219,8 @@ kijk() {
         "date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
         "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
         "expdate":format-dateTime(
-          TAQ/customLayer/c_media_dateexpires * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+          TAQ/customLayer/c_media_dateexpires * duration("PT1S") +
+          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
         "subtitle":{
@@ -242,7 +243,7 @@ regio_frl() {
     return
     json:=if ($b//@sourcetype="live") then {
       "name"://meta[@itemprop="name"]/@content||": Livestream",
-      "date":"'$(date +%d-%m-%Y)'",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
       "formats":xivid:m3u8-to-json($b//asset/@src)
     } else {
       "name":"Omrop Fryslân: "||//h1,
@@ -285,11 +286,11 @@ regio_nh() {
         substring-after(//title,"- ")||": Livestream",
       "date":if ($a) then
         format-date(
-          $a/updated * duration("PT1S") + dateTime("1970-01-01T'$(date +%::z | tail -c +2)'"),
+          $a/updated * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
           "[D01]-[M01]-[Y]"
         )
       else
-        "'$(date +%d-%m-%Y)'",
+        format-date(current-date(),"[D01]-[M01]-[Y]"),
       "formats":xivid:m3u8-to-json(
         if ($a) then
           $a/(media)()/videoUrl
@@ -307,7 +308,7 @@ regio_fll() {
     let $a:=//div[ends-with(@class,"videoplayer")] return
     json:=if ($a/@data-page-type="home") then {
       "name":"Omroep Flevoland: Livestream",
-      "date":"'$(date +%d-%m-%Y)'",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
       "formats":xivid:m3u8-to-json($a/@data-file)
     } else {
       "name":"Omroep Flevoland: "||//h2,
@@ -351,7 +352,7 @@ regio_utr() {
         extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1)
       )/{
         "name":publicationData/label||": Livestream",
-        "date":"'$(date +%d-%m-%Y)'",
+        "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
         "formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)
       }
     else
@@ -414,7 +415,7 @@ regio() {
     return
     json:=if ($c) then {
       "name":$b/publicationData/label||": Livestream",
-      "date":"'$(date +%d-%m-%Y)'",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
       "formats":xivid:m3u8-to-json($c)
     } else {
       "name":concat(
@@ -578,7 +579,7 @@ youtube() {
     return
     json:=if ($a/livestream="1") then {
       "name"://meta[@property="og:title"]/@content,
-      "date":"'$(date +%d-%m-%Y)'",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
       "formats":xivid:m3u8-to-json($a/json(player_response)/streamingData/hlsManifestUrl)
     } else {
       "name"://meta[@property="og:title"]/@content,
