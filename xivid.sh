@@ -52,7 +52,7 @@ EOF
 }
 
 npo() {
-  eval "$(xidel --xquery '
+  eval "$(xidel -e '
     let $a:=x:request({
           "header":"X-Requested-With: XMLHttpRequest",
           "url":"https://www.npostart.nl/api/token"
@@ -104,42 +104,13 @@ npo() {
         else
           $b/(subtitles)()/src
       }[url],
-      "formats":[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$c
-        }[url],
-        for $x at $i in tail(
-          tokenize(
-            extract(unparsed-text($c),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),
-            "#EXT-X-STREAM-INF:"
-          )
-        )
-        order by extract($x,"BANDWIDTH=(\d+)",1)
-        count $i
-        return {
-          "format":"hls-"||$i,
-          "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-          "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-          "bitrate":let $a:=extract(
-            $x,
-            "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
-            (1,2)
-          ) return
-          join(
-            ($a[2][.],$a[1]),
-            "|"
-          )||"kbps",
-          "url":resolve-uri(extract($x,"(.+m3u8)",1),$c)
-        }
-      ]
+      "formats":xivid:m3u8-to-json($c)
     }
   ' --output-format=bash)"
 }
 
 nos() {
-  eval "$(xidel "$1" --xquery '
+  eval "$(xidel "$1" -e '
     json:={
       "name":concat(
         "NOS: ",
@@ -150,42 +121,14 @@ nos() {
         "'$(date +%d-%m-%Y)'"
       else
         replace(//@datetime,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),
-      "formats":let $a:=x:request({
-        "url"://video/(.//@src,@data-stream)
-      }) return [
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$a/url
-        },
-        for $x at $i in tail(
-          tokenize($a/doc,"#EXT-X-STREAM-INF:")
-        )
-        order by extract($x,"BANDWIDTH=(\d+)",1)
-        count $i
-        return {
-          "format":"hls-"||$i,
-          "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-          "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-          "bitrate":let $a:=extract(
-            $x,
-            "audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",
-            (1,2)
-          ) return
-          join(
-            ($a[2][.],$a[1]),
-            "|"
-          )||"kbps",
-          "url":resolve-uri(extract($x,"(.+m3u8)",1),$a/url)
-        }
-      ]
+      "formats":xivid:m3u8-to-json(//video/(.//@src,@data-stream))
     }
   ' --output-format=bash)"
 }
 
 rtl() {
   tz=$(date +%::z)
-  eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" --xquery '
+  eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" -e '
     json:=$json[meta/nr_of_videos_total > 0]/{
       "name":concat(
         .//station,
@@ -206,32 +149,7 @@ rtl() {
         (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + dateTime("1970-01-01T'${tz:1}'"),
         "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
       ),
-      "formats":let $a:=.//videohost||.//videopath return [
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$a
-        },
-        for $x at $i in tail(
-          tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")
-        )
-        order by extract($x,"BANDWIDTH=(\d+)",1) count $i
-        return {
-          "format":"hls-"||$i,
-          "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-          "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-          "bitrate":let $a:=extract(
-            $x,
-            "audio.+?(\d+)(?:-video=(\d+)\d{3})?",
-            (1,2)
-          ) return
-          join(
-            ($a[2][.],round($a[1] div 1000)),
-            "|"
-          )||"kbps",
-          "url":extract($x,"(.+m3u8)",1)
-        }
-      ]
+      "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
     }
   ' --output-format=bash)"
 }
@@ -265,7 +183,7 @@ kijk() {
           "(\d+)-(\d+)-(\d+) ([\d:]+).*",
           "$3-$2-$1 $4"
         ),
-        "formats":let $a:=(sources)()[size = 0]/src return [
+        "formats":[
           for $x at $i in (sources)()[stream_name]
           order by $x/size
           count $i
@@ -276,22 +194,8 @@ kijk() {
             "resolution":concat(width,"x",height),
             "bitrate":round(avg_bitrate div 1000)||"kbps",
             "url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))
-          },{
-            "format":"hls-0",
-            "container":"m3u8[manifest]",
-            "url":$a
-          }[url],
-          tail(
-            tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")
-          ) ! {
-            "format":"hls-"||position(),
-            "container":if (contains(.,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-            "resolution":extract(.,"RESOLUTION=([\dx]+)",1),
-            "bitrate":round(
-              extract(.,"BANDWIDTH=(\d+)",1) div 1000
-            )||"kbps",
-            "url":resolve-uri(extract(.,"(.+m3u8)",1),$a)
-          }
+          },
+          xivid:m3u8-to-json((sources)()[size = 0]/src)
         ]
       }
     else
@@ -322,40 +226,7 @@ kijk() {
           "format":"webvtt",
           "url":(tracks)()[label=" Nederlands"]/file
         }[url],
-        "formats":[
-          (sources)()[not(drm) and type="m3u8"][1]/x:request({
-            "url":file,
-            "error-handling":"xxx=accept"
-          })[contains(headers[1],"200")]/(
-            {
-              "format":"hls-0",
-              "container":"m3u8[manifest]",
-              "url":url
-            },
-            for $x at $i in tail(
-              tokenize(
-                extract(doc,"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),
-                "#EXT-X-STREAM-INF:"
-              )
-            )
-            order by extract($x,"BANDWIDTH=(\d+)",1) count $i
-            return {
-              "format":"hls-"||$i,
-              "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-              "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-              "bitrate":let $a:=extract(
-                $x,
-                "audio.+?(\d+)\d{3}(?:-video=(\d+)\d{3})?",
-                (1,2)
-              ) return
-              join(
-                ($a[2][.],$a[1]),
-                "|"
-              )||"kbps",
-              "url":resolve-uri(extract($x,"(.+m3u8)",1),url)
-            }
-          )
-        ]
+        "formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
       }
   ' --output-format=bash)"
 }
@@ -372,22 +243,7 @@ regio_frl() {
     json:=if ($b//@sourcetype="live") then {
       "name"://meta[@itemprop="name"]/@content||": Livestream",
       "date":"'$(date +%d-%m-%Y)'",
-      "formats":[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$b//asset/@src
-        },
-        tail(
-          tokenize(unparsed-text($b//asset/@src),"#EXT-X-STREAM-INF:")
-        ) ! {
-          "format":"hls-"||position(),
-          "container":"m3u8[h264+aac]",
-          "resolution":extract(.,"RESOLUTION=([\dx]+)",1),
-          "bitrate":extract(.,"(\d+)/.+m3u8",1)||"kbps",
-          "url":resolve-uri(extract(.,"(.+m3u8)",1),$b//asset/@src)
-        }
-      ]
+      "formats":xivid:m3u8-to-json($b//asset/@src)
     } else {
       "name":"Omrop Fryslân: "||//h1,
       "date":replace(
@@ -398,7 +254,7 @@ regio_frl() {
       "duration":duration(
         "P"||//meta[@itemprop="duration"]/@content
       ) + time("00:00:00"),
-      "formats":[
+      "formats":(
         for $x at $i in $b//asset
         order by $x/@bandwidth
         count $i
@@ -409,7 +265,7 @@ regio_frl() {
           "bitrate":$x/@bandwidth||"kbps",
           "url":resolve-uri($x/@src,$a[1])
         }
-      ]
+      )
     }
   ' --output-format=bash)"
 }
@@ -434,60 +290,25 @@ regio_nh() {
         )
       else
         "'$(date +%d-%m-%Y)'",
-      "formats":x:request({
-        "url":if ($a) then
+      "formats":xivid:m3u8-to-json(
+        if ($a) then
           $a/(media)()/videoUrl
         else
           json(
             //script/extract(.,"INIT_DATA__ = (.+)",1)[.]
           )/videoStream
-      })/[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":url
-        }[url],
-        tail(
-          tokenize(doc,"#EXT-X-STREAM-INF:")
-        ) ! {
-          "format":"hls-"||position(),
-          "container":"m3u8[h264+aac]",
-          "resolution":extract(.,"RESOLUTION=([\dx]+)",1)[.],
-          "bitrate":round(
-            extract(.,"BANDWIDTH=(\d+)",1) div 1000
-          )||"kbps",
-          "url":extract(.,"(.+m3u8)",1)
-        }
-      ]
+      )
     }
   ' --output-format=bash)"
 }
 
 regio_fll() {
-  eval "$(xidel "$1" --xquery '
+  eval "$(xidel "$1" -e '
     let $a:=//div[ends-with(@class,"videoplayer")] return
     json:=if ($a/@data-page-type="home") then {
       "name":"Omroep Flevoland: Livestream",
       "date":"'$(date +%d-%m-%Y)'",
-      "formats":[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$a/@data-file
-        },
-        for $x at $i in tail(
-          tokenize(unparsed-text($a/@data-file),"#EXT-X-STREAM-INF:")
-        )
-        order by extract($x,"BANDWIDTH=(\d+)",1)
-        count $i
-        return {
-          "format":"hls-"||$i,
-          "container":"m3u8[h264+aac]",
-          "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
-          "bitrate":extract($x,"BANDWIDTH=(\d+)\d{3}",1)||"kbps",
-          "url":resolve-uri(extract($x,"(.+m3u8)",1),$a/@data-file)
-        }
-      ]
+      "formats":xivid:m3u8-to-json($a/@data-file)
     } else {
       "name":"Omroep Flevoland: "||//h2,
       "date":if ($a/@data-page-type="missed") then
@@ -524,34 +345,14 @@ regio_fll() {
 }
 
 regio_utr() {
-  eval "$(xidel "$1" --xquery '
+  eval "$(xidel "$1" -e '
     json:=if (//script[@async]) then
       json(
         extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1)
       )/{
         "name":publicationData/label||": Livestream",
         "date":"'$(date +%d-%m-%Y)'",
-        "formats":let $a:=clipData/(assets)()[mediatype="MP4_HLS"]/src return [
-          {
-            "format":"hls-0",
-            "container":"m3u8[manifest]",
-            "url":$a
-          },
-          for $x at $i in tail(
-            tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")
-          )
-          order by extract($x,"BANDWIDTH=(\d+)",1)
-          count $i
-          return {
-            "format":"hls-"||$i,
-            "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-            "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-            "bitrate":round(
-              extract($x,"BANDWIDTH=(\d+)",1) div 1000
-            )||"kbps",
-            "url":resolve-uri(extract($x,"(.+m3u8)",1),$a)
-          }
-        ]
+        "formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)
       }
     else
       let $a:=json(
@@ -604,37 +405,17 @@ regio() {
             extract(raw,"var opts = (.+);",1)
           )
         ),
-        $c:=$b/clipData/(assets)(1)[ends-with(src,"m3u8")]/x:request({
-          "url":if (starts-with(src,"//")) then
+        $c:=$b/clipData/(assets)(1)[ends-with(src,"m3u8")]/(
+          if (starts-with(src,"//")) then
             $b/protocol||substring-after(src,"//")
           else
             resolve-uri(src,$b/publicationData/defaultMediaAssetPath)
-        })
+        )
     return
     json:=if ($c) then {
       "name":$b/publicationData/label||": Livestream",
       "date":"'$(date +%d-%m-%Y)'",
-      "formats":[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$c/url
-        },
-        for $x at $i in tail(
-          tokenize($c/doc,"#EXT-X-STREAM-INF:")
-        )
-        order by extract($x,"BANDWIDTH=(\d+)",1)
-        count $i
-        return {
-          "format":"hls-"||$i,
-          "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-          "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-          "bitrate":round(
-            extract($x,"BANDWIDTH=(\d+)",1) div 1000
-          )||"kbps",
-          "url":resolve-uri(extract($x,"(.+m3u8)",1),$c/url)
-        }
-      ]
+      "formats":xivid:m3u8-to-json($c)
     } else {
       "name":concat(
         $b/publicationData/label,
@@ -717,18 +498,16 @@ dumpert() {
 }
 
 telegraaf() {
-  eval "$(xidel "$1" --xquery '
+  eval "$(xidel "$1" -e '
     let $a:=json(
-          concat(
-            "https://content.tmgvideo.nl/playlist/item=",
-            json(
-              //script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
-            )/(.//videoId)[1],
-            "/playlist.json"
-          )
-        ),
-        $b:=$a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1)
-    return json:={
+      concat(
+        "https://content.tmgvideo.nl/playlist/item=",
+        json(
+          //script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
+        )/(.//videoId)[1],
+        "/playlist.json"
+      )
+    ) return json:={
       "name":"Telegraaf: "||$a//title,
       "date":replace(
         $a//datecreated,
@@ -739,42 +518,17 @@ telegraaf() {
         $a//duration * duration("PT1S"),
         "[H01]:[m01]:[s01]"
       ),
-      "formats":[
+      "formats":(
         $a//locations/reverse((progressive)())/{
           "format":"pg-"||position(),
           "container":"mp4[h264+aac]",
           "resolution":concat(width,"x",height),
           "url":.//src
         },
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":$b
-        },
-        for $x at $i in tail(
-          tokenize(
-            extract(unparsed-text($b),"(#EXT-X-STREAM-INF.+m3u8$)",1,"ms"),
-            "#EXT-X-STREAM-INF:"
-          )
+        xivid:m3u8-to-json(
+          $a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1)
         )
-        order by extract($x,"BANDWIDTH=(\d+)",1)
-        count $i
-        return {
-          "format":"hls-"||$i,
-          "container":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
-          "resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],
-          "bitrate":let $a:=extract(
-            $x,
-            "audio.+?(\d+)\d{3}(?:-video.+?(\d+)\d{3})?",
-            (1,2)
-          ) return
-          join(
-            ($a[2][.],$a[1]),
-            "|"
-          )||"kbps",
-          "url":resolve-uri(extract($x,"(.+m3u8)",1),$b)
-        }
-      ]
+      )
     }
   ' --output-format=bash)"
 }
@@ -825,33 +579,7 @@ youtube() {
     json:=if ($a/livestream="1") then {
       "name"://meta[@property="og:title"]/@content,
       "date":"'$(date +%d-%m-%Y)'",
-      "formats":$a/json(player_response)/streamingData/[
-        {
-          "format":"hls-0",
-          "container":"m3u8[manifest]",
-          "url":hlsManifestUrl
-        },
-        tail(
-          tokenize(unparsed-text(hlsManifestUrl),"#EXT-X-STREAM-INF:")
-        ) ! {
-          "format":"hls-"||position(),
-          "container":"m3u8[h264+aac]",
-          "resolution":concat(
-            extract(.,"RESOLUTION=([\dx]+)", 1),
-            "@",
-            round(
-              number(
-                extract(.,"FRAME-RATE=([\d.]+)",1)
-              )
-            ),
-            "fps"
-          ),
-          "bitrate":round(
-            extract(.,"BANDWIDTH=(\d+)",1) div 1000
-          )||"kbps",
-          "url":extract(.,"(.+m3u8)",1)
-        }
-      ]
+      "formats":xivid:m3u8-to-json($a/json(player_response)/streamingData/hlsManifestUrl)
     } else {
       "name"://meta[@property="og:title"]/@content,
       "date":format-date(
@@ -863,7 +591,7 @@ youtube() {
         "format":"ttml",
         "url":$a/(json(player_response)//captionTracks)()[languageCode="nl"]/baseUrl
       }[url],
-      "formats":[
+      "formats":(
         for $x at $i in reverse($b[quality]) return {
           "format":"pg-"||$i,
           "container":let $a:=extract(
@@ -906,7 +634,7 @@ youtube() {
           "bitrate":round($x/bitrate div 1000)||"kbps",
           "url":$x/url
         }
-      ]
+      )
     }
   ' --output-format=bash)"
 }
@@ -922,52 +650,20 @@ vimeo() {
         "(\d+)-(\d+)-(\d+).+",
         "$3-$2-$1"
       ),
-      "duration":clip/duration/formatted,
-      "formats":player/json(config_url)//files/[
-        let $a:=hls/(.//url)[1] return (
-          for $x at $i in (progressive)()
-          order by $x/width
-          count $i
-          return
-          $x/{
-            "format":"pg-"||$i,
-            "container":"mp4[h264+aac]",
-            "resolution":concat(width,"x",height,"@",fps,"fps"),
-            "url":url
-          },
-          {
-            "format":"hls-0",
-            "container":"m3u8[manifest]",
-            "url":$a
-          },
-          for $x at $i in tail(
-            tokenize(unparsed-text($a),"#EXT-X-STREAM-INF:")
-          )
-          order by extract($x,"BANDWIDTH=(\d+)",1)
-          count $i
-          return {
-            "format":"hls-"||$i,
-            "container":"m3u8[h264+aac]",
-            "resolution":concat(
-              extract($x,"RESOLUTION=([\dx]+)",1),
-              "@",
-              round(
-                number(
-                  extract($x,"FRAME-RATE=([\d.]+)",1)
-                )
-              ),
-              "fps"
-            ),
-            "bitrate":round(
-              extract($x,"BANDWIDTH=(\d+)",1) div 1000
-            )||"kbps",
-            "url":resolve-uri(
-              extract($x,"(.+m3u8)",1),
-              $a
-            )
-          }
-        )
-      ]
+      "duration":clip/duration/raw * duration("PT1S") + time("00:00:00"),
+      "formats":player/json(config_url)//files/(
+        for $x at $i in (progressive)()
+        order by $x/width
+        count $i
+        return
+        $x/{
+          "format":"pg-"||$i,
+          "container":"mp4[h264+aac]",
+          "resolution":concat(width,"x",height,"@",fps,"fps"),
+          "url":url
+        },
+        xivid:m3u8-to-json((hls//url)[1])
+      )
     }
   ' --output-format=bash)"
 }
@@ -1007,7 +703,7 @@ info() {
     return (
       $b ! concat(
         substring($a(.)||$d,1,$c + 1),
-        if ($json(.) instance of string) then$json(.) else $json(.)/format
+        if ($json(.) instance of string) then $json(.) else $json(.)/format
       ),
       if ($e(2)) then
         for $x at $i in $e() return
@@ -1059,7 +755,7 @@ Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
 fi
-export XIDEL_OPTIONS="--silent"
+export XIDEL_OPTIONS="--silent --module=xivid.xq"
 user_agent="Mozilla/5.0 Firefox/64.0"
 
 while true; do
