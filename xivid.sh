@@ -92,7 +92,7 @@ npo() {
         "[H01]:[m01]:[s01]"
       ),
       "subtitle":{
-        "format":"webvtt",
+        "type":"webvtt",
         "url":if ($b/parentId) then
           x:request({
             "url":concat(
@@ -224,7 +224,7 @@ kijk() {
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
         "subtitle":{
-          "format":"webvtt",
+          "type":"webvtt",
           "url":(tracks)()[label=" Nederlands"]/file
         }[url],
         "formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
@@ -559,7 +559,7 @@ youtube() {
       ),
       "duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),
       "subtitle":{
-        "format":"ttml",
+        "type":"ttml",
         "url":$a/(json(player_response)//captionTracks)()[languageCode="nl"]/baseUrl
       }[url],
       "formats":(
@@ -674,7 +674,7 @@ info() {
     return (
       $b ! concat(
         substring($a(.)||$d,1,$c + 1),
-        if ($json(.) instance of string) then $json(.) else $json(.)/format
+        if ($json(.) instance of string) then $json(.) else $json(.)/type
       ),
       if ($e(2)) then
         for $x at $i in $e() return

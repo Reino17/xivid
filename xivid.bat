@@ -222,7 +222,7 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" -e ^"
         '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
       ^)^,
       'subtitle':{
-        'format':'webvtt'^,
+        'type':'webvtt'^,
         'url':^(tracks^)^(^)[label^=' Nederlands']/file
       }[url]^,
       'formats':xivid:m3u8-to-json^(^(sources^)^(^)[not^(drm^) and type^='m3u8'][1]/file^)
@@ -577,7 +577,7 @@ xidel "%~1" --xquery ^"^
     ),^
     'duration':duration(//meta[@itemprop='duration']/@content) + time('00:00:00'),^
     'subtitle':{^
-      'format':'ttml',^
+      'type':'ttml',^
       'url':$a/(json(player_response)//captionTracks)()[languageCode='nl']/baseUrl^
     }[url],^
     'formats':(^
