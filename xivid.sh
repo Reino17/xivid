@@ -18,18 +18,16 @@
 # https://github.com/Reino17/bashgemist
 # door Reino Wijnsma (rwijnsma@xs4all.nl)
 
-show_help() {
+help() {
   cat <<EOF
-BashGemist, een video-url extractie script.
-Gebruik: ./bashgemist.sh [optie] url
+Xivid, een video-url extractie script.
+Gebruik: ./xivid.sh [optie] url
 
-  -h, --help              Toon deze hulppagina.
-  -f, --format FORMAAT    Formaat code. Zonder opgave wordt het best
-                          beschikbare formaat gekozen.
-  -i, --info              Toon video informatie, incl. een opsomming
-                          van alle beschikbare formaten.
-  -j, --json              Toon video informatie als JSON.
-  -d, --debug             Toon bash debug informatie.
+  -f FORMAAT    Forceer specifiek formaat. Zonder opgave wordt het
+                best beschikbare formaat gekozen.
+  -i            Toon video informatie, incl. een opsomming van alle
+                beschikbare formaten.
+  -j            Toon video informatie als JSON.
 
 Ondersteunde websites:
   npostart.nl             omropfryslan.nl       omroepwest.nl
@@ -47,9 +45,9 @@ Ondersteunde websites:
   vimeo.com
 
 Voorbeelden:
-  ./bashgemist.sh https://www.npostart.nl/nos-journaal/01-01-2017/POW_03375409
-  ./bashgemist.sh -i https://www.rtl.nl/video/f2068013-ce22-34aa-94cb-1b1aaec8d1bd
-  ./bashgemist.sh -f hls-6 https://www.kijk.nl/video/nHD4my1HMKu
+  ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
+  ./xivid.sh -i https://www.rtl.nl/video/26862f08-13c0-31d2-9789-49a3b286552d
+  ./xivid.sh -f hls-6 https://www.kijk.nl/video/jCimXJk75RP
 EOF
 }
 
@@ -1044,19 +1042,19 @@ info() {
   ' <<< $1
 }
 
-if ! command -v xidel >/dev/null; then
-  cat 1>&2 <<EOF
-BashGemist, een video-url extractie script.
-Fout: Xidel niet gevonden!
-Installeer Xidel a.u.b. om dit script te kunnen gebruiken.
+if command -v xidel >/dev/null; then
+  if [[ $(xidel --version | xidel -s - -e 'let $a:=x:lines($raw)[1] return number(string-join(extract($a,"(\d+)",1,"*")))') < 98 ]]; then
+    cat 1>&2 <<EOF
+xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
+Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
-  exit 1
-elif [[ $(xidel --version | xidel -s - -e 'boolean(extract($raw,"Xidel (.+)",1) < "0.9.8")') = true ]]; then
+    exit 1
+  fi
+else
   cat 1>&2 <<EOF
-BashGemist, een video-url extractie script.
-Fout: Xidel gevonden, maar versie is te oud!
-Installeer Xidel 0.9.8 of nieuwer a.u.b.
+xivid: 'xidel' niet gevonden!
+Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
@@ -1064,59 +1062,64 @@ fi
 export XIDEL_OPTIONS="--silent"
 user_agent="Mozilla/5.0 Firefox/64.0"
 
-if [[ -z "$@" ]]; then
-  cat 1>&2 <<EOF
-BashGemist, een video-url extractie script.
-Gebruik: ./bashgemist.sh [optie] url
-Typ -h of --help voor een lijst van alle opties.
-EOF
-  exit 1
-fi
-
 while true; do
   re='^https?://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
   case $1 in
-    -h|--help)
-      show_help
+    -h)
+      help
       exit
       ;;
-    -f|--format)
+    -f)
       if [[ $3 ]]; then
-        format=$2
-        shift
-      else
-        if [[ $2 =~ $re ]]; then
-          echo "bashgemist: ontbrekende formaat code." 1>&2
-          exit 1
+        if [[ $2 ]]; then
+          f=$2
+          shift
         else
-          echo "bashgemist: ontbrekende url." 1>&2
+          echo "xivid: formaat code ontbreekt." 1>&2
           exit 1
         fi
+      elif [[ $2 ]]; then
+        if [[ $2 =~ $re ]]; then
+          echo "xivid: formaat code ontbreekt." 1>&2
+          exit 1
+        else
+          echo "xivid: url ontbreekt." 1>&2
+          exit 1
+        fi
+      else
+        echo "xivid: formaat code en url ontbreken." 1>&2
+        exit 1
       fi
       ;;
-    -i|--info)
-      info=1
+    -i)
+      if [[ $2 ]]; then
+        i=1
+      else
+        echo "xivid: url ontbreekt." 1>&2
+        exit 1
+      fi
       ;;
-    -j|--json)
-      dump_json=1
+    -j)
+      if [[ $2 ]]; then
+        j=1
+      else
+        echo "xivid: url ontbreekt." 1>&2
+        exit 1
+      fi
       ;;
-    -d|--debug)
-      set -x
-      ;;
-    -|-?*)
-      echo "bashgemist: ongeldige optie: '$1'." 1>&2
+    -*)
+      echo "xivid: optie '$1' ongeldig." 1>&2
       exit 1
       ;;
     *)
-      if [[ $1 ]]; then
-        if [[ $1 =~ $re ]]; then
-          url=$1
-        else
-          echo "bashgemist: ongeldige url." 1>&2
-          exit 1
-        fi
+      if [[ -z "$@" ]]; then
+        echo "xivid: url ontbreekt." 1>&2
+        echo "Typ -h voor een lijst met alle opties." 1>&2
+        exit 1
+      elif [[ $1 =~ $re ]]; then
+        url=$1
       else
-        echo "bashgemist: ontbrekende url." 1>&2
+        echo "xivid: url ongeldig." 1>&2
         exit 1
       fi
       break
@@ -1126,7 +1129,7 @@ done
 
 if [[ $url =~ (npostart.nl|gemi.st) ]]; then
   if [[ $url =~ npostart.nl/live ]]; then
-    echo "bashgemist: niet ondersteunde url." 1>&2
+    echo "xivid: url niet ondersteund." 1>&2
     exit 1
   fi
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
@@ -1171,33 +1174,36 @@ elif [[ $url =~ (youtube.com|youtu.be) ]]; then
 elif [[ $url =~ vimeo.com ]]; then
   vimeo "$url"
 else
-  echo "bashgemist: niet ondersteunde url." 1>&2
+  echo "xivid: url niet ondersteund." 1>&2
   exit 1
 fi
 
-if [[ $format ]]; then
-  if [[ -n $(xidel - -e '$json/(formats)()' <<< $json) ]]; then
-    if [[ $(xidel - -e '$json/(formats)()/format' <<< $json) =~ $format ]]; then
-      xidel - -e '$json/(formats)()[format="'$format'"]/url' <<< $json
+if [[ $json ]]; then
+  eval "$(xidel - -e 'fmts:=string-join($json/(formats)()/format)' --output-format=bash <<< $json)"
+else
+  echo "xivid: geen video(-informatie) beschikbaar." 1>&2
+  exit 1
+fi
+if [[ $f ]]; then
+  if [[ $fmts ]]; then
+    if [[ $fmts =~ $f ]]; then
+      xidel - -e '$json/(formats)()[format="'$f'"]/url' <<< $json
     else
-      echo "bashgemist: ongeldige formaat code." 1>&2
+      echo "xivid: formaat code ongeldig." 1>&2
       exit 1
     fi
   else
-    echo "bashgemist: geen video's beschikbaar." 1>&2
+    echo "xivid: geen video beschikbaar." 1>&2
     exit 1
   fi
-elif [[ $info ]]; then
+elif [[ $i ]]; then
   info "$json"
-elif [[ $dump_json ]]; then
+elif [[ $j ]]; then
   xidel - -e '$json' <<< $json
+elif [[ $fmts ]]; then
+  xidel - -e '$json/(formats)()[last()]/url' <<< $json
 else
-  if [[ -n $(xidel - -e '$json/(formats)()' <<< $json) ]]; then
-    xidel - -e '$json/(formats)()[last()]/url' <<< $json
-  else
-    echo "bashgemist: geen video's beschikbaar." 1>&2
-    exit 1
-  fi
+  echo "xivid: geen video beschikbaar." 1>&2
+  exit 1
 fi
-
 exit
