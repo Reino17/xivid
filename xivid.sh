@@ -311,10 +311,10 @@ regio_fll() {
       "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
       "formats":xivid:m3u8-to-json($a/@data-file)
     } else {
-      "name":"Omroep Flevoland: "||//h2,
+      "name":"Omroep Flevoland: "||normalize-space(//h2),
       "date":if ($a/@data-page-type="missed") then
         substring(
-          //span[starts-with(@class,"t--red")],
+          normalize-space(//span[starts-with(@class,"t--red")]),
           4
         )
       else

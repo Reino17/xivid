@@ -5120,12 +5120,18 @@ $ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e '{"name":"Omro
 
 https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a
 
+$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e 'outer-html(//h2)'
+<h2>
+
+            Dit is Flevoland
+        </h2>
+
 $ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e 'outer-html(//span[starts-with(@class,"t--red")])'
 <span class="t--red t--strong t--capitalize d--inl-block">
         Vr 12-04-2019
     </span>
 
-$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e '{"name":"Omroep Flevoland: "||//h2,"date":substring(//span[starts-with(@class,"t--red")],4),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e '{"name":"Omroep Flevoland: "||normalize-space(//h2),"date":substring(normalize-space(//span[starts-with(@class,"t--red")]),4),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
 {
   "name": "Omroep Flevoland: Dit is Flevoland",
   "date": "12-04-2019",
@@ -5138,6 +5144,8 @@ $ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4a
   ]
 }
 
+https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop
+
 $ xidel -s "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e 'outer-html(//span[@class="d--block--sm"])'
 <span class="d--block--sm">
 
@@ -5145,7 +5153,7 @@ $ xidel -s "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorp
 
         </span>
 
-$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e '{"name":"Omroep Flevoland: "||//h2,"date":xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e '{"name":"Omroep Flevoland: "||normalize-space(//h2),"date":xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
 {
   "name": "Omroep Flevoland: Team De Corner wint dorpenloop",
   "date": "13-04-2019",
@@ -5162,7 +5170,7 @@ $ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/sport/170116/team-d
 
 Eén query voor beide videostreams:
 
-$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e 'let $a:=//div[ends-with(@class,"videoplayer")] return if ($a/@data-page-type="home") then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/@data-file)} else {"name":"Omroep Flevoland: "||//h2,"date":if ($a/@data-page-type="missed") then substring(//span[starts-with(@class,"t--red")],4) else xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e 'let $a:=//div[ends-with(@class,"videoplayer")] return if ($a/@data-page-type="home") then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/@data-file)} else {"name":"Omroep Flevoland: "||normalize-space(//h2),"date":if ($a/@data-page-type="missed") then substring(normalize-space(//span[starts-with(@class,"t--red")]),4) else xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
 
 ------------------------------------------------------------------------------------------------
 
@@ -5173,10 +5181,10 @@ $ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e 'let $a:=//div
     "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
     "formats":xivid:m3u8-to-json($a/@data-file)
   } else {
-    "name":"Omroep Flevoland: "||//h2,
+    "name":"Omroep Flevoland: "||normalize-space(//h2),
     "date":if ($a/@data-page-type="missed") then
       substring(
-        //span[starts-with(@class,"t--red")],
+        normalize-space(//span[starts-with(@class,"t--red")]),
         4
       )
     else
