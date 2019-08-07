@@ -349,10 +349,10 @@ regio_utr() {
           ": ",
           (
             substring-before(
-              //h3[@class="article-title"],
+              normalize-space(//h3[@class="article-title"]),
               " -"
             )[.],
-            //h1[@class="article-title"]
+            normalize-space(//h1[@class="article-title"])
           )[1]
         ),
         "date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),

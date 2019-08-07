@@ -5237,7 +5237,7 @@ $ xidel -s --module=xivid.xq "https://www.rtvutrecht.nl/live/rtvutrecht/" -f '//
 
 https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/
 
-$ xidel -s "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",substring-before(//h3[@class="article-title"]," -")),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
+$ xidel -s "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",substring-before(normalize-space(//h3[@class="article-title"])," -")),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
 {
   "name": "RTV Utrecht: UNieuws",
   "date": "27-04-2019",
@@ -5252,7 +5252,7 @@ $ xidel -s "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190
 
 https://www.rtvutrecht.nl/nieuws/1908421/
 
-$ xidel -s "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(//h3[@class="article-title"]," -")[.],//h1[@class="article-title"])[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
+$ xidel -s "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(normalize-space(//h3[@class="article-title"])," -")[.],normalize-space(//h1[@class="article-title"]))[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
 {
   "name": "RTV Utrecht: Fantastische energie en geen wanklank: trotse burgemeester is tevreden over Koningsdag Amersfoort",
   "date": "27-04-2019",
@@ -5269,7 +5269,7 @@ $ xidel -s "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'let $a:=json(//script
 
 Eén query voor beide videostreams:
 
-$ xidel -s --module=xivid.xq "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'if (//script[@async]) then json(extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)} else let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(//h3[@class="article-title"]," -")[.],//h1[@class="article-title"])[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
+$ xidel -s --module=xivid.xq "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'if (//script[@async]) then json(extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)} else let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(normalize-space(//h3[@class="article-title"])," -")[.],normalize-space(//h1[@class="article-title"]))[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"format":"pg-1","container":"mp4[h264+aac]","url":$a}]}'
 
 ------------------------------------------------------------------------------------------------
 
@@ -5291,10 +5291,10 @@ $ xidel -s --module=xivid.xq "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'if 
         ": ",
         (
           substring-before(
-            //h3[@class="article-title"],
+            normalize-space(//h3[@class="article-title"]),
             " -"
           )[.],
-          //h1[@class="article-title"]
+          normalize-space(//h1[@class="article-title"])
         )[1]
       ),
       "date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
