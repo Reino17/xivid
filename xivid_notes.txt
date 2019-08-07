@@ -3907,9 +3907,21 @@ $ xidel -s --module=xivid.xq "https://nos.nl/livestream/npo-politiek.html" -e '{
 
 [dumpert]
 
-https://www.dumpert.nl/mediabase/7629097/eca3888b/monfils_wint_abn_amro_in_stijl.html
+http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html
 
-$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" --xquery '{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
+$ xidel -s -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" -e 'outer-html(//div[starts-with(@class,"theoplayer-container")])'
+<div class="theoplayer-container video-js theoplayer-skin" id="video1" data-files="eyJmbHYiOiJodHRwczpcL1wvbWVkaWEuZHVtcGVydC5ubFwvZmx2XC80MzAxYmZhZF9zY2hpcHBlcnMubXA0Lm1wNC5mbHYiLCJ0YWJsZXQiOiJodHRwczpcL1wvbWVkaWEuZHVtcGVydC5ubFwvdGFibGV0XC80MzAxYmZhZF9zY2hpcHBlcnMubXA0Lm1wNC5tcDQiLCJtb2JpbGUiOiJodHRwczpcL1wvbWVkaWEuZHVtcGVydC5ubFwvbW9iaWxlXC80MzAxYmZhZF9zY2hpcHBlcnMubXA0Lm1wNC5tcDQiLCI3MjBwIjoiaHR0cHM6XC9cL21lZGlhLmR1bXBlcnQubmxcLzcyMHBcLzQzMDFiZmFkX3NjaGlwcGVycy5tcDQubXA0Lm1wNCIsInN0aWxsIjoiaHR0cHM6XC9cL21lZGlhLmR1bXBlcnQubmxcL3N0aWxsc1wvNjY3ODE5OF80MzAxYmZhZC5qcGcifQ=="></div>
+
+$ xidel -s -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" -e 'json(binary-to-string(base64Binary(//@data-files)))'
+{
+  "flv": "https://media.dumpert.nl/flv/4301bfad_schippers.mp4.mp4.flv",
+  "tablet": "https://media.dumpert.nl/tablet/4301bfad_schippers.mp4.mp4.mp4",
+  "mobile": "https://media.dumpert.nl/mobile/4301bfad_schippers.mp4.mp4.mp4",
+  "720p": "https://media.dumpert.nl/720p/4301bfad_schippers.mp4.mp4.mp4",
+  "still": "https://media.dumpert.nl/stills/6678198_4301bfad.jpg"
+}
+
+$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "http://www.dumpert.nl/mediabase/6678198/4301bfad/goud._dafne_schippers_wint_200m_bejing_.html" --xquery '{"name":"Dumpert: "||//div[@class="dump-desc"]/normalize-space(h1),"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
 {
   "name": "Dumpert: GOUD. Dafne Schippers wint 200m Bejing!",
   "date": "28-08-2015",
@@ -3941,11 +3953,11 @@ https://www.dumpert.nl/embed/6678198/4301bfad/
 
 Gebruik altijd de non-embedded url als bron.
 
-$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/embed/6678198/4301bfad/" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/{"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
+$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/embed/6678198/4301bfad/" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/{"name":"Dumpert: "||//div[@class="dump-desc"]/normalize-space(h1),"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}}'
 
 https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html (embedded youtube video)
 
-$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/(if (//iframe) then replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1") else {"name":"Dumpert: "||//div[@class="dump-desc"]/h1,"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}})'
+$ xidel -s --module=xivid.xq -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/mediabase/7627779/f41e160c/keiglad_hier_dfjw_mee_met_de_zoutstrooiers.html" --xquery '(if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .)/(if (//iframe) then replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1") else {"name":"Dumpert: "||//div[@class="dump-desc"]/normalize-space(h1),"date":xivid:txt-to-date(//p[@class="dump-pub"]),"formats":let $a:=json(binary-to-string(base64Binary(//@data-files))) for $x at $i in ("flv","mobile","tablet","720p") ! $a(.) return {"format":"pg-"||$i,"container":extract($x,".+\.(.+)",1)||"[h264+aac]","url":$x}})'
 https://youtu.be/CZ_9DCl6O4M
 
 ------------------------------------------------------------------------------------------------
@@ -3957,7 +3969,7 @@ https://youtu.be/CZ_9DCl6O4M
     if (//iframe) then
       replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1")
     else {
-      "name":"Dumpert: "||//div[@class="dump-desc"]/h1,
+      "name":"Dumpert: "||//div[@class="dump-desc"]/normalize-space(h1),
       "date":xivid:txt-to-date(//p[@class="dump-pub"]),
       "formats":let $a:=json(
         binary-to-string(base64Binary(//@data-files))

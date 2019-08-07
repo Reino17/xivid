@@ -464,7 +464,7 @@ FOR /F "delims=" %%A IN ('xidel -H "Cookie: nsfw=1;cpc=10" "%~1" --xquery ^"
     if ^(//iframe^) then
       replace^(//iframe/@src^,'.+/^(.+^)\?.+'^,'https://youtu.be/$1'^)
     else {
-      'name':'Dumpert: '^|^|//div[@class^='dump-desc']/h1^,
+      'name':'Dumpert: '^|^|//div[@class^='dump-desc']/normalize-space^(h1^)^,
       'date':xivid:txt-to-date^(//p[@class^='dump-pub']^)^,
       'formats':let $a:^=json^(
         binary-to-string^(base64Binary^(//@data-files^)^)
