@@ -483,9 +483,7 @@ youtube() {
                   "https://www.youtube.com/get_video_info?video_id=",
                   //meta[@itemprop="videoId"]/@content,
                   "&amp;eurl=",
-                  uri-encode(
-                    "https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content
-                  ),
+                  uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),
                   "&amp;sts=",
                   json(
                     doc(
@@ -496,30 +494,44 @@ youtube() {
               ),
               "&amp;"
             )
-            let $a:=tokenize($x,"=")
-            return {
-              $a[1]:uri-decode($a[2])
-            }
+            let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}
           |}
         else
           json(
             //script/extract(.,"ytplayer.config = (.+?\});",1)[.]
           )/args,
-        $b:=$a/(
-          url_encoded_fmt_stream_map,
-          adaptive_fmts
-        ) ! tokenize(.,",") ! {|
+        $b:=$a/json(player_response),
+        $c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|
+          let $a:=extract(
+            tokenize($a/fmt_list,",")[$i],
+            "/(\d+)x(\d+)",
+            (1,2)
+          ) return ({"width":$a[1]},{"height":$a[2]}),
+          for $y in tokenize($x,"&amp;")
+          let $a:=tokenize($y,"=")
+          return
+          {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}
+        |},
+        $d:=tokenize($a/adaptive_fmts,",") ! {|
           for $x in tokenize(.,"&amp;")
           let $a:=tokenize($x,"=")
-          return {
-            $a[1]:uri-decode($a[2])
+          return
+          if ($a[1]="size") then
+            let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]})
+          else {
+            if ($a[1]="type") then
+              "mimeType"
+            else if ($a[1]="audio_sample_rate") then
+              "audioSampleRate"
+            else
+              $a[1]:uri-decode($a[2])
           }
         |}
     return
-    json:=if ($a/livestream="1") then {
+    json:=if ($b/videoDetails/isLive) then {
       "name"://meta[@property="og:title"]/@content,
       "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-      "formats":xivid:m3u8-to-json($a/json(player_response)/streamingData/hlsManifestUrl)
+      "formats":xivid:m3u8-to-json($b/streamingData/hlsManifestUrl)
     } else {
       "name"://meta[@property="og:title"]/@content,
       "date":format-date(
@@ -529,13 +541,16 @@ youtube() {
       "duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),
       "subtitle":{
         "type":"ttml",
-        "url":$a/(json(player_response)//captionTracks)()[languageCode="nl"]/baseUrl
+        "url":($b//captionTracks)()[languageCode="nl"]/baseUrl
       }[url],
       "formats":(
-        for $x at $i in reverse($b[quality]) return {
+        for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)])
+        order by $x/width
+        count $i
+        return {
           "format":"pg-"||$i,
           "container":let $a:=extract(
-            $x/type,
+            $x/mimeType,
             "/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",
             (1 to 3)
           ) return
@@ -547,30 +562,28 @@ youtube() {
             if ($a[3]="mp4a") then "aac" else $a[3],
             "]"
           ),
-          "resolution":reverse(
-            tokenize($a/fmt_list,",") ! substring-after(.,"/")
-          )[$i],
+          "resolution":concat($x/width,"x",$x/height),
+          "bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),
           "url":$x/url
         },
-        for $x at $i in $b[index]
-        order by $x/boolean(size),$x/bitrate
+        for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)]
+        order by $x/boolean(width),$x/bitrate
         count $i
         return {
           "format":"dash-"||$i,
           "container":let $a:=extract(
-            $x/type,
-            "/(.+);.+&quot;(\w+)(?:\.|&quot;)",
+            $x/mimeType,
+            "/(.+);.+&quot;(\w+)",
             (1,2)
           ) return
           concat(
-            if ($a[1]="3gpp") then "3gp" else $a[1],
+            $a[1],
             "[",
-            if ($a[2]="avc1") then "h264"
-            else if ($a[2]="mp4a") then "aac" else $a[2],
+            if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],
             "]"
           ),
-          "resolution":$x/size ! concat(.,"@",$x/fps,"fps"),
-          "samplerate":$x/audio_sample_rate ! concat(. div 1000,"kHz"),
+          "resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),
+          "samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),
           "bitrate":round($x/bitrate div 1000)||"kbps",
           "url":$x/url
         }
