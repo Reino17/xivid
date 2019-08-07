@@ -643,6 +643,53 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
+:facebook
+CALL :timezone
+FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
+  let $a:^=json^(
+    replace^(
+      extract^(.^,'\^(^(\{bootloadable.+?^)\^)^;'^,1^)^,
+      '\\x'^,
+      '\\u00'
+    ^)
+  ^)/^(.//videoData^)^(^)
+  return json:^={
+    'name':substring-before^(//title^,' ^| Facebook'^)^,
+    'date':format-date^(
+      extract^($raw^,'data-utime^=^&quot^;^(.+?^)^&quot^;'^,1^) * duration^('PT1S'^) + duration^('%tz%'^) + date^('1970-01-01'^)^,
+      '[D01]-[M01]-[Y]'
+    ^)^,
+    'duration':format-time^(
+      duration^($a/parse-xml^(dash_manifest^)//@mediaPresentationDuration^) + duration^('PT0.5S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'formats':[
+      $a/^(sd_src^,hd_src^)[.] ! {
+        'format':'pg-'^|^|position^(^)^,
+        'container':'mp4[h264+aac]'^,
+        'url':uri-decode^(.^)
+      }^,
+      for $x at $i in $a/parse-xml^(dash_manifest^)//Representation
+      order by $x/boolean^(@width^)^,$x/@bandwidth
+      count $i
+      return {
+        'format':'dash-'^|^|$i^,
+        'container':concat^(
+          substring-after^($x/@mimeType^,'/'^)^,
+          '['^,
+          extract^($x/@codecs^,'^(^^[\w]+^)'^,1^) ! ^(if ^(.^='avc1'^) then 'h264' else if ^(.^='mp4a'^) then 'aac' else .^)^,
+          ']'
+        ^)^,
+        'resolution':$x/@width ! concat^(.^,'x'^,$x/@height^)^,
+        'samplerate':$x/@audioSamplingRate ! concat^(. div 1000^,'kHz'^)^,
+        'bitrate':round^($x/@bandwidth div 1000^)^|^|'kbps'^,
+        'url':$x/uri-decode^(BaseUrl^)
+      }
+    ]
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :info
 xidel --xquery ^"^
   let $json:=json(^
@@ -742,7 +789,7 @@ FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   EXIT /B 1
 )
 SET "XIDEL_OPTIONS=--silent --module=xivid.xq"
-SET "user_agent=Mozilla/5.0 Firefox/68.0"
+SET "XIDEL_UA=Mozilla/5.0 Firefox/68.0"
 
 :options
 SET "prm1=%~1"
@@ -864,6 +911,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :youtube "%url%"
 ) ELSE IF NOT "%url:vimeo.com=%"=="%url%" (
   CALL :vimeo "%url%"
+) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
+  CALL :facebook "%url%"
 ) ELSE (
   ECHO xivid: url niet ondersteund.
   EXIT /B 1

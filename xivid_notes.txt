@@ -5459,3 +5459,135 @@ $ xidel -s --module=xivid.xq "https://www.telegraaf.nl/video/3439197/kamikaze-ac
     )
   }
 '
+
+================================================================================================
+
+[facebook]
+
+https://www.facebook.com/rtlnieuws/videos/783883842013477
+
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/68.0" "https://www.facebook.com/rtlnieuws/videos/783883842013477" -e 'json(extract(.,"\((\{bootloadable.+?)\);",1))'
+Error:
+jerr:JNDY0021: Failed to parse JSON: Invalid character at line 1, pos 25872: 'x' at  (tkColon) in [...]
+
+dash_manifest:"\x3C?xml version=\"1.0\"?>...
+               ^positie 25872
+
+$ xidel -s -e 'concat("3C = ",x:integer("3C",16)," = ",x:cps(x:integer("3C",16)))'
+3C = 60 = <
+
+Alle tekens met codepoint 1 t/m 255 (de extended ASCII range) kunnen, ge-escaped met "\x", gecodeerd worden. Dus \x01 t/m \xFF.
+Alle tekens met codepoint 1 t/m 65535 (Unicode) kunnen, ge-escaped met "\u", gecodeerd worden. Dus \u0001 t/m \uFFFF.
+In JSON is alleen Unicode codering toegestaan. Alle "\x" moeten dus vervangen worden met "\u00".
+
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/68.0" "https://www.facebook.com/rtlnieuws/videos/783883842013477" -e 'json(replace(extract(.,"\((\{bootloadable.+?)\);",1),"\\\x","\\\u00"))'
+...een hele lange JSON.
+
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/68.0" "https://www.facebook.com/rtlnieuws/videos/783883842013477" --xquery 'let $a:=json(replace(extract(.,"\((\{bootloadable.+?)\);",1),"\\\x","\\\u00"))/(.//videoData)() return {"name":substring-before(//title," | Facebook"),"date":format-date(extract($raw,"data-utime=&quot;(.+?)&quot;",1) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[$a/(sd_src,hd_src) ! {"format":"pg-"||position(),"container":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"format":"dash-"||$i,"container":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
+{
+  "name": "RTL Nieuws - Wat nou zwembad, afkoelen kan ook in de skihal",
+  "date": "26-07-2019",
+  "duration": "00:01:34",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://video.fams1-1.fna.fbcdn.net/v/t42.9040-2/68205667_2474333502853468_6132856631718838272_n.mp4?_nc_cat=105&efg=eyJybHIiOjUxNiwicmxhIjo1MTIsInZlbmNvZGVfdGFnIjoic3ZlX3NkIn0=&_nc_oc=AQnjmFuTYUwOnkzwp_r8nCUzS82IlaQGIRTBeCUiY0ncgPGLvBTYGUco_I3jJqhge6s&rl=516&vabr=287&_nc_ht=video.fams1-1.fna&oh=e1e701ff7bb1004adea8324461af14d2&oe=5D3BC81B"
+    },
+    {
+      "format": "pg-2",
+      "container": "mp4[h264+aac]",
+      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.24130-6/10000000_178797359955772_4533674329407659696_n.mp4?_nc_cat=100&efg=eyJ2ZW5jb2RlX3RhZyI6Im9lcF9oZCJ9&_nc_oc=AQlKTVem2P9z7bKOgx_dnGyGLv--7iQgsWYZ8L72hXqhJYqEV5ZQ7i1s-nDTUirCWVc&_nc_ht=scontent.fams1-2.fna&oh=3bee879eace0147f67a04783f59d9462&oe=5DA66184"
+    },
+    {
+      "format": "dash-1",
+      "container": "mp4[aac]",
+      "resolution": null,
+      "samplerate": "48kHz",
+      "bitrate": "65kbps",
+      "url": "https://video.fams1-1.fna.fbcdn.net/v/t42.1790-2/68279680_395734527964748_8718694988524814336_n.mp4?_nc_cat=1&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfYXVkaW9fYWFjcF82NF9mcmFnXzJfYXVkaW8ifQ==&_nc_oc=AQlNvFME_76_bDhkB-Teo1wBZI2UzpsMePhEdozlZuYTrucQwDslAdX0zznNZN2OaZk&_nc_ht=video.fams1-1.fna&oh=71db14a63223b223d9ea14657316eb87&oe=5D3BC7B7"
+    },
+    {
+      "format": "dash-2",
+      "container": "mp4[h264]",
+      "resolution": "256x144",
+      "samplerate": null,
+      "bitrate": "108kbps",
+      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.1790-2/68245318_415375175740790_3441968829461168128_n.mp4?_nc_cat=104&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfMjU2X2NyZl8yM19tYWluXzMuMF9mcmFnXzJfdmlkZW8ifQ==&_nc_oc=AQkAfG60auib-jlX-DXNPOvSH9KYLiDYDzc3WBq0xF7fq5u55fteVdcgIvX8zrd4Ny8&_nc_ht=video.fams1-2.fna&oh=e447ca1c92814431027648f0311c288a&oe=5D3BD889"
+    },
+    [...]
+    {
+      "format": "dash-7",
+      "container": "mp4[h264]",
+      "resolution": "1920x1080",
+      "samplerate": null,
+      "bitrate": "4952kbps",
+      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/10000000_698630943910215_5979648555495718912_n.mp4?_nc_cat=101&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfaHE1X2ZyYWdfMl92aWRlbyJ9&_nc_oc=AQka8icaQQIzk-H7CQYimldsbvlxOIocGnnybg2jhHhxATJtQgEfGG06LMHdU9NVxdo&_nc_ht=video.fams1-2.fna&oh=45ba3b8e2508c138d15ef66c87c64adf&oe=5D3BBFC5"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.facebook.com/EditieNL/videos/1919047391451451 (geen dash_manifest en maar één progressieve videostream)
+
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/68.0" "https://www.facebook.com/EditieNL/videos/1919047391451451" --xquery 'let $a:=json(replace(extract(.,"\((\{bootloadable.+?)\);",1),"\\\x","\\\u00"))/(.//videoData)() return {"name":substring-before(//title," | Facebook"),"date":format-date(extract($raw,"data-utime=&quot;(.+?)&quot;",1) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[$a/(sd_src,hd_src)[.] ! {"format":"pg-"||position(),"container":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"format":"dash-"||$i,"container":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
+{
+  "name": "Editie NL - Handig: hoe maak jij je eigen airco?",
+  "date": "25-07-2018",
+  "duration": null,
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/37671110_1755888834526416_8670517502846959616_n.mp4?_nc_cat=103&efg=eyJybHIiOjYxMiwicmxhIjo1MTIsInZlbmNvZGVfdGFnIjoic3ZlX3NkIn0=&_nc_oc=AQns0FP54l8gSn3RXJ0O5e8ZhXU-_c810ojzcldZNpHmje-w92_78NJvBTeyUqSHa0g&rl=612&vabr=340&_nc_ht=video.fams1-2.fna&oh=175d768a5f3912409d10768a82085b37&oe=5D3BA0C8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:=json(
+    replace(
+      extract(.,"\((\{bootloadable.+?)\);",1),
+      "\\\x",
+      "\\\u00"
+    )
+  )/(.//videoData)()
+  return {
+    "name":substring-before(//title," | Facebook"),
+    "date":format-date(
+      extract($raw,"data-utime=&quot;(.+?)&quot;",1) * duration("PT1S") +
+      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(
+      duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      $a/(sd_src,hd_src)[.] ! {
+        "format":"pg-"||position(),
+        "container":"mp4[h264+aac]",
+        "url":uri-decode(.)
+      },
+      for $x at $i in $a/parse-xml(dash_manifest)//Representation
+      order by $x/boolean(@width),$x/@bandwidth
+      count $i
+      return {
+        "format":"dash-"||$i,
+        "container":concat(
+          substring-after($x/@mimeType,"/"),
+          "[",
+          extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),
+          "]"
+        ),
+        "resolution":$x/@width ! concat(.,"x",$x/@height),
+        "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
+        "bitrate":round($x/@bandwidth div 1000)||"kbps",
+        "url":$x/uri-decode(BaseUrl)
+      }
+    ]
+  }
+'
