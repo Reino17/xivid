@@ -167,80 +167,37 @@ rtl() {
 }
 
 kijk() {
-  eval "$(xidel "https://embed.kijk.nl/video/$1" --xquery '
-    json:=if (//video) then
-      x:request({
-        "headers":"Accept: application/json;pk="||extract(
-          unparsed-text(//script[contains(@src,//@data-account)]/@src),
-          "policyKey:&quot;(.+?)&quot;",
-          1
-        ),
-        "url":concat(
-          "https://edge.api.brightcove.com/playback/v1/accounts/",
-          //@data-account,
-          "/videos/",
-          //@data-video-id
-        )
-      })/json/{
-        "name":concat(
-          upper-case(custom_fields/sbs_station),
-          ": ",
-          name,
-          if (custom_fields/sbs_episode) then " "||custom_fields/sbs_episode else ()
-        ),
-        "date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
-        "duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),
-        "expdate":replace(
-          json("http://api.kijk.nl/v1/default/entitlement/'$1'")//enddate/date,
-          "(\d+)-(\d+)-(\d+) ([\d:]+).*",
-          "$3-$2-$1 $4"
-        ),
-        "formats":[
-          for $x at $i in (sources)()[stream_name]
-          order by $x/size
-          count $i
-          return
-          $x/{
-            "format":"pg-"||$i,
-            "container":"mp4[h264+aac]",
-            "resolution":concat(width,"x",height),
-            "bitrate":round(avg_bitrate div 1000)||"kbps",
-            "url":replace(stream_name,"mp4:",extract($a,"(.+?nl/)",1))
-          },
-          xivid:m3u8-to-json((sources)()[size = 0]/src)
-        ]
-      }
-    else
-      json(
-        //script/extract(.,"playerConfig = (.+);",1)[.]
-      )/(playlist)()/{
-        "name":TAQ/concat(
-          upper-case(customLayer/c_media_station),
-          ": ",
-          customLayer/c_media_ispartof,
-          if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then
-            concat(
-              " S",
-              dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),
-              "E",
-              dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)
-            )
-          else
-            ()
-        ),
-        "date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
-        "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
-        "expdate":format-dateTime(
-          TAQ/customLayer/c_media_dateexpires * duration("PT1S") +
-          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
-          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
-        ),
-        "subtitle":{
-          "type":"webvtt",
-          "url":(tracks)()[label=" Nederlands"]/file
-        }[url],
-        "formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
-      }
+  eval "$(xidel "https://embed.kijk.nl/video/$1" -e '
+    json:=json(
+      //script/extract(.,"playerConfig = (.+);",1)[.]
+    )/(playlist)()/{
+      "name":TAQ/concat(
+        upper-case(customLayer/c_media_station),
+        ": ",
+        customLayer/c_media_ispartof,
+        if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then
+          concat(
+            " S",
+            dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),
+            "E",
+            dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)
+          )
+        else
+          ()
+      ),
+      "date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
+      "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
+      "expdate":format-dateTime(
+        TAQ/customLayer/c_media_dateexpires * duration("PT1S") +
+        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+        "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+      ),
+      "subtitle":{
+        "type":"webvtt",
+        "url":(tracks)()[label="Nederlands"]/file
+      }[url],
+      "formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
+    }
   ' --output-format=bash)"
 }
 
