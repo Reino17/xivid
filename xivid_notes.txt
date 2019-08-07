@@ -1,3 +1,525 @@
+[Reeksen en positionering]
+
+$ xidel -s -e 'join(1 to 10)'
+$ xidel -s -e 'join(for $x in 1 to 10 return $x)'
+1 2 3 4 5 6 7 8 9 10
+
+$ xidel -s -e 'join((1 to 10) ! .[. mod 2 = 1])'
+$ xidel -s --xquery 'join(for $x in 1 to 10 where $x mod 2 = 1 return $x)
+1 3 5 7 9
+
+$ xidel -s -e 'join((1 to 10) ! .[. mod 2 = 0])'
+$ xidel -s --xquery 'join(for $x in 1 to 10 where $x mod 2 = 0 return $x)'
+2 4 6 8 10
+
+$ xidel -s -e 'join((65 to 74) ! codepoints-to-string(.))'
+$ xidel -s -e 'join((65 to 74) ! x:cps(.))'
+$ xidel -s -e 'join(for $x in 65 to 74 return x:cps($x))'
+A B C D E F G H I J
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a)'
+A B C D E F G H I J
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return $a[1]'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return head($a)'
+A
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return $a[10]'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return $a[last()]'
+J
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(tail($a))'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() > 1])'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,2))'
+B C D E F G H I J
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() < last()])'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() < 10])'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,1,count($a) - 1))'
+A B C D E F G H I
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() != 5])'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(remove($a,5))'
+A B C D F G H I J
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 = 1])'
+A C E G I
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 = 0])'
+B D F H J
+
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(reverse($a))'
+J I H G F E D C B A
+
+$ xidel -s -e 'let $a:=1 to 10 return (join($a),join($a ! x:cps(. + 64)),join(reverse($a)),join(reverse($a) ! x:cps(. + 64)))'
+1 2 3 4 5 6 7 8 9 10
+A B C D E F G H I J
+10 9 8 7 6 5 4 3 2 1
+J I H G F E D C B A
+
+================================================================================================
+
+[Base conversions]
+
+Decimal     (Base 10)    31 = (3*10^1)+(1*10^0)                       = 30+1       = 31
+Binary      (Base  2) 11111 = (1*2^4)+(1*2^3)+(1*2^2)+(1*2^1)+(1*2^0) = 16+8+4+2+1 = 31
+Hexadecimal (Base 16)    1F = (1*16^1)+(15*16^0)                      = 16+15      = 31
+
+Dec to Bin/Hex:
+
+$ xidel -s -e 'x:integer-to-base(31,2)'
+11111
+
+$ xidel -s -e 'x:integer-to-base(31,16)'
+1F
+
+Bin/Hex to Dec:
+
+$ xidel -s -e 'x:integer("11111",2)'
+$ xidel -s -e 'x:integer("0b11111")'
+31
+
+$ xidel -s -e 'x:integer("1F",16)'
+$ xidel -s -e 'x:integer("0x1F")'
+31
+
+Bin to Hex:
+
+$ xidel -s -e 'x:integer-to-base(x:integer("11111",2),16)'
+$ xidel -s -e 'x:integer-to-base(x:integer("0b11111"),16)'
+1F
+
+Hex to Bin:
+
+$ xidel -s -e 'x:integer-to-base(x:integer("1F",16),2)'
+$ xidel -s -e 'x:integer-to-base(x:integer("0x1F"),2)'
+11111
+
+------------------------------------------------------------------------------------------------
+
+Unsigned (32bit) Hex to Dec:
+
+xidel -s -e "x:integer('0xffffff88')"
+4294967176
+
+Signed (32bit) Hex to Dec:
+
+https://www.digital-detective.net/manual-identification-of-suspect-computer-time-zone-2/
+http://core.ecu.edu/csci/wirthj/Basen/signBin-c.html
+https://stackoverflow.com/q/5826818
+https://stackoverflow.com/q/33629416
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Check of de decimale waarde groter is dan 2^31:
+
+- Tel het aantal bits.
+
+  $ xidel -s -e '(string-length("0xffffff88") - 2) * 4'
+  $ xidel -s -e 'string-length("ffffff88") * 4'
+  32
+
+  x4, want F_16 is 1111_2 (4 bits):
+  $ xidel -s -e 'x:integer-to-base(x:integer("0xf"),2)'
+  1111
+
+- Converteer als unsigned 32bit Hex en trek daar 2^(aantal bits) van af.
+
+  $ xidel -s -e 'math:pow(2,(string-length("0xffffff88") - 2) * 4)'
+  4.294967296E9
+
+  $ xidel -s -e 'integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))'
+  4294967296
+
+  $ xidel -s -e 'x:integer("0xffffff88") - integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))'
+  -120
+
+- Dit geldt alleen voor 0x80000000 en hoger. Converteer 0x7fffffff en lager als unsigned 32bit Hex!
+
+  $ xidel -s -e 'x:integer("0x80000000")'
+  2147483648
+
+  $ xidel -s -e 'integer(math:pow(2,(string-length("0x80000000") - 2) * 4 - 1))'
+  2147483648   # 2^31
+
+  $ xidel -s -e 'integer(math:pow(2,(string-length("0x80000000") - 2) * 4)) div 2'
+  2147483648
+
+  $ xidel -s -e 'let $a:=x:integer("0x80000000"),$b:=integer(math:pow(2,(string-length("0x80000000") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
+  -2147483648
+
+  $ xidel -s -e 'let $a:=x:integer("0x7fffffff"),$b:=integer(math:pow(2,(string-length("0x7fffffff") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
+  2147483647
+
+  $ xidel -s -e 'let $a:=x:integer("0xffffff88"),$b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
+  -120
+
+-e '
+  let $a:=x:integer("0xffffff88"),
+      $b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))
+  return
+  if ($a > $b div 2) then
+    $a - $b
+  else
+    $a
+'
+
+$ xidel -s -e 'declare function local:shex-to-dec ($hex as xs:string) as xs:integer {let $a:=x:integer($hex),$b:=integer(math:pow(2,(string-length($hex) - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
+-120
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Check of de hoeveelheid bits groter is dan 31:
+
+- Tel het aantal bits.
+
+  $ xidel -s -e 'x:integer-to-base(x:integer("0xffffff88"),2)'
+  11111111111111111111111110001000
+
+  $ xidel -s -e 'string-length(x:integer-to-base(x:integer("0xffffff88"),2))'
+  32
+
+- Converteer als unsigned 32bit Hex en trek daar 2^(aantal bits) van af.
+
+  $ xidel -s -e 'math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2)))'
+  4.294967296E9
+
+  $ xidel -s -e 'integer(math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2))))'
+  4294967296
+
+  $ xidel -s -e 'let $a:=x:integer("0xffffff88") return $a - integer(math:pow(2,string-length(x:integer-to-base($a,2))))'
+  -120
+
+- Dit geldt alleen voor 0x80000000 en hoger. Converteer 0x7fffffff en lager als unsigned 32bit Hex!
+
+  $ xidel -s -e 'x:integer-to-base(x:integer("0x80000000"),2)'
+  10000000000000000000000000000000
+
+  $ xidel -s -e 'x:integer-to-base(x:integer("0x7fffffff"),2)'
+  1111111111111111111111111111111
+
+  $ xidel -s -e 'let $a:=x:integer("0x80000000"),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  -2147483648
+
+  $ xidel -s -e 'let $a:=x:integer("0x7fffffff"),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  2147483647   # 2^31
+
+  $ xidel -s -e 'let $a:=x:integer("0xffffff88"),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  -120
+
+$ xidel -s -e 'declare function local:shex-to-dec ($hex as xs:string) as xs:integer {let $a:=x:integer($hex),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
+-120
+
+declare function shex-to-dec ($shex as xs:string) as xs:integer {
+  let $a:=x:integer($shex),
+      $b:=x:integer-to-base($a,2)
+  return
+  if (string-length($b) > 31) then
+    $a - integer(math:pow(2,string-length($b)))
+  else
+    $a
+};
+
+------------------------------------------------------------------------------------------------
+
+Genereer een willekeurig 128bit hexadecimaal getal:
+
+$ xidel -s -e 'join((1 to 32))'
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
+
+$ xidel -s -e 'random-seed(),join((1 to 32) ! random(16))'
+8 5 3 4 15 0 13 7 15 2 7 3 13 1 10 8 6 7 11 5 5 8 9 3 11 5 5 1 10 8 0 1
+
+$ xidel -s -e 'random-seed(),join((1 to 32) ! x:integer-to-base(random(16),16))'
+8 5 3 4 F 0 D 7 F 2 7 3 D 1 A 8 6 7 B 5 5 8 9 3 B 5 5 1 A 8 0 1
+
+$ xidel -s -e 'random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))'
+8534F0D7F273D1A867B55893B551A801
+
+------------------------------------------------------------------------------------------------
+
+Base64:
+
+https://en.wikipedia.org/wiki/Base64
+
+$ xidel -s -e 'string-to-base64Binary("Xivid")'
+WGl2aWQ=
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+String to Base64 (zonder string-to-base64Binary() ):
+
+----------------------------------------------------------------
+
+Base64 tekens:
+
+$ xidel -s -e 'string-join((for $x in (65 to 90,97 to 122,48 to 57) return x:cps($x),"+","/"))'
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+|        65 t/m 90       ||        97 t/m 122      ||48 t/m57|     # Codepoints in ASCII tabel.
+0                                                              63  # 64 tekens, range: 0-63.
+
+Principe:
+
+X        i        v        i        d                  # van teken
+88       105      118      105      100                # naar codepoint/decimaal
+01011000 01101001 01110110 01101001 01100100           # naar binair
+010110 000110 100101 110110 011010 010110 0100[00]     # opdelen in groepjes van 6 bits
+22     6      37     54     26     22     16           # naar decimaal/codepoint
+W      G      l      2      a      W      Q        =   # naar base64 met eventuele padding
+
+----------------------------------------------------------------
+
+$ xidel -s -e 'join(string-to-codepoints("Xivid"))'
+$ xidel -s -e 'join(x:cps("Xivid"))'
+88 105 118 105 100
+
+$ xidel -s -e 'join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2)))'
+01011000 01101001 01110110 01101001 01100100
+
+$ xidel -s -e 'string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2)))'
+0101100001101001011101100110100101100100
+
+Deze string moet opgedeeld worden in substrings met een lengte van 6 tekens.
+
+$ xidel -s -e 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return substring($bin,1,6)'
+010110
+
+$ xidel -s -e 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return substring($bin,37,6)'
+0100
+
+Dus opdelen op de indexes 1, 7, 13, 19, 25, 31, 37.
+
+$ xidel -s -e 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return join((1 to string-length($bin)) ! .[. mod 6 = 1])'
+$ xidel -s --xquery 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return join(for $x in 1 to string-length($bin) where $x mod 6 = 1 return $x)'
+1 7 13 19 25 31 37
+
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 return substring($bin,$x,6))'
+010110 000110 100101 110110 011010 010110 0100
+
+De binaire getallen dienen altijd 6 bits te bevatten.
+
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return substring($a||"0000",1,6))'
+010110 000110 100101 110110 011010 010110 010000
+
+De extra nullen worden later als padding (=) toegevoegd. 00 wordt =, 0000 wordt ==.
+
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return string-length($a))'
+6 6 6 6 6 6 4
+
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return (1 to (6 - string-length($a)[. != 6]) div 2) ! "=")'
+=
+
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return (substring($a||"0000",1,6),(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+010110 000110 100101 110110 011010 010110 010000 =
+
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return (x:integer(substring($a||"0000",1,6),2),(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+22 6 37 54 26 22 16 =
+
+$ xidel -s --xquery 'join(let $base64:=(for $x in (65 to 90,97 to 122,48 to 57) return codepoints-to-string($x),"+","/"),$bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return ($base64[x:integer(substring($a||"0000",1,6),2) + 1],(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+W G l 2 a W Q =
+
+$ xidel -s --xquery 'string-join(let $base64:=(for $x in (65 to 90,97 to 122,48 to 57) return codepoints-to-string($x),"+","/"),$bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return ($base64[x:integer(substring($a||"0000",1,6),2) + 1],(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+WGl2aWQ=
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Base64 to string:
+
+$ xidel -s -e 'binary-to-string(base64Binary("WGl2aWQ="))'
+Xivid
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+File to Base64:
+
+$ xidel -s -e 'file:read-binary("nl.png")'   # Nederlandse vlag van 18 bij 12 pixels.
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAG0lEQVQoz2P4z8BABmIYGtrIAkND21CJAjIQAF2WZqj5EZlfAAAAAElFTkSuQmCC
+
+File to Base64 (html):
+
+$ xidel -s --xquery 'concat("<img src=&quot;data:image/png;base64,",file:read-binary("nl.png"),"&quot;>")'
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAG0lEQVQoz2P4z8BABmIYGtrIAkND21CJAjIQAF2WZqj5EZlfAAAAAElFTkSuQmCC">
+
+Base64 to file:
+
+$ xidel -s -e 'file:write-binary("nl.png",base64Binary("iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAG0lEQVQoz2P4z8BABmIYGtrIAkND21CJAjIQAF2WZqj5EZlfAAAAAElFTkSuQmCC"))'
+
+================================================================================================
+
+[Codepoints en tekensets]
+
+https://nl.wikipedia.org/wiki/ASCII_%28tekenset%29
+https://nl.wikipedia.org/wiki/ISO_8859-1
+
+ASCII 7bit (2^7=128), 0 t/m 127:
+
+- 0 t/m 127 in 16 rijen van 8.
+
+  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x])'
+  0 16 32 48 64 80 96 112
+  1 17 33 49 65 81 97 113
+  2 18 34 50 66 82 98 114
+  3 19 35 51 67 83 99 115
+  4 20 36 52 68 84 100 116
+  5 21 37 53 69 85 101 117
+  6 22 38 54 70 86 102 118
+  7 23 39 55 71 87 103 119
+  8 24 40 56 72 88 104 120
+  9 25 41 57 73 89 105 121
+  10 26 42 58 74 90 106 122
+  11 27 43 59 75 91 107 123
+  12 28 44 60 76 92 108 124
+  13 29 45 61 77 93 109 125
+  14 30 46 62 78 94 110 126
+  15 31 47 63 79 95 111 127
+
+- Uitlijnen. I.p.v. if ((. = 0) or (. = 1) or ...) then... geeft een vergelijking met een reeks ook een boolean.
+
+  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x] ! (if (. = (0 to 9,96 to 99)) then " "||. else .))'
+   0 16 32 48 64 80  96 112
+   1 17 33 49 65 81  97 113
+   2 18 34 50 66 82  98 114
+   3 19 35 51 67 83  99 115
+   4 20 36 52 68 84 100 116
+   5 21 37 53 69 85 101 117
+   6 22 38 54 70 86 102 118
+   7 23 39 55 71 87 103 119
+   8 24 40 56 72 88 104 120
+   9 25 41 57 73 89 105 121
+  10 26 42 58 74 90 106 122
+  11 27 43 59 75 91 107 123
+  12 28 44 60 76 92 108 124
+  13 29 45 61 77 93 109 125
+  14 30 46 62 78 94 110 126
+  15 31 47 63 79 95 111 127
+
+- Hexadecimale getallen erbij, met | als scheiding en een extra 0 voor 0 t/m 9.
+
+  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) = 1) then "0"||. else .))))'
+   0|00 16|10 32|20 48|30 64|40 80|50  96|60 112|70
+   1|01 17|11 33|21 49|31 65|41 81|51  97|61 113|71
+   2|02 18|12 34|22 50|32 66|42 82|52  98|62 114|72
+   3|03 19|13 35|23 51|33 67|43 83|53  99|63 115|73
+   4|04 20|14 36|24 52|34 68|44 84|54 100|64 116|74
+   5|05 21|15 37|25 53|35 69|45 85|55 101|65 117|75
+   6|06 22|16 38|26 54|36 70|46 86|56 102|66 118|76
+   7|07 23|17 39|27 55|37 71|47 87|57 103|67 119|77
+   8|08 24|18 40|28 56|38 72|48 88|58 104|68 120|78
+   9|09 25|19 41|29 57|39 73|49 89|59 105|69 121|79
+  10|0A 26|1A 42|2A 58|3A 74|4A 90|5A 106|6A 122|7A
+  11|0B 27|1B 43|2B 59|3B 75|4B 91|5B 107|6B 123|7B
+  12|0C 28|1C 44|2C 60|3C 76|4C 92|5C 108|6C 124|7C
+  13|0D 29|1D 45|2D 61|3D 77|4D 93|5D 109|6D 125|7D
+  14|0E 30|1E 46|2E 62|3E 78|4E 94|5E 110|6E 126|7E
+  15|0F 31|1F 47|2F 63|3F 79|4F 95|5F 111|6F 127|7F
+
+- Tekens erbij, maar vervang 0, 7, 8, 9, 10 en 13 met spaties, omdat dit beheertekens (control characters) betreft.
+
+  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) = 1) then "0"||. else .)),if (. = (0,7,8,9,10,13)) then " " else x:cps(.)))'
+   0|00   16|10 ► 32|20   48|30 0 64|40 @ 80|50 P  96|60 ` 112|70 p
+   1|01 ☺ 17|11 ◄ 33|21 ! 49|31 1 65|41 A 81|51 Q  97|61 a 113|71 q
+   2|02 ☻ 18|12 ↕ 34|22 " 50|32 2 66|42 B 82|52 R  98|62 b 114|72 r
+   3|03 ♥ 19|13 ‼ 35|23 # 51|33 3 67|43 C 83|53 S  99|63 c 115|73 s
+   4|04 ♦ 20|14 ¶ 36|24 $ 52|34 4 68|44 D 84|54 T 100|64 d 116|74 t
+   5|05 ♣ 21|15 § 37|25 % 53|35 5 69|45 E 85|55 U 101|65 e 117|75 u
+   6|06 ♠ 22|16 ▬ 38|26 & 54|36 6 70|46 F 86|56 V 102|66 f 118|76 v
+   7|07   23|17 ↨ 39|27 ' 55|37 7 71|47 G 87|57 W 103|67 g 119|77 w
+   8|08   24|18 ↑ 40|28 ( 56|38 8 72|48 H 88|58 X 104|68 h 120|78 x
+   9|09   25|19 ↓ 41|29 ) 57|39 9 73|49 I 89|59 Y 105|69 i 121|79 y
+  10|0A   26|1A → 42|2A * 58|3A : 74|4A J 90|5A Z 106|6A j 122|7A z
+  11|0B ♂ 27|1B ← 43|2B + 59|3B ; 75|4B K 91|5B [ 107|6B k 123|7B {
+  12|0C ♀ 28|1C ∟ 44|2C , 60|3C < 76|4C L 92|5C \ 108|6C l 124|7C |
+  13|0D   29|1D ↔ 45|2D - 61|3D = 77|4D M 93|5D ] 109|6D m 125|7D }
+  14|0E ♫ 30|1E ▲ 46|2E . 62|3E > 78|4E N 94|5E ^ 110|6E n 126|7E ~
+  15|0F ☼ 31|1F ▼ 47|2F / 63|3F ? 79|4F O 95|5F _ 111|6F o 127|7F ⌂
+
+ALT+<cp> voor weergave (Windows).   # ALT 1 of ALT 127.
+&#<cp>; / &#x<hex> voor HTML.       # &#1; / &#x01; of &#127; / &#x7F;.
+\x<hex> voor Javascript.            # \x01 of \x7F.
+\u00<hex> voor JSON.                # \u0001 of \u007F.
+
+------------------------------------------------------------------------------------------------
+
+Extended ASCII 8bit (2^8=256), 127 t/m 255:
+
+- ISO 8859-1 / Latin-1 / "Unicode" in charmap.exe (Character Map).
+
+  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),x:cps(.)))' [--output-encoding=oem]
+  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),binary-to-string(xs:hexBinary(x:integer-to-base(.,16)),"latin1")))'
+  128|80 ? 144|90 ? 160|A0   176|B0 ° 192|C0 A 208|D0 D 224|E0 à 240|F0 d
+  129|81 ? 145|91 ? 161|A1 ¡ 177|B1 ± 193|C1 A 209|D1 Ñ 225|E1 á 241|F1 ñ
+  130|82 ? 146|92 ? 162|A2 ¢ 178|B2 ² 194|C2 A 210|D2 O 226|E2 â 242|F2 ò
+  131|83 ? 147|93 ? 163|A3 £ 179|B3 3 195|C3 A 211|D3 O 227|E3 a 243|F3 ó
+  132|84 ? 148|94 ? 164|A4 ☼ 180|B4 ' 196|C4 Ä 212|D4 O 228|E4 ä 244|F4 ô
+  133|85 ? 149|95 ? 165|A5 ¥ 181|B5 µ 197|C5 Å 213|D5 O 229|E5 å 245|F5 o
+  134|86 ? 150|96 ? 166|A6 ▌ 182|B6 ¶ 198|C6 Æ 214|D6 Ö 230|E6 æ 246|F6 ö
+  135|87 ? 151|97 ? 167|A7 § 183|B7 · 199|C7 Ç 215|D7 x 231|E7 ç 247|F7 ÷
+  136|88 ? 152|98 ? 168|A8 " 184|B8 , 200|C8 E 216|D8 O 232|E8 è 248|F8 o
+  137|89 ? 153|99 ? 169|A9 c 185|B9 1 201|C9 É 217|D9 U 233|E9 é 249|F9 ù
+  138|8A ? 154|9A ? 170|AA ª 186|BA º 202|CA E 218|DA U 234|EA ê 250|FA ú
+  139|8B ? 155|9B ? 171|AB « 187|BB » 203|CB E 219|DB U 235|EB ë 251|FB û
+  140|8C ? 156|9C ? 172|AC ¬ 188|BC ¼ 204|CC I 220|DC Ü 236|EC ì 252|FC ü
+  141|8D ? 157|9D ? 173|AD - 189|BD ½ 205|CD I 221|DD Y 237|ED í 253|FD y
+  142|8E ? 158|9E ? 174|AE r 190|BE _ 206|CE I 222|DE _ 238|EE î 254|FE _
+  143|8F ? 159|9F ? 175|AF _ 191|BF ¿ 207|CF I 223|DF ß 239|EF ï 255|FF ÿ
+
+  128 t/m 159 zijn beheertekens. ANSI / Windows-1252 / "Windows: Western" in charmap.exe heeft deze vervangen met de volgende grafische tekens:
+
+    128|80 € 144|90 
+    129|81   145|91 ‘
+    130|82 ‚ 146|92 ’
+    131|83 ƒ 147|93 “
+    132|84 „ 148|94 ”
+    133|85 … 149|95 •
+    134|86 † 150|96 –
+    135|87 ‡ 151|97 —
+    136|88 ˆ 152|98 ˜
+    137|89 ‰ 153|99 ™
+    138|8A Š 154|9A š
+    139|8B ‹ 155|9B ›
+    140|8C Œ 156|9C œ
+    141|8D   157|9D 
+    142|8E Ž 158|9E ž
+    143|8F   159|9F Ÿ
+
+  "latin1" heeft ze dus niet, maar het "Raster Fonts" in CMD (en dus Cygwin Bash) ondersteunt ze ook niet.
+
+  Geldige opties voor $encoding: utf8, utf-32le, oem, utf-8, latin1, utf-16, utf-16be, utf-32be, utf-32.
+
+ALT+0<cp> voor weergave (Windows).   # ALT 0163 of ALT 0255.
+&#<cp>; / &#x<hex> voor HTML.        # &#163; / &#xA3; of &#255; / &#xFF;.
+\x<hex> voor Javascript.             # \xA3 of \xFF.
+\u00<hex> voor JSON.                 # \u00A3 of \u00FF.
+
+- Code page 437 / CP437 / OEM-US / "DOS: United States" in charmap.exe.
+
+  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),x:cps(.)))' --output-encoding=latin1
+  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),binary-to-string(xs:hexBinary(x:integer-to-base(.,16)),"oem")))'
+  128|80 Ç 144|90 É 160|A0 á 176|B0 ░ 192|C0 └ 208|D0 ╨ 224|E0 α 240|F0 ≡
+  129|81 ü 145|91 æ 161|A1 í 177|B1 ▒ 193|C1 ┴ 209|D1 ╤ 225|E1 ß 241|F1 ±
+  130|82 é 146|92 Æ 162|A2 ó 178|B2 ▓ 194|C2 ┬ 210|D2 ╥ 226|E2 Γ 242|F2 ≥
+  131|83 â 147|93 ô 163|A3 ú 179|B3 │ 195|C3 ├ 211|D3 ╙ 227|E3 π 243|F3 ≤
+  132|84 ä 148|94 ö 164|A4 ñ 180|B4 ┤ 196|C4 ─ 212|D4 ╘ 228|E4 Σ 244|F4 ⌠
+  133|85 à 149|95 ò 165|A5 Ñ 181|B5 ╡ 197|C5 ┼ 213|D5 ╒ 229|E5 σ 245|F5 ⌡
+  134|86 å 150|96 û 166|A6 ª 182|B6 ╢ 198|C6 ╞ 214|D6 ╓ 230|E6 µ 246|F6 ÷
+  135|87 ç 151|97 ù 167|A7 º 183|B7 ╖ 199|C7 ╟ 215|D7 ╫ 231|E7 τ 247|F7 ≈
+  136|88 ê 152|98 ÿ 168|A8 ¿ 184|B8 ╕ 200|C8 ╚ 216|D8 ╪ 232|E8 Φ 248|F8 °
+  137|89 ë 153|99 Ö 169|A9 ⌐ 185|B9 ╣ 201|C9 ╔ 217|D9 ┘ 233|E9 Θ 249|F9 ∙
+  138|8A è 154|9A Ü 170|AA ¬ 186|BA ║ 202|CA ╩ 218|DA ┌ 234|EA Ω 250|FA ·
+  139|8B ï 155|9B ¢ 171|AB ½ 187|BB ╗ 203|CB ╦ 219|DB █ 235|EB δ 251|FB √
+  140|8C î 156|9C £ 172|AC ¼ 188|BC ╝ 204|CC ╠ 220|DC ▄ 236|EC ∞ 252|FC ⁿ
+  141|8D ì 157|9D ¥ 173|AD ¡ 189|BD ╜ 205|CD ═ 221|DD ▌ 237|ED φ 253|FD ²
+  142|8E Ä 158|9E ₧ 174|AE « 190|BE ╛ 206|CE ╬ 222|DE ▐ 238|EE ε 254|FE ■
+  143|8F Å 159|9F ƒ 175|AF » 191|BF ┐ 207|CF ╧ 223|DF ▀ 239|EF ∩ 255|FF  
+
+  CMD (en dus Cygwin Bash) is standaard afgesteld op CHCP 437 (oem). Hierdoor krijg je dit rare tafereel dat --output-encoding precies andersom werkt.
+
+ALT+<cp> voor weergave (Windows).   # ALT 128 of ALT 253.
+
+================================================================================================
+
 [Epoch/time conversions and timezone recovery]
 
 "The Unix epoch (or Unix time or POSIX time or Unix timestamp) is the number of seconds that have elapsed since January 1, 1970." (https://www.epochconverter.com/)
@@ -194,6 +716,235 @@ $ xidel -s -e 'format-time(time("00:19:06.540"),"[H01]:[m01]:[s01]")'
 
 $ xidel -s -e 'format-time(time("00:19:06.540") + duration("PT0.5S"),"[H01]:[m01]:[s01]")'
 00:19:07
+
+================================================================================================
+
+[Batch escape characters voor prettification]
+
+https://www.robvanderwoude.com/escapechars.php
+
+Query (Unix quoting):
+
+-e '
+  let $a:=string-join(
+        tokenize($raw) ! x:integer-to-base(.,16)
+      ),
+      $b:=x:integer($a,16)
+  return
+  concat("<^| ",$a," & ",$b," |%>")
+'
+
+Query (Windows quoting):
+
+-e "
+  let $a:=string-join(
+        tokenize($raw) ! x:integer-to-base(.,16)
+      ),
+      $b:=x:integer($a,16)
+  return
+  concat('<^| ',$a,' & ',$b,' |%>')
+"
+
+------------------------------------------------------------------------------------------------
+
+Directe commando:
+
+SET "var=11 7 14 3"
+ECHO %var% | xidel -s - ^
+-e ^"^
+  let $a:=string-join(^
+        tokenize($raw) ! x:integer-to-base(.,16)^
+      ),^
+      $b:=x:integer($a,16)^
+  return^
+  concat('^<^^^| ',$a,' ^& ',$b,' ^|%%^>')^
+"
+
+- In het geval van een Unix query dienen de aanhalingstekens omgedraaid te worden (Windows quoting). ' wordt " en andersom.
+- De dubbele aanhalingstekens dienen ge-escaped te worden: ^". Die aan het einde query NIET. Tenzij er een spatie vóór zit.
+- De tekens % & < > ^ | dienen "ge-escaped" te worden: %% ^& ^< ^> ^^ ^|.
+- Het einde van iedere regel, behalve de laatste, dient ge-escaped te worden.
+  Begint de nieuwe regel NIET met een spatie, dan moet er nog een statie vóór de ^.
+
+Output commando:
+<^| B7E3 & 47075 |%>
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Unix --> Windows in Bash:
+
+$ sed -n 728,735p xivid_notes.txt
+$ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position()>727][position()<9]'
+$ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position()<736][position()>727]'
+-e '
+  let $a:=string-join(
+        tokenize($raw) ! x:integer-to-base(.,16)
+      ),
+      $b:=x:integer($a,16)
+  return
+  concat("<^| ",$a," & ",$b," |%>")
+'
+
+$ sed -n 728,735p xivid_notes.txt | xidel -s - -e 'let $a:=x:lines($raw) return ($a[1],$a[last()])'
+-e '
+'
+
+$ sed -n 728,735p xivid_notes.txt | xidel -s - -e 'let $a:=x:lines($raw) return (replace($a[1],"'\''","^""")||"^",replace($a[last()],"'\''",""""))'
+$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",replace($a[last()],"&apos;","&quot;"))'
+-e ^"^
+"
+
+$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position()>1][position()<last()] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))'
+-e ^"^
+  let $a:=string-join(^
+        tokenize($raw) ! x:integer-to-base(.,16)^
+      ),^
+      $b:=x:integer($a,16)^
+  return^
+  concat('^<^^^| ',$a,' ^& ',$b,' ^|%%^>')^
+"
+
+Een here-string als input werkt ook, maar de $ moet dan wel ge-escaped worden:
+
+$ cat <<EOF | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position()>1][position()<last()] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))'
+-e '
+  let \$a:=string-join(
+        tokenize(\$raw) ! x:integer-to-base(.,16)
+      ),
+      \$b:=x:integer(\$a,16)
+  return
+  concat("<^| ",\$a," & ",\$b," |%>")
+'
+EOF
+-e ^"^
+  let $a:=string-join(^
+        tokenize($raw) ! x:integer-to-base(.,16)^
+      ),^
+      $b:=x:integer($a,16)^
+  return^
+  concat('^<^^^| ',$a,' ^& ',$b,' ^|%%^>')^
+"
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Unix --> Windows in Batch:
+
+xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'''','^\"')||'^',replace($a[last()],'''','\"'))"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;'),replace($a[last()],'&apos;','&quot;'))"
+-e ^"^
+"
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'([&amp;<>^|])','^$1')||'^'),replace($a[last()],'&apos;','&quot;'))"
+-e ^"^
+  let $a:=string-join(^
+        tokenize($raw) ! x:integer-to-base(.,16)^
+      ),^
+      $b:=x:integer($a,16)^
+  return^
+  concat('^<^^^| ',$a,' ^& ',$b,' ^|%%^>')^
+"
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Windows --> Windows in Batch:
+
+xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'\"','^^\"')||'^',$a[last()])"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;')||'^',$a[last()])"
+-e ^"^
+"
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(.,'%','%%'),'([&amp;<>^|])','^$1')||'^'),$a[last()])"
+-e ^"^
+  let $a:=string-join(^
+        tokenize($raw) ! x:integer-to-base(.,16)^
+      ),^
+      $b:=x:integer($a,16)^
+  return^
+  concat('^<^^^| ',$a,' ^& ',$b,' ^|%%^>')^
+"
+
+------------------------------------------------------------------------------------------------
+
+Directe commando (delayed expansion):
+
+SET "var=11 7 14 3"
+SETLOCAL ENABLEDELAYEDEXPANSION
+ECHO !var! | xidel -s - ^
+-e ^"^
+  let $a:=string-join(^
+        tokenize($raw) ^^! x:integer-to-base(.,16)^
+      ),^
+      $b:=x:integer($a,16)^
+  return^
+  concat('^<^^^^^| ',$a,' ^& ',$b,' ^|%%^>')^
+"
+
+- Zie hier boven.
+- Het uitroepteken dient dubbel ge-escaped te worden: ^^!.
+- Het dakje (accent circonflexe) dient nóg een keer ge-escaped te worden: ^^^^.
+
+Output commando:
+<^| B7E3 & 47075 |%>
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Unix --> Windows in Bash:
+
+$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position()>1][position()<last()] ! (replace(replace(replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"\^","^^"),"!","^!"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))'
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Unix --> Windows in Batch:
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'\^','^^'),'!','^!'),'([&amp;<>^|])','^$1')||'^'),replace($a[last()],'&apos;','&quot;'))"
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Windows --> Windows in Batch:
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(replace(replace(.,'%','%%'),'\^','^^'),'!','^!'),'([&amp;<>^|])','^$1')||'^'),$a[last()])"
+
+------------------------------------------------------------------------------------------------
+
+Commando in FOR loop:
+
+SET "var=11 7 14 3"
+FOR /F "delims=" %%A IN ('ECHO %var% ^| xidel -s -
+-e ^"
+  let $a:^=string-join^(
+        tokenize^($raw^) ! x:integer-to-base^(.^,16^)
+      ^)^,
+      $b:^=x:integer^($a^,16^)
+  return
+  var:^=concat^('^<^^^| '^,$a^,' ^& '^,$b^,' ^|%%^>'^)
+^" --output-format^=cmd') DO %%A
+ECHO %var%
+
+- Naast de escape characters, % & < > ^ |, dienen ook de delimiters, , ; = én " ( ) ge-escaped te worden.
+- Het hele rijtje wordt dus: % & < > ^ | , ; = " ( ).
+- Het einde van een regel hoeft niet ge-escaped te worden.
+
+Output commando:
+SET var=^<^^^| B7E3 ^& 47075 ^|%^>
+ECHO <^| B7E3 & 47075 |%>
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Unix --> Windows in Bash:
+
+$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;"),$a[position()>1][position()<last()] ! replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|,;=()])","^$1"),replace($a[last()],"&apos;","^&quot;"))'
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Unix --> Windows in Batch:
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;'),$a[position()>1][position()<last()] ! replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'([&amp;<>^|,;=()])','^$1'),replace($a[last()],'&apos;','^&quot;'))"
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Xidel commando Windows --> Windows in Batch:
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;'),$a[position()>1][position()<last()] ! replace(replace(.,'%','%%'),'([&amp;<>^|,;=()])','^$1'),replace($a[last()],'&quot;','^&quot;'))"
 
 ================================================================================================
 
