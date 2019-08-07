@@ -70,42 +70,54 @@ npo() {
             $a/token
           )
         )/stream[not(protection)]/src
-    return json:={
-      "name":$b/concat(
-        franchiseTitle,
-        if (contains(franchiseTitle,title)) then () else ": "||title
-      ),
-      "date":format-date(
-        dateTime($b/broadcastDate),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        $b/duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "start":format-time(
-        $b[startAt]/startAt * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "end":format-time(
-        $b[startAt]/(duration + startAt) * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "subtitle":{
-        "type":"webvtt",
-        "url":if ($b/parentId) then
-          x:request({
-            "url":concat(
-              "https://rs.poms.omroep.nl/v1/api/subtitles/",
-              $b/parentId,
-              "/nl_NL/CAPTION.vtt"
-            )
-          })[contains(headers[1],"200")]/url
+    return json:={|
+      if ($b) then {
+        "name":$b/concat(
+          franchiseTitle,
+          if (contains(franchiseTitle,title)) then () else ": "||title
+        ),
+        "date":format-date(
+          dateTime($b/broadcastDate),
+          "[D01]-[M01]-[Y]"
+        ),
+        "duration":format-time(
+          $b/duration * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        ),
+        "start":if ($b/startAt) then
+          format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]")
         else
-          $b/(subtitles)()/src
-      }[url],
-      "formats":xivid:m3u8-to-json($c)
-    }
+          (),
+        "end":if ($b/startAt) then
+          format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]")
+        else
+          (),
+        "subtitle":{
+          "type":"webvtt",
+          "url":if ($b/parentId) then
+            x:request({
+              "url":concat(
+                "https://rs.poms.omroep.nl/v1/api/subtitles/",
+                $b/parentId,
+                "/nl_NL/CAPTION.vtt"
+              )
+            })[contains(headers[1],"200")]/url
+          else
+            $b/(subtitles)()/src
+        }[url]
+      } else
+        doc("https://www.npostart.nl/'$1'")/{
+          "name":.//div[@class="npo-header-episode-content"]/concat(h1,": ",.//h2),
+          "date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),
+          "duration":format-time(
+            .//@duration * duration("PT1S"),
+            "[H01]:[m01]:[s01]"
+          )
+        },
+      {
+        "formats":xivid:m3u8-to-json($c)
+      }
+    |}
   ' --output-format=bash)"
 }
 

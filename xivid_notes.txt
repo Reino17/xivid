@@ -1729,8 +1729,43 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"h
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
-  let $prid:="POMS_NOS_7332480",
+https://www.npostart.nl/flikken-maastricht/01-03-2019/AT_2105037
+
+$ xidel -s -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return unparsed-text($a/embedUrl)'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flikken Maastricht</title>
+    <link href="/styles/video-js.css" rel="stylesheet">
+    <link href="/styles/main.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="npo-player-overlay" id="npo-player-exclusive" style="background-image: url('https://images.poms.omroep.nl/image/s1280/c1280x720/1195343.jpg');" >
+    <div class="npo-player-overlay-bg"></div>
+    <div class="npo-player-overlay-message">
+        <p>Dit programma is alleen te zien met een NPO Start Plus account (41).</p>
+
+                <p></p>
+    </div>
+</div>
+</body>
+</html>
+
+Geen JSON en dus geen enkele video-informatie (van deze DRM video). De hoofdpagina heeft die wel.
+
+$ xidel -s --module=xivid.xq -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream[not(protection)]/src return {|if ($b) then {"name":$b/concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime($b/broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time($b/duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"start":if ($b/startAt) then format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"end":if ($b/startAt) then format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"subtitle":{"type":"webvtt","url":if ($b/parentId) then x:request({"url":concat("https://rs.poms.omroep.nl/v1/api/subtitles/",$b/parentId,"/nl_NL/CAPTION.vtt")})[contains(headers[1],"200")]/url else $b/(subtitles)()/src}[url]} else doc("https://www.npostart.nl/"||$prid)/{"name":.//div[@class="npo-header-episode-content"]/concat(h1,": ",.//h2),"date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),"duration":format-time(.//@duration * duration("PT1S"),"[H01]:[m01]:[s01]")},{"formats":xivid:m3u8-to-json($c)}|}'
+{
+  "name": "Flikken Maastricht: Virtus et justitia",
+  "date": "01-03-2019",
+  "duration": "00:47:27",
+  "formats": null
+}
+
+------------------------------------------------------------------------------------------------
+
+-e '
+  let $prid:="AT_2105037",
       $a:=x:request({
         "header":"X-Requested-With: XMLHttpRequest",
         "url":"https://www.npostart.nl/api/token"
@@ -1749,42 +1784,54 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"h
           $a/token
         )
       )/stream[not(protection)]/src
-  return {
-    "name":$b/concat(
-      franchiseTitle,
-      if (contains(franchiseTitle,title)) then () else ": "||title
-    ),
-    "date":format-date(
-      dateTime($b/broadcastDate),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":format-time(
-      $b/duration * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "start":format-time(
-      $b[startAt]/startAt * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "end":format-time(
-      $b[startAt]/(duration + startAt) * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "subtitle":{
-      "type":"webvtt",
-      "url":if ($b/parentId) then
-        x:request({
-          "url":concat(
-            "https://rs.poms.omroep.nl/v1/api/subtitles/",
-            $b/parentId,
-            "/nl_NL/CAPTION.vtt"
-          )
-        })[contains(headers[1],"200")]/url
+  return {|
+    if ($b) then {
+      "name":$b/concat(
+        franchiseTitle,
+        if (contains(franchiseTitle,title)) then () else ": "||title
+      ),
+      "date":format-date(
+        dateTime($b/broadcastDate),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        $b/duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "start":if ($b/startAt) then
+        format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]")
       else
-        $b/(subtitles)()/src
-    }[url],
-    "formats":xivid:m3u8-to-json($c)
-  }
+        (),
+      "end":if ($b/startAt) then
+        format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]")
+      else
+        (),
+      "subtitle":{
+        "type":"webvtt",
+        "url":if ($b/parentId) then
+          x:request({
+            "url":concat(
+              "https://rs.poms.omroep.nl/v1/api/subtitles/",
+              $b/parentId,
+              "/nl_NL/CAPTION.vtt"
+            )
+          })[contains(headers[1],"200")]/url
+        else
+          $b/(subtitles)()/src
+      }[url]
+    } else
+      doc("https://www.npostart.nl/"||$prid)/{
+        "name":.//div[@class="npo-header-episode-content"]/concat(h1,": ",.//h2),
+        "date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),
+        "duration":format-time(
+          .//@duration * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        )
+      },
+    {
+      "formats":xivid:m3u8-to-json($c)
+    }
+  |}
 '
 
 ================================================================================================
