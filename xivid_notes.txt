@@ -658,7 +658,8 @@ $ xidel -s -e 'x:parse-date("17 february 2019  7:45","dd mmmm yyyy")'
 $ xidel -s -e 'x:parse-dateTime("17 february 2019  7:45","dd mmmm yyyy  h:nn")'
 2019-02-17T07:45:00
 
-Het Pascal format komt heel precies, MAAR Xidel ondersteunt (op dit moment) alleen Engels en Duits:
+Het Pascal format (https://www.freepascal.org/docs-html/rtl/sysutils/formatchars.html) komt heel precies,
+MAAR Xidel ondersteunt (op dit moment) alleen Engels en Duits:
 
 $ xidel -s -e 'x:parse-date("17 februari 2019  7:45","dd mmmm yyyy")'
 Error:
