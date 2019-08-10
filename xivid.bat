@@ -42,6 +42,7 @@ ECHO   telegraaf.nl
 ECHO   youtube.com
 ECHO   youtu.be
 ECHO   vimeo.com
+ECHO   facebook.com
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558

@@ -43,6 +43,7 @@ Ondersteunde websites:
   youtube.com
   youtu.be
   vimeo.com
+  facebook.com
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558

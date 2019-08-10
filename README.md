@@ -26,7 +26,24 @@ Gebruik (Linux): ./xivid.sh [optie] url
                 beschikbare formaten.
   -j            Toon video informatie als JSON.
 ```
-Gebruik `-h` voor een actueel overzicht van ondersteunde websites.
+Deze websites worden op dit moment ondersteund:
+```
+  npostart.nl             omropfryslan.nl       omroepwest.nl
+  gemi.st                 rtvnoord.nl           rijnmond.nl
+  nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
+  tvblik.nl               nhnieuws.nl           omroepgelderland.nl
+  uitzendinggemist.net    at5.nl                omroepzeeland.nl
+  rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
+  kijk.nl                 rtvoost.nl            l1.nl
+
+  dumpert.nl
+  telegraaf.nl
+  youtube.com
+  youtu.be
+  vimeo.com
+  facebook.com
+```
+De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
 
 ## Voorbeelden
 Zonder optie geeft Xivid de video-url van het "beste" formaat:
@@ -54,7 +71,7 @@ Gebruik `-f` voor een ander gewenst formaat:
 xivid.bat -f hls-4 https://www.npostart.nl/POW_03375558
 https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=506000.m3u8
 ```
-(Het 20:00u NOS Journaal van 28-02-2017 in dit voorbeeld is het laatste onversleutelde NOS Journaal. Alle uitzendingen daarna (en waarschijnlijk alle video's op npostart.nl vanaf 01-03-2017) zijn versleuteld en beveiligd met DRM (Digital Rights Manangement) en zijn daardoor niet te downloaden.)
+(Het 20:00u NOS Journaal van 28-02-2017 in dit voorbeeld is het laatste onversleutelde NOS Journaal. Alle uitzendingen daarna (en waarschijnlijk alle video's op npostart.nl vanaf 01-03-2017) zijn versleuteld en beveiligd met DRM en zijn daardoor niet te downloaden.)
 
 # Xidel
 [Xidel](http://videlibri.sourceforge.net/xidel.html) is een commandoregel programma voor het downloaden en informatie onttrekken van HTML/XML pagina's, JSON-APIs en lokale bestanden door gebruik te maken van CSS, XPath 3.0, XQuery 3.0, JSONiq, of pattern templates.
