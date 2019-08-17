@@ -518,7 +518,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       $a//duration * duration^('PT1S'^)^,
       '[H01]:[m01]:[s01]'
     ^)^,
-    'formats':(
+    'formats':^(
       $a//locations/reverse^(^(progressive^)^(^)^)/{
         'format':'pg-'^|^|position^(^)^,
         'container':'mp4[h264+aac]'^,
@@ -527,8 +527,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       }^,
       xivid:m3u8-to-json^(
         $a//locations/^(adaptive^)^(^)[ends-with^(type^,'x-mpegURL'^)]/extract^(src^,'^(.+m3u8^)'^,1^)
-      )
-    )
+      ^)
+    ^)
   }
 ^" --output-format^=cmd') DO %%A
 EXIT /B
