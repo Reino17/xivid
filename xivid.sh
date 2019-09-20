@@ -454,24 +454,24 @@ regio() {
 
 dumpert() {
   eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
-    json:=(
-      if (//body[@id="embed"]) then doc(//meta[@property="og:url"]/@content) else .
-    )/(
-      if (//iframe) then
-        replace(//iframe/@src,".+/(.+)\?.+","https://youtu.be/$1")
-      else {
-        "name":"Dumpert: "||//div[@class="dump-desc"]/normalize-space(h1),
-        "date":xivid:txt-to-date(//p[@class="dump-pub"]),
-        "formats":let $a:=json(
-          binary-to-string(base64Binary(//@data-files))
-        )
-        for $x at $i in ("flv","mobile","tablet","720p") ! $a(.)
-        return {
-          "format":"pg-"||$i,
-          "container":extract($x,".+\.(.+)",1)||"[h264+aac]",
-          "url":$x
+    json:=json(
+      json(
+        //script/extract(.,"JSON\.parse\((.+)\)",1)[.]
+      )
+    )/items/item/item[(media)()[mediatype="VIDEO"]]/(
+      if ((.//variants)()/version="embed") then
+        replace((.//variants)()/uri,"youtube:","https://youtu.be/")
+      else
+        {
+          "name":"Dumpert: "||title,
+          "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
+          "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
+          "formats":for $x at $i in ("mobile","tablet","720p","original") let $a:=(.//variants)()[version=$x]/uri return {
+            "format":"pg-"||$i,
+            "container":"mp4[h264+aac]",
+            "url":$a
+          }[url]
         }
-      }
     )
   ' --output-format=bash)"
   if [[ $json =~ youtu.be ]]; then
