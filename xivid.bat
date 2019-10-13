@@ -533,6 +533,38 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
+:ad
+FOR /F "delims=" %%A IN ('xidel -H "Cookie: pwv=2;pws=functional" "%~1" --xquery ^"
+  json:^=json^(
+    ^(
+      doc^(
+        ^(
+          extract^(
+            unparsed-text^(//script[@class^='mc-embed']/@src^)^,
+            'embed_uri ^= ^&apos^;^(.+^)^&apos^;^;'^,
+            1
+          ^)^,
+          //iframe[@class^='mc-embed']/@src
+        ^)[.]
+      ^)^,
+      .
+    ^)//script[@data-mc-object-type^='production']
+  ^)/{
+    'name':'AD: '^|^|title^,
+    'date':replace^(
+      publicationDate^,
+      '^(\d+^)-^(\d+^)-^(\d+^).+'^,
+      '$3-$2-$1'
+    ^)^,
+    'duration':format-time^(
+      duration * duration^('PT1S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'formats':xivid:m3u8-to-json^(^(sources^)^(^)/src^)
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :youtube
 xidel "%~1" --xquery ^"^
   let $a:=if (//meta[@property='og:restrictions:age']) then^
@@ -947,6 +979,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :dumpert "%url%"
 ) ELSE IF NOT "%url:telegraaf.nl=%"=="%url%" (
   CALL :telegraaf "%url%"
+) ELSE IF NOT "%url:ad.nl=%"=="%url%" (
+  CALL :ad "%url%"
 ) ELSE IF NOT "%url:youtube.com=%"=="%url%" (
   CALL :youtube "%url%"
 ) ELSE IF NOT "%url:youtu.be=%"=="%url%" (

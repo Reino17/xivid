@@ -6476,6 +6476,240 @@ $ xidel -s --module=xivid.xq "https://www.telegraaf.nl/video/3439197/kamikaze-ac
 
 ================================================================================================
 
+[ad]
+
+https://www.ad.nl/video/kanalen/brabants-dagblad~c416/series/korte-reportage~s962/brabantse-boeren-gaan-los-op-links-rechts-van-snollebollekes~p104067
+
+$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/video/kanalen/brabants-dagblad~c416/series/korte-reportage~s962/brabantse-boeren-gaan-los-op-links-rechts-van-snollebollekes~p104067" -e 'json(//script[@data-mc-object-type="production"])'
+{
+  "adsEnabled": true,
+  "clickoutUrl": null,
+  "clickoutUrlTimeOffset": null,
+  "displayLogo": true,
+  "duration": 22,
+  "genreId": 10,
+  "id": 104067,
+  "live": false,
+  "ooyalaId": null,
+  "origin": "origin_online_source",
+  "playerSkin": "default",
+  "posterUrl": "https://imgix.mychannels.video/imgix/629c2387-cdfd-4e1d-8742-1bdb9c49587b/VVS%20Still%20links%20rechts.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.5&fp-y=0.5",
+  "publicationDate": "2019-10-01 11:59:00",
+  "publication_status": "published",
+  "showId": 962,
+  "sources": [
+    {
+      "src": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl",
+      "type": "application/vnd.apple.mpegurl"
+    }
+  ],
+  "theme": "News",
+  "title": "Brabantse boeren gaan los op Links Rechts van Snollebollekes"
+}
+
+$ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/video/kanalen/brabants-dagblad~c416/series/korte-reportage~s962/brabantse-boeren-gaan-los-op-links-rechts-van-snollebollekes~p104067" -e 'json(//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
+{
+  "name": "AD: Brabantse boeren gaan los op Links Rechts van Snollebollekes",
+  "date": "01-10-2019",
+  "duration": "00:00:22",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "320x180@30fps",
+      "bitrate": "481kbps",
+      "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i176422914-na1f6458e-2586-4547-9491-fea1ea11c357&anvtrid=1bf60e79c0e5f3967f858c0627ead193"
+    },
+    [...],
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720@30fps",
+      "bitrate": "2510kbps",
+      "url": "https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i176422914-na1f6458e-2586-4547-9491-fea1ea11c357&anvtrid=1bf60e79c0e5f3967f858c0627ead193"
+    }
+  ]
+}
+
+Zonder "if (string-length($a/url) < 512) then $a/url else $url" in xivid:m3u8-to-json():
+{
+  "format": "hls-0",
+  "container": "m3u8[manifest]",
+  "url": "https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2VA_PSLbbNUp302PxtXXfQENkIA4s9mOL2qycWG-NZbrTMfVlwL05yCZg3q5VcghXoYLrAHSl9xn0eHZBymWIjmtnJpc005GKCimwfnYHEoEJFeuwBPwdMe5Qmb-OvhlSoUTRA6xZt2HSmFnt8wb8ayty9Wt2XQb9mL_arnk0OEQ7XOn7dUNXsLRg1RIjWVf18vhZOSNhMBrN3-hEIcJKb75fwIYhqdAD9w85IexSrYAJqcYmenrqAoyUZGeuCN3Hlc3PJgs6jV_qw_-wOen6neNGZBT8CFmNma85Vfdw7bt8y3-DtDkx70xjb8bhOmOESzetf7Aels7NghNP-WhI0iYyc7pL14p2pyJYoyW_QV_CxpktikfJ8GJ5BOghLBueYwcSiGwIkkt2z2TCTghCnHuRimM03xi292D4mp62uqM_7-iRlRHhztQVPlCu3jV4aSKNUNCo40I3c-mB2A2Nyr-hIJMmbThTIe-Hp1hMq2EX5BDKKGCdaqfjg4KYa7X_ERbjJNGcQ1cMmyMswvXY-uY8H9wBcEPQvuoEPXy5gRzFdORfgJiYRZJBk_DOjufq1Dxiy_55Bhmw-Bw2hRnMoHFz2j1eZ_UyIolJ76Xz1nsOjOt_AxY0eineGSHmmSF-kEUKGLRetXgEhuvR0UoX31Y3vtMG0v8PI-XPvgKATdBHc7jj9di2fZyQhukmjnQC1sEu9MM3nnHOqrSmbkvQtADsfFcuyTcfdJlnhcufU9QgdzjWsS3-EKq9-kcvf3TtqNQX1yWDLQPSfSjHEzkdZDAccx6FmXESQkfMeRluufUitGistOucgu89xRLty9--SlGxMpvvZs_uw_4hVC6ba7-vUsLO0bB4cP66tKb809uM9uqy2dVHwoBLSnYKGKti0RvRVkotgPpo1SsYBA49fq9IBTnFiBqKQMlm2IsNQthun1fM4WdI3MhePl68upVzm61qcCpwKIYEF55Bb3bzA&anvtrid=2c422506e010d9c092ad6564d06c7c9a&anvauth=tb=0~te=1570918109~sgn=422231fded672998b6d2cc3f7031c8a08349df211a8c303c79b28d44a3c441a4&t=1570918019"
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/
+
+$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/" -e '//iframe[@class="mc-embed"]/@src'
+https://mychannels.video/embed/66560?automute=true&autoplay=true&autoplay_onscreen=true&display_logo=true&play_ads=true&single_play=true
+
+$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/" -f '//iframe[@class="mc-embed"]/@src' -e 'json(//script[@data-mc-object-type="production"])'
+{
+  "adsEnabled": true,
+  "clickoutUrl": null,
+  "clickoutUrlTimeOffset": null,
+  "displayLogo": true,
+  "duration": 544,
+  "genreId": 10,
+  "id": 66560,
+  "live": false,
+  "ooyalaId": "N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy",
+  "origin": "origin_dpn_original",
+  "playerSkin": "default",
+  "posterUrl": "https://imgix.mychannels.video/imgix/a022bbee-be17-4424-b208-0075cecef841/imgix_e1ff0aab-0142-4d47-a04e-08186ccfadb1_stilltesla0.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.71&fp-y=0.04",
+  "publicationDate": "2019-03-04 13:52:00",
+  "publication_status": "published",
+  "showId": 1630,
+  "sources": [
+    {
+      "src": "https://video.persgroep.be/N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy/index.m3u8",
+      "type": "application/vnd.apple.mpegurl"
+    }
+  ],
+  "theme": "News",
+  "title": "Teslatest"
+}
+
+$ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/" -f '//iframe[@class="mc-embed"]/@src' -e 'json(//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
+{
+  "name": "AD: Teslatest",
+  "date": "04-03-2019",
+  "duration": "00:09:04",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://video.persgroep.be/N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "320x180@25fps",
+      "bitrate": "490kbps",
+      "url": "https://video.persgroep.be/N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy/index300.m3u8"
+    },
+    [...],
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720@25fps",
+      "bitrate": "24208kbps",
+      "url": "https://video.persgroep.be/N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy/index2200.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/
+
+$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -e '//script[@class="mc-embed"]/@src'
+https://embed.mychannels.video/script/production/53235?options=TUTF_default&mode=iframe
+
+$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -f '//script[@class="mc-embed"]/@src' --xquery 'extract($raw,"embed_uri = &apos;(.+)&apos;;",1)'
+https://embed.mychannels.video/production/53235?options=TUTF_default
+
+$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -f '//script[@class="mc-embed"]/@src' --follow-kind=xquery3 -f 'extract($raw,"embed_uri = &apos;(.+)&apos;;",1)' -e 'json(//script[@data-mc-object-type="production"])'
+{
+  "adsEnabled": true,
+  "clickoutUrl": null,
+  "clickoutUrlTimeOffset": null,
+  "displayLogo": true,
+  "duration": 30,
+  "genreId": 10,
+  "id": 53235,
+  "live": false,
+  "ooyalaId": "k3MGNmZzE62C7JZZBxHCWgECXn8756TG",
+  "origin": "origin_dpn_original",
+  "playerSkin": "default",
+  "posterUrl": "https://imgix.mychannels.video/imgix/0b11f1d5-122e-4c07-a0f8-a5b89b2710e7/Tijdlijn.00_00_30_05.Still003.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.5&fp-y=0.5",
+  "publicationDate": "2019-02-03 20:03:57",
+  "publication_status": "published",
+  "showId": 911,
+  "sources": [
+    {
+      "src": "https://video.persgroep.be/k3MGNmZzE62C7JZZBxHCWgECXn8756TG/index.m3u8",
+      "type": "application/vnd.apple.mpegurl"
+    }
+  ],
+  "theme": "News",
+  "title": "De nummers op benzinepompen zijn veranderd"
+}
+
+$ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -f '//script[@class="mc-embed"]/@src' --follow-kind=xquery3 -f 'extract($raw,"embed_uri = &apos;(.+)&apos;;",1)' -e 'json(//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
+{
+  "name": "AD: De nummers op benzinepompen zijn veranderd",
+  "date": "03-02-2019",
+  "duration": "00:00:30",
+  "formats": [
+    {
+      "format": "hls-0",
+      "container": "m3u8[manifest]",
+      "url": "https://video.persgroep.be/k3MGNmZzE62C7JZZBxHCWgECXn8756TG/index.m3u8"
+    },
+    {
+      "format": "hls-1",
+      "container": "m3u8[h264+aac]",
+      "resolution": "320x180@25fps",
+      "bitrate": "450kbps",
+      "url": "https://video.persgroep.be/k3MGNmZzE62C7JZZBxHCWgECXn8756TG/index300.m3u8"
+    },
+    [...],
+    {
+      "format": "hls-5",
+      "container": "m3u8[h264+aac]",
+      "resolution": "1280x720@25fps",
+      "bitrate": "23105kbps",
+      "url": "https://video.persgroep.be/k3MGNmZzE62C7JZZBxHCWgECXn8756TG/index2200.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" --xquery 'json((doc((extract(unparsed-text(//script[@class="mc-embed"]/@src),"embed_uri = &apos;(.+)&apos;;",1),//iframe[@class="mc-embed"]/@src)[.]),.)//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  json(
+    (
+      doc(
+        (
+          extract(
+            unparsed-text(//script[@class="mc-embed"]/@src),
+            "embed_uri = &apos;(.+)&apos;;",
+            1
+          ),
+          //iframe[@class="mc-embed"]/@src
+        )[.]
+      ),
+      .
+    )//script[@data-mc-object-type="production"]
+  )/{
+    "name":"AD: "||title,
+    "date":replace(
+      publicationDate,
+      "(\d+)-(\d+)-(\d+).+",
+      "$3-$2-$1"
+    ),
+    "duration":format-time(
+      duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":xivid:m3u8-to-json((sources)()/src)
+  }
+'
+
+================================================================================================
+
 [facebook]
 
 https://www.facebook.com/rtlnieuws/videos/783883842013477

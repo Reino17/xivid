@@ -515,6 +515,38 @@ telegraaf() {
   ' --output-format=bash)"
 }
 
+ad() {
+  eval "$(xidel -H "Cookie: pwv=2;pws=functional" "$1" --xquery '
+    json:=json(
+      (
+        doc(
+          (
+            extract(
+              unparsed-text(//script[@class="mc-embed"]/@src),
+              "embed_uri = &apos;(.+)&apos;;",
+              1
+            ),
+            //iframe[@class="mc-embed"]/@src
+          )[.]
+        ),
+        .
+      )//script[@data-mc-object-type="production"]
+    )/{
+      "name":"AD: "||title,
+      "date":replace(
+        publicationDate,
+        "(\d+)-(\d+)-(\d+).+",
+        "$3-$2-$1"
+      ),
+      "duration":format-time(
+        duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "formats":xivid:m3u8-to-json((sources)()/src)
+    }
+  ' --output-format=bash)"
+}
+
 youtube() {
   eval "$(xidel "$1" --xquery '
     let $a:=if (//meta[@property="og:restrictions:age"]) then
@@ -906,6 +938,8 @@ elif [[ $url =~ dumpert.nl ]]; then
   dumpert "$url"
 elif [[ $url =~ telegraaf.nl ]]; then
   telegraaf "$url"
+elif [[ $url =~ ad.nl ]]; then
+  ad "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
 elif [[ $url =~ vimeo.com ]]; then
