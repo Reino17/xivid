@@ -547,6 +547,36 @@ ad() {
   ' --output-format=bash)"
 }
 
+lc() {
+  eval "$(xidel "$1" --xquery '
+    json:=json(
+      extract(unparsed-text(//figure[@class="video"]//@src),"var opts = (.+);",1)
+    )/{
+      "name":concat("LC: ",clipData/title),
+      "date":format-date(
+        dateTime(clipData/publisheddate),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":clipData/length * duration("PT1S") + time("00:00:00"),
+      "formats":[
+        for $x at $i in clipData/(assets)()
+        order by $x/bandwidth
+        count $i
+        return {
+          "format":"pg-"||$i,
+          "container":"mp4[h264+aac]",
+          "resolution":concat($x/width,"x",$x/height),
+          "bitrate":$x/bandwidth||"kbps",
+          "url":resolve-uri(
+            $x/src,
+            publicationData/defaultMediaAssetPath
+          )
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 youtube() {
   eval "$(xidel "$1" --xquery '
     let $a:=if (//meta[@property="og:restrictions:age"]) then
@@ -940,6 +970,8 @@ elif [[ $url =~ telegraaf.nl ]]; then
   telegraaf "$url"
 elif [[ $url =~ ad.nl ]]; then
   ad "$url"
+elif [[ $url =~ lc.nl ]]; then
+  lc "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
 elif [[ $url =~ vimeo.com ]]; then

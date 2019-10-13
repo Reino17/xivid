@@ -6754,6 +6754,69 @@ $ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.n
 
 ================================================================================================
 
+[leeuwarder courant]
+
+https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bolsward-luid-klingelend-verscheept-naar-Sneek-24902697.html
+
+$ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bolsward-luid-klingelend-verscheept-naar-Sneek-24902697.html" -e '//figure[@class="video"]//@src'
+//ndc.bbvms.com/p/lc_videoplayer_v2/c/3422620.js   # Blue Billywig
+
+$ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bolsward-luid-klingelend-verscheept-naar-Sneek-24902697.html" --xquery 'json(extract(unparsed-text(//figure[@class="video"]//@src),"var opts = (.+);",1))/{"name":concat("LC: ",clipData/title),"date":format-date(dateTime(clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":clipData/length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in clipData/(assets)() order by $x/bandwidth count $i return {"format":"pg-"||$i,"container":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,publicationData/defaultMediaAssetPath)}]}'
+{
+  "name": "LC: Gammele toren op transport",
+  "date": "08-10-2019",
+  "duration": "00:01:45",
+  "formats": [
+    {
+      "format": "pg-1",
+      "container": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "400kbps",
+      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2019/10/08/asset-3422620-1570538762646090.mp4"
+    },
+    [...],
+    {
+      "format": "pg-6",
+      "container": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3000kbps",
+      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2019/10/08/asset-3422620-1570538764549080.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  json(
+    extract(unparsed-text(//figure[@class="video"]//@src),"var opts = (.+);",1)
+  )/{
+    "name":concat("LC: ",clipData/title),
+    "date":format-date(
+      dateTime(clipData/publisheddate),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":clipData/length * duration("PT1S") + time("00:00:00"),
+    "formats":[
+      for $x at $i in clipData/(assets)()
+      order by $x/bandwidth
+      count $i
+      return {
+        "format":"pg-"||$i,
+        "container":"mp4[h264+aac]",
+        "resolution":concat($x/width,"x",$x/height),
+        "bitrate":$x/bandwidth||"kbps",
+        "url":resolve-uri(
+          $x/src,
+          publicationData/defaultMediaAssetPath
+        )
+      }
+    ]
+  }
+'
+
+================================================================================================
+
 [facebook]
 
 https://www.facebook.com/rtlnieuws/videos/783883842013477

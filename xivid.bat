@@ -565,6 +565,36 @@ FOR /F "delims=" %%A IN ('xidel -H "Cookie: pwv=2;pws=functional" "%~1" --xquery
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
+:lc
+FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
+  json:^=json^(
+    extract^(unparsed-text^(//figure[@class^='video']//@src^)^,'var opts ^= ^(.+^)^;'^,1^)
+  ^)/{
+    'name':concat^('LC: '^,clipData/title^)^,
+    'date':format-date^(
+      dateTime^(clipData/publisheddate^)^,
+      '[D01]-[M01]-[Y]'
+    ^)^,
+    'duration':clipData/length * duration^('PT1S'^) + time^('00:00:00'^)^,
+    'formats':[
+      for $x at $i in clipData/^(assets^)^(^)
+      order by $x/bandwidth
+      count $i
+      return {
+        'format':'pg-'^|^|$i^,
+        'container':'mp4[h264+aac]'^,
+        'resolution':concat^($x/width^,'x'^,$x/height^)^,
+        'bitrate':$x/bandwidth^|^|'kbps'^,
+        'url':resolve-uri^(
+          $x/src^,
+          publicationData/defaultMediaAssetPath
+        ^)
+      }
+    ]
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :youtube
 xidel "%~1" --xquery ^"^
   let $a:=if (//meta[@property='og:restrictions:age']) then^
@@ -981,6 +1011,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :telegraaf "%url%"
 ) ELSE IF NOT "%url:ad.nl=%"=="%url%" (
   CALL :ad "%url%"
+) ELSE IF NOT "%url:lc.nl=%"=="%url%" (
+  CALL :lc "%url%"
 ) ELSE IF NOT "%url:youtube.com=%"=="%url%" (
   CALL :youtube "%url%"
 ) ELSE IF NOT "%url:youtu.be=%"=="%url%" (
