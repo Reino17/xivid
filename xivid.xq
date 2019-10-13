@@ -10,9 +10,9 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
       {
         "format":"hls-0",
         "container":"m3u8[manifest]",
-        "url":$a/url
+        "url":if (string-length($a/url) < 512) then $a/url else $url
       },
-      for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8$","ms")]
+      for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")]
       order by extract($x,"BANDWIDTH=(\d+)",1)
       count $i
       return {
@@ -35,7 +35,7 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
             $b,
           "kbps"
         ),
-        "url":extract($x,".+m3u8") ! (
+        "url":extract($x,".+m3u8(?:.+|)") ! (
           if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
         )
       }

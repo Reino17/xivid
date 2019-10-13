@@ -1623,17 +1623,61 @@ $ xidel -s 2970835.m3u8 --xquery 'let $a:="https://d3pvma9xb2775h.cloudfront.net
 
 ------------------------------------------------------------------------------------------------
 
+'ad_10065499.m3u8':
+
+#EXTM3U
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-STREAM-INF:BANDWIDTH=2510000,FRAME-RATE=30,RESOLUTION=1280x720,AVERAGE-BANDWIDTH=2360000,CODECS="mp4a.40.2, avc1.64001f"
+https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
+#EXT-X-STREAM-INF:BANDWIDTH=1775000,FRAME-RATE=30,RESOLUTION=1280x720,AVERAGE-BANDWIDTH=1660000,CODECS="mp4a.40.2, avc1.64001f"
+https://dcs-vod.apis.anvato.net/vod/p/1775000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
+#EXT-X-STREAM-INF:BANDWIDTH=1145000,FRAME-RATE=30,RESOLUTION=640x360,AVERAGE-BANDWIDTH=1060000,CODECS="mp4a.40.2, avc1.64001e"
+https://dcs-vod.apis.anvato.net/vod/p/1145000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
+#EXT-X-STREAM-INF:BANDWIDTH=796400,FRAME-RATE=30,RESOLUTION=640x360,AVERAGE-BANDWIDTH=728000,CODECS="mp4a.40.2, avc1.64001e"
+https://dcs-vod.apis.anvato.net/vod/p/796400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
+#EXT-X-STREAM-INF:BANDWIDTH=481400,FRAME-RATE=30,RESOLUTION=320x180,AVERAGE-BANDWIDTH=428000,CODECS="mp4a.40.2, avc1.64000d"
+https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=2360000,RESOLUTION=1280x720,CODECS="avc1.64001f",URI="https://dcs-vod.apis.anvato.net/vod/p/2360000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1660000,RESOLUTION=1280x720,CODECS="avc1.64001f",URI="https://dcs-vod.apis.anvato.net/vod/p/1660000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1060000,RESOLUTION=640x360,CODECS="avc1.64001e",URI="https://dcs-vod.apis.anvato.net/vod/p/1060000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=728000,RESOLUTION=640x360,CODECS="avc1.64001e",URI="https://dcs-vod.apis.anvato.net/vod/p/728000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=428000,RESOLUTION=320x180,CODECS="avc1.64000d",URI="https://dcs-vod.apis.anvato.net/vod/p/428000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
+
+$ xidel -s ad_10065499.m3u8 --xquery 'let $a:="https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl" return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tokenize($raw,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":extract($x,"BANDWIDTH=(\d+)",1) div 1000||"kbps","url":extract($x,".+m3u8(?:.+|)")}]'
+[
+  {
+    "format": "hls-0",
+    "container": "m3u8[manifest]",
+    "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+  },
+  {
+    "format": "hls-1",
+    "container": "m3u8[h264+aac]",
+    "resolution": "320x180@30fps",
+    "bitrate": "481kbps",
+    "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3"
+  },
+  [...],
+  {
+    "format": "hls-5",
+    "container": "m3u8[h264+aac]",
+    "resolution": "1280x720@30fps",
+    "bitrate": "2510kbps",
+    "url": "https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
 Cumulatief (1 query voor alle gevallen):
 
-$ xidel -s 1535976944566.m3u8 --xquery 'let $a:="https://vod-tpc-prod-1.talpatvcdn.nl/[...]/1535976944566.m3u8" return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tokenize($raw,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8$","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),$b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else $b,"kbps"),"url":extract($x,".+m3u8") ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a))}]'
-
-Dan kan ik er net zo goed een functie van maken. Zal aardig wat regels aan code schelen.
+$ xidel -s 1535976944566.m3u8 --xquery 'let $a:="https://vod-tpc-prod-1.talpatvcdn.nl/[...]/1535976944566.m3u8" return [{"format":"hls-0","container":"m3u8[manifest]","url":$a},for $x at $i in tokenize($raw,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),$b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else $b,"kbps"),"url":extract($x,".+m3u8(?:.+|)") ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a))}]'
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Alleen lokaal voor m3u8-bestanden:
 
-$ xidel -s --xquery 'declare function m3u8-to-json ($url as xs:string, $url2 as xs:string) as item()* {({"format":"hls-0","container":"m3u8[manifest]","url":$url2},for $x at $i in tokenize(file:read-text($url),"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8$","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),$b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else $b,"kbps"),"url":extract($x,".+m3u8") ! (if (starts-with(.,"http")) then . else resolve-uri(.,$url2))})}; m3u8-to-json("1535976944566.m3u8","https://vod-tpc-prod-1.talpatvcdn.nl/[...]/1535976944566.m3u8")'
+$ xidel -s --xquery 'declare function m3u8-to-json ($url as xs:string, $url2 as xs:string) as item()* {({"format":"hls-0","container":"m3u8[manifest]","url":$url2},for $x at $i in tokenize(file:read-text($url),"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),$b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else $b,"kbps"),"url":extract($x,".+m3u8(?:.+|)") ! (if (starts-with(.,"http")) then . else resolve-uri(.,$url2))})}; m3u8-to-json("1535976944566.m3u8","https://vod-tpc-prod-1.talpatvcdn.nl/[...]/1535976944566.m3u8")'
 {
   "format": "hls-0",
   "container": "m3u8[manifest]",
@@ -1657,9 +1701,9 @@ $ xidel -s --xquery 'declare function m3u8-to-json ($url as xs:string, $url2 as 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-m3u8-to-json functie incl. x:request() voor redirect-urls:
+m3u8-to-json functie incl. x:request() voor redirect-urls. Als de redirect-url langer is dan 512 tekens (bijv. door een lang token), dan wordt de initiële url weergegeven:
 
---xquery 'declare function m3u8-to-json ($url as xs:string?) as item()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"}) return $a[doc]/({"format":"hls-0","container":"m3u8[manifest]","url":$a/url},for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8$","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),$b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else $b,"kbps"),"url":extract($x,".+m3u8") ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; m3u8-to-json(<url>)'
+--xquery 'declare function m3u8-to-json ($url as xs:string?) as item()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"}) return $a[doc]/({"format":"hls-0","container":"m3u8[manifest]","url":if (string-length($a/url) < 512) then $a/url else $url},for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")] order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"format":"hls-"||$i,"container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .),"bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),$b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else $b,"kbps"),"url":extract($x,".+m3u8(?:.+|)") ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; m3u8-to-json(<url>)'
 
 xs:string    # Een string.
 xs:string+   # Eén of meerdere strings.
@@ -1676,9 +1720,9 @@ declare function m3u8-to-json ($url as xs:string?) as item()* {
       {
         "format":"hls-0",
         "container":"m3u8[manifest]",
-        "url":$a/url
+        "url":if (string-length($a/url) < 512) then $a/url else $url
       },
-      for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8$","ms")]
+      for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")]
       order by extract($x,"BANDWIDTH=(\d+)",1)
       count $i
       return {
@@ -1701,7 +1745,7 @@ declare function m3u8-to-json ($url as xs:string?) as item()* {
             $b,
           "kbps"
         ),
-        "url":extract($x,".+m3u8") ! (
+        "url":extract($x,".+m3u8(?:.+|)") ! (
           if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
         )
       }
