@@ -71,7 +71,8 @@ npo() {
             $a/token
           )
         )/stream[not(protection)]/src
-    return json:={|
+    return
+    json:={|
       if ($b) then {
         "name":$b/concat(
           franchiseTitle,
@@ -86,11 +87,17 @@ npo() {
           "[H01]:[m01]:[s01]"
         ),
         "start":if ($b/startAt) then
-          format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]")
+          format-time(
+            $b/startAt * duration("PT1S"),
+            "[H01]:[m01]:[s01]"
+          )
         else
           (),
         "end":if ($b/startAt) then
-          format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]")
+          format-time(
+            $b/(duration + startAt) * duration("PT1S"),
+            "[H01]:[m01]:[s01]"
+          )
         else
           (),
         "subtitle":{
@@ -150,7 +157,8 @@ rtl() {
         if (.//classname="uitzending") then episodes/name else .//title
       ),
       "date":format-date(
-        (material)()/original_date * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        (material)()/original_date * duration("PT1S") +
+        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -184,7 +192,11 @@ kijk() {
         )
       })/json/{
         "name":concat(upper-case(custom_fields/sbs_station),": ",name),
-        "date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
+        "date":replace(
+          custom_fields/sko_dt,
+          "(\d{4})(\d{2})(\d{2})",
+          "$3-$2-$1"
+        ),
         "duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),
         "expdate":replace(
           json("http://api.kijk.nl/v1/default/entitlement/'$1'")//enddate/date,
@@ -227,7 +239,11 @@ kijk() {
           else
             ()
         ),
-        "date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
+        "date":replace(
+          TAQ/customLayer/c_sko_dt,
+          "(\d{4})(\d{2})(\d{2})",
+          "$3-$2-$1"
+        ),
         "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
         "expdate":format-dateTime(
           TAQ/customLayer/c_media_dateexpires * duration("PT1S") +
@@ -286,8 +302,8 @@ regio_nh() {
   eval "$(xidel "$1" -e '
     let $a:=json(
       //script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.]
-    )/pageData
-    return json:={
+    )/pageData return
+    json:={
       "name":if ($a) then
         if ($a/(media)(1)/title) then
           $a/(media)(1)/concat(source,": ",title)
@@ -297,7 +313,8 @@ regio_nh() {
         substring-after(//title,"- ")||": Livestream",
       "date":if ($a) then
         format-date(
-          $a/updated * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+          $a/updated * duration("PT1S") +
+          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
           "[D01]-[M01]-[Y]"
         )
       else
@@ -466,7 +483,8 @@ dumpert() {
           "name":"Dumpert: "||title,
           "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
           "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
-          "formats":for $x at $i in ("mobile","tablet","720p","original") let $a:=(.//variants)()[version=$x]/uri return {
+          "formats":for $x at $i in ("mobile","tablet","720p","original")
+          let $a:=(.//variants)()[version=$x]/uri return {
             "format":"pg-"||$i,
             "container":"mp4[h264+aac]",
             "url":$a
@@ -489,7 +507,8 @@ telegraaf() {
         )/(.//videoId)[1],
         "/playlist.json"
       )
-    ) return json:={
+    ) return
+    json:={
       "name":"Telegraaf: "||$a//title,
       "date":replace(
         $a//datecreated,
@@ -550,7 +569,11 @@ ad() {
 lc() {
   eval "$(xidel "$1" --xquery '
     json:=json(
-      extract(unparsed-text(//figure[@class="video"]//@src),"var opts = (.+);",1)
+      extract(
+        unparsed-text(//figure[@class="video"]//@src),
+        "var opts = (.+);",
+        1
+      )
     )/{
       "name":concat("LC: ",clipData/title),
       "date":format-date(

@@ -17,7 +17,10 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
       count $i
       return {
         "format":"hls-"||$i,
-        "container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+        "container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then
+          "m3u8[h264+aac]"
+        else
+          "m3u8[aac]",
         "resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return
         extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (
           if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .

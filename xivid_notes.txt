@@ -1727,7 +1727,10 @@ declare function m3u8-to-json ($url as xs:string?) as item()* {
       count $i
       return {
         "format":"hls-"||$i,
-        "container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+        "container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then
+          "m3u8[h264+aac]"
+        else
+          "m3u8[aac]",
         "resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return
         extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (
           if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .
@@ -1830,9 +1833,9 @@ $ xidel -s -e 'x:request({"header":"X-Requested-With: XMLHttpRequest","url":"htt
 
 $ xidel -s "https://www.npostart.nl/live/npo-1" -e 'let $a:=//npo-player/@media-id return x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$a})/json'
 {
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb21zY29yZSI6eyJucG9JbmdlbG9nZCI6Im5vIiwibnBvTG9naW50eXBlIjoiYW5vbmllbSIsIm5wb0xvZ2luSWQiOiIifSwic21hcnR0YWciOnsic2l0ZUlkIjoiNCJ9LCJoYXNTdWJzY3JpcHRpb24iOiIiLCJoYXNQcmVtaXVtU3Vic2NyaXB0aW9uIjoiIiwiZWxlbWVudElkIjoicGxheWVyLUxJX05MMV80MTg4MTAyIiwibWVkaWFJZCI6IkxJX05MMV80MTg4MTAyIiwidG9wc3BpbiI6eyJwYXJ0eUlkIjoiIiwicHJvZmlsZUlkIjoiIn0sImhhc1NldHRpbmdzIjoiMCIsImhhc0FkQ29uc2VudCI6IjEiLCJzaGFyZSI6IjEiLCJwYWdlVXJsIjoiIiwic3RlclJlZmVycmFsVXJsIjoiIiwic3RlclNpdGVJZCI6Im5wb3N0YXJ0IiwiaWF0IjoxNTUyNjY0NTY0LCJuYmYiOjE1NTI2NjQ1NjQsImV4cCI6MTU1MjY5MzM2NCwiY29uc3VtZXJJZCI6bnVsbCwiaXNQbGF5bGlzdCI6ZmFsc2UsInJlZmVycmVyVXJsIjpudWxsLCJza2lwQ2F0YWxvZyI6MCwibm9BZHMiOjAsInJlY29tbWVuZGF0aW9ucyI6MSwiaXNzIjoiZXlKcGRpSTZJbXB1UkZWbFFqaG1kbWxCVTFOalEyOU5WR2xYZFZFOVBTSXNJblpoYkhWbElqb2lZM2h4UmpVNFlWTjJOMEp1VVRkTmMxWjVlbmQ2VGpWMU1YUXpaRzVXT1VkaFNIUkhObW94VkRBellUbGhRMFl4UkVWa1NuVjBPVTVXY1RFd1EzWXJkeUlzSW0xaFl5STZJbVppWVRWbFlUSmtPRE5rTWpCak1URmlZemsyTkdFek5XWTNNakpsWldGbU9HVTVZMk15TlRobU4yVmlZVEZqTlRNellUUTJabVEyTVRKbVpESmtZekVpZlE9PSJ9.Vajmxn2QFcp9ZUAcfK6eTayccAhKZhLSIggO5i_G9mk",
-  "embedUrl": "https://start-player.npo.nl/embed/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb21zY29yZSI6eyJucG9JbmdlbG9nZCI6Im5vIiwibnBvTG9naW50eXBlIjoiYW5vbmllbSIsIm5wb0xvZ2luSWQiOiIifSwic21hcnR0YWciOnsic2l0ZUlkIjoiNCJ9LCJoYXNTdWJzY3JpcHRpb24iOiIiLCJoYXNQcmVtaXVtU3Vic2NyaXB0aW9uIjoiIiwiZWxlbWVudElkIjoicGxheWVyLUxJX05MMV80MTg4MTAyIiwibWVkaWFJZCI6IkxJX05MMV80MTg4MTAyIiwidG9wc3BpbiI6eyJwYXJ0eUlkIjoiIiwicHJvZmlsZUlkIjoiIn0sImhhc1NldHRpbmdzIjoiMCIsImhhc0FkQ29uc2VudCI6IjEiLCJzaGFyZSI6IjEiLCJwYWdlVXJsIjoiIiwic3RlclJlZmVycmFsVXJsIjoiIiwic3RlclNpdGVJZCI6Im5wb3N0YXJ0IiwiaWF0IjoxNTUyNjY0NTY0LCJuYmYiOjE1NTI2NjQ1NjQsImV4cCI6MTU1MjY5MzM2NCwiY29uc3VtZXJJZCI6bnVsbCwiaXNQbGF5bGlzdCI6ZmFsc2UsInJlZmVycmVyVXJsIjpudWxsLCJza2lwQ2F0YWxvZyI6MCwibm9BZHMiOjAsInJlY29tbWVuZGF0aW9ucyI6MSwiaXNzIjoiZXlKcGRpSTZJbXB1UkZWbFFqaG1kbWxCVTFOalEyOU5WR2xYZFZFOVBTSXNJblpoYkhWbElqb2lZM2h4UmpVNFlWTjJOMEp1VVRkTmMxWjVlbmQ2VGpWMU1YUXpaRzVXT1VkaFNIUkhObW94VkRBellUbGhRMFl4UkVWa1NuVjBPVTVXY1RFd1EzWXJkeUlzSW0xaFl5STZJbVppWVRWbFlUSmtPRE5rTWpCak1URmlZemsyTkdFek5XWTNNakpsWldGbU9HVTVZMk15TlRobU4yVmlZVEZqTlRNellUUTJabVEyTVRKbVpESmtZekVpZlE9PSJ9.Vajmxn2QFcp9ZUAcfK6eTayccAhKZhLSIggO5i_G9mk",
-  "embedCode": "<script>var urlForIframe = \"https://start-player.npo.nl/embed/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb21zY29yZSI6eyJucG9JbmdlbG9nZCI6Im5vIiwibnBvTG9naW50eXBlIjoiYW5vbmllbSIsIm5wb0xvZ2luSWQiOiIifSwic21hcnR0YWciOnsic2l0ZUlkIjoiNCJ9LCJoYXNTdWJzY3JpcHRpb24iOiIiLCJoYXNQcmVtaXVtU3Vic2NyaXB0aW9uIjoiIiwiZWxlbWVudElkIjoicGxheWVyLUxJX05MMV80MTg4MTAyIiwibWVkaWFJZCI6IkxJX05MMV80MTg4MTAyIiwidG9wc3BpbiI6eyJwYXJ0eUlkIjoiIiwicHJvZmlsZUlkIjoiIn0sImhhc1NldHRpbmdzIjoiMCIsImhhc0FkQ29uc2VudCI6IjEiLCJzaGFyZSI6IjEiLCJwYWdlVXJsIjoiIiwic3RlclJlZmVycmFsVXJsIjoiIiwic3RlclNpdGVJZCI6Im5wb3N0YXJ0IiwiaWF0IjoxNTUyNjY0NTY0LCJuYmYiOjE1NTI2NjQ1NjQsImV4cCI6MTU1MjY5MzM2NCwiY29uc3VtZXJJZCI6bnVsbCwiaXNQbGF5bGlzdCI6ZmFsc2UsInJlZmVycmVyVXJsIjpudWxsLCJza2lwQ2F0YWxvZyI6MCwibm9BZHMiOjAsInJlY29tbWVuZGF0aW9ucyI6MSwiaXNzIjoiZXlKcGRpSTZJbXB1UkZWbFFqaG1kbWxCVTFOalEyOU5WR2xYZFZFOVBTSXNJblpoYkhWbElqb2lZM2h4UmpVNFlWTjJOMEp1VVRkTmMxWjVlbmQ2VGpWMU1YUXpaRzVXT1VkaFNIUkhObW94VkRBellUbGhRMFl4UkVWa1NuVjBPVTVXY1RFd1EzWXJkeUlzSW0xaFl5STZJbVppWVRWbFlUSmtPRE5rTWpCak1URmlZemsyTkdFek5XWTNNakpsWldGbU9HVTVZMk15TlRobU4yVmlZVEZqTlRNellUUTJabVEyTVRKbVpESmtZekVpZlE9PSJ9.Vajmxn2QFcp9ZUAcfK6eTayccAhKZhLSIggO5i_G9mk\"; var elementId = \"player-LI_NL1_4188102\"; var mediaId = \"LI_NL1_4188102\";</script><script src=\"https://start-player.npo.nl/js/embed.js\"></script>"
+  "token": "eyJ0eXA[...]5i_G9mk",
+  "embedUrl": "https://start-player.npo.nl/embed/eyJ0eXA[...]5i_G9mk",
+  "embedCode": "<script>var urlForIframe = \"https://start-player.npo.nl/embed/eyJ0eXA[...]5i_G9mk\"; var elementId = \"player-LI_NL1_4188102\"; var mediaId = \"LI_NL1_4188102\";</script><script src=\"https://start-player.npo.nl/js/embed.js\"></script>"
 }
 
 $ xidel -s "https://www.npostart.nl/live/npo-1" -e 'let $a:=//npo-player/@media-id return x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$a})/json/json(doc(embedUrl)//script/extract(.,"var video =(.+);",1)[.])'
@@ -2092,20 +2095,7 @@ $ xidel -s --module=xivid.xq "https://www.npostart.nl/live/npo-1" -e '{"name":re
       "bitrate": "128kbps",
       "url": "https://smoote2d.omroep.nl/urishieldv2/l2fm3a9a3af15007ec5f005c8d0822000000.a5e79cf6973549e2d3d7ea1527f32029/live/npo/tvlive/npo1/npo1.isml/npo1-audio=128000.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "500|128kbps",
-      "url": "https://smoote2d.omroep.nl/urishieldv2/l2fm3a9a3af15007ec5f005c8d0822000000.a5e79cf6973549e2d3d7ea1527f32029/live/npo/tvlive/npo1/npo1.isml/npo1-audio=128000-video=500000.m3u8"
-    },
-    {
-      "format": "hls-3",
-      "container": "m3u8[h264+aac]",
-      "resolution": "848x480",
-      "bitrate": "1000|128kbps",
-      "url": "https://smoote2d.omroep.nl/urishieldv2/l2fm3a9a3af15007ec5f005c8d0822000000.a5e79cf6973549e2d3d7ea1527f32029/live/npo/tvlive/npo1/npo1.isml/npo1-audio=128000-video=1000000.m3u8"
-    },
+    [...]
     {
       "format": "hls-4",
       "container": "m3u8[h264+aac]",
@@ -2312,34 +2302,7 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="POW_03375558",$a:=x:request({"heade
       "bitrate": "64kbps",
       "url": "https://nl-ams-p11-am3.cdn.streamgate.nl/eyJ0eXA[...]gq6Kpkc/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=64000.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "128kbps",
-      "url": "https://nl-ams-p11-am3.cdn.streamgate.nl/eyJ0eXA[...]gq6Kpkc/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000.m3u8"
-    },
-    {
-      "format": "hls-3",
-      "container": "m3u8[h264+aac]",
-      "resolution": "480x270",
-      "bitrate": "203|64kbps",
-      "url": "https://nl-ams-p11-am3.cdn.streamgate.nl/eyJ0eXA[...]gq6Kpkc/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=64000-video=203000.m3u8"
-    },
-    {
-      "format": "hls-4",
-      "container": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "506|128kbps",
-      "url": "https://nl-ams-p11-am3.cdn.streamgate.nl/eyJ0eXA[...]gq6Kpkc/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=506000.m3u8"
-    },
-    {
-      "format": "hls-5",
-      "container": "m3u8[h264+aac]",
-      "resolution": "768x432",
-      "bitrate": "707|128kbps",
-      "url": "https://nl-ams-p11-am3.cdn.streamgate.nl/eyJ0eXA[...]gq6Kpkc/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=707000.m3u8"
-    },
+    [...]
     {
       "format": "hls-6",
       "container": "m3u8[h264+aac]",
@@ -2656,11 +2619,17 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="AT_2105037",$a:=x:request({"header"
         "[H01]:[m01]:[s01]"
       ),
       "start":if ($b/startAt) then
-        format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]")
+        format-time(
+          $b/startAt * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        )
       else
         (),
       "end":if ($b/startAt) then
-        format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]")
+        format-time(
+          $b/(duration + startAt) * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        )
       else
         (),
       "subtitle":{
@@ -2795,7 +2764,8 @@ $ xidel -s --module=xivid.xq "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed
       if (.//classname="uitzending") then episodes/name else .//title
     ),
     "date":format-date(
-      (material)()/original_date * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+      (material)()/original_date * duration("PT1S") +
+      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
       "[D01]-[M01]-[Y]"
     ),
     "duration":format-time(
@@ -2836,7 +2806,8 @@ xidel -s --module=xivid.xq "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d
       '[H01]:[m01]:[s01]'
     ),
     'expdate':format-dateTime(
-      (.//ddr_timeframes)()[model='AVOD']/stop * duration('PT1S') + duration('%tz%') + dateTime('1970-01-01T00:00:00'),
+      (.//ddr_timeframes)()[model='AVOD']/stop * duration('PT1S') +
+      duration('%tz%') + dateTime('1970-01-01T00:00:00'),
       '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
     ),
     'formats':xivid:m3u8-to-json(.//videohost||.//videopath)
@@ -2864,21 +2835,7 @@ https://www.kijk.nl/sbs6/hartvannederland/videos/khGyAypO3su/hart-van-nederland-
 $ xidel -s "https://embed.kijk.nl/video/khGyAypO3su" -e 'outer-html(//video)'
 <video data-video-id="6070768508001" data-account="585049245001" data-player="B168VjQ3W" data-embed="default" data-application-id="" class="video-js" controls="" width="100%" height="100%" id="player" preload="none"></video>
 
-$ xidel -s "https://embed.kijk.nl/video/khGyAypO3su" --xquery '
-  x:request({
-    "headers":"Accept: application/json;pk="||extract(
-      unparsed-text(//script[contains(@src,//@data-account)]/@src),
-      "policyKey:&quot;(.+?)&quot;",
-      1
-    ),
-    "url":concat(
-      "https://edge.api.brightcove.com/playback/v1/accounts/",
-      //@data-account,
-      "/videos/",
-      //@data-video-id
-    )
-  })/json
-'
+$ xidel -s "https://embed.kijk.nl/video/khGyAypO3su" --xquery 'x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:&quot;(.+?)&quot;",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json'
 {
   "description": "Hart van Nederland - Laat",
   "poster_sources": [
@@ -3377,7 +3334,11 @@ $ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/rTCCffSSSSS" --xquery 
       )
     })/json/{
       "name":concat(upper-case(custom_fields/sbs_station),": ",name),
-      "date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
+      "date":replace(
+        custom_fields/sko_dt,
+        "(\d{4})(\d{2})(\d{2})",
+        "$3-$2-$1"
+      ),
       "duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),
       "expdate":replace(
         json("http://api.kijk.nl/v1/default/entitlement/rTCCffSSSSS")//enddate/date,
@@ -3420,7 +3381,11 @@ $ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/rTCCffSSSSS" --xquery 
         else
           ()
       ),
-      "date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),
+      "date":replace(
+        TAQ/customLayer/c_sko_dt,
+        "(\d{4})(\d{2})(\d{2})",
+        "$3-$2-$1"
+      ),
       "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
       "expdate":format-dateTime(
         TAQ/customLayer/c_media_dateexpires * duration("PT1S") +
@@ -4305,7 +4270,7 @@ Kv.up(a,2);Kv.y9(a,23);Kv.y9(a,22);Kv.Rp(a,52);Kv.up(a,3);Kv.y9(a,1);Kv.up(a,1);
   $ xidel -s GuoxLggqI_g.json --xquery 'let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag = 22]/{|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|}'
   {
     "sp": "sig",
-    "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?expire=1564689970&ei=0vFCXdm5Buaz8gOSt56YDg&ip=80.101.49.5&id=o-AM1ibvM0Feuk9dfaoOg3JIDE2bGsRFvUjonCfjXC4doV&itag=22&source=youtube&requiressl=yes&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7l&ms=au%2Crdu&mv=m&mvi=1&pl=15&initcwndbps=1722500&mime=video%2Fmp4&ratebypass=yes&dur=5306.015&lmt=1541644163348912&mt=1564668289&fvip=2&beids=23806810&c=WEB&txp=5531432&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cmime%2Cratebypass%2Cdur%2Clmt&lsparams=mm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AHylml4wRAIgYgfiMLa-3zEHAFw3G3NVL2b-nktzrDnHqm-dMZoGkjsCIFgGrQFtuM9R3IwnKUpJ_k476H49zDJDOqhU0-6DodfL",
+    "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?expire=1564689970&ei=0vFCXdm5Buaz8gOSt56YDg&ip=x.x.x.x&id=o-AM1ibvM0Feuk9dfaoOg3JIDE2bGsRFvUjonCfjXC4doV&itag=22&source=youtube&requiressl=yes&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7l&ms=au%2Crdu&mv=m&mvi=1&pl=15&initcwndbps=1722500&mime=video%2Fmp4&ratebypass=yes&dur=5306.015&lmt=1541644163348912&mt=1564668289&fvip=2&beids=23806810&c=WEB&txp=5531432&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cmime%2Cratebypass%2Cdur%2Clmt&lsparams=mm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AHylml4wRAIgYgfiMLa-3zEHAFw3G3NVL2b-nktzrDnHqm-dMZoGkjsCIFgGrQFtuM9R3IwnKUpJ_k476H49zDJDOqhU0-6DodfL",
     "s": "fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g=="
   }
 
@@ -4974,7 +4939,8 @@ $ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7758863_849bf
         "name":"Dumpert: "||title,
         "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
         "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
-        "formats":for $x at $i in ("mobile","tablet","720p","original") let $a:=(.//variants)()[version=$x]/uri return {
+        "formats":for $x at $i in ("mobile","tablet","720p","original")
+        let $a:=(.//variants)()[version=$x]/uri return {
           "format":"pg-"||$i,
           "container":"mp4[h264+aac]",
           "url":$a
@@ -5034,13 +5000,7 @@ $ xidel -s --module=xivid.xq "https://www.omropfryslan.nl/live/omrop-fryslan-tv"
       "bitrate": "528kbps",
       "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/400/prog_index.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "854x480@25fps",
-      "bitrate": "1328kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/1200/prog_index.m3u8"
-    },
+    [...]
     {
       "format": "hls-3",
       "container": "m3u8[h264+aac]",
@@ -5227,13 +5187,7 @@ $ xidel -s --module=xivid.xq "https://www.rtvoost.nl/tv" -e 'let $a:=json(resolv
       "bitrate": "613kbps",
       "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/e8a15a5f-a530-432e-a025-6dffc1426309/index.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "1024x576",
-      "bitrate": "1589kbps",
-      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/bc0f880f-dbe0-4de2-825d-ec01d960f7fc/index.m3u8"
-    },
+    [...]
     {
       "format": "hls-3",
       "container": "m3u8[h264+aac]",
@@ -5319,13 +5273,7 @@ $ xidel -s --module=xivid.xq "https://www.omroepwest.nl/tv" -e 'let $a:=x:reques
       "bitrate": "571kbps",
       "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b531072.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "712x400",
-      "bitrate": "1451kbps",
-      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b1331072.m3u8"
-    },
+    [...]
     {
       "format": "hls-3",
       "container": "m3u8[h264+aac]",
@@ -5454,13 +5402,7 @@ $ xidel -s --module=xivid.xq "https://l1.nl/live-l1-tv" -e 'let $a:=x:request({"
       "bitrate": "142kbps",
       "url": "https://d34pj260kw1xmk.cloudfront.net/live/l1/tv/1553845279-au-index.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "1192kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/live/l1/tv/1553845279-fast-640-360-1000000-index.m3u8"
-    },
+    [...]
     {
       "format": "hls-3",
       "container": "m3u8[h264+aac]",
@@ -5965,13 +5907,7 @@ $ xidel -s --module=xivid.xq "https://www.nhnieuws.nl/tv" -e '{"name":"NH Nieuws
       "bitrate": "1153kbps",
       "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/chunklist_b1048576.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2307kbps",
-      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/fbbbade6227f9c819319e5f479bc7d71/sz/nhnieuws/wowza4/live/live.smil/chunklist_b2097152.m3u8"
-    },
+    [...]
     {
       "format": "hls-3",
       "container": "m3u8[h264+aac]",
@@ -6001,13 +5937,7 @@ $ xidel -s --module=xivid.xq "https://www.at5.nl/tv" -e '{"name":substring-after
       "bitrate": "1153kbps",
       "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/da0bb837c8a60cd2a854e5100324cc68/sz/atvijf/wowza4/live/live.smil/chunklist_b1048576.m3u8"
     },
-    {
-      "format": "hls-2",
-      "container": "m3u8[h264+aac]",
-      "resolution": "768x608",
-      "bitrate": "2307kbps",
-      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/da0bb837c8a60cd2a854e5100324cc68/sz/atvijf/wowza4/live/live.smil/chunklist_b2097152.m3u8"
-    },
+    [...]
     {
       "format": "hls-3",
       "container": "m3u8[h264+aac]",
@@ -6102,7 +6032,8 @@ $ xidel -s --module=xivid.xq "https://www.at5.nl/artikelen/e27519/zaterdag-27-ap
       substring-after(//title,"- ")||": Livestream",
     "date":if ($a) then
       format-date(
-        $a/updated * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        $a/updated * duration("PT1S") +
+        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       )
     else
@@ -6156,13 +6087,11 @@ $ xidel -s --module=xivid.xq "https://www.omroepflevoland.nl/" -e '{"name":"Omro
 
 https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a
 
-$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e 'outer-html(//h2)'
+$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e '(outer-html(//h2),outer-html(//span[starts-with(@class,"t--red")]))'
 <h2>
 
             Dit is Flevoland
         </h2>
-
-$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e 'outer-html(//span[starts-with(@class,"t--red")])'
 <span class="t--red t--strong t--capitalize d--inl-block">
         Vr 12-04-2019
     </span>
@@ -6569,7 +6498,7 @@ $ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.n
       "bitrate": "481kbps",
       "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i176422914-na1f6458e-2586-4547-9491-fea1ea11c357&anvtrid=1bf60e79c0e5f3967f858c0627ead193"
     },
-    [...],
+    [...]
     {
       "format": "hls-5",
       "container": "m3u8[h264+aac]",
@@ -6639,7 +6568,7 @@ $ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.n
       "bitrate": "490kbps",
       "url": "https://video.persgroep.be/N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy/index300.m3u8"
     },
-    [...],
+    [...]
     {
       "format": "hls-5",
       "container": "m3u8[h264+aac]",
@@ -6705,7 +6634,7 @@ $ xidel -s --module=xivid.xq -H "Cookie: pwv=2;pws=functional" "https://www.ad.n
       "bitrate": "450kbps",
       "url": "https://video.persgroep.be/k3MGNmZzE62C7JZZBxHCWgECXn8756TG/index300.m3u8"
     },
-    [...],
+    [...]
     {
       "format": "hls-5",
       "container": "m3u8[h264+aac]",
@@ -6774,7 +6703,7 @@ $ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bol
       "bitrate": "400kbps",
       "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2019/10/08/asset-3422620-1570538762646090.mp4"
     },
-    [...],
+    [...]
     {
       "format": "pg-6",
       "container": "mp4[h264+aac]",
@@ -6789,7 +6718,11 @@ $ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bol
 
 --xquery '
   json(
-    extract(unparsed-text(//figure[@class="video"]//@src),"var opts = (.+);",1)
+    extract(
+      unparsed-text(//figure[@class="video"]//@src),
+      "var opts = (.+);",
+      1
+    )
   )/{
     "name":concat("LC: ",clipData/title),
     "date":format-date(
