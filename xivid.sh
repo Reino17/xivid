@@ -865,7 +865,7 @@ info() {
 }
 
 if command -v xidel >/dev/null; then
-  if [[ $(xidel --version | xidel -s - -e 'let $a:=x:lines($raw)[1] return number(string-join(extract($a,"(\d+)",1,"*")))') < 98 ]]; then
+  if [[ $(xidel --version | xidel -s - -e 'number(string-join(extract(x:lines($raw)[1],"(\d+)",1,"*")))') < 98 ]]; then
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
 Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
@@ -882,7 +882,7 @@ EOF
   exit 1
 fi
 export XIDEL_OPTIONS="--silent --module=xivid.xq"
-XIDEL_UA="Mozilla/5.0 Firefox/68.0"
+XIDEL_UA="Mozilla/5.0 Firefox/70.0"
 
 while true; do
   re='^https?://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
