@@ -156,18 +156,18 @@ Check of de decimale waarde groter is dan 2^31:
   $ xidel -s -e 'let $a:=x:integer("0xffffff88"),$b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
   -120
 
--e '
-  let $a:=x:integer("0xffffff88"),
-      $b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))
+$ xidel -s -e 'declare function local:shex-to-dec ($hex as xs:string) as xs:integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
+-120
+
+declare function xivid:shex-to-dec ($shex as string) as integer {
+  let $a:=x:integer($shex),
+      $b:=integer(math:pow(2,(string-length($shex) - 2) * 4))
   return
   if ($a > $b div 2) then
     $a - $b
   else
     $a
-'
-
-$ xidel -s -e 'declare function local:shex-to-dec ($hex as xs:string) as xs:integer {let $a:=x:integer($hex),$b:=integer(math:pow(2,(string-length($hex) - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
--120
+};
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -212,7 +212,7 @@ Check of de hoeveelheid bits groter is dan 31:
 $ xidel -s -e 'declare function local:shex-to-dec ($hex as xs:string) as xs:integer {let $a:=x:integer($hex),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
 -120
 
-declare function shex-to-dec ($shex as xs:string) as xs:integer {
+declare function xivid:shex-to-dec ($shex as xs:string) as xs:integer {
   let $a:=x:integer($shex),
       $b:=x:integer-to-base($a,2)
   return
@@ -629,23 +629,21 @@ HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation
     ActiveTimeBias      REG_DWORD       0xffffff88
 
 FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @ECHO %A
+of
+xidel -s -e "tokenize(system('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'),'\s+')[.][last()]"
+(met xidel 0.9.9 kan het zonder 'separator': tokenize(system('REG QUERY [...]'))[last()] )
 0xffffff88   # Signed 32bit Hex
 
-xidel -s -e "let $a:=x:integer('0xffffff88'),$b:=x:integer-to-base($a,2) return if (string-length($b) < 32) then $a else $a - integer(math:pow(2,string-length($b)))"
+xidel -s -e "let $a:=x:integer(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]),$b:=x:integer-to-base($a,2) return if (string-length($b) < 32) then $a else $a - integer(math:pow(2,string-length($b)))"
+xidel -s --module=xivid.xq -e "xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()])"
 -120
 
-FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @xidel -s -e "let $a:=x:integer('%A'),$b:=x:integer-to-base($a,2) return (if (string-length($b) < 32) then $a else $a - math:pow(2,string-length($b))) * duration('-PT1M')"
+xidel -s --module=xivid.xq -e "xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]) * duration('-PT1M')"
 PT2H
 
-FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @xidel -s -e "let $a:=1561935600,$b:=x:integer('%A'),$c:=x:integer-to-base($b,2) return $a * duration('PT1S') + (if (string-length($c) < 32) then $b else $b - math:pow(2,string-length($c))) * duration('-PT1M') + dateTime('1970-01-01T00:00:00')"
-2019-07-01T01:00:00
-
+xidel -s --module=xivid.xq -e "let $a:=1561935600,$b:=xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]) return $a * duration('PT1S') + $b * duration('-PT1M') + dateTime('1970-01-01T00:00:00')"
 of
-
-FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @xidel -s -e "let $a:=x:integer('%A'),$b:=x:integer-to-base($a,2) return (if (string-length($b) < 32) then $a else $a - math:pow(2,string-length($b))) * -60"
-7200
-
-FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @xidel -s -e "let $a:=1561935600,$b:=x:integer('%A'),$c:=x:integer-to-base($b,2) return ($a + (if (string-length($c) < 32) then $b else $b - math:pow(2,string-length($c))) * -60) * duration('PT1S') + dateTime('1970-01-01T00:00:00')"
+xidel -s --module=xivid.xq -e "let $a:=1561935600,$b:=xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]) return ($a + $b * -60) * duration('PT1S') + dateTime('1970-01-01T00:00:00')"
 2019-07-01T01:00:00
 
 ------------------------------------------------------------------------------------------------
@@ -2785,9 +2783,14 @@ $ xidel -s --module=xivid.xq "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed
 
 Batch:
 
-FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO (
-  FOR /F "delims=" %B IN ('xidel -s --module=xivid.xq -e "tz:=xivid:shex-to-dec('%A') * duration('-PT1M')" --output-format=cmd') DO %B
-)
+FOR /F "delims=" %A IN ('xidel -s --module=xivid.xq -e "
+  tz:=xivid:shex-to-dec(
+    tokenize(
+      system('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'),
+      '\s+'
+    )[.][last()]
+  ) * -60
+" --output-format=cmd') DO %A
 xidel -s --module=xivid.xq "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e "
   $json[meta/nr_of_videos_total > 0]/{
     'name':concat(
@@ -2798,7 +2801,7 @@ xidel -s --module=xivid.xq "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d
       if (.//classname='uitzending') then episodes/name else .//title
     ),
     'date':format-date(
-      (material)()/original_date * duration('PT1S') + duration('%tz%') + dateTime('1970-01-01T00:00:00'),
+      (material)()/(original_date + %tz%) * duration('PT1S') + date('1970-01-01'),
       '[D01]-[M01]-[Y]'
     ),
     'duration':format-time(
@@ -2806,8 +2809,8 @@ xidel -s --module=xivid.xq "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d
       '[H01]:[m01]:[s01]'
     ),
     'expdate':format-dateTime(
-      (.//ddr_timeframes)()[model='AVOD']/stop * duration('PT1S') +
-      duration('%tz%') + dateTime('1970-01-01T00:00:00'),
+      (.//ddr_timeframes)()[model='AVOD']/(stop + %tz%) *
+      duration('PT1S') + dateTime('1970-01-01T00:00:00'),
       '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
     ),
     'formats':xivid:m3u8-to-json(.//videohost||.//videopath)

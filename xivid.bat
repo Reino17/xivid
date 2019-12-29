@@ -156,7 +156,7 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
       if ^(.//classname^='uitzending'^) then episodes/name else .//title
     ^)^,
     'date':format-date^(
-      ^(material^)^(^)/original_date * duration^('PT1S'^) + duration^('%tz%'^) + date^('1970-01-01'^)^,
+      ^(material^)^(^)/^(original_date + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -164,8 +164,8 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
       '[H01]:[m01]:[s01]'
     ^)^,
     'expdate':format-dateTime^(
-      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/stop * duration^('PT1S'^) +
-      duration^('%tz%'^) + dateTime^('1970-01-01T00:00:00'^)^,
+      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/^(stop + %tz%^) *
+      duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
       '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
     ^)^,
     'formats':xivid:m3u8-to-json^(.//videohost^|^|.//videopath^)
@@ -245,8 +245,8 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" --xquery ^"
       ^)^,
       'duration':TAQ/customLayer/c_sko_cl * duration^('PT1S'^) + time^('00:00:00'^)^,
       'expdate':format-dateTime^(
-        TAQ/customLayer/c_media_dateexpires * duration^('PT1S'^) +
-        duration^('%tz%'^) + dateTime^('1970-01-01T00:00:00'^)^,
+        TAQ/customLayer/^(c_media_dateexpires + %tz%^) *
+        duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
         '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
       ^)^,
       'subtitle':{
@@ -329,7 +329,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       substring-after^(//title^,'- '^)^|^|': Livestream'^,
     'date':if ^($a^) then
       format-date^(
-        $a/updated * duration^('PT1S'^) + duration^('%tz%'^) + date^('1970-01-01'^)^,
+        $a/^(updated + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
         '[D01]-[M01]-[Y]'
       ^)
     else
@@ -783,7 +783,7 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
   return json:^={
     'name':substring-before^(//title^,' ^| Facebook'^)^,
     'date':format-date^(
-      extract^($raw^,'data-utime^=^&quot^;^(.+?^)^&quot^;'^,1^) * duration^('PT1S'^) + duration^('%tz%'^) + date^('1970-01-01'^)^,
+      ^(extract^($raw^,'data-utime^=^&quot^;^(.+?^)^&quot^;'^,1^) + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -894,9 +894,14 @@ ENDLOCAL
 EXIT /B
 
 :timezone
-FOR /F "skip=4 tokens=3" %%A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO (
-  FOR /F "delims=" %%B IN ('xidel -e "tz:=xivid:shex-to-dec('%%A') * duration('-PT1M')" --output-format^=cmd') DO %%B
-)
+FOR /F "delims=" %%A IN ('xidel -e ^"
+  tz:^=xivid:shex-to-dec^(
+    tokenize^(
+      system^('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'^)^,
+      '\s+'
+    ^)[.][last^(^)]
+  ^) * -60
+^" --output-format^=cmd') DO %%A
 EXIT /B
 
 :start
