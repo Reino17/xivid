@@ -8,16 +8,16 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
     }) return
     $a[doc]/(
       {
-        "format":"hls-0",
-        "container":"m3u8[manifest]",
+        "id":"hls-0",
+        "format":"m3u8[manifest]",
         "url":if (string-length($a/url) < 512) then $a/url else $url
       },
       for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")]
       order by extract($x,"BANDWIDTH=(\d+)",1)
       count $i
       return {
-        "format":"hls-"||$i,
-        "container":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then
+        "id":"hls-"||$i,
+        "format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then
           "m3u8[h264+aac]"
         else
           "m3u8[aac]",

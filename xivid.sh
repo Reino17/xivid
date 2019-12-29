@@ -23,11 +23,11 @@ help() {
 Xivid, een video-url extractie script.
 Gebruik: ./xivid.sh [optie] url
 
-  -f FORMAAT    Forceer specifiek formaat. Zonder opgave wordt het
-                best beschikbare formaat gekozen.
-  -i            Toon video informatie, incl. een opsomming van alle
-                beschikbare formaten.
-  -j            Toon video informatie als JSON.
+  -f ID    Forceer specifiek formaat. Zonder opgave wordt het best
+           beschikbare formaat gekozen.
+  -i       Toon video informatie, incl. een opsomming van alle
+           beschikbare formaten.
+  -j       Toon video informatie als JSON.
 
 Ondersteunde websites:
   npostart.nl             omropfryslan.nl       omroepwest.nl
@@ -208,8 +208,8 @@ kijk() {
           order by $x/size
           count $i
           return {
-            "format":"pg-"||$i,
-            "container":"mp4[h264+aac]",
+            "id":"pg-"||$i,
+            "format":"mp4[h264+aac]",
             "resolution":concat($x/width,"x",$x/height),
             "bitrate":round($x/avg_bitrate div 1000)||"kbps",
             "url":replace(
@@ -287,8 +287,8 @@ regio_frl() {
         order by $x/@bandwidth
         count $i
         return {
-          "format":"pg-"||$i,
-          "container":"mp4[h264+aac]",
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
           "resolution":concat($x/@width,"x",$x/@height),
           "bitrate":$x/@bandwidth||"kbps",
           "url":resolve-uri($x/@src,$a[1])
@@ -349,8 +349,8 @@ regio_fll() {
         xivid:txt-to-date(//span[@class="d--block--sm"]),
       "formats":[
         {
-          "format":"pg-1",
-          "container":"mp4[h264+aac]",
+          "id":"pg-1",
+          "format":"mp4[h264+aac]",
           "url"://div[ends-with(@class,"videoplayer")]/@data-file
         }
       ]
@@ -386,8 +386,8 @@ regio_utr() {
         "date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
         "formats":[
           {
-            "format":"pg-1",
-            "container":"mp4[h264+aac]",
+            "id":"pg-1",
+            "format":"mp4[h264+aac]",
             "url":$a
           }
         ]
@@ -455,8 +455,8 @@ regio() {
         order by $x/bandwidth
         count $i
         return {
-          "format":"pg-"||$i,
-          "container":"mp4[h264+aac]",
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
           "resolution":concat($x/width,"x",$x/height),
           "bitrate":$x/bandwidth||"kbps",
           "url":resolve-uri(
@@ -485,8 +485,8 @@ dumpert() {
           "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
           "formats":for $x at $i in ("mobile","tablet","720p","original")
           let $a:=(.//variants)()[version=$x]/uri return {
-            "format":"pg-"||$i,
-            "container":"mp4[h264+aac]",
+            "id":"pg-"||$i,
+            "format":"mp4[h264+aac]",
             "url":$a
           }[url]
         }
@@ -521,8 +521,8 @@ telegraaf() {
       ),
       "formats":(
         $a//locations/reverse((progressive)())/{
-          "format":"pg-"||position(),
-          "container":"mp4[h264+aac]",
+          "id":"pg-"||position(),
+          "format":"mp4[h264+aac]",
           "resolution":concat(width,"x",height),
           "url":.//src
         },
@@ -586,8 +586,8 @@ lc() {
         order by $x/bandwidth
         count $i
         return {
-          "format":"pg-"||$i,
-          "container":"mp4[h264+aac]",
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
           "resolution":concat($x/width,"x",$x/height),
           "bitrate":$x/bandwidth||"kbps",
           "url":resolve-uri(
@@ -675,8 +675,8 @@ youtube() {
         order by $x/width
         count $i
         return {
-          "format":"pg-"||$i,
-          "container":let $a:=extract(
+          "id":"pg-"||$i,
+          "format":let $a:=extract(
             $x/mimeType,
             "/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",
             (1 to 3)
@@ -697,8 +697,8 @@ youtube() {
         order by $x/boolean(width),$x/bitrate
         count $i
         return {
-          "format":"dash-"||$i,
-          "container":let $a:=extract(
+          "id":"dash-"||$i,
+          "format":let $a:=extract(
             $x/mimeType,
             "/(.+);.+&quot;(\w+)",
             (1,2)
@@ -737,8 +737,8 @@ vimeo() {
         count $i
         return
         $x/{
-          "format":"pg-"||$i,
-          "container":"mp4[h264+aac]",
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
           "resolution":concat(width,"x",height,"@",fps,"fps"),
           "url":url
         },
@@ -770,16 +770,16 @@ facebook() {
       ),
       "formats":[
         $a/(sd_src,hd_src)[.] ! {
-          "format":"pg-"||position(),
-          "container":"mp4[h264+aac]",
+          "id":"pg-"||position(),
+          "format":"mp4[h264+aac]",
           "url":uri-decode(.)
         },
         for $x at $i in $a/parse-xml(dash_manifest)//Representation
         order by $x/boolean(@width),$x/@bandwidth
         count $i
         return {
-          "format":"dash-"||$i,
-          "container":concat(
+          "id":"dash-"||$i,
+          "format":concat(
             substring-after($x/@mimeType,"/"),
             "[",
             extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),
@@ -813,8 +813,8 @@ info() {
         $d:=string-join((1 to $c + 1) ! " "),
         $e:=[
           {
+            "id":"id",
             "format":"formaat",
-            "container":"container",
             "resolution":"resolutie",
             "samplerate":"frequentie",
             "bitrate":"bitrate"
@@ -897,19 +897,19 @@ while true; do
           f=$2
           shift
         else
-          echo "xivid: formaat code ontbreekt." 1>&2
+          echo "xivid: formaat id ontbreekt." 1>&2
           exit 1
         fi
       elif [[ $2 ]]; then
         if [[ $2 =~ $re ]]; then
-          echo "xivid: formaat code ontbreekt." 1>&2
+          echo "xivid: formaat id ontbreekt." 1>&2
           exit 1
         else
           echo "xivid: url ontbreekt." 1>&2
           exit 1
         fi
       else
-        echo "xivid: formaat code en url ontbreken." 1>&2
+        echo "xivid: formaat id en url ontbreken." 1>&2
         exit 1
       fi
       ;;
@@ -951,7 +951,7 @@ done
 
 if [[ $url =~ (npostart.nl|gemi.st) ]]; then
   if [[ $url =~ npostart.nl/live ]]; then
-    echo "xivid: url niet ondersteund." 1>&2
+    echo "xivid: url wordt niet ondersteund." 1>&2
     exit 1
   fi
   npo "$(xidel -e 'extract("'$url'",".+/([\w_]+)",1)')"
@@ -1002,12 +1002,12 @@ elif [[ $url =~ vimeo.com ]]; then
 elif [[ $url =~ facebook.com ]]; then
   facebook "$url"
 else
-  echo "xivid: url niet ondersteund." 1>&2
+  echo "xivid: url wordt niet ondersteund." 1>&2
   exit 1
 fi
 
 if [[ $json ]]; then
-  eval "$(xidel - -e 'fmts:=string-join($json/(formats)()/format)' --output-format=bash <<< $json)"
+  eval "$(xidel - -e 'fmts:=string-join($json/(formats)()/id)' --output-format=bash <<< $json)"
 else
   echo "xivid: geen video(-informatie) beschikbaar." 1>&2
   exit 1
@@ -1015,9 +1015,9 @@ fi
 if [[ $f ]]; then
   if [[ $fmts ]]; then
     if [[ $fmts =~ $f ]]; then
-      xidel - -e '$json/(formats)()[format="'$f'"]/url' <<< $json
+      xidel - -e '$json/(formats)()[id="'$f'"]/url' <<< $json
     else
-      echo "xivid: formaat code ongeldig." 1>&2
+      echo "xivid: formaat id ongeldig." 1>&2
       exit 1
     fi
   else

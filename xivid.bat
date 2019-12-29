@@ -22,11 +22,11 @@
 ECHO Xivid, een video-url extractie script.
 ECHO Gebruik: xivid.bat [optie] url
 ECHO.
-ECHO   -f FORMAAT    Forceer specifiek formaat. Zonder opgave wordt het
-ECHO                 best beschikbare formaat gekozen.
-ECHO   -i            Toon video informatie, incl. een opsomming van alle
-ECHO                 beschikbare formaten.
-ECHO   -j            Toon video informatie als JSON.
+ECHO   -f ID    Forceer specifiek formaat. Zonder opgave wordt het best
+ECHO            beschikbare formaat gekozen.
+ECHO   -i       Toon video informatie, incl. een opsomming van alle
+ECHO            beschikbare formaten.
+ECHO   -j       Toon video informatie als JSON.
 ECHO.
 ECHO Ondersteunde websites:
 ECHO   npostart.nl             omropfryslan.nl       omroepwest.nl
@@ -207,8 +207,8 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" --xquery ^"
         order by $x/size
         count $i
         return {
-          'format':'pg-'^|^|$i^,
-          'container':'mp4[h264+aac]'^,
+          'id':'pg-'^|^|$i^,
+          'format':'mp4[h264+aac]'^,
           'resolution':concat^($x/width^,'x'^,$x/height^)^,
           'bitrate':round^($x/avg_bitrate div 1000^)^|^|'kbps'^,
           'url':replace^(
@@ -302,8 +302,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
       order by $x/@bandwidth
       count $i
       return {
-        'format':'pg-'^|^|$i^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-'^|^|$i^,
+        'format':'mp4[h264+aac]'^,
         'resolution':concat^($x/@width^,'x'^,$x/@height^)^,
         'bitrate':$x/@bandwidth^|^|'kbps'^,
         'url':resolve-uri^($x/@src^,$a[1]^)
@@ -364,8 +364,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       xivid:txt-to-date^(//span[@class^='d--block--sm']^)^,
     'formats':[
       {
-        'format':'pg-1'^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-1'^,
+        'format':'mp4[h264+aac]'^,
         'url'://div[ends-with^(@class^,'videoplayer'^)]/@data-file
       }
     ]
@@ -401,8 +401,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       'date':replace^($a^,'.+?^(\d+^)/^(\d+^)/^(\d+^).+'^,'$3-$2-$1'^)^,
       'formats':[
         {
-          'format':'pg-1'^,
-          'container':'mp4[h264+aac]'^,
+          'id':'pg-1'^,
+          'format':'mp4[h264+aac]'^,
           'url':$a
         }
       ]
@@ -470,8 +470,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
       order by $x/bandwidth
       count $i
       return {
-        'format':'pg-'^|^|$i^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-'^|^|$i^,
+        'format':'mp4[h264+aac]'^,
         'resolution':concat^($x/width^,'x'^,$x/height^)^,
         'bitrate':$x/bandwidth^|^|'kbps'^,
         'url':resolve-uri^(
@@ -500,8 +500,8 @@ FOR /F "delims=" %%A IN ('xidel -H "Cookie: nsfw=1;cpc=10" "%~1" --xquery ^"
         'duration':^(media^)^(^)/duration * duration^('PT1S'^) + time^('00:00:00'^)^,
         'formats':for $x at $i in ^('mobile'^,'tablet'^,'720p'^,'original'^)
         let $a:^=^(.//variants^)^(^)[version^=$x]/uri return {
-          'format':'pg-'^|^|$i^,
-          'container':'mp4[h264+aac]'^,
+          'id':'pg-'^|^|$i^,
+          'format':'mp4[h264+aac]'^,
           'url':$a
         }[url]
       }
@@ -539,8 +539,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
     ^)^,
     'formats':^(
       $a//locations/reverse^(^(progressive^)^(^)^)/{
-        'format':'pg-'^|^|position^(^)^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-'^|^|position^(^)^,
+        'format':'mp4[h264+aac]'^,
         'resolution':concat^(width^,'x'^,height^)^,
         'url':.//src
       }^,
@@ -604,8 +604,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
       order by $x/bandwidth
       count $i
       return {
-        'format':'pg-'^|^|$i^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-'^|^|$i^,
+        'format':'mp4[h264+aac]'^,
         'resolution':concat^($x/width^,'x'^,$x/height^)^,
         'bitrate':$x/bandwidth^|^|'kbps'^,
         'url':resolve-uri^(
@@ -693,8 +693,8 @@ xidel "%~1" --xquery ^"^
       order by $x/width^
       count $i^
       return {^
-        'format':'pg-'^|^|$i,^
-        'container':let $a:=extract(^
+        'id':'pg-'^|^|$i,^
+        'format':let $a:=extract(^
           $x/mimeType,^
           '/(.+);.+^&quot;(\w+)\..+ (\w+)(?:\.^|^&quot;)',^
           (1 to 3)^
@@ -715,8 +715,8 @@ xidel "%~1" --xquery ^"^
       order by $x/boolean(width),$x/bitrate^
       count $i^
       return {^
-        'format':'dash-'^|^|$i,^
-        'container':let $a:=extract(^
+        'id':'dash-'^|^|$i,^
+        'format':let $a:=extract(^
           $x/mimeType,^
           '/(.+);.+^&quot;(\w+)',^
           (1,2)^
@@ -759,8 +759,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
       count $i
       return
       $x/{
-        'format':'pg-'^|^|$i^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-'^|^|$i^,
+        'format':'mp4[h264+aac]'^,
         'resolution':concat^(width^,'x'^,height^,'@'^,fps^,'fps'^)^,
         'url':url
       }^,
@@ -792,16 +792,16 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
     ^)^,
     'formats':[
       $a/^(sd_src^,hd_src^)[.] ! {
-        'format':'pg-'^|^|position^(^)^,
-        'container':'mp4[h264+aac]'^,
+        'id':'pg-'^|^|position^(^)^,
+        'format':'mp4[h264+aac]'^,
         'url':uri-decode^(.^)
       }^,
       for $x at $i in $a/parse-xml^(dash_manifest^)//Representation
       order by $x/boolean^(@width^)^,$x/@bandwidth
       count $i
       return {
-        'format':'dash-'^|^|$i^,
-        'container':concat^(
+        'id':'dash-'^|^|$i^,
+        'format':concat^(
           substring-after^($x/@mimeType^,'/'^)^,
           '['^,
           extract^($x/@codecs^,'^(^^[\w]+^)'^,1^) ! ^(if ^(.^='avc1'^) then 'h264' else if ^(.^='mp4a'^) then 'aac' else .^)^,
@@ -841,8 +841,8 @@ xidel --xquery ^"^
       $d:=string-join((1 to $c + 1) ! ' '),^
       $e:=[^
         {^
+          'id':'id',^
           'format':'formaat',^
-          'container':'container',^
           'resolution':'resolutie',^
           'samplerate':'frequentie',^
           'bitrate':'bitrate'^
@@ -930,13 +930,13 @@ IF NOT "%~1"=="" (
         SET "f=%~2"
         SHIFT /2
       ) ELSE (
-        ECHO xivid: formaat code ontbreekt.
+        ECHO xivid: formaat id ontbreekt.
         EXIT /B 1
       )
     ) ELSE IF NOT "%~2"=="" (
       FOR /F "delims=" %%A IN ('xidel -e "matches('%~2','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')"') DO (
         IF "%%A"=="true" (
-          ECHO xivid: formaat code ontbreekt.
+          ECHO xivid: formaat id ontbreekt.
           EXIT /B 1
         ) ELSE (
           ECHO xivid: url ontbreekt.
@@ -944,7 +944,7 @@ IF NOT "%~1"=="" (
         )
       )
     ) ELSE (
-      ECHO xivid: formaat code en url ontbreken.
+      ECHO xivid: formaat id en url ontbreken.
       EXIT /B 1
     )
   ) ELSE IF "%~1"=="-i" (
@@ -984,7 +984,7 @@ IF NOT "%~1"=="" (
 
 IF NOT "%url:npostart.nl=%"=="%url%" (
   IF NOT "%url:npostart.nl/live=%"=="%url%" (
-    ECHO xivid: url niet ondersteund.
+    ECHO xivid: url wordt niet ondersteund.
     EXIT /B 1
   )
   FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','.+/([\w_]+)',1)"') DO CALL :npo %%A
@@ -1045,14 +1045,14 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
   CALL :facebook "%url%"
 ) ELSE (
-  ECHO xivid: url niet ondersteund.
+  ECHO xivid: url wordt niet ondersteund.
   EXIT /B 1
 )
 
 IF EXIST xivid.json (
-  FOR /F "delims=" %%A IN ('xidel xivid.json -e "fmts:=string-join($json/(formats)()/format)" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('xidel xivid.json -e "fmts:=string-join($json/(formats)()/id)" --output-format^=cmd') DO %%A
 ) ELSE IF DEFINED json (
-  FOR /F "delims=" %%A IN ('ECHO %json% ^| xidel - -e "fmts:=string-join($json/(formats)()/format)" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('ECHO %json% ^| xidel - -e "fmts:=string-join($json/(formats)()/id)" --output-format^=cmd') DO %%A
 ) ELSE (
   ECHO xivid: geen video^(-informatie^) beschikbaar.
   EXIT /B 1
@@ -1062,12 +1062,12 @@ IF DEFINED f (
     SETLOCAL ENABLEDELAYEDEXPANSION
     IF NOT "!fmts:%f%=!"=="!fmts!" (
       IF EXIST xivid.json (
-        xidel xivid.json -e "$json/(formats)()[format='%f%']/url"
+        xidel xivid.json -e "$json/(formats)()[id='%f%']/url"
       ) ELSE IF DEFINED json (
-        ECHO %json% | xidel - -e "$json/(formats)()[format='%f%']/url"
+        ECHO %json% | xidel - -e "$json/(formats)()[id='%f%']/url"
       )
     ) ELSE (
-      ECHO xivid: formaat code ongeldig.
+      ECHO xivid: formaat id ongeldig.
       IF EXIST xivid.json DEL xivid.json
       EXIT /B 1
     )

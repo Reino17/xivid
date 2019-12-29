@@ -20,11 +20,11 @@ Of download de [tarball](https://github.com/Reino17/xivid/archive/master.zip).
 Gebruik (Windows): xivid.bat [optie] url
 Gebruik (Linux): ./xivid.sh [optie] url
 
-  -f FORMAAT    Forceer specifiek formaat. Zonder opgave wordt het
-                best beschikbare formaat gekozen.
-  -i            Toon video informatie, incl. een opsomming van alle
-                beschikbare formaten.
-  -j            Toon video informatie als JSON.
+  -f ID    Forceer specifiek formaat. Zonder opgave wordt het best
+           beschikbare formaat gekozen.
+  -i       Toon video informatie, incl. een opsomming van alle
+           beschikbare formaten.
+  -j       Toon video informatie als JSON.
 ```
 Deze websites worden op dit moment ondersteund:
 ```
@@ -57,14 +57,14 @@ Naam:          NOS Journaal 20.00 uur
 Datum:         28-02-2017
 Tijdsduur:     00:25:37
 Ondertiteling: webvtt
-Formaten:      formaat  container       resolutie  bitrate
-               hls-0    m3u8[manifest]
-               hls-1    m3u8[aac]                  64kbps
-               hls-2    m3u8[aac]                  128kbps
-               hls-3    m3u8[h264+aac]  480x270    203|64kbps
-               hls-4    m3u8[h264+aac]  640x360    506|128kbps
-               hls-5    m3u8[h264+aac]  768x432    707|128kbps
-               hls-6    m3u8[h264+aac]  1024x576   1109|128kbps  (best)
+Formaten:      id     formaat         resolutie  bitrate
+               hls-0  m3u8[manifest]
+               hls-1  m3u8[aac]                  64kbps
+               hls-2  m3u8[aac]                  128kbps
+               hls-3  m3u8[h264+aac]  480x270    203|64kbps
+               hls-4  m3u8[h264+aac]  640x360    506|128kbps
+               hls-5  m3u8[h264+aac]  768x432    707|128kbps
+               hls-6  m3u8[h264+aac]  1024x576   1109|128kbps  (best)
 ```
 Gebruik `-f` voor een ander gewenst formaat:
 ```
@@ -155,14 +155,14 @@ Tijdsduur:     00:01:05
 Begin:         00:09:02
 Einde:         00:10:07
 Ondertiteling: webvtt
-Formaten:      formaat  container       resolutie  bitrate
-               hls-0    m3u8[manifest]
-               hls-1    m3u8[aac]                  64kbps
-               hls-2    m3u8[aac]                  128kbps
-               hls-3    m3u8[h264+aac]  480x270    209|64kbps
-               hls-4    m3u8[h264+aac]  640x360    517|128kbps
-               hls-5    m3u8[h264+aac]  768x432    721|128kbps
-               hls-6    m3u8[h264+aac]  1024x576   1027|128kbps  (best)
+Formaten:      id     format          resolutie  bitrate
+               hls-0  m3u8[manifest]
+               hls-1  m3u8[aac]                  64kbps
+               hls-2  m3u8[aac]                  128kbps
+               hls-3  m3u8[h264+aac]  480x270    209|64kbps
+               hls-4  m3u8[h264+aac]  640x360    517|128kbps
+               hls-5  m3u8[h264+aac]  768x432    721|128kbps
+               hls-6  m3u8[h264+aac]  1024x576   1027|128kbps  (best)
 
 Download:      ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 ```
@@ -183,21 +183,21 @@ Als je de ondertiteling in dit geval ook wilt meenemen, dan kan dat, maar omdat 
   },
   "formats": [
     {
-      "format": "hls-0",
-      "container": "m3u8[manifest]",
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
       "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/playlist.m3u8"
     },
     {
-      "format": "hls-1",
-      "container": "m3u8[aac]",
+      "id": "hls-1",
+      "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "64kbps",
       "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=64000.m3u8"
     },
     [...]
     {
-      "format": "hls-6",
-      "container": "m3u8[h264+aac]",
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
       "resolution": "1024x576",
       "bitrate": "1027|128kbps",
       "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000-video=1027000.m3u8"
