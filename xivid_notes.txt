@@ -61,6 +61,74 @@ J I H G F E D C B A
 
 ================================================================================================
 
+[JSON filtering and selection]
+
+$ xidel -s -e '
+  let $a:={"a":1,"b":2} return (
+    {"foo":{"bar":$a/c}},
+    {"foo":{"bar":$a/c}[bar]},
+    {"foo":{"bar1"?:$a/a,"bar2"?:$a/b,"bar3"?:$a/c}},
+    {"foo":{"bar1"?:$a/a,"bar2"?:$a/c}},
+    {"foo":{"bar"?:$a/c}},
+    {"foo":[{"bar":$a/a},{"bar":$a/b},{"bar":$a/c}[bar]]},
+    {"foo":[{"bar":$a/a},{"bar":$a/c}[bar]]},
+    {"foo":[{"bar":$a/c}[bar]]},
+    {"foo":({"bar":$a/a},{"bar":$a/b},{"bar":$a/c}[bar])},
+    {"foo":({"bar":$a/a},{"bar":$a/c}[bar])},
+    {"foo":({"bar":$a/c}[bar])},
+    {"foo":({"bar":$a/a},{"bar":$a/b},{"bar":$a/c}[bar]) ! [.]},
+    {"foo":({"bar":$a/a},{"bar":$a/c}[bar]) ! [.]},
+    {"foo":({"bar":$a/c}[bar]) ! [.]},
+    {"foo":let $b:=({"bar":$a/a},{"bar":$a/b},{"bar":$a/c}[bar]) return [$b]},
+    {"foo":let $b:=({"bar":$a/a},{"bar":$a/c}[bar]) return [$b]},
+    {"foo":let $b:=({"bar":$a/c}[bar]) return [$b]},
+    {"foo":let $b:=({"bar":$a/a},{"bar":$a/b},{"bar":$a/c}[bar]) return [$b][exists($b)]},
+    {"foo":let $b:=({"bar":$a/a},{"bar":$a/c}[bar]) return [$b][exists($b)]},
+    {"foo":let $b:=({"bar":$a/c}[bar]) return [$b][exists($b)]}
+  )
+' --printed-json-format=compact
+{"foo": {"bar": null}}
+{"foo": null}                           # [bar] evalueert naar null, waardoor het hele object verdwijnt.
+{"foo": {"bar1": 1, "bar2": 2}}         # ? is "optional pair".
+{"foo": {"bar1": 1}}
+{"foo": {}}                             # Geen attribute-value-pair? Dan krijg je een leeg object.
+{"foo": [{"bar": 1}, {"bar": 2}]}
+{"foo": [{"bar": 1}]}
+{"foo": []}                             # Met blokhaken krijg je zonder één object een lege array.
+{"foo": [{"bar": 1}, {"bar": 2}]}       # Met haakjes evalueert de reeks automatisch tot array.
+{"foo": {"bar": 1}}                     # De reeks, uiteindelijk één object, blijft ook een object.
+{"foo": null}
+{"foo": [[{"bar": 1}], [{"bar": 2}]]}   # Elk object van de reeks wordt een array en dit evalueert tot weer een array.
+{"foo": [{"bar": 1}]}
+{"foo": null}
+{"foo": [{"bar": 1}, {"bar": 2}]}       # De hele reeks wordt een array.
+{"foo": [{"bar": 1}]}
+{"foo": []}                             # Zonder te controleren of $b minimaal één object heeft krijg je weer een lege array.
+{"foo": [{"bar": 1}, {"bar": 2}]}
+{"foo": [{"bar": 1}]}
+{"foo": null}                           # De enige manier voor de eis "Eén of meerdere objecten? Array. Nul objecten? null.
+
+$ xidel -s -e '
+  let $a:={"a":1,"b":2},
+      $b:={"a":"x","b":"y"}
+  return (
+    {"foo":$a[b]/{"bar":b}},
+    {"foo":$a[exists(b)]/{"bar":b}},
+    {"foo":$b[b]/{"bar":b}},
+    {"foo":$b[exists(b)]/{"bar":b}},
+    {"foo":$a[c]/{"bar":c}},
+    {"foo":$b[c]/{"bar":c}}
+  )
+' --printed-json-format=compact
+{"foo": null}                           # $a[b] evalueert naar $a[2], maar er is geen 2e object, dus krijg je null.
+{"foo": {"bar": 2}}                     # Als de waarde van het attribuut dat je checkt een integer is, dan is exists() vereist.
+{"foo": {"bar": "y"}}                   # $b/b is een string en dus is exists() niet vereist.
+{"foo": {"bar": "y"}}
+{"foo": null}
+{"foo": null}
+
+================================================================================================
+
 [Base conversions]
 
 Decimal     (Base 10)    31 = (3*10^1)+(1*10^0)                       = 30+1       = 31
