@@ -769,18 +769,14 @@ vimeo() {
 }
 
 facebook() {
-  eval "$(xidel --user-agent="$XIDEL_UA" "$1" --xquery '
-    let $a:=json(
-      replace(
-        extract(.,"\((\{bootloadable.+?)\);",1),
-        "\\\x",
-        "\\\u00"
-      )
-    )/(.//videoData)()
-    return json:={
-      "name":substring-before(//title," | Facebook"),
+  eval "$(xidel --user-agent="$XIDEL_UA" -H "Accept-Language: en-us" "$1" --xquery '
+    let $a:=//script/extract(.,"\((\{bootloadable.+?)\);",1)[.] ! json(
+      replace(.,"\\\x","\\\u00")
+    )/(.//videoData)() return
+    json:={
+      "name":replace(//title,"(.+) \| (.+)","$2: $1"),
       "date":format-date(
-        extract($raw,"data-utime=&quot;(.+?)&quot;",1) * duration("PT1S") +
+        //code/comment() ! parse-html(.)//@data-utime * duration("PT1S") +
         (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
@@ -789,7 +785,13 @@ facebook() {
         "[H01]:[m01]:[s01]"
       ),
       "formats":[
-        $a/(sd_src,hd_src)[.] ! {
+        {
+          "id":"sub-1",
+          "format":"srt",
+          "language":"en",
+          "url":$a/subtitles_src
+        }[url],
+        $a/(sd_src,hd_src_no_ratelimit) ! {
           "id":"pg-"||position(),
           "format":"mp4[h264+aac]",
           "url":uri-decode(.)
