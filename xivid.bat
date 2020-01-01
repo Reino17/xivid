@@ -1020,7 +1020,12 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:rtlnieuws.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel "%url%" -e "//@data-uuid"') DO CALL :rtl %%A
 ) ELSE IF NOT "%url:kijk.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','(?:video|videos)/(\w+)',1)"') DO CALL :kijk %%A
+  FOR /F "delims=" %%A IN ('xidel -e ^"
+    if ^(contains^('%url%'^,'preview.kijk.nl'^)^) then
+      extract^('%url%'^,'.+/^(\w+^)'^,1^)
+    else
+      extract^('%url%'^,'^(?:video^|videos^)/^(\w+^)'^,1^)
+  ^"') DO CALL :kijk %%A
 ) ELSE IF NOT "%url:omropfryslan.nl=%"=="%url%" (
   CALL :regio_frl "%url%"
 ) ELSE IF NOT "%url:nhnieuws.nl=%"=="%url%" (

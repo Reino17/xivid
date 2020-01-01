@@ -992,7 +992,12 @@ elif [[ $url =~ rtl.nl ]]; then
 elif [[ $url =~ rtlnieuws.nl ]]; then
   rtl "$(xidel "$url" -e '//@data-uuid')"
 elif [[ $url =~ kijk.nl ]]; then
-  kijk "$(xidel -e 'extract("'$url'","(?:video|videos)/(\w+)",1)')"
+  kijk "$(xidel -e '
+    if (contains("'$url'","preview.kijk.nl")) then
+      extract("'$url'",".+/(\w+)",1)
+    else
+      extract("'$url'","(?:video|videos)/(\w+)",1)
+  ')"
 elif [[ $url =~ omropfryslan.nl ]]; then
   regio_frl "$url"
 elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then

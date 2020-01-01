@@ -2918,9 +2918,11 @@ $ cat <<EOF | while read a; do xidel -s -e 'extract("'$a'","(?:video|videos)/(\w
 https://www.kijk.nl/sbs6/hartvannederland/videos/VR83fgb6opk/hart-van-nederland-late-editie
 http://www.kijk.nl/video/VR83fgb6opk
 EOF
+VR83fgb6opk
+VR83fgb6opk
 
-VR83fgb6opk
-VR83fgb6opk
+xidel -s -e 'extract("https://preview.kijk.nl/programmas/grenzeloos-verliefd-baby-in-het-buitenland/NsXx2geIdIz/seizoen/118203432391/afleveringen/video/episode-grenzeloos-verliefd-baby-in-het-buitenland-s1-e1-2019-11-13/ybCO9ezyTBj",".+/(\w+)",1)'
+ybCO9ezyTBj
 
 ------------------------------------------------------------------------------------------------
 
@@ -3419,6 +3421,40 @@ $ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/GvV9ESmuZuP" --xquery 
       "language": "nl",
       "label": "Nederlands",
       "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/GvV9ESmuZuP/51a62296-c330-4ea3-889e-319a32f88e58/MasterChef_Australie_Season_11_Episode_64-webvtt-nl.vtt"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://preview.kijk.nl/programmas/grenzeloos-verliefd-baby-in-het-buitenland/NsXx2geIdIz/seizoen/118203432391/afleveringen/video/episode-grenzeloos-verliefd-baby-in-het-buitenland-s1-e1-2019-11-13/ybCO9ezyTBj
+
+$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/ybCO9ezyTBj" --xquery '[...]'
+{
+  "name": "NET5: Grenzeloos Verliefd: baby in het buitenland S01E01",
+  "date": "12-11-2019",
+  "duration": "00:45:00",
+  "expdate": "12-11-2024 21:30:59",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/ybCO9ezyTBj/a024a0dd-ce7a-4f0c-9ab9-41b6ac3f0c10/Grenzeloos_Verliefd_baby_in_het_buitenland_Season_1_Episode_1-index.ism/1573330043798.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "160kbps",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/ybCO9ezyTBj/a024a0dd-ce7a-4f0c-9ab9-41b6ac3f0c10/Grenzeloos_Verliefd_baby_in_het_buitenland_Season_1_Episode_1-index.ism/Grenzeloos_Verliefd_baby_in_het_buitenland_Season_1_Episode_1-index-audio=160000.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-7",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "6001|160kbps",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/ybCO9ezyTBj/a024a0dd-ce7a-4f0c-9ab9-41b6ac3f0c10/Grenzeloos_Verliefd_baby_in_het_buitenland_Season_1_Episode_1-index.ism/Grenzeloos_Verliefd_baby_in_het_buitenland_Season_1_Episode_1-index-audio=160000-video=6001026.m3u8"
     }
   ]
 }
