@@ -1,18 +1,28 @@
+xquery version "3.0-xidel";
 module namespace xivid = "https://github.com/Reino17/xivid/";
 
-declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
+declare function xivid:m3u8-to-json ($url as string?) as object()* {
   if ($url) then
     let $a:=x:request({
-      "url":$url,
-      "error-handling":"4xx=accept"
-    }) return
-    $a[doc]/(
+          "url":$url,
+          "error-handling":"4xx=accept"
+        })[doc],
+        $b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*")
+    return (
+      $b[contains(.,"TYPE=SUBTITLES")] ! {
+        "id":"sub-1",
+        "format":"m3u8[vtt]",
+        "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+        "url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (
+          if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
+        )
+      },
       {
         "id":"hls-0",
         "format":"m3u8[manifest]",
         "url":if (string-length($a/url) < 512) then $a/url else $url
-      },
-      for $x at $i in tokenize($a/doc,"#EXT-X-")[matches(.,"^STREAM-INF:.+m3u8","ms")]
+      }[url],
+      for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")]
       order by extract($x,"BANDWIDTH=(\d+)",1)
       count $i
       return {
@@ -21,24 +31,28 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
           "m3u8[h264+aac]"
         else
           "m3u8[aac]",
-        "resolution":let $a:=extract($x,"FRAME-RATE=([\d.]+)",1) return
-        extract($x,"RESOLUTION=([\dx]+)",1)[.] ! (
-          if ($a) then concat(.,"@",round-half-to-even($a,3),"fps") else .
-        ),
-        "bitrate":let $a:=extract($x,"audio(?:_.+?)?=(\d+)(?:-video.+?(\d+))?",(1,2)),
-            $b:=round(extract($x,"BANDWIDTH=(\d+)",1) div 1000)
+        "resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],
+            $b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1)
         return
+        if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,
+        "bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
         concat(
-          if ($a[1]) then 
+          if ($a[1]) then
             join(
               (round($a[2][.] div 1000),round($a[1] div 1000)),
               "|"
             )
           else
-            $b,
+            (
+              round(extract($x,"BANDWIDTH=(\d+)",1)[.] div 1000),
+              extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
+            ),
           "kbps"
         ),
-        "url":extract($x,".+m3u8(?:.+|)") ! (
+        "url":(
+          extract($x,"URI=&quot;(.+?)&quot;",1),
+          extract($x,".+m3u8.*?$","m")
+        )[.][1] ! (
           if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
         )
       }
@@ -47,7 +61,7 @@ declare function xivid:m3u8-to-json ($url as xs:string?) as item()* {
     ()
 };
 
-declare function xivid:txt-to-date ($txt as xs:string) as xs:string {
+declare function xivid:txt-to-date ($txt as string) as string {
   let $a:={
         "januari":"01","februari":"02","maart":"03",
         "april":"04","mei":"05","juni":"06",
@@ -66,7 +80,7 @@ declare function xivid:txt-to-date ($txt as xs:string) as xs:string {
   )
 };
 
-declare function xivid:shex-to-dec ($shex as xs:string) as xs:integer {
+declare function xivid:shex-to-dec ($shex as string) as integer {
   let $a:=x:integer($shex),
       $b:=x:integer-to-base($a,2)
   return
