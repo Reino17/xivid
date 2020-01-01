@@ -89,3 +89,72 @@ declare function xivid:shex-to-dec ($shex as string) as integer {
   else
     $a
 };
+
+declare function xivid:info ($json as object()) as string* {
+  let $a:={
+        "name":"Naam:",
+        "date":"Datum:",
+        "duration":"Tijdsduur:",
+        "start":"Begin:",
+        "end":"Einde:",
+        "expdate":"Gratis tot:"
+      },
+      $b:=$json()[.!="formats"] ! .[$json(.)[.]],
+      $c:=max(
+        $b ! $a(.) ! string-length(.)
+      ) ! (if (. > 9) then . else 9),
+      $d:=string-join((1 to $c + 1) ! " "),
+      $e:=[
+        {
+          "id":"id",
+          "format":"formaat",
+          "language":"taal",
+          "resolution":"resolutie",
+          "samplerate":"frequentie",
+          "bitrate":"bitrate"
+        },
+        $json/(formats)()
+      ],
+      $f:=for $x in $e(1)() return
+      distinct-values(
+        $json/(formats)()()[.!="url"][contains(.,$x)]
+      ),
+      $g:=$f ! max($e()(.) ! string-length(.)),
+      $h:=string-join((1 to sum($g)) ! " ")
+  return (
+    $b ! concat(
+      substring($a(.)||$d,1,$c + 1),
+      $json(.)
+    ),
+    if ($e(2)) then
+      for $x at $i in $e() return
+      concat(
+        if ($i = 1) then substring("Formaten:"||$d,1,$c + 1) else $d,
+        string-join(
+          for $y at $j in $f return
+          if ($i = count($e()) and $j = count($f)) then
+            $x($y)[.]||" (best)"
+          else
+            substring($x($y)[.]||$h,1,$g[$j] + 2)
+        )
+      )
+    else
+      substring("Formaten:"||$d,1,$c + 1)||"-",
+    $json[start]/(
+      let $i:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))
+      return (
+        "",
+        concat(
+          substring("Download:"||$d,1,$c + 1),
+          "ffmpeg",
+          ($i[1] - $i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+          " -i <url>",
+          ($i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+          " -t ",
+          $i[2],
+          " [...]"
+        )
+      )
+    )
+  )
+};

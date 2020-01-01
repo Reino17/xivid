@@ -817,75 +817,6 @@ facebook() {
   ' --output-format=bash)"
 }
 
-info() {
-  xidel - --xquery '
-    let $a:={
-          "name":"Naam:",
-          "date":"Datum:",
-          "duration":"Tijdsduur:",
-          "start":"Begin:",
-          "end":"Einde:",
-          "expdate":"Gratis tot:",
-          "subtitle":"Ondertiteling:"
-        },
-        $b:=$json()[.!="formats"] ! .[$json(.)[.]],
-        $c:=max(
-          $b ! $a(.) ! string-length(.)
-        ) ! (if (. > 9) then . else 9),
-        $d:=string-join((1 to $c + 1) ! " "),
-        $e:=[
-          {
-            "id":"id",
-            "format":"formaat",
-            "resolution":"resolutie",
-            "samplerate":"frequentie",
-            "bitrate":"bitrate"
-          },
-          $json/(formats)()
-        ],
-        $f:=for $x in $e(1)() return
-        distinct-values(
-          $json/(formats)()()[.!="url"]
-        )[contains(.,$x)],
-        $g:=$f ! max($e()(.) ! string-length(.)),
-        $h:=string-join((1 to sum($g)) ! " ")
-    return (
-      $b ! concat(
-        substring($a(.)||$d,1,$c + 1),
-        if ($json(.) instance of string) then $json(.) else $json(.)/type
-      ),
-      if ($e(2)) then
-        for $x at $i in $e() return
-        concat(
-          if ($i = 1) then substring("Formaten:"||$d,1,$c + 1) else $d,
-          string-join(
-            for $y at $i in $f return
-            substring($x($y)[.]||$h,1,$g[$i] + 2)
-          ),
-          if ($i = count($e())) then "(best)" else ()
-        )
-      else
-        substring("Formaten:"||$d,1,$c + 1)||"-",
-      $json[start]/(
-        let $i:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))
-        return (
-          "",
-          concat(
-            substring("Download:"||$d,1,$c + 1),
-            "ffmpeg",
-            ($i[1] - $i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
-            " -i <url>",
-            ($i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
-            " -t ",
-            $i[2],
-            " [...]"
-          )
-        )
-      )
-    )
-  ' <<< $1
-}
-
 if command -v xidel >/dev/null; then
   if [[ $(xidel --version | xidel -s - -e 'number(string-join(extract(x:lines($raw)[1],"(\d+)",1,"*")))') < 98 ]]; then
     cat 1>&2 <<EOF
@@ -1052,7 +983,7 @@ if [[ $f ]]; then
     exit 1
   fi
 elif [[ $i ]]; then
-  info "$json"
+  xidel - -e 'xivid:info($json)' <<< $json
 elif [[ $j ]]; then
   xidel - -e '$json' <<< $json
 elif [[ $fmts ]]; then
