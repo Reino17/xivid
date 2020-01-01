@@ -56,15 +56,15 @@ https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb6
 Naam:          NOS Journaal 20.00 uur
 Datum:         28-02-2017
 Tijdsduur:     00:25:37
-Ondertiteling: webvtt
-Formaten:      id     formaat         resolutie  bitrate
+Formaten:      id     formaat         taal  resolutie  bitrate
+               sub-1  vtt             nl
                hls-0  m3u8[manifest]
-               hls-1  m3u8[aac]                  64kbps
-               hls-2  m3u8[aac]                  128kbps
-               hls-3  m3u8[h264+aac]  480x270    203|64kbps
-               hls-4  m3u8[h264+aac]  640x360    506|128kbps
-               hls-5  m3u8[h264+aac]  768x432    707|128kbps
-               hls-6  m3u8[h264+aac]  1024x576   1109|128kbps  (best)
+               hls-1  m3u8[aac]                        64kbps
+               hls-2  m3u8[aac]                        128kbps
+               hls-3  m3u8[h264+aac]        480x270    203|64kbps
+               hls-4  m3u8[h264+aac]        640x360    506|128kbps
+               hls-5  m3u8[h264+aac]        768x432    707|128kbps
+               hls-6  m3u8[h264+aac]        1024x576   1109|128kbps (best)
 ```
 Gebruik `-f` voor een ander gewenst formaat:
 ```
@@ -149,20 +149,20 @@ FOR /F %A IN ('xivid.bat <url>') DO ffmpeg.exe -i %A -c copy <bestandsnaam>
 # Videofragment downloaden
 ```
 ./xivid.sh -i https://www.npostart.nl/POMS_NOS_7332477
-Naam:          NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
-Datum:         14-02-2017
-Tijdsduur:     00:01:05
-Begin:         00:09:02
-Einde:         00:10:07
-Ondertiteling: webvtt
-Formaten:      id     format          resolutie  bitrate
-               hls-0  m3u8[manifest]
-               hls-1  m3u8[aac]                  64kbps
-               hls-2  m3u8[aac]                  128kbps
-               hls-3  m3u8[h264+aac]  480x270    209|64kbps
-               hls-4  m3u8[h264+aac]  640x360    517|128kbps
-               hls-5  m3u8[h264+aac]  768x432    721|128kbps
-               hls-6  m3u8[h264+aac]  1024x576   1027|128kbps  (best)
+Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
+Datum:     14-02-2017
+Tijdsduur: 00:01:05
+Begin:     00:09:02
+Einde:     00:10:07
+Formaten:  id     formaat         taal  resolutie  bitrate
+           sub-1  vtt             nl
+           hls-0  m3u8[manifest]
+           hls-1  m3u8[aac]                        64kbps
+           hls-2  m3u8[aac]                        128kbps
+           hls-3  m3u8[h264+aac]        480x270    209|64kbps
+           hls-4  m3u8[h264+aac]        640x360    517|128kbps
+           hls-5  m3u8[h264+aac]        768x432    721|128kbps
+           hls-6  m3u8[h264+aac]        1024x576   1027|128kbps (best)
 
 Download:      ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 ```
@@ -177,11 +177,14 @@ Als je de ondertiteling in dit geval ook wilt meenemen, dan kan dat, maar omdat 
   "duration": "00:01:05",
   "start": "00:09:02",
   "end": "00:10:07",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03373320/nl_NL/CAPTION.vtt"
-  },
   "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03373320/nl_NL/CAPTION.vtt"
+    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
