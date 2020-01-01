@@ -768,6 +768,69 @@ vimeo() {
   ' --output-format=bash)"
 }
 
+twitch() {
+  eval "$(xidel "$1" --xquery '
+    declare variable $id:=extract($url,".+/(.+)",1);
+    declare variable $cid:="kimne78kx3ncx6brgo4mv6wki5h1ko";
+    json:=if ($id castable as integer) then
+      let $a:=x:request({
+            "headers":"Client-ID: "||$cid,
+            "url":"https://api.twitch.tv/kraken/videos/"||$id
+          })/json,
+          $b:=x:request({
+            "headers":"Client-ID: "||$cid,
+            "url":concat("http://api.twitch.tv/api/vods/",$id,"/access_token")
+          })/json
+      return {
+        "name":"Twitch: "||$a/title,
+        "date":format-date(
+          dateTime($a/published_at),
+          "[D01]-[M01]-[Y]"
+        ),
+        "duration":format-time(
+          $a/length * duration("PT1S"),
+          "[H01]:[m01]:[s01]"
+        ),
+        "formats":xivid:m3u8-to-json(
+          concat(
+            "https://usher.ttvnw.net/vod/",
+            $id,
+            ".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;player=twitchweb&amp;sig=",
+            $b/sig,
+            "&amp;token=",
+            uri-encode($b/token)
+          )
+        )
+      }
+    else
+      let $a:=x:request({
+            "headers":"Client-ID: "||$cid,
+            "url":concat("http://api.twitch.tv/kraken/streams/",$id,"?stream_type=all")
+          })/json,
+          $b:=x:request({
+            "headers":"Client-ID: "||$cid,
+            "url":concat("http://api.twitch.tv/api/channels/",$id,"/access_token")
+          })/json
+      return {
+        "name":"Twitch: "||$a//status,
+        "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+        "formats":xivid:m3u8-to-json(
+          concat(
+            "https://usher.ttvnw.net/api/channel/hls/",
+            $id,
+            ".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;p=",
+            random-seed(),
+            random(1000000),
+            "&amp;player=twitchweb&amp;segment_preference=4&amp;sig=",
+            $b/sig,
+            "&amp;token=",
+            uri-encode($b/token)
+          )
+        )
+      }
+  ' --output-format=bash)"
+}
+
 facebook() {
   eval "$(xidel --user-agent="$XIDEL_UA" -H "Accept-Language: en-us" "$1" --xquery '
     let $a:=//script/extract(.,"\((\{bootloadable.+?)\);",1)[.] ! json(
@@ -1034,6 +1097,8 @@ elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
 elif [[ $url =~ vimeo.com ]]; then
   vimeo "$url"
+elif [[ $url =~ twitch.tv ]]; then
+  twitch "$url"
 elif [[ $url =~ facebook.com ]]; then
   facebook "$url"
 elif [[ $url =~ twitter.com ]]; then
