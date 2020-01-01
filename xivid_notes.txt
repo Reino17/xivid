@@ -4219,16 +4219,20 @@ $ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" -e 'let $a:=json(//scri
 
 De formaten uit het "url_encoded_fmt_stream_map"- en "adaptive_fmts"-attribuut hebben wel een "url"-attribuut, maar de signature ook; $c[not(s)] en $d[not(s)].
 
-$ xidel -s --module=xivid.xq "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response),$c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|},$d:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return if ($a[1]="size") then let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]}) else {if ($a[1]="type") then "mimeType" else if ($a[1]="audio_sample_rate") then "audioSampleRate" else $a[1]:uri-decode($a[2])}|} return if ($b/videoDetails/isLive) then {"name"://meta[@property="og:title"]/@content,"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($b/streamingData/hlsManifestUrl)} else {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"subtitle":{"type":"ttml","url":($b//captionTracks)()[languageCode="nl"]/baseUrl}[url],"formats":(for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)]) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)] order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url})}'
+$ xidel -s --module=xivid.xq "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response),$c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|},$d:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return if ($a[1]="size") then let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]}) else {if ($a[1]="type") then "mimeType" else if ($a[1]="audio_sample_rate") then "audioSampleRate" else $a[1]:uri-decode($a[2])}|} return if ($b/videoDetails/isLive) then {"name"://meta[@property="og:title"]/@content,"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($b/streamingData/hlsManifestUrl)} else {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":let $a:=(($b//captionTracks)()[languageCode="nl"]/{"id":"sub-1","format":"ttml","language":"nl","label":name/simpleText,"url":baseUrl}[url],for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)]) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)] order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}) return [$a][exists($a)]}'
 {
   "name": "The Uncertainty Has Settled (Full film)",
   "date": "07-11-2018",
   "duration": "01:28:26",
-  "subtitle": {
-    "type": "ttml",
-    "url": "https://www.youtube.com/api/timedtext?[...]&lang=nl"
-  },
-  "formats": null
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "ttml",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://www.youtube.com/api/timedtext?[...]&lang=nl"
+    }
+  ]
 }
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -4580,11 +4584,14 @@ hv.Qe(a,38);hv.w1(a,63);hv.Qe(a,7);hv.Qe(a,18);hv.w1(a,80);hv.Qe(a,21)
       "[D01]-[M01]-[Y]"
     ),
     "duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),
-    "subtitle":{
-      "type":"ttml",
-      "url":($b//captionTracks)()[languageCode="nl"]/baseUrl
-    }[url],
-    "formats":(
+    "formats":let $a:=(
+      ($b//captionTracks)()[languageCode="nl"]/{
+        "id":"sub-1",
+        "format":"ttml",
+        "language":"nl",
+        "label":name/simpleText,
+        "url":baseUrl
+      }[url],
       for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)])
       order by $x/width
       count $i
@@ -4628,7 +4635,8 @@ hv.Qe(a,38);hv.w1(a,63);hv.Qe(a,7);hv.Qe(a,18);hv.w1(a,80);hv.Qe(a,21)
         "bitrate":round($x/bitrate div 1000)||"kbps",
         "url":$x/url
       }
-    )
+    ) return
+    [$a][exists($a)]
   }
 '
 

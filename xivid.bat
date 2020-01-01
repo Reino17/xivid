@@ -700,11 +700,14 @@ xidel "%~1" --xquery ^"^
       '[D01]-[M01]-[Y]'^
     ),^
     'duration':duration(//meta[@itemprop='duration']/@content) + time('00:00:00'),^
-    'subtitle':{^
-      'type':'ttml',^
-      'url':($b//captionTracks)()[languageCode='nl']/baseUrl^
-    }[url],^
-    'formats':(^
+    'formats':let $a:=(^
+      ($b//captionTracks)()[languageCode='nl']/{^
+        'id':'sub-1',^
+        'format':'ttml',^
+        'language':'nl',^
+        'label':name/simpleText,^
+        'url':baseUrl^
+      }[url],^
       for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)])^
       order by $x/width^
       count $i^
@@ -748,7 +751,8 @@ xidel "%~1" --xquery ^"^
         'bitrate':round($x/bitrate div 1000)^|^|'kbps',^
         'url':$x/url^
       }^
-    )^
+    ) return^
+    [$a][exists($a)]^
   }^
 " > xivid.json
 REM CMD's commandline buffer is 8KB (8192 bytes) groot. De gegenereerde JSON
