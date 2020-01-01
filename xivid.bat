@@ -839,6 +839,52 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" -H "Accept-Language: e
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
+:twitter
+CALL :timezone
+FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
+  declare variable $head:^='Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%%2F40K4moUkGsoc%%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw'^;
+  let $a:^=x:request^({
+        'method':'POST'^,
+        'headers':$head^,
+        'url':'https://api.twitter.com/1.1/guest/activate.json'
+      }^)/json/guest_token^,
+      $b:^=x:request^({
+        'headers':^($head^,'x-guest-token: '^|^|$a^)^,
+        'url':'https://api.twitter.com/1.1/'^|^|^(
+          if ^(//@data-supports-broadcast-player^) then
+            concat^('broadcasts/show.json?ids^='^,extract^(//@data-expanded-url^,'.+/^(.+^)'^,1^)^)
+          else
+            concat^('videos/tweet/config/'^,//@data-associated-tweet-id^,'.json'^)
+        ^)
+      }^)/json
+  return
+  json:^={
+    'name'://title^,
+    'date':format-date^(
+      //div[@class^='permalink-header']/^(.//@data-time + %tz%^) *
+      duration^('PT1S'^) + date^('1970-01-01'^)^,
+      '[D01]-[M01]-[Y]'
+    ^)^,
+    'duration':format-time^(
+      round^(^($b//durationMs^,$b//end_ms - $b//start_ms^) div 1000^) * duration^('PT1S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'formats':if ^($b/broadcasts^) then
+      [{
+        'id':'hls-1'^,
+        'format':'m3u8[h264+aac]'^,
+        'resolution':concat^($b//width^,'x'^,$b//height^)^,
+        'url':x:request^({
+          'headers':^($head^,'x-guest-token: '^|^|$a^)^,
+          'url':'https://api.twitter.com/1.1/live_video_stream/status/'^|^|$b//media_key
+        }^)//location
+      }]
+    else
+      xivid:m3u8-to-json^($b//playbackUrl^)
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :timezone
 FOR /F "delims=" %%A IN ('xidel -e ^"
   tz:^=xivid:shex-to-dec^(
@@ -1000,6 +1046,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :vimeo "%url%"
 ) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
   CALL :facebook "%url%"
+) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
+  CALL :twitter "%url%"
 ) ELSE (
   ECHO xivid: url wordt niet ondersteund.
   EXIT /B 1

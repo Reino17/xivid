@@ -817,6 +817,51 @@ facebook() {
   ' --output-format=bash)"
 }
 
+twitter() {
+  eval "$(xidel "$1" -e '
+    declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw";
+    let $a:=x:request({
+          "method":"POST",
+          "headers":$head,
+          "url":"https://api.twitter.com/1.1/guest/activate.json"
+        })/json/guest_token,
+        $b:=x:request({
+          "headers":($head,"x-guest-token: "||$a),
+          "url":"https://api.twitter.com/1.1/"||(
+            if (//@data-supports-broadcast-player) then
+              concat("broadcasts/show.json?ids=",extract(//@data-expanded-url,".+/(.+)",1))
+            else
+              concat("videos/tweet/config/",//@data-associated-tweet-id,".json")
+          )
+        })/json
+    return
+    json:={
+      "name"://title,
+      "date":format-date(
+        //div[@class="permalink-header"]//@data-time * duration("PT1S") +
+        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        round(($b//durationMs,$b//end_ms - $b//start_ms) div 1000) * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "formats":if ($b/broadcasts) then
+        [{
+          "id":"hls-1",
+          "format":"m3u8[h264+aac]",
+          "resolution":concat($b//width,"x",$b//height),
+          "url":x:request({
+            "headers":($head,"x-guest-token: "||$a),
+            "url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key
+          })//location
+        }]
+      else
+        xivid:m3u8-to-json($b//playbackUrl)
+    }
+  ' --output-format=bash)"
+}
+
 if command -v xidel >/dev/null; then
   if [[ $(xidel --version | xidel -s - -e 'number(string-join(extract(x:lines($raw)[1],"(\d+)",1,"*")))') < 98 ]]; then
     cat 1>&2 <<EOF
@@ -959,6 +1004,8 @@ elif [[ $url =~ vimeo.com ]]; then
   vimeo "$url"
 elif [[ $url =~ facebook.com ]]; then
   facebook "$url"
+elif [[ $url =~ twitter.com ]]; then
+  twitter "$url"
 else
   echo "xivid: url wordt niet ondersteund." 1>&2
   exit 1
