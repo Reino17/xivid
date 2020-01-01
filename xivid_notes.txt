@@ -7492,3 +7492,263 @@ $ xidel -s --module=xivid.xq "https://twitter.com/ViviEducation/status/113653486
         xivid:m3u8-to-json($b//playbackUrl)
     }
 '
+
+================================================================================================
+
+[pornhub]
+
+https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 -e 'json(//script/extract(.,"flashvars_\d+ = (.+);",1)[.])'
+{
+  "maxInitialBufferLength": 40,
+  "disable_sharebar": 0,
+  "htmlPauseRoll": "true",
+  "htmlPostRoll": "true",
+  "errorReports": "https://nl.pornhub.com/video/problems/213567022",
+  "autoplay": "true",
+  "autoreplay": "false",
+  "video_unavailable": "false",
+  "pauseroll_url": "",
+  "postroll_url": "",
+  "embedCode": "<iframe src=\"https://nl.pornhub.com/embed/ph5c8e7e44e1da9\" frameborder=\"0\" width=\"560\" height=\"340\" scrolling=\"no\" allowfullscreen></iframe>",
+  "hidePostPauseRoll": false,
+  "isHD": "true",
+  "video_duration": "549",
+  "actionTags": "",
+  "link_url": "https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9",
+  "related_url": "https://nl.pornhub.com/video/player_related_datas?id=213567022",
+  "image_url": "https://ci.phncdn.com/videos/201903/17/213567022/thumbs_15/(m=eaAaGwObaaaa)(mh=y9U5PUCUUhw4TvQr)11.jpg",
+  "video_title": "Strongest orgasm with magic wand in my life - Mini Diva",
+  "defaultQuality": [720, 480, 240, 1080],
+  "vcServerUrl": "/svvt/add?stype=svv&svalue=213567022&snonce=9m0n5r1k2bxtmp16&skey=b08200ef86dfea42762dc62114170c8ba6b63bb1eac28778073798398b94bb92&stime=1571831395",
+  "display_hd_upsell": true,
+  "mediaDefinitions": [
+    {
+      "defaultQuality": false,
+      "format": "mp4",
+      "quality": "1080",
+      "videoUrl": ""
+    },
+    {
+      "defaultQuality": true,
+      "format": "mp4",
+      "quality": "720",
+      "videoUrl": ""
+    },
+    {
+      "defaultQuality": false,
+      "format": "mp4",
+      "quality": "480",
+      "videoUrl": ""
+    },
+    {
+      "defaultQuality": false,
+      "format": "mp4",
+      "quality": "240",
+      "videoUrl": ""
+    }
+  ],
+  "isVertical": "false",
+  "video_unavailable_country": "false",
+  "mp4_seek": "ms",
+  "hotspots": [...],
+  "toprated_url": "https://nl.pornhub.com/video?o=tr&t=m",
+  "mostviewed_url": "https://nl.pornhub.com/video?o=mv&t=m",
+  "options": "show",
+  "cdn": "edgecast",
+  "startLagThreshold": 1000,
+  "outBufferLagThreshold": 2000,
+  "appId": "1111",
+  "service": "protrack",
+  "cdnProvider": "ec",
+  "tubesCmsPrerollConfigType": "new",
+  "prerollGlobalConfig": [],
+  "thumbs": {
+    "samplingFrequency": 4,
+    "type": "normal",
+    "cdnType": "regular",
+    "urlPattern": "https://ci.phncdn.com/videos/201903/17/213567022/timeline/160x90/(m=eGCaiCObaaaa)(mh=pe1wGHehMCV3C3N5)S{5}.jpg",
+    "thumbHeight": "90",
+    "thumbWidth": "160"
+  },
+  "nextVideo": {
+    "thumb": "https://ci.phncdn.com/videos/201905/24/225491641/thumbs_30/(m=ecuKGgaaaa)(mh=lL3N_B5yKPww3SYA)7.jpg",
+    "duration": "543",
+    "title": "Playing with fake sperm and moaning loudly - Mini Diva",
+    "isHD": "1",
+    "nextUrl": "/view_video.php?viewkey=ph5ce838569ffa9",
+    "video": "https://cw.phncdn.com/videos/201905/24/225491641/180P_225K_225491641.webm?_47_5LtAayyvs9--Ch_yRnH_BmYiCR-SUCOoCdrv-UoEd1GMXGBLdu_roHuGJ-Scd3IQs8rjfg9nUCjLRBQswhvrfQnHWptgfm-55pfKlgw9X8illq7yAOvzgFXy0okg0CNnNuQSVDBuwVn0EuWceC3iYHrqrIo1o_ii0a7qziEGZBLJDMMtYyedObvDJD7lXfmBxGG2vBY"
+  },
+  "language": "nl"
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Alle variabelen die beginnen met "ra":
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 -e '//script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*")'
+var rartbgld9ypsra88rartbgld9ypsra88="RTBGld9yp" + "S";var ramvideos2ra80ramvideos2ra80="m/video" +"s/2";var ray8a0qjswhqra29ray8a0qjswhqra29="Y8a0QjswhQ";var rakgtxvzjdjjra68rakgtxvzjdjjra68="kgTXvzJDjJ";var rapvnczg7gyra11rapvnczg7gyra11="Pv_NcZG" + "7gy";var ra135670221ra37ra135670221ra37="13567022/1";var ramp4sozra16ramp4sozra16=".mp4?sO_z_";var rabkfv0rnivra63rabkfv0rnivra63="bKF_v0rniv";var rajhqux87hjara11rajhqux87hjara11="jHqux87" + "Hja";var ra2z3lg3vimrra67ra2z3lg3vimrra67="2Z3lg3vimr";var ra080p4000kra70ra080p4000kra70="080P_" + "4000K";var rapzckmhujslra13rapzckmhujslra13="PzCkmhUJsl";var radbrepkflvlra44radbrepkflvlra44="dbRePKF" + "lvL";var rabdolgevyyra19rabdolgevyyra19="BDolgEVy_y";var ra1p0aupo6m2ra47ra1p0aupo6m2ra47="1p0auPo6m2";var ranu3ahwl8jdra86ranu3ahwl8jdra86="NU3Ahwl8jD";var ral0ngra13ral0ngra13="l0-Ng";var ra8py92lhycmra54ra8py92lhycmra54="8Py92LhYCM";var raaa3zsoj10jra68raaa3zsoj10jra68="Aa3zs" + "OJ10J";var razwvi9unrdhra66razwvi9unrdhra66="zwvi9UNRDH";varra213567022ra77ra213567022ra77="_2135" + "67022";var raew9u8nqr10ra63raew9u8nqr10ra63="EW9u8NQr10";var raphncdncora99raphncdncora99=".phnc" + "dn.co";var raaj5cykddvlra67raaj5cykddvlra67="Aj5cy" + "kDdvl";var raekhtgiggvmra32raekhtgiggvmra32="eKhtGiGGvM";var rahttpscvra78rahttpscvra78="https:/" + "/cv";var ra01903172ra84ra01903172ra84="01903/17/2";var raozy6wnekgra83raozy6wnekgra83="oZy6wn_ek" + "G";var radck0c1oeorra37radck0c1oeorra37="dCk0C1OEor";var quality_1080p=/* + ranu3ahwl8jdra86ranu3ahwl8jdra86 + */rahttpscvra78rahttpscvra78 + /* + ra1p0aupo6m2ra47ra1p0aupo6m2ra47 + */raphncdncora99raphncdncora99 + /* + ra1p0aupo6m2ra47ra1p0aupo6m2ra47 + */ramvideos2ra80ramvideos2ra80 + /* + ral0ngra13ral0ngra13 + */ra01903172ra84ra01903172ra84 + /* + raekhtgiggvmra32raekhtgiggvmra32 + */ra135670221ra37ra135670221ra37 + /* + raekhtgiggvmra32raekhtgiggvmra32 + */ra080p4000kra70ra080p4000kra70 + /* + rapvnczg7gyra11rapvnczg7gyra11 + */ra213567022ra77ra213567022ra77 + /* + raaa3zsoj10jra68raaa3zsoj10jra68 + */ramp4sozra16ramp4sozra16 + /* + raaj5cykddvlra67raaj5cykddvlra67 + */radbrepkflvlra44radbrepkflvlra44 + /* + ral0ngra13ral0ngra13 + */ra8py92lhycmra54ra8py92lhycmra54 + /* + rakgtxvzjdjjra68rakgtxvzjdjjra68 + */raekhtgiggvmra32raekhtgiggvmra32 + /* + raaj5cykddvlra67raaj5cykddvlra67 +*/ranu3ahwl8jdra86ranu3ahwl8jdra86 + /* + rakgtxvzjdjjra68rakgtxvzjdjjra68 + */razwvi9unrdhra66razwvi9unrdhra66 + /* + rajhqux87hjara11rajhqux87hjara11 + */rakgtxvzjdjjra68rakgtxvzjdjjra68 + /* + ranu3ahwl8jdra86ranu3ahwl8jdra86 + */rapzckmhujslra13rapzckmhujslra13 + /* + ra213567022ra77ra213567022ra77 + */raaa3zsoj10jra68raaa3zsoj10jra68 + /* + rapzckmhujslra13rapzckmhujslra13 + */radck0c1oeorra37radck0c1oeorra37 + /* + raozy6wnekgra83raozy6wnekgra83 + */rabdolgevyyra19rabdolgevyyra19 + /* + rahttpscvra78rahttpscvra78 + */ray8a0qjswhqra29ray8a0qjswhqra29 + /* + ranu3ahwl8jdra86ranu3ahwl8jdra86 + */rapvnczg7gyra11rapvnczg7gyra11 + /* + raekhtgiggvmra32raekhtgiggvmra32 + */rartbgld9ypsra88rartbgld9ypsra88 + /* + ra1p0aupo6m2ra47ra1p0aupo6m2ra47 + */ra1p0aupo6m2ra47ra1p0aupo6m2ra47 + /* + ray8a0qjswhqra29ray8a0qjswhqra29 + */raaj5cykddvlra67raaj5cykddvlra67 + /* + rahttpscvra78rahttpscvra78 + */rabkfv0rnivra63rabkfv0rnivra63 + /* + rakgtxvzjdjjra68rakgtxvzjdjjra68 + */rajhqux87hjara11rajhqux87hjara11 + /* + rabkfv0rnivra63rabkfv0rnivra63 + */raozy6wnekgra83raozy6wnekgra83 + /* + ramvideos2ra80ramvideos2ra80 + */ra2z3lg3vimrra67ra2z3lg3vimrra67 + /* + raekhtgiggvmra32raekhtgiggvmra32+ */raew9u8nqr10ra63raew9u8nqr10ra63 + /* + rartbgld9ypsra88rartbgld9ypsra88 + */ral0ngra13ral0ngra13;
+[...]
+
+Verwijder de aanhalingstekens en de +jes en sorteer op "quality":
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 --xquery 'for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") order by extract($x,"quality_(\d+)p=",1) return $x'
+var rarehueazwdra85rarehueazwdra85=rEhUeAzwD;var ra6kpoaxbjira88ra6kpoaxbjira88=6KPoAXBji;var racomvideora91racomvideora91=com/video;var radkc4qphrqra22radkc4qphrqra22=dKC4qphrQ;var rax9pj3nb5kra58rax9pj3nb5kra58=X9Pj3nB5K;var ra0k7sn1emra51ra0k7sn1emra51=0k7sN1e-M;var ra67022mp4ra80ra67022mp4ra80=67022.mp4;var ra17213567ra22ra17213567ra22=17/213567;var raw7vawsnacra62raw7vawsnacra62=W7vAWsnAC;var ra6ef3gugmbra52ra6ef3gugmbra52=6eF3gugmb;var ra76wrhm1y4ra65ra76wrhm1y4ra65=76WrHM1y4;var rackiriuxsnra64rackiriuxsnra64=ckiriUxsn;var rarda6rwms9ra66rarda6rwms9ra66=rDa6RWms9;var rainnsl34knra60rainnsl34knra60=iNnSL34kN;var rashj3zcazsra40rashj3zcazsra40=shj3ZCAZS;var ravfbq4pzgcra60ravfbq4pzgcra60=vFBq4PzGc;var ra2novmsxhjra91ra2novmsxhjra91=2NOVMSxHj;var rap17xlv136ra49rap17xlv136ra49=P17xlv136;var ras201903ra34ras201903ra34=s/201903/;var rahttpscra88rahttpscra88=https://c;var raqpfic0ln5ra88raqpfic0ln5ra88=qPfiC0lN5;var rawwvvtt5ygra83rawwvvtt5ygra83=WWVvtT5YG;var rarup7bahn5ra22rarup7bahn5ra22=Rup7baHn5;var ran7wp7zokbra15ran7wp7zokbra15=N7wP7ZOKB;var ravvefrjgnmra13ravvefrjgnmra13=VvEfRJgNM;var rawqyokfhtcra66rawqyokfhtcra66=wQYoKfhtc;var rapojsrpra90rapojsrpra90=?pojsr__p;var ra400k2135ra52ra400k2135ra52=400K_2135;var ra022240pra18ra022240pra18=022/240P_;var ravphncdnra25ravphncdnra25=v.phncdn.;var ra6nnfara49ra6nnfara49=6nNfA;var quality_240p=/* + rashj3zcazsra40rashj3zcazsra40 + */rahttpscra88rahttpscra88 + /* + ra67022mp4ra80ra67022mp4ra80 + */ravphncdnra25ravphncdnra25 + /* + rarda6rwms9ra66rarda6rwms9ra66 + */racomvideora91racomvideora91 + /* + ra76wrhm1y4ra65ra76wrhm1y4ra65 + */ras201903ra34ras201903ra34 + /* + rax9pj3nb5kra58rax9pj3nb5kra58 + */ra17213567ra22ra17213567ra22 + /* + rawqyokfhtcra66rawqyokfhtcra66 + */ra022240pra18ra022240pra18 + /* + ra400k2135ra52ra400k2135ra52 + */ra400k2135ra52ra400k2135ra52 + /* + raw7vawsnacra62raw7vawsnacra62 + */ra67022mp4ra80ra67022mp4ra80 + /* + ra67022mp4ra80ra67022mp4ra80 + */rapojsrpra90rapojsrpra90 + /* + radkc4qphrqra22radkc4qphrqra22 + */ra0k7sn1emra51ra0k7sn1emra51 + /* + rawqyokfhtcra66rawqyokfhtcra66 + */ra6kpoaxbjira88ra6kpoaxbjira88 + /* + rarda6rwms9ra66rarda6rwms9ra66 + */rarda6rwms9ra66rarda6rwms9ra66 + /* + rainnsl34knra60rainnsl34knra60 + */ravvefrjgnmra13ravvefrjgnmra13 + /* + rax9pj3nb5kra58rax9pj3nb5kra58 + */rarup7bahn5ra22rarup7bahn5ra22 + /* + racomvideora91racomvideora91 + */rackiriuxsnra64rackiriuxsnra64 + /* + rax9pj3nb5kra58rax9pj3nb5kra58 + */rawwvvtt5ygra83rawwvvtt5ygra83 + /* + rax9pj3nb5kra58rax9pj3nb5kra58 + */rax9pj3nb5kra58rax9pj3nb5kra58 + /* + racomvideora91racomvideora91 + */rashj3zcazsra40rashj3zcazsra40 + /* + radkc4qphrqra22radkc4qphrqra22 + */ra6ef3gugmbra52ra6ef3gugmbra52 + /* + rax9pj3nb5kra58rax9pj3nb5kra58 + */rarehueazwdra85rarehueazwdra85 + /* + ra022240pra18ra022240pra18 + */radkc4qphrqra22radkc4qphrqra22 + /* + ravvefrjgnmra13ravvefrjgnmra13 + */ravfbq4pzgcra60ravfbq4pzgcra60 + /* + ra6ef3gugmbra52ra6ef3gugmbra52 + */rawqyokfhtcra66rawqyokfhtcra66 + /* + racomvideora91racomvideora91 + */raw7vawsnacra62raw7vawsnacra62 + /* + rarda6rwms9ra66rarda6rwms9ra66 + */ran7wp7zokbra15ran7wp7zokbra15 + /* + ra67022mp4ra80ra67022mp4ra80 + */rainnsl34knra60rainnsl34knra60 + /* + rawwvvtt5ygra83rawwvvtt5ygra83 + */rap17xlv136ra49rap17xlv136ra49 + /* + rainnsl34knra60rainnsl34knra60 + */raqpfic0ln5ra88raqpfic0ln5ra88 + /* + rackiriuxsnra64rackiriuxsnra64 + */ra2novmsxhjra91ra2novmsxhjra91 + /* + ravphncdnra25ravphncdnra25 + */ra76wrhm1y4ra65ra76wrhm1y4ra65 + /* + ra17213567ra22ra17213567ra22 + */ra6nnfara49ra6nnfara49;
+[...]
+
+De variabele-namen-string per formaat:
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 --xquery 'for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") order by extract($x,"quality_(\d+)p=",1) return substring-after($x,"quality_")'
+240p=/* + rashj3zcazsra40rashj3zcazsra40 + */rahttpscra88rahttpscra88 + [...]
+480p=/* + rargtc5dyra30rargtc5dyra30 + */rahttpsra70rahttpsra70 + [...]
+720p=/* + ra3jitdoapf9ra80ra3jitdoapf9ra80 + */rahttpscvra38rahttpscvra38 + [...]
+1080p=/* + ranu3ahwl8jdra86ranu3ahwl8jdra86 + */rahttpscvra78rahttpscvra78 + [...]
+
+Een variabele-naam tussen /* [...] */ is commentaar en zorgt alleen maar voor verwarring.
+Creëer een reeks van alle variabelen die er toe doen. Feitelijk die dus met */ beginnen:
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 --xquery 'for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") order by extract($x,"quality_(\d+)p=",1) return extract($x,"\*/(\w+)",1,"*")'
+rahttpscra88rahttpscra88
+ravphncdnra25ravphncdnra25
+racomvideora91racomvideora91
+ras201903ra34ras201903ra34
+ra17213567ra22ra17213567ra22
+ra022240pra18ra022240pra18
+ra400k2135ra52ra400k2135ra52
+ra67022mp4ra80ra67022mp4ra80
+rapojsrpra90rapojsrpra90
+ra0k7sn1emra51ra0k7sn1emra51
+ra6kpoaxbjira88ra6kpoaxbjira88
+rarda6rwms9ra66rarda6rwms9ra66
+ravvefrjgnmra13ravvefrjgnmra13
+rarup7bahn5ra22rarup7bahn5ra22
+rackiriuxsnra64rackiriuxsnra64
+rawwvvtt5ygra83rawwvvtt5ygra83
+rax9pj3nb5kra58rax9pj3nb5kra58
+rashj3zcazsra40rashj3zcazsra40
+ra6ef3gugmbra52ra6ef3gugmbra52
+rarehueazwdra85rarehueazwdra85
+radkc4qphrqra22radkc4qphrqra22
+ravfbq4pzgcra60ravfbq4pzgcra60
+rawqyokfhtcra66rawqyokfhtcra66
+raw7vawsnacra62raw7vawsnacra62
+ran7wp7zokbra15ran7wp7zokbra15
+rainnsl34knra60rainnsl34knra60
+rap17xlv136ra49rap17xlv136ra49
+raqpfic0ln5ra88raqpfic0ln5ra88
+ra2novmsxhjra91ra2novmsxhjra91
+ra76wrhm1y4ra65ra76wrhm1y4ra65
+ra6nnfara49ra6nnfara49
+[...]
+
+Zoek in $x de inhoud van deze variabelen op:
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 --xquery 'for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") order by extract($x,"quality_(\d+)p=",1) return join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))'
+https://c v.phncdn. com/video s/201903/ 17/213567 022/240P_ 400K_2135 67022.mp4 ?pojsr__p 0k7sN1e-M 6KPoAXBji rDa6RWms9 VvEfRJgNM Rup7baHn5 ckiriUxsn WWVvtT5YG X9Pj3nB5K shj3ZCAZS 6eF3gugmb rEhUeAzwD dKC4qphrQ vFBq4PzGc wQYoKfhtc W7vAWsnAC N7wP7ZOKB iNnSL34kN P17xlv136 qPfiC0lN5 2NOVMSxHj 76WrHM1y4 6nNfA
+[...]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9 --xquery 'let $a:=json(//script/extract(.,"flashvars_\d+ = (.+);",1)[.]) return {"name":"Pornhub: "||$a/video_title,"date":replace($a/image_url,".+?(\d{4})(\d{2})/(\d{2}).+","$3-$2-$1"),"duration":format-time($a/video_duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") order by extract($x,"quality_(\d+)p=",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))}]}'
+{
+  "name": "Pornhub: Strongest orgasm with magic wand in my life - Mini Diva",
+  "date": "17-03-2019",
+  "duration": "00:09:09",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "426x240",
+      "url": "https://cv.phncdn.com/videos/201903/17/213567022/240P_400K_213567022.mp4?pojsr__[...]y46nNfA"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "url": "https://cv.phncdn.com/videos/201903/17/213567022/1080P_4000K_213567022.mp4?sO_z_db[...]10l0-Ng"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+https://nl.pornhub.com/view_video.php?viewkey=ph5de04f60346c5
+
+$ xidel -s https://nl.pornhub.com/view_video.php?viewkey=ph5de04f60346c5 -e '$raw' > ph5de04f60346c5.htm
+
+$ xidel -s ph5de04f60346c5.htm --xquery 'for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") order by extract($x,"quality_(\d+)p=",1) return string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))'
+https://cv.phncdn.com/videos/201911/28/264884532/240P_400K_264884532.mp4?9NTnorc[...]W3RUlSA
+https://ev.phncdn.com/videos/201911/28/264884532/240P_400K_264884532.mp4?validfrom=1577621517&[...]&hash=goqm8xnfG0iBP%2FpPktavpgwwTcc%3D
+https://cv.phncdn.com/videos/201911/28/264884532/480P_600K_264884532.mp4?RGUDCeQ[...]Ch-o28g
+https://ev.phncdn.com/videos/201911/28/264884532/480P_600K_264884532.mp4?validfrom=1577621517&[...]&hash=BGkOHmwf2fSurb4vzy4VZYQ2M4s%3D
+https://cv.phncdn.com/videos/201911/28/264884532/720P_1500K_264884532.mp4?9qzEKSV[...]HHosis4
+https://ev.phncdn.com/videos/201911/28/264884532/720P_1500K_264884532.mp4?validfrom=1577621517&[...]&hash=MlLcZR0es2RhmPDmWaWQ3k%2FcU6E%3D
+https://cv.phncdn.com/videos/201911/28/264884532/1080P_4000K_264884532.mp4?w7RL7UG[...]ZQNJk0Q
+https://ev.phncdn.com/videos/201911/28/264884532/1080P_4000K_264884532.mp4?validfrom=1577621517&[...]&hash=nev6iokXkRjOvWTVk9%2B6YnkUca8%3D
+
+Pornhub genereert 2 type urls: één met een hele lange code als achtervoegsel en één met een achtervoegsel die begint met "validfrom" en eindigt met een hash.
+Laad je deze url meerdere keren, dan genereert de website meestal of het ene type urls, of de andere, maar soms (door een foutje?) ook beide.
+
+Met een group by verdwijnen de andere urls:
+
+$ xidel -s ph5de04f60346c5.htm --xquery 'for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") group by $q:=extract($x,"quality_(\d+)p=",1) return string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))'
+https://cv.phncdn.com/videos/201911/28/264884532/240P_400K_264884532.mp4?9NTnorc[...]W3RUlSA
+https://cv.phncdn.com/videos/201911/28/264884532/480P_600K_264884532.mp4?RGUDCeQ[...]Ch-o28g
+https://cv.phncdn.com/videos/201911/28/264884532/720P_1500K_264884532.mp4?9qzEKSV[...]HHosis4
+https://cv.phncdn.com/videos/201911/28/264884532/1080P_4000K_264884532.mp4?w7RL7UG[...]ZQNJk0Q
+
+$ xidel -s ph5de04f60346c5.htm --xquery 'let $a:=json(//script/extract(.,"flashvars_\d+ = (.+);",1)[.]) return {"name":"Pornhub: "||$a/video_title,"date":replace($a/image_url,".+?(\d{4})(\d{2})/(\d{2}).+","$3-$2-$1"),"duration":format-time($a/video_duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") ! replace(.,"&quot; \+ &quot;|&quot;","") group by $q:=extract($x,"quality_(\d+)p=",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))}]}'
+{
+  "name": "Pornhub: HOT MAID gets destroyed on the job - 4K",
+  "date": "28-11-2019",
+  "duration": "00:13:50",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "426x240",
+      "url": "https://cv.phncdn.com/videos/201911/28/264884532/240P_400K_264884532.mp4?9NTnorc[...]W3RUlSA"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "url": "https://cv.phncdn.com/videos/201911/28/264884532/1080P_4000K_264884532.mp4?w7RL7UG[...]ZQNJk0Q"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:=json(//script/extract(.,"flashvars_\d+ = (.+);",1)[.]) return
+  {
+    "name":"Pornhub: "||$a/video_title,
+    "date":replace(
+      $a/image_url,
+      ".+?(\d{4})(\d{2})/(\d{2}).+",
+      "$3-$2-$1"
+    ),
+    "duration":format-time(
+      $a/video_duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") !
+      replace(.,"&quot; \+ &quot;|&quot;","")
+      group by $q:=extract($x,"quality_(\d+)p=",1)
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
+        "url":string-join(
+          extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
+        )
+      }
+    ]
+  }
+'
