@@ -8202,3 +8202,139 @@ $ xidel -s --module=xivid.xq --xquery 'declare variable $id:=extract("https://ww
       )
     }
 '
+
+================================================================================================
+
+[autojunk]
+
+https://www.autojunk.nl/2018/10/ford-fiesta-st-interview
+
+$ xidel -s "https://www.autojunk.nl/2018/10/ford-fiesta-st-interview" -e '//div[@id="playerWrapper"]/script[1]/extract(.,"clipData.assets = (.+\]);",1,"s")'
+[{
+              id: 1, // unique asset ID
+              mediatype: "MP4_HD", // HD if higher then 720p, MP4_MAIN otherwise.
+              src: "https://static.autojunk.nl/flv/2018/1030/122604_720p.mp4", // asset URL
+              width: "1280", // video width
+              height: "720", // video height, used to display the asset name in the quality selector (rounded)
+              bandwidth: "2000" // asset bitrate in kbps, used to sort the assets from high to low in the quality selector in the player and pick a suitable asset for the user's connection speed.
+          },
+          {
+              id: 2,
+              mediatype: "MP4_MAIN",
+              src: "https://static.autojunk.nl/flv/2018/1030/122604.mp4",
+              width: "640",
+              height: "360",
+              bandwidth: "1200",
+          }]
+
+$ xidel -s "https://www.autojunk.nl/2018/10/ford-fiesta-st-interview" -e '//div[@id="playerWrapper"]/script[1]/json(replace(extract(.,"clipData.assets = (.+\]);",1,"s")," //.+",""))'
+[
+  {
+    "id": 1,
+    "mediatype": "MP4_HD",
+    "src": "https://static.autojunk.nl/flv/2018/1030/122604_720p.mp4",
+    "width": "1280",
+    "height": "720",
+    "bandwidth": "2000"
+  },
+  {
+    "id": 2,
+    "mediatype": "MP4_MAIN",
+    "src": "https://static.autojunk.nl/flv/2018/1030/122604.mp4",
+    "width": "640",
+    "height": "360",
+    "bandwidth": "1200"
+  }
+]
+
+$ xidel -s aj_ford-fiesta-st-interview.htm --xquery 'let $a:=//div[@id="playerWrapper"]/script[1] return {"name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),"date":extract(//span[@class="posted"],"([\d-]+)",1),"duration":format-time(extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in json(replace(extract($a,"clipData.assets = (.+\]);",1,"s")," //.+",""))() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":$x/src}]}'
+{
+  "name": "Autojunk: Ford Fiesta ST interview",
+  "date": "30-10-2018",
+  "duration": "00:11:30",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "1200kbps",
+      "url": "https://static.autojunk.nl/flv/2018/1030/122604.mp4"
+    },
+    {
+      "id": "pg-2",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2000kbps",
+      "url": "https://static.autojunk.nl/flv/2018/1030/122604_720p.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+http://www.autojunk.nl/2009/11/peugeot-206-rally-crash
+
+$ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" -e '//div[@id="playerWrapper"]/script[1]/extract(.,"clipData.assets = (.+\]);",1,"s")'
+[{
+              id: 1, // unique asset ID
+              mediatype: "MP4_HD", // HD if higher then 720p, MP4_MAIN otherwise.
+              src: "https://static.autojunk.nl/flv/2009/1115/135833.mp4", // asset URL
+              width: "1280", // video width
+              height: "720", // video height, used to display the asset name in the quality selector (rounded)
+              bandwidth: "2000" // asset bitrate in kbps, used to sort the assets from high to low in the quality selector in the player and pick a suitable asset for the user's connection speed.
+          },
+          {
+              id: 2,
+              mediatype: "MP4_MAIN",
+              src: "",
+              width: "640",
+              height: "360",
+              bandwidth: "1200",
+          }]
+
+$ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" --xquery 'let $a:=//div[@id="playerWrapper"]/script[1] return {"name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),"date":extract(//span[@class="posted"],"([\d-]+)",1),"duration":format-time(extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in json(replace(extract($a,"clipData.assets = (.+\]);",1,"s")," //.+",""))()[src] order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":$x/src}]}'
+{
+  "name": "Autojunk: Peugeot 206 rally crash",
+  "date": "15-11-2009",
+  "duration": null,
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2000kbps",
+      "url": "https://static.autojunk.nl/flv/2009/1115/135833.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $a:=//div[@id="playerWrapper"]/script[1] return {
+    "name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),
+    "date":extract(//span[@class="posted"],"([\d-]+)",1),
+    "duration":format-time(
+      extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      for $x at $i in json(
+        replace(
+          extract($a,"clipData.assets = (.+\]);",1,"s"),
+          " //.+",
+          ""
+        )
+      )()[src]
+      order by $x/bandwidth
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":concat($x/width,"x",$x/height),
+        "bitrate":$x/bandwidth||"kbps",
+        "url":$x/src
+      }
+    ]
+  }
+'

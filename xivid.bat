@@ -545,6 +545,38 @@ IF NOT "!json:youtu.be=!"=="!json!" (
 ENDLOCAL
 EXIT /B
 
+:autojunk
+FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
+  let $a:^=//div[@id^='playerWrapper']/script[1] return
+  json:^={
+    'name':'Autojunk: '^|^|extract^($a^,'clipData.title^=^&quot^;^(.+^)^&quot^;'^,1^)^,
+    'date':extract^(//span[@class^='posted']^,'^([\d-]+^)'^,1^)^,
+    'duration':format-time^(
+      extract^($a^,'clipData\[^&quot^;length^&quot^;\].+?^(\d+^)'^,1^) * duration^('PT1S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'formats':[
+      for $x at $i in json^(
+        replace^(
+          extract^($a^,'clipData.assets ^= ^(.+\]^)^;'^,1^,'s'^)^,
+          ' //.+'^,
+          ''
+        ^)
+      ^)^(^)[src]
+      order by $x/bandwidth
+      count $i
+      return {
+        'id':'pg-'^|^|$i^,
+        'format':'mp4[h264+aac]'^,
+        'resolution':concat^($x/width^,'x'^,$x/height^)^,
+        'bitrate':$x/bandwidth^|^|'kbps'^,
+        'url':$x/src
+      }
+    ]
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :telegraaf
 FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
   let $a:^=json^(
@@ -1141,6 +1173,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :regio "%url%"
 ) ELSE IF NOT "%url:dumpert.nl=%"=="%url%" (
   CALL :dumpert "%url%"
+) ELSE IF NOT "%url:autojunk.nl=%"=="%url%" (
+  CALL :autojunk "%url%"
 ) ELSE IF NOT "%url:telegraaf.nl=%"=="%url%" (
   CALL :telegraaf "%url%"
 ) ELSE IF NOT "%url:ad.nl=%"=="%url%" (
