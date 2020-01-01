@@ -2239,14 +2239,14 @@ https://content.omroep.nl/streams/doeg/vodnotavailable.m4v?odiredirecturl=/video
 
 https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558 (laatste NOS Journaal 20:00 zonder DRM)
 
-$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json return $a'
+$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json return $b'
 {
   "token": "eyJ0eXA[...]fFLtQQU",
   "embedUrl": "https://start-player.npo.nl/embed/eyJ0eXA[...]fFLtQQU",
   "embedCode": "<script async>if (typeof(NPOFrame) === \"function\") { NPOFrame('player-POW_03375558',  'https://start-player.npo.nl/embed/eyJ0eXA[...]fFLtQQU', 'POW_03375558'); } else { var el = document.createElement('script'); el.src = 'https://start-player.npo.nl/js/embed.min.js'; el.onload = function(){NPOFrame('player-POW_03375558',  'https://start-player.npo.nl/embed/eyJ0eXA[...]fFLtQQU', 'POW_03375558');};document.getElementById('player-POW_03375558').appendChild(el);}</script>"
 }
 
-$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $b'
+$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $c'
 {
   "id": "POW_03375558",
   "type": "broadcast",
@@ -2328,7 +2328,7 @@ $ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-Wi
   "channel": "NED1"
 }
 
-$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token)) return $c'
+$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token)) return $d'
 {
   "stream": {
     "src": "https://pedgewarea28a.video.kpnstreaming.nl/session/61318042-a74f-11e9-a539-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/playlist.m3u8?token=4825852375b33792a341d5d141b665ae_1563315898_1563315898",
@@ -2346,16 +2346,19 @@ $ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-Wi
   }
 }
 
-$ xidel -s --module=xivid.xq -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream/src return {"name":$b/concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime($b/broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time($b/duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"subtitle":{"type":"webvtt","url":$b/(subtitles)()/src}[url],"formats":xivid:m3u8-to-json($c)}'
+$ xidel -s --module=xivid.xq -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token))/stream/src return $c/{"name":concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime(broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[(subtitles)()/{"id":"sub-1","format":"vtt","language":language,"label":label,"url":src}[url],xivid:m3u8-to-json($d)]}'
 {
   "name": "NOS Journaal 20.00 uur",
   "date": "28-02-2017",
   "duration": "00:25:37",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt"
-  },
   "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt"
+    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
@@ -2383,7 +2386,7 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="POW_03375558",$a:=x:request({"heade
 
 https://www.npostart.nl/nos-journaal/15-07-2019/POW_04059460 (video met DRM)
 
-$ xidel -s -e 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token)) return $c'
+$ xidel -s -e 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token)) return $d'
 {
   "stream": {
     "src": "https://nl-ams-p22-am3.cdn.streamgate.nl/eyJ0eXA[...]zYAx6JM/vod/npo/fps/TEST/npo/hls/POW_04059460_v1563215505/playlist.m3u8",
@@ -2406,59 +2409,19 @@ $ xidel -s -e 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-Wi
   }
 }
 
-Controleer in het "stream"-object op de aanwezigheid van het "protection"-object om beveiligde/versleutelde video's er uit te filteren:
--e "[...]$c:=[...]/stream[not(protection)]/src
-                         ^~~~~~~~~~~~~~~~~
-
-$ xidel -s --module=xivid.xq -e 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream[not(protection)]/src return {"name":$b/concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime($b/broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time($b/duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"subtitle":{"type":"webvtt","url":$b/(subtitles)()/src}[url],"formats":xivid:m3u8-to-json($c)}'
+$ xidel -s --module=xivid.xq --xquery 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token))/stream/src return $c/{"name":concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime(broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[(subtitles)()/{"id":"sub-1","format":"vtt","language":language,"label":label,"url":src}[url],xivid:m3u8-to-json($d)]}'
 {
   "name": "NOS Journaal 20.00 uur",
   "date": "15-07-2019",
   "duration": "00:25:03",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_04059460/nl_NL/CAPTION.vtt"
-  },
-  "formats": null
-}
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-Video met DRM, maar gewoon omdat het kan. Playlist vereist andere ontleding namelijk.
-
-$ xidel -s --xquery 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream/src return unparsed-text($c)'
-#EXTM3U
-#EXT-X-VERSION:4
-## Created with Unified Streaming Platform(version=1.7.18) - generated by HMG
-
-# AUDIO groups
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-aacl-128",LANGUAGE="en",NAME="English",DEFAULT=YES,AUTOSELECT=YES,URI="a1/a1.m3u8"
-
-# variants
-#EXT-X-STREAM-INF:BANDWIDTH=1526000,AVERAGE-BANDWIDTH=1398000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=768x432,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v4/v4.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=707000,AVERAGE-BANDWIDTH=658000,CODECS="avc1.4D401F,mp4a.40.2",RESOLUTION=480x270,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v5/v5.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=882000,AVERAGE-BANDWIDTH=815000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=480x270,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v6/v6.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=446000,AVERAGE-BANDWIDTH=412000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=320x180,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v7/v7.m3u8
-
-# keyframes
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=439000,AVERAGE-BANDWIDTH=197000,CODECS="avc1.42C01E",RESOLUTION=768x432,URI="v4/iframe_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=227000,AVERAGE-BANDWIDTH=102000,CODECS="avc1.4D401F",RESOLUTION=480x270,URI="v5/iframe_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=312000,AVERAGE-BANDWIDTH=106000,CODECS="avc1.42C01E",RESOLUTION=480x270,URI="v6/iframe_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=134000,AVERAGE-BANDWIDTH=48000,CODECS="avc1.42C01E",RESOLUTION=320x180,URI="v7/iframe_index.m3u8"
-
-$ xidel -s --xquery 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream/src return {"name":$b/concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime($b/broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time($b/duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"subtitle":{"type":"webvtt","url":$b/(subtitles)()/src}[url],"formats":[{"id":"hls-0","format":"m3u8[manifest]","url":$c},for $x at $i in tokenize(tail(tokenize(substring-before(unparsed-text($c),"# keyframes"),"#EXT-X-MEDIA")),"#EXT-X-STREAM-INF") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":let $a:=extract($x,"(?:.+?BANDWIDTH=(\d+)\d{3})?.+aacl-(\d+)",(1,2)) return join(($a[1][.]-$a[2],$a[2]),"|")||"kbps","url":resolve-uri(extract($x,"(\w+/\w+\.m3u8)",1),$c)}]}'
-{
-  "name": "NOS Journaal 20.00 uur",
-  "date": "15-07-2019",
-  "duration": "00:25:03",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_04059460/nl_NL/CAPTION.vtt"
-  },
   "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_04059460/nl_NL/CAPTION.vtt"
+    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
@@ -2499,11 +2462,31 @@ $ ffmpeg -hide_banner -i "https://nl-ams-p22-am3.cdn.streamgate.nl/eyJ0eXA[...]g
 
 In de praktijk wordt SAMPLE-AES alleen voor DRM gebruikt, dus de FFmpeg community zal dit nooit toevoegen.
 
+Controleer in het "stream"-object op de aanwezigheid van het "protection"-object om beveiligde/versleutelde video's er uit te filteren:
+-e "[...]$c:=[...]/stream[not(protection)]/src
+                         ^~~~~~~~~~~~~~~~~
+
+$ xidel -s --module=xivid.xq -e 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token))/stream[not(protection)]/src return $c/{"name":concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime(broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[(subtitles)()/{"id":"sub-1","format":"vtt","language":language,"label":label,"url":src}[url],xivid:m3u8-to-json($d)]}'
+{
+  "name": "NOS Journaal 20.00 uur",
+  "date": "15-07-2019",
+  "duration": "00:25:03",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_04059460/nl_NL/CAPTION.vtt"
+    }
+  ]
+}
+
 ------------------------------------------------------------------------------------------------
 
 https://www.npostart.nl/stop-verkeerslicht-voor-telefoonverslaafde/14-02-2017/POMS_NOS_7332477 (videofragment)
 
-$ xidel -s -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $b'
+$ xidel -s -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"}), $b:=json/x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $c'
 {
   "id": "POMS_NOS_7332477",
   "type": "fragment",
@@ -2578,37 +2561,67 @@ $ xidel -s -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requeste
   "channel": "NED1"
 }
 
-$ xidel -s --module=xivid.xq -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream[not(protection)]/src return {"name":$b/concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime($b/broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time($b/duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"start":if ($b/startAt) then format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"end":if ($b/startAt) then format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"subtitle":{"type":"webvtt","url":if ($b/parentId) then x:request({"url":concat("https://rs.poms.omroep.nl/v1/api/subtitles/",$b/parentId,"/nl_NL/CAPTION.vtt")})[contains(headers[1],"200")]/url else $b/(subtitles)()/src}[url],"formats":xivid:m3u8-to-json($c)}'
+$ xidel -s --module=xivid.xq -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json,$b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token))/stream[not(protection)]/src return $c/{"name":concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime(broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"start":if (startAt) then format-time(startAt * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"end":if (startAt) then format-time((startAt + duration) * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"formats":[(if (not((subtitles)()) and parentId) then json(doc(x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||parentId})/json/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) else .)/(subtitles)()/{"id":"sub-1","format":"vtt","language":language,"label":label,"url":src}[url],xivid:m3u8-to-json($d)]}'
 {
   "name": "NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde",
   "date": "14-02-2017",
   "duration": "00:01:05",
   "start": "00:09:02",
   "end": "00:10:07",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03373320/nl_NL/CAPTION.vtt"
-  },
   "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://rs.poms.omroep.nl/v1/api/subtitles/POW_03373320/nl_NL/CAPTION.vtt"
+    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://nl-ams-p11-am5.cdn.streamgate.nl/eyJ0eXA[...]LcvOmX0/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/playlist.m3u8"
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/playlist.m3u8?token=99473931ddac2668ed6834a0c8eb91bf_1577118774_1577118774"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "64kbps",
-      "url": "https://nl-ams-p11-am5.cdn.streamgate.nl/eyJ0eXA[...]LcvOmX0/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=64000.m3u8"
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=64000.m3u8"
     },
-    [...],
+    {
+      "id": "hls-2",
+      "format": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "128kbps",
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000.m3u8"
+    },
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "209|64kbps",
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=64000-video=209000.m3u8"
+    },
+    {
+      "id": "hls-4",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "517|128kbps",
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000-video=517000.m3u8"
+    },
+    {
+      "id": "hls-5",
+      "format": "m3u8[h264+aac]",
+      "resolution": "768x432",
+      "bitrate": "721|128kbps",
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000-video=721000.m3u8"
+    },
     {
       "id": "hls-6",
       "format": "m3u8[h264+aac]",
       "resolution": "1024x576",
       "bitrate": "1027|128kbps",
-      "url": "https://nl-ams-p11-am5.cdn.streamgate.nl/eyJ0eXA[...]LcvOmX0/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000-video=1027000.m3u8"
+      "url": "https://pedgewarer23b.video.kpnstreaming.nl/session/b41ecb78-24d8-11ea-b91e-1458d04270a0/vn6ge2/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000-video=1027000.m3u8"
     }
   ]
 }
@@ -2617,7 +2630,7 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"h
 
 https://www.npostart.nl/flikken-maastricht/01-03-2019/AT_2105037
 
-$ xidel -s -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return unparsed-text($a/embedUrl)'
+$ xidel -s -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"}), $b:=json/x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return unparsed-text($b/embedUrl)'
 <!DOCTYPE html>
 <html>
 <head>
@@ -2640,12 +2653,11 @@ $ xidel -s -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With
 
 Geen JSON en dus geen enkele video-informatie (van deze DRM video). De hoofdpagina heeft die wel.
 
-$ xidel -s --module=xivid.xq -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json/x:request({"post":"_token="||token,"url":"https://www.npostart.nl/player/"||$prid})/json,$b:=json(doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$c:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&amp;quality=npo&amp;tokenId=",$a/token))/stream[not(protection)]/src return {|if ($b) then {"name":$b/concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime($b/broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time($b/duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"start":if ($b/startAt) then format-time($b/startAt * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"end":if ($b/startAt) then format-time($b/(duration + startAt) * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"subtitle":{"type":"webvtt","url":if ($b/parentId) then x:request({"url":concat("https://rs.poms.omroep.nl/v1/api/subtitles/",$b/parentId,"/nl_NL/CAPTION.vtt")})[contains(headers[1],"200")]/url else $b/(subtitles)()/src}[url]} else doc("https://www.npostart.nl/"||$prid)/{"name":.//div[@class="npo-header-episode-content"]/concat(h1,": ",.//h2),"date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),"duration":format-time(.//@duration * duration("PT1S"),"[H01]:[m01]:[s01]")},{"formats":xivid:m3u8-to-json($c)}|}'
+$ xidel -s --module=xivid.xq -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json,$b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token))/stream[not(protection)]/src return if ($c) then $c/{"name":concat(franchiseTitle,if (contains(franchiseTitle,title)) then () else ": "||title),"date":format-date(dateTime(broadcastDate),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"start":if (startAt) then format-time(startAt * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"end":if (startAt) then format-time((startAt + duration) * duration("PT1S"),"[H01]:[m01]:[s01]") else (),"formats":let $e:=((if (not((subtitles)()) and parentId) then json(doc(x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||parentId})/json/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) else .)/(subtitles)()/{"id":"sub-1","format":"vtt","language":language,"label":label,"url":src}[url],xivid:m3u8-to-json($d)) return [$e][exists($e)]} else doc("https://www.npostart.nl/"||$prid)/{"name":.//div[@class="npo-header-episode-content"]/concat(normalize-space(h1),": ",.//h2),"date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),"duration":format-time(.//@duration * duration("PT1S"),"[H01]:[m01]:[s01]")}'
 {
   "name": "Flikken Maastricht: Virtus et justitia",
   "date": "01-03-2019",
-  "duration": "00:47:27",
-  "formats": null
+  "duration": "00:47:27"
 }
 
 ------------------------------------------------------------------------------------------------
@@ -2655,75 +2667,86 @@ $ xidel -s --module=xivid.xq -e 'let $prid:="AT_2105037",$a:=x:request({"header"
       $a:=x:request({
         "header":"X-Requested-With: XMLHttpRequest",
         "url":"https://www.npostart.nl/api/token"
-      })/json/x:request({
-        "post":"_token="||token,
+      })/json,
+      $b:=x:request({
+        "post":"_token="||$a/token,
         "url":"https://www.npostart.nl/player/"||$prid
       })/json,
-      $b:=json(
-        doc($a/embedUrl)//script/extract(.,"var video =(.+);",1)[.]
-      ),
       $c:=json(
+        doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]
+      ),
+      $d:=json(
         concat(
           "https://start-player.npo.nl/video/",
           $prid,
-          "/streams?profile=hls&amp;quality=npo&amp;tokenId=",
-          $a/token
+          "/streams?profile=hls&quality=npo&tokenId=",
+          $b/token
         )
       )/stream[not(protection)]/src
-  return {|
-    if ($b) then {
-      "name":$b/concat(
-        franchiseTitle,
-        if (contains(franchiseTitle,title)) then () else ": "||title
-      ),
-      "date":format-date(
-        dateTime($b/broadcastDate),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        $b/duration * duration("PT1S"),
+  return
+  if ($c) then $c/{
+    "name":concat(
+      franchiseTitle,
+      if (contains(franchiseTitle,title)) then () else ": "||title
+    ),
+    "date":format-date(
+      dateTime(broadcastDate),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(
+      duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "start":if (startAt) then
+      format-time(
+        startAt * duration("PT1S"),
         "[H01]:[m01]:[s01]"
-      ),
-      "start":if ($b/startAt) then
-        format-time(
-          $b/startAt * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
-      "end":if ($b/startAt) then
-        format-time(
-          $b/(duration + startAt) * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
-      "subtitle":{
-        "type":"webvtt",
-        "url":if ($b/parentId) then
-          x:request({
-            "url":concat(
-              "https://rs.poms.omroep.nl/v1/api/subtitles/",
-              $b/parentId,
-              "/nl_NL/CAPTION.vtt"
-            )
-          })[contains(headers[1],"200")]/url
+      )
+    else
+      (),
+    "end":if (startAt) then
+      format-time(
+        (startAt + duration) * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      )
+    else
+      (),
+    "formats":let $e:=(
+      (
+        if (not((subtitles)()) and parentId) then
+          json(
+            doc(
+              x:request({
+                "post":"_token="||$a/token,
+                "url":"https://www.npostart.nl/player/"||parentId
+              })/json/embedUrl
+            )//script/extract(.,"var video =(.+);",1)[.]
+          )
         else
-          $b/(subtitles)()/src
-      }[url]
-    } else
-      doc("https://www.npostart.nl/"||$prid)/{
-        "name":.//div[@class="npo-header-episode-content"]/concat(h1,": ",.//h2),
-        "date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),
-        "duration":format-time(
-          .//@duration * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      },
-    {
-      "formats":xivid:m3u8-to-json($c)
+          .
+      )/(subtitles)()/{
+        "id":"sub-1",
+        "format":"vtt",
+        "language":language,
+        "label":label,
+        "url":src
+      }[url],
+      xivid:m3u8-to-json($d)
+    ) return
+    [$e][exists($e)]
+  } else
+    doc("https://www.npostart.nl/"||$prid)/{
+      "name":.//div[@class="npo-header-episode-content"]/concat(
+        normalize-space(h1),
+        ": ",
+        .//h2
+      ),
+      "date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),
+      "duration":format-time(
+        .//@duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      )
     }
-  |}
 '
 
 ================================================================================================

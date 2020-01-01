@@ -55,75 +55,85 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
   let $a:^=x:request^({
         'header':'X-Requested-With: XMLHttpRequest'^,
         'url':'https://www.npostart.nl/api/token'
-      }^)/json/x:request^({
-        'post':'_token^='^|^|token^,
+      }^)/json^,
+      $b:^=x:request^({
+        'post':'_token^='^|^|$a/token^,
         'url':'https://www.npostart.nl/player/%~1'
       }^)/json^,
-      $b:^=json^(
-        doc^($a/embedUrl^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
-      ^)^,
       $c:^=json^(
+        doc^($b/embedUrl^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
+      ^)^,
+      $d:^=json^(
         concat^(
           'https://start-player.npo.nl/video/%~1'^,
-          '/streams?profile^=hls^&amp^;quality^=npo^&amp^;tokenId^='^,
-          $a/token
+          '/streams?profile^=hls^&quality^=npo^&tokenId^='^,
+          $b/token
         ^)
       ^)/stream[not^(protection^)]/src
   return
-  json:^={^|
-    if ^($b^) then {
-      'name':$b/concat^(
-        franchiseTitle^,
-        if ^(contains^(franchiseTitle^,title^)^) then ^(^) else ': '^|^|title
-      ^)^,
-      'date':format-date^(
-        dateTime^($b/broadcastDate^)^,
-        '[D01]-[M01]-[Y]'
-      ^)^,
-      'duration':format-time^(
-        $b/duration * duration^('PT1S'^)^,
+  json:^=if ^($c^) then $c/{
+    'name':concat^(
+      franchiseTitle^,
+      if ^(contains^(franchiseTitle^,title^)^) then ^(^) else ': '^|^|title
+    ^)^,
+    'date':format-date^(
+      dateTime^(broadcastDate^)^,
+      '[D01]-[M01]-[Y]'
+    ^)^,
+    'duration':format-time^(
+      duration * duration^('PT1S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'start':if ^(startAt^) then
+      format-time^(
+        startAt * duration^('PT1S'^)^,
         '[H01]:[m01]:[s01]'
-      ^)^,
-      'start':if ^($b/startAt^) then
-        format-time^(
-          $b/startAt * duration^('PT1S'^)^,
-          '[H01]:[m01]:[s01]'
-        ^)
-      else
-        ^(^)^,
-      'end':if ^($b/startAt^) then
-        format-time^(
-          $b/^(duration + startAt^) * duration^('PT1S'^)^,
-          '[H01]:[m01]:[s01]'
-        ^)
-      else
-        ^(^)^,
-      'subtitle':{
-        'type':'webvtt'^,
-        'url':if ^($b/parentId^) then
-          x:request^({
-            'url':concat^(
-              'https://rs.poms.omroep.nl/v1/api/subtitles/'^,
-              $b/parentId^,
-              '/nl_NL/CAPTION.vtt'
-            ^)
-          }^)[contains^(headers[1]^,'200'^)]/url
+      ^)
+    else
+      ^(^)^,
+    'end':if ^(startAt^) then
+      format-time^(
+        ^(startAt + duration^) * duration^('PT1S'^)^,
+        '[H01]:[m01]:[s01]'
+      ^)
+    else
+      ^(^)^,
+    'formats':let $e:^=^(
+      ^(
+        if ^(not^(^(subtitles^)^(^)^) and parentId^) then
+          json^(
+            doc^(
+              x:request^({
+                'post':'_token^='^|^|$a/token^,
+                'url':'https://www.npostart.nl/player/'^|^|parentId
+              }^)/json/embedUrl
+            ^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
+          ^)
         else
-          $b/^(subtitles^)^(^)/src
-      }[url]
-    } else
-      doc^('https://www.npostart.nl/%~1'^)/{
-        'name':.//div[@class^='npo-header-episode-content']/concat^(h1^,': '^,.//h2^)^,
-        'date':.//npo-player/extract^(@current-url^,'^(\d+-\d+-\d+^)'^,1^)^,
-        'duration':format-time^(
-          .//@duration * duration^('PT1S'^)^,
-          '[H01]:[m01]:[s01]'
-        ^)
-      }^,
-    {
-      'formats':xivid:m3u8-to-json^($c^)
+          .
+      ^)/^(subtitles^)^(^)/{
+        'id':'sub-1'^,
+        'format':'vtt'^,
+        'language':language^,
+        'label':label^,
+        'url':src
+      }[url]^,
+      xivid:m3u8-to-json^($d^)
+    ^) return
+    [$e][exists^($e^)]
+  } else
+    doc^('https://www.npostart.nl/%~1'^)/{
+      'name':.//div[@class^='npo-header-episode-content']/concat^(
+        normalize-space^(h1^)^,
+        ': '^,
+        .//h2
+      ^)^,
+      'date':.//npo-player/extract^(@current-url^,'^(\d+-\d+-\d+^)'^,1^)^,
+      'duration':format-time^(
+        .//@duration * duration^('PT1S'^)^,
+        '[H01]:[m01]:[s01]'
+      ^)
     }
-  ^|}
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
