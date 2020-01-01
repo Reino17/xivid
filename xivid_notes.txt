@@ -3222,17 +3222,27 @@ $ xidel -s "https://embed.kijk.nl/video/Ihyf6IA0qkW" -e 'json(//script/extract(.
   [...]
 }
 
-$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/Ihyf6IA0qkW" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then concat(" S",dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"subtitle":{"type":"webvtt","url":(tracks)()[label="Nederlands"]/file}[url],"formats":xivid:m3u8-to-json((sources)()[type="m3u8"]/file)}'
+$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/Ihyf6IA0qkW" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then concat(" S",dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":let $a:=((tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file}[url],xivid:m3u8-to-json((sources)()[type="m3u8"]/file)) return [$a][exists($a)]}'
 {
   "name": "SBS6: Wegmisbruikers S24E01",
   "date": "04-08-2019",
   "duration": "00:41:08",
   "expdate": "31-10-2020 22:26:44",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/Ihyf6IA0qkW/033e9d3f-40ee-42a4-9564-8d7e7d87696b/Wegmisbruikers_Season_24_Episode_1-webvtt-nl.vtt"
-  },
   "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Doven en Slechthorenden",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/Ihyf6IA0qkW/033e9d3f-40ee-42a4-9564-8d7e7d87696b/Wegmisbruikers_Season_24_Episode_1-webvtt-sd.vtt"
+    },
+    {
+      "id": "sub-2",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/Ihyf6IA0qkW/033e9d3f-40ee-42a4-9564-8d7e7d87696b/Wegmisbruikers_Season_24_Episode_1-webvtt-nl.vtt"
+    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
@@ -3345,13 +3355,12 @@ $ xidel -s "https://embed.kijk.nl/video/w7ZW52xLgL5" -e 'json(//script/extract(.
 
 De 3 m3u8 playlists zijn allemaal hetzelfde. Dan maar gewoon de 1e: (sources)()[type="m3u8"][1]/file.
 
-$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/w7ZW52xLgL5" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then concat(" S",dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"subtitle":{"type":"webvtt","url":(tracks)()[label="Nederlands"]/file}[url],"formats":xivid:m3u8-to-json((sources)()[type="m3u8"][1]/file)}'
+$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/w7ZW52xLgL5" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then concat(" S",dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":let $a:=((tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file}[url],xivid:m3u8-to-json((sources)()[type="m3u8"][1]/file)) return [$a][exists($a)]}'
 {
   "name": "NET5: Peking Express S01E01",
   "date": "03-04-2017",
   "duration": "01:03:59",
   "expdate": "31-03-2020 04:55:00",
-  "subtitle": null,
   "formats": [
     {
       "id": "hls-0",
@@ -3378,36 +3387,40 @@ $ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/w7ZW52xLgL5" -e 'json(
 
 ------------------------------------------------------------------------------------------------
 
-https://www.kijk.nl/net5/ncis/videos/rTCCffSSSSS/ncis
+https://www.kijk.nl/net5/masterchefaustralie/videos/GvV9ESmuZuP/masterchef-australi
 
-$ xidel -s "https://embed.kijk.nl/video/rTCCffSSSSS" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(.//sources)()[type="m3u8"]'
+$ xidel -s "https://embed.kijk.nl/video/GvV9ESmuZuP" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(.//sources)()[type="m3u8"]'
 {
   "type": "m3u8",
-  "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/rTCCffSSSSS/c45f645b-4787-422d-a29e-00a175f0425a/rTCCffSSSSS_1564250654699.ism/master.m3u8",
+  "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/GvV9ESmuZuP/51a62296-c330-4ea3-889e-319a32f88e58/GvV9ESmuZuP_1576079341928.ism/master.m3u8",
   "drm": {
     "fairplay": {
-      "releasePid": "qEQ1DqelMsFz",
+      "releasePid": "1XB2n8X7rNTe",
       "certificateUrl": "https://vod-tpc-prod-1.talpatvcdn.nl/fairplay.cer",
-      "processSpcUrl": "https://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay?form=json&schema=1.0&token=_Vuv3k8-CNfaZgTonDaesVBIoMAqwEBA&account=http%3A%2F%2Faccess.auth.theplatform.com%2Fdata%2FAccount%2F2702725319&releasePid=qEQ1DqelMsFz"
+      "processSpcUrl": "https://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay?form=json&schema=1.0&token=dnKDoLVKuJeua8D6j7bAUSACEOCYwMDY&account=http%3A%2F%2Faccess.auth.theplatform.com%2Fdata%2FAccount%2F2702725319&releasePid=1XB2n8X7rNTe"
     }
   }
 }
 
 Controleer in de "sources"-array op de aanwezigheid van het "drm"-object om beveiligde/versleutelde video's er uit te filteren:
--e "[...]$c:=[...]/stream[not(protection)]/src
-                         ^~~~~~~~~~~~~~~~~
+(sources)()[not(drm) and type="m3u8"][1]/file
+            ^~~~~~~~
 
-$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/rTCCffSSSSS" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:&quot;(.+?)&quot;",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/rTCCffSSSSS")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":(for $x at $i in (sources)()[stream_name] order by $x/size count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":round($x/avg_bitrate div 1000)||"kbps","url":replace($x/stream_name,"mp4:",extract((sources)()[size = 0]/src,"(.+?nl/)",1))},xivid:m3u8-to-json((sources)()[size = 0]/src))} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then concat(" S",dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"subtitle":{"type":"webvtt","url":(tracks)()[label="Nederlands"]/file}[url],"formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)}'
+$ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/GvV9ESmuZuP" --xquery 'if (//video) then x:request({"headers":"Accept: application/json;pk="||extract(unparsed-text(//script[contains(@src,//@data-account)]/@src),"policyKey:&quot;(.+?)&quot;",1),"url":concat("https://edge.api.brightcove.com/playback/v1/accounts/",//@data-account,"/videos/",//@data-video-id)})/json/{"name":concat(upper-case(custom_fields/sbs_station),": ",name),"date":replace(custom_fields/sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),"expdate":replace(json("http://api.kijk.nl/v1/default/entitlement/GvV9ESmuZuP")//enddate/date,"(\d+)-(\d+)-(\d+) ([\d:]+).*","$3-$2-$1 $4"),"formats":(for $x at $i in (sources)()[stream_name] order by $x/size count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":round($x/avg_bitrate div 1000)||"kbps","url":replace($x/stream_name,"mp4:",extract((sources)()[size = 0]/src,"(.+?nl/)",1))},xivid:m3u8-to-json((sources)()[size = 0]/src))} else json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":TAQ/concat(upper-case(customLayer/c_media_station),": ",customLayer/c_media_ispartof,if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then concat(" S",dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),"E",dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)) else ()),"date":replace(TAQ/customLayer/c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(TAQ/customLayer/c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":let $a:=((tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file}[url],xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)) return [$a][exists($a)]}'
 {
-  "name": "NET5: Navy NCIS S12E23",
-  "date": "30-07-2019",
-  "duration": "00:41:00",
-  "expdate": "29-08-2019 20:30:00",
-  "subtitle": {
-    "type": "webvtt",
-    "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/rTCCffSSSSS/c45f645b-4787-422d-a29e-00a175f0425a/Navy_NCIS_Season_12_Episode_23-webvtt-nl.vtt"
-  },
-  "formats": null
+  "name": "NET5: MasterChef Australië S11E64",
+  "date": "12-12-2019",
+  "duration": "00:45:57",
+  "expdate": "31-07-2022 19:30:00",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/GvV9ESmuZuP/51a62296-c330-4ea3-889e-319a32f88e58/MasterChef_Australie_Season_11_Episode_64-webvtt-nl.vtt"
+    }
+  ]
 }
 
 ------------------------------------------------------------------------------------------------
@@ -3486,11 +3499,17 @@ $ xidel -s --module=xivid.xq "https://embed.kijk.nl/video/rTCCffSSSSS" --xquery 
         (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
         "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
       ),
-      "subtitle":{
-        "type":"webvtt",
-        "url":(tracks)()[label="Nederlands"]/file
-      }[url],
-      "formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
+      "formats":let $a:=(
+        (tracks)()[kind="captions"]/{
+          "id":"sub-"||position(),
+          "format":"vtt",
+          "language":"nl",
+          "label":label,
+          "url":file
+        }[url],
+        xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
+      ) return
+      [$a][exists($a)]
     }
 '
 

@@ -260,11 +260,17 @@ kijk() {
           (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
-        "subtitle":{
-          "type":"webvtt",
-          "url":(tracks)()[label="Nederlands"]/file
-        }[url],
-        "formats":xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
+        "formats":let $a:=(
+          (tracks)()[kind="captions"]/{
+            "id":"sub-"||position(),
+            "format":"vtt",
+            "language":"nl",
+            "label":label,
+            "url":file
+          }[url],
+          xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
+        ) return
+        [$a][exists($a)]
       }
   ' --output-format=bash)"
 }
