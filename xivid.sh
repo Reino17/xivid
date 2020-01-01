@@ -141,17 +141,31 @@ npo() {
 
 nos() {
   eval "$(xidel "$1" -e '
-    json:={
+    let $a:=json(
+      //script[ends-with(@data-ssr-name,"VideoPlayer") or @data-ssr-name="pages/Article/Article"]
+    )/(.//video,.)[1] return
+    json:=if (//video/@data-type="livestream") then {
       "name":concat(
         "NOS: ",
         //h1[ends-with(@class,"__title")],
-        if (//video/@data-type="livestream") then " Livestream" else ()
+        " Livestream"
       ),
-      "date":if (//video/@data-type="livestream") then
-        format-date(current-date(),"[D01]-[M01]-[Y]")
-      else
-        replace(//@datetime,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),
-      "formats":xivid:m3u8-to-json(//video/(.//@src,@data-stream))
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json(//@data-stream)
+    } else {
+      "name":"NOS: "||$a/title,
+      "date":format-date(
+        dateTime(
+          replace(
+            ($a/published_at,//@datetime)[1],
+            "(.+)(\d{2})",
+            "$1:$2"
+          )
+        ),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":$a/duration * duration("PT1S") + time("00:00:00"),
+      "formats":xivid:m3u8-to-json($a/(formats)(1)/url/mp4)
     }
   ' --output-format=bash)"
 }
