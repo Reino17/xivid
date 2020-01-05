@@ -97,14 +97,13 @@ declare function xivid:info ($json as object()) as string* {
         "duration":"Tijdsduur:",
         "start":"Begin:",
         "end":"Einde:",
-        "expdate":"Gratis tot:"
+        "expdate":"Gratis tot:",
+        "formats":"Formaten:"
       },
-      $b:=$json()[.!="formats"] ! .[$json(.)[.]],
-      $c:=max(
-        $b ! $a(.) ! string-length(.)
-      ) ! (if (. > 9) then . else 9),
-      $d:=string-join((1 to $c + 1) ! " "),
-      $e:=[
+      $b:=max(
+        $a()[$json(.)] ! $a(.) ! string-length()
+      ),
+      $c:=[
         {
           "id":"id",
           "format":"formaat",
@@ -115,45 +114,54 @@ declare function xivid:info ($json as object()) as string* {
         },
         $json/(formats)()
       ],
-      $f:=for $x in $e(1)() return
-      distinct-values(
-        $json/(formats)()()[.!="url"][contains(.,$x)]
+      $d:=$c(1)() ! distinct-values(
+        for $x in $c()[position() > 1] return
+        .[$x(.)]
       ),
-      $g:=$f ! max($e()(.) ! string-length(.)),
-      $h:=string-join((1 to sum($g)) ! " ")
+      $e:=$d ! max($c()(.) ! string-length())
   return (
-    $b ! concat(
-      substring($a(.)||$d,1,$c + 1),
-      $json(.)
+    $a()[$json(.)] ! concat(
+      substring(
+        $a(.)||string-join((1 to $b) ! " "),
+        1,$b + 1
+      ),
+      if (.=$a()[last()]) then
+        if ($c(2)) then
+          join(
+            $c() ! string-join(
+              for $x at $i in $d return
+              if (position() = count($c()) and $i = count($d)) then
+                .($x)||" (best)"
+              else
+                substring(
+                  .($x)||string-join((1 to $e[$i] + 2) ! " "),
+                  1,$e[$i] + 2
+                )
+            ),
+            "&#10;"||string-join((1 to $b + 1) ! " ")
+          )
+        else
+          "-"
+      else
+        $json(.)
     ),
-    if ($e(2)) then
-      for $x at $i in $e() return
-      concat(
-        if ($i = 1) then substring("Formaten:"||$d,1,$c + 1) else $d,
-        string-join(
-          for $y at $j in $f return
-          if ($i = count($e()) and $j = count($f)) then
-            $x($y)[.]||" (best)"
-          else
-            substring($x($y)[.]||$h,1,$g[$j] + 2)
-        )
-      )
-    else
-      substring("Formaten:"||$d,1,$c + 1)||"-",
     $json[start]/(
-      let $i:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))
-      return (
-        "",
-        concat(
-          substring("Download:"||$d,1,$c + 1),
-          "ffmpeg",
-          ($i[1] - $i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
-          " -i <url>",
-          ($i[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
-          " -t ",
-          $i[2],
-          " [...]"
-        )
+      "",
+      let $f:=(start,duration) ! (
+        (time(.) - time("00:00:00")) div dayTimeDuration("PT1S")
+      ) return
+      concat(
+        substring(
+          "Download:"||string-join((1 to $b) ! " "),
+          1,$b + 1
+        ),
+        "ffmpeg",
+        ($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+        " -i <url>",
+        ($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+        " -t ",
+        $f[2],
+        " [...]"
       )
     )
   )
