@@ -420,6 +420,7 @@ $ xidel -s -e 'file:write-binary("nl.png",base64Binary("iVBORw0KGgoAAAANSUhEUgAA
 
 https://nl.wikipedia.org/wiki/ASCII_%28tekenset%29
 https://nl.wikipedia.org/wiki/ISO_8859-1
+https://en.wikipedia.org/wiki/Control_character
 
 ASCII 7bit (2^7=128), 0 t/m 127:
 
@@ -507,6 +508,15 @@ ALT+<cp> voor weergave (Windows).   # ALT 1 of ALT 127.
 &#<cp>; / &#x<hex> voor HTML.       # &#1; / &#x01; of &#127; / &#x7F;.
 \x<hex> voor Javascript.            # \x01 of \x7F.
 \u00<hex> voor JSON.                # \u0001 of \u007F.
+
+- De beheertekens (control characters).
+
+ 0|NUL \0 &#0;  null
+ 7|BEL \a &#7;  bell
+ 8|BS  \b &#8;  backspace
+ 9|HT  \t &#9;  horizontal tab
+10|LF  \n &#10; line feed
+13|CR  \r &#13; carriage return
 
 ------------------------------------------------------------------------------------------------
 
