@@ -71,69 +71,72 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
         ^)
       ^)/stream[not^(protection^)]/src
   return
-  json:^=if ^($c^) then $c/{
-    'name':concat^(
-      franchiseTitle^,
-      if ^(contains^(franchiseTitle^,title^)^) then ^(^) else ': '^|^|title
-    ^)^,
-    'date':format-date^(
-      dateTime^(broadcastDate^)^,
-      '[D01]-[M01]-[Y]'
-    ^)^,
-    'duration':format-time^(
-      duration * duration^('PT1S'^)^,
-      '[H01]:[m01]:[s01]'
-    ^)^,
-    'start':if ^(startAt^) then
-      format-time^(
-        startAt * duration^('PT1S'^)^,
-        '[H01]:[m01]:[s01]'
-      ^)
-    else
-      ^(^)^,
-    'end':if ^(startAt^) then
-      format-time^(
-        ^(startAt + duration^) * duration^('PT1S'^)^,
-        '[H01]:[m01]:[s01]'
-      ^)
-    else
-      ^(^)^,
-    'formats':let $e:^=^(
-      ^(
-        if ^(not^(^(subtitles^)^(^)^) and parentId^) then
-          json^(
-            doc^(
-              x:request^({
-                'post':'_token^='^|^|$a/token^,
-                'url':'https://www.npostart.nl/player/'^|^|parentId
-              }^)/json/embedUrl
-            ^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
-          ^)
-        else
-          .
-      ^)/^(subtitles^)^(^)/{
-        'id':'sub-1'^,
-        'format':'vtt'^,
-        'language':language^,
-        'label':label^,
-        'url':src
-      }[url]^,
-      xivid:m3u8-to-json^($d^)
-    ^) return
-    [$e][exists^($e^)]
-  } else
-    doc^('https://www.npostart.nl/%~1'^)/{
-      'name':.//div[@class^='npo-header-episode-content']/concat^(
-        normalize-space^(h1^)^,
-        ': '^,
-        .//h2
+  json:^={^|
+    if ^($c^) then $c/{
+      'name':concat^(
+        franchiseTitle^,
+        if ^(contains^(franchiseTitle^,title^)^) then ^(^) else ': '^|^|title
       ^)^,
-      'date':.//npo-player/extract^(@current-url^,'^(\d+-\d+-\d+^)'^,1^)^,
+      'date':format-date^(
+        dateTime^(broadcastDate^)^,
+        '[D01]-[M01]-[Y]'
+      ^)^,
       'duration':format-time^(
-        .//@duration * duration^('PT1S'^)^,
+        duration * duration^('PT1S'^)^,
         '[H01]:[m01]:[s01]'
-      ^)
+      ^)^,
+      'start':if ^(startAt^) then
+        format-time^(
+          startAt * duration^('PT1S'^)^,
+          '[H01]:[m01]:[s01]'
+        ^)
+      else
+        ^(^)^,
+      'end':if ^(startAt^) then
+        format-time^(
+          ^(startAt + duration^) * duration^('PT1S'^)^,
+          '[H01]:[m01]:[s01]'
+        ^)
+      else
+        ^(^)
+    } else
+      doc^('https://www.npostart.nl/%~1'^)/{
+        'name':.//div[@class^='npo-header-episode-content']/concat^(
+          normalize-space^(h1^)^,
+          ': '^,
+          .//h2
+        ^)^,
+        'date':.//npo-player/extract^(@current-url^,'^(\d+-\d+-\d+^)'^,1^)^,
+        'duration':format-time^(
+          .//@duration * duration^('PT1S'^)^,
+          '[H01]:[m01]:[s01]'
+        ^)
+      }^,
+    {
+      'formats':[
+        ^(
+          if ^(not^($c/^(subtitles^)^(^)^) and $c/parentId^) then
+            json^(
+              doc^(
+                x:request^({
+                  'post':'_token^='^|^|$a/token^,
+                  'url':'https://www.npostart.nl/player/'^|^|$c/parentId
+                }^)/json/embedUrl
+              ^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
+            ^)
+          else
+            $c
+        ^)/^(subtitles^)^(^)/{
+          'id':'sub-1'^,
+          'format':'vtt'^,
+          'language':language^,
+          'label':label^,
+          'url':src
+        }^,
+        xivid:m3u8-to-json^($d^)
+      ]
     }
+  ^|}
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
@@ -226,7 +229,7 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" --xquery ^"
         '^(\d+^)-^(\d+^)-^(\d+^) ^([\d:]+^).*'^,
         '$3-$2-$1 $4'
       ^)^,
-      'formats':^(
+      'formats':[
         for $x at $i in ^(sources^)^(^)[stream_name]
         order by $x/size
         count $i
@@ -242,7 +245,7 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" --xquery ^"
           ^)
         }^,
         xivid:m3u8-to-json^(^(sources^)^(^)[size ^= 0]/src^)
-      ^)
+      ]
     }
   else
     json^(
@@ -273,17 +276,16 @@ FOR /F "delims=" %%A IN ('xidel "https://embed.kijk.nl/video/%~1" --xquery ^"
         duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
         '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
       ^)^,
-      'formats':let $a:^=^(
+      'formats':[
         ^(tracks^)^(^)[kind^='captions']/{
           'id':'sub-'^|^|position^(^)^,
           'format':'vtt'^,
           'language':'nl'^,
           'label':label^,
           'url':file
-        }[url]^,
+        }^,
         xivid:m3u8-to-json^(^(sources^)^(^)[not^(drm^) and type^='m3u8'][1]/file^)
-      ^) return
-      [$a][exists^($a^)]
+      ]
     }
 ^" --output-format^=cmd') DO %%A
 EXIT /B
@@ -327,7 +329,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
     'duration':duration^(
       'P'^|^|//meta[@itemprop^='duration']/@content
     ^) + time^('00:00:00'^)^,
-    'formats':^(
+    'formats':[
       for $x at $i in $b//asset
       order by $x/@bandwidth
       count $i
@@ -338,7 +340,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
         'bitrate':$x/@bandwidth^|^|'kbps'^,
         'url':resolve-uri^($x/@src^,$a[1]^)
       }
-    ^)
+    ]
   }
 ^" --output-format^=cmd') DO %%A
 EXIT /B
@@ -529,7 +531,8 @@ FOR /F "delims=" %%A IN ('xidel -H "Cookie: nsfw=1;cpc=10" "%~1" --xquery ^"
         'date':format-date^(dateTime^(date^)^,'[D01]-[M01]-[Y]'^)^,
         'duration':^(media^)^(^)/duration * duration^('PT1S'^) + time^('00:00:00'^)^,
         'formats':for $x at $i in ^('mobile'^,'tablet'^,'720p'^,'original'^)
-        let $a:^=^(.//variants^)^(^)[version^=$x]/uri return {
+        let $a:^=^(.//variants^)^(^)[version^=$x]/uri
+        return {
           'id':'pg-'^|^|$i^,
           'format':'mp4[h264+aac]'^,
           'url':$a
@@ -599,7 +602,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       $a//duration * duration^('PT1S'^)^,
       '[H01]:[m01]:[s01]'
     ^)^,
-    'formats':^(
+    'formats':[
       $a//locations/reverse^(^(progressive^)^(^)^)/{
         'id':'pg-'^|^|position^(^)^,
         'format':'mp4[h264+aac]'^,
@@ -609,7 +612,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       xivid:m3u8-to-json^(
         $a//locations/^(adaptive^)^(^)[ends-with^(type^,'x-mpegURL'^)]/extract^(src^,'^(.+m3u8^)'^,1^)
       ^)
-    ^)
+    ]
   }
 ^" --output-format^=cmd') DO %%A
 EXIT /B
@@ -746,14 +749,14 @@ xidel "%~1" --xquery ^"^
       '[D01]-[M01]-[Y]'^
     ),^
     'duration':duration(//meta[@itemprop='duration']/@content) + time('00:00:00'),^
-    'formats':let $a:=(^
+    'formats':[^
       ($b//captionTracks)()[languageCode='nl']/{^
         'id':'sub-1',^
         'format':'ttml',^
         'language':'nl',^
         'label':name/simpleText,^
         'url':baseUrl^
-      }[url],^
+      },^
       for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)])^
       order by $x/width^
       count $i^
@@ -797,8 +800,7 @@ xidel "%~1" --xquery ^"^
         'bitrate':round($x/bitrate div 1000)^|^|'kbps',^
         'url':$x/url^
       }^
-    ) return^
-    [$a][exists($a)]^
+    ]^
   }^
 " > xivid.json
 REM CMD's commandline buffer is 8KB (8192 bytes) groot. De gegenereerde JSON

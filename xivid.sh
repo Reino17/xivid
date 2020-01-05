@@ -73,69 +73,72 @@ npo() {
           )
         )/stream[not(protection)]/src
     return
-    json:=if ($c) then $c/{
-      "name":concat(
-        franchiseTitle,
-        if (contains(franchiseTitle,title)) then () else ": "||title
-      ),
-      "date":format-date(
-        dateTime(broadcastDate),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "start":if (startAt) then
-        format-time(
-          startAt * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
-      "end":if (startAt) then
-        format-time(
-          (duration + startAt) * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
-      "formats":let $e:=(
-        (
-          if (not((subtitles)()) and parentId) then
-            json(
-              doc(
-                x:request({
-                  "post":"_token="||$a/token,
-                  "url":"https://www.npostart.nl/player/"||parentId
-                })/json/embedUrl
-              )//script/extract(.,"var video =(.+);",1)[.]
-            )
-          else
-            .
-        )/(subtitles)()/{
-          "id":"sub-1",
-          "format":"vtt",
-          "language":language,
-          "label":label,
-          "url":src
-        }[url],
-        xivid:m3u8-to-json($d)
-      ) return
-      [$e][exists($e)]
-    } else
-      doc("https://www.npostart.nl/'$1'")/{
-        "name":.//div[@class="npo-header-episode-content"]/concat(
-          normalize-space(h1),
-          ": ",
-          .//h2
+    json:={|
+      if ($c) then $c/{
+        "name":concat(
+          franchiseTitle,
+          if (contains(franchiseTitle,title)) then () else ": "||title
         ),
-        "date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),
+        "date":format-date(
+          dateTime(broadcastDate),
+          "[D01]-[M01]-[Y]"
+        ),
         "duration":format-time(
-          .//@duration * duration("PT1S"),
+          duration * duration("PT1S"),
           "[H01]:[m01]:[s01]"
-        )
+        ),
+        "start":if (startAt) then
+          format-time(
+            startAt * duration("PT1S"),
+            "[H01]:[m01]:[s01]"
+          )
+        else
+          (),
+        "end":if (startAt) then
+          format-time(
+            (duration + startAt) * duration("PT1S"),
+            "[H01]:[m01]:[s01]"
+          )
+        else
+          ()
+      } else
+        doc("https://www.npostart.nl/'${1%%[[:cntrl:]]}'")/{
+          "name":.//div[@class="npo-header-episode-content"]/concat(
+            normalize-space(h1),
+            ": ",
+            .//h2
+          ),
+          "date":.//npo-player/extract(@current-url,"(\d+-\d+-\d+)",1),
+          "duration":format-time(
+            .//@duration * duration("PT1S"),
+            "[H01]:[m01]:[s01]"
+          )
+        },
+      {
+        "formats":[
+          (
+            if (not($c/(subtitles)()) and $c/parentId) then
+              json(
+                doc(
+                  x:request({
+                    "post":"_token="||$a/token,
+                    "url":"https://www.npostart.nl/player/"||$c/parentId
+                  })/json/embedUrl
+                )//script/extract(.,"var video =(.+);",1)[.]
+              )
+            else
+              $c
+          )/(subtitles)()/{
+            "id":"sub-1",
+            "format":"vtt",
+            "language":language,
+            "label":label,
+            "url":src
+          },
+          xivid:m3u8-to-json($d)
+        ]
       }
+    |}
   ' --output-format=bash)"
 }
 
@@ -227,7 +230,7 @@ kijk() {
           "(\d+)-(\d+)-(\d+) ([\d:]+).*",
           "$3-$2-$1 $4"
         ),
-        "formats":(
+        "formats":[
           for $x at $i in (sources)()[stream_name]
           order by $x/size
           count $i
@@ -243,7 +246,7 @@ kijk() {
             )
           },
           xivid:m3u8-to-json((sources)()[size = 0]/src)
-        )
+        ]
       }
     else
       json(
@@ -274,17 +277,16 @@ kijk() {
           (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
-        "formats":let $a:=(
+        "formats":[
           (tracks)()[kind="captions"]/{
             "id":"sub-"||position(),
             "format":"vtt",
             "language":"nl",
             "label":label,
             "url":file
-          }[url],
+          },
           xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
-        ) return
-        [$a][exists($a)]
+        ]
       }
   ' --output-format=bash)"
 }
@@ -312,7 +314,7 @@ regio_frl() {
       "duration":duration(
         "P"||//meta[@itemprop="duration"]/@content
       ) + time("00:00:00"),
-      "formats":(
+      "formats":[
         for $x at $i in $b//asset
         order by $x/@bandwidth
         count $i
@@ -323,7 +325,7 @@ regio_frl() {
           "bitrate":$x/@bandwidth||"kbps",
           "url":resolve-uri($x/@src,$a[1])
         }
-      )
+      ]
     }
   ' --output-format=bash)"
 }
@@ -514,7 +516,8 @@ dumpert() {
           "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
           "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
           "formats":for $x at $i in ("mobile","tablet","720p","original")
-          let $a:=(.//variants)()[version=$x]/uri return {
+          let $a:=(.//variants)()[version=$x]/uri
+          return {
             "id":"pg-"||$i,
             "format":"mp4[h264+aac]",
             "url":$a
@@ -581,7 +584,7 @@ telegraaf() {
         $a//duration * duration("PT1S"),
         "[H01]:[m01]:[s01]"
       ),
-      "formats":(
+      "formats":[
         $a//locations/reverse((progressive)())/{
           "id":"pg-"||position(),
           "format":"mp4[h264+aac]",
@@ -591,7 +594,7 @@ telegraaf() {
         xivid:m3u8-to-json(
           $a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1)
         )
-      )
+      ]
     }
   ' --output-format=bash)"
 }
@@ -728,14 +731,14 @@ youtube() {
         "[D01]-[M01]-[Y]"
       ),
       "duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),
-      "formats":let $a:=(
+      "formats":[
         ($b//captionTracks)()[languageCode="nl"]/{
           "id":"sub-1",
           "format":"ttml",
           "language":"nl",
           "label":name/simpleText,
           "url":baseUrl
-        }[url],
+        },
         for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)])
         order by $x/width
         count $i
@@ -779,8 +782,7 @@ youtube() {
           "bitrate":round($x/bitrate div 1000)||"kbps",
           "url":$x/url
         }
-      ) return
-      [$a][exists($a)]
+      ]
     }
   ' --output-format=bash)"
 }
