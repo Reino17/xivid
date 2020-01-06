@@ -36,13 +36,15 @@ Deze websites worden op dit moment ondersteund:
   rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
-  dumpert.nl
-  telegraaf.nl
+  dumpert.nl              vimeo.com
+  autojunk.nl             twitch.tv
+  telegraaf.nl            facebook.com
+  ad.nl                   twitter.com
+  lc.nl                   pornhub.com
   youtube.com
   youtu.be
-  vimeo.com
-  facebook.com
 ```
+Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
 
 ## Voorbeelden
@@ -53,18 +55,18 @@ https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb6
 ```
 ```
 ./xivid.sh -i https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
-Naam:          NOS Journaal 20.00 uur
-Datum:         28-02-2017
-Tijdsduur:     00:25:37
-Formaten:      id     formaat         taal  resolutie  bitrate
-               sub-1  vtt             nl
-               hls-0  m3u8[manifest]
-               hls-1  m3u8[aac]                        64kbps
-               hls-2  m3u8[aac]                        128kbps
-               hls-3  m3u8[h264+aac]        480x270    203|64kbps
-               hls-4  m3u8[h264+aac]        640x360    506|128kbps
-               hls-5  m3u8[h264+aac]        768x432    707|128kbps
-               hls-6  m3u8[h264+aac]        1024x576   1109|128kbps (best)
+Naam:      NOS Journaal 20.00 uur
+Datum:     28-02-2017
+Tijdsduur: 00:25:37
+Formaten:  id     formaat         taal  resolutie  bitrate
+           sub-1  vtt             nl
+           hls-0  m3u8[manifest]
+           hls-1  m3u8[aac]                        64kbps
+           hls-2  m3u8[aac]                        128kbps
+           hls-3  m3u8[h264+aac]        480x270    203|64kbps
+           hls-4  m3u8[h264+aac]        640x360    506|128kbps
+           hls-5  m3u8[h264+aac]        768x432    707|128kbps
+           hls-6  m3u8[h264+aac]        1024x576   1109|128kbps (best)
 ```
 Gebruik `-f` voor een ander gewenst formaat:
 ```
@@ -164,7 +166,7 @@ Formaten:  id     formaat         taal  resolutie  bitrate
            hls-5  m3u8[h264+aac]        768x432    721|128kbps
            hls-6  m3u8[h264+aac]        1024x576   1027|128kbps (best)
 
-Download:      ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
+Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 ```
 Dit een voorbeeld van een speciaal soort videofragment. De video-urls (van alle formaten) zijn die van de hele aflevering. Als je dit videofragment op npostart.nl bekijkt, dan krijg je keurig een video van iets langer dan een minuut te zien. Als je 't echter wilt downloaden, dan zul je 't zelf op de juiste momenten uit moeten knippen. Gelukkig kan dit prima met FFmpeg en Xivid geeft je in dit geval de commando waarmee je dit kunt doen.
 

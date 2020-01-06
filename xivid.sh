@@ -38,12 +38,13 @@ Ondersteunde websites:
   rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
-  dumpert.nl
-  telegraaf.nl
+  dumpert.nl              vimeo.com
+  autojunk.nl             twitch.tv
+  telegraaf.nl            facebook.com
+  ad.nl                   twitter.com
+  lc.nl                   pornhub.com
   youtube.com
   youtu.be
-  vimeo.com
-  facebook.com
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -102,7 +103,7 @@ npo() {
         else
           ()
       } else
-        doc("https://www.npostart.nl/'${1%%[[:cntrl:]]}'")/{
+        doc("https://www.npostart.nl/'$1'")/{
           "name":.//div[@class="npo-header-episode-content"]/concat(
             normalize-space(h1),
             ": ",
