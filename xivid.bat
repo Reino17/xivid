@@ -1043,6 +1043,7 @@ EXIT /B
 :start
 @ECHO off
 SETLOCAL DISABLEDELAYEDEXPANSION
+SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   FOR /F "tokens=2-4 delims=. " %%B IN ('xidel --version ^| FIND "Xidel"') DO IF %%C%%D LSS 98 (
     ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.

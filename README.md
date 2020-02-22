@@ -1,4 +1,4 @@
-##### Xivid, een Windows en Linux video-url extractie commandoregel-script.
+#### Xivid, een Windows en Linux video-url extractie commandoregel-script.
 
 - [Download](#download)
 - [Gebruik en opties](#gebruik-en-opties)
@@ -49,11 +49,11 @@ De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of a
 
 ## Voorbeelden
 Zonder optie geeft Xivid de video-url van het "beste" formaat:
-```
+```bat
 xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
 https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=1109000.m3u8
 ```
-```
+```sh
 ./xivid.sh -i https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
 Naam:      NOS Journaal 20.00 uur
 Datum:     28-02-2017
@@ -69,7 +69,7 @@ Formaten:  id     formaat         taal  resolutie  bitrate
            hls-6  m3u8[h264+aac]        1024x576   1109|128kbps (best)
 ```
 Gebruik `-f` voor een ander gewenst formaat:
-```
+```bat
 xivid.bat -f hls-4 https://www.npostart.nl/POW_03375558
 https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=506000.m3u8
 ```
@@ -81,33 +81,32 @@ https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb6
 Xivid maakt veelvuldig gebruik van Xidel en kan niet functioneren zonder. Xidel is dus essentieel. Minimale vereiste versie is `0.9.8`. Nieuwere (beta) versies zouden in principe ook moeten werken.
 
 ## Linux
-Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#downloads) en installeer deze in `/usr/bin`, of ergens anders in `$PATH`.  
+Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#downloads) en plaats `xidel` in `/usr/bin`, of ergens anders in `$PATH`.  
 Installeer vervolgens `openssl`, `openssl-dev` en `libcrypto` zodat Xidel beveiligde http**s**-urls kan openen.
 
-Installeer je Xidel liever ergens anders, maak dan een [symlink](https://en.wikipedia.org/wiki/Symbolic_link#POSIX_and_Unix-like_operating_systems) aan zodat Xidel toch gevonden kan worden:
+Installeer je `xidel` liever ergens anders, maak dan een [symlink](https://en.wikipedia.org/wiki/Symbolic_link#POSIX_and_Unix-like_operating_systems) aan zodat `xidel` toch gevonden kan worden:
 ```sh
 ln -s /<andere-map>/xidel /usr/bin/xidel
 ```
 
 ## Windows
-Download de Xidel [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads) en installeer deze in `C:\Windows\SysWOW64`, of ergens anders in `%PATH%`. 
+Download de Xidel [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads) en plaats `xidel.exe` in dezelfde map als `xivid.bat`, `C:\Windows\system32`, of ergens anders in `%PATH%`. 
 
-Installeer je Xidel liever ergens anders, maak dan een [symlink](https://en.wikipedia.org/wiki/Symbolic_link#Microsoft_Windows) aan zodat Xidel toch gevonden kan worden:
+Pak je `xidel.exe` liever ergens anders uit, maar staat deze map niet in `%PATH%`, maak dan een [symlink](https://en.wikipedia.org/wiki/Symbolic_link#Microsoft_Windows) aan zodat `xidel.exe` toch gevonden kan worden:
 ```bat
-mklink -s X:\<andere-map>\xidel.exe C:\Windows\SysWOW64\xidel.exe
+mklink -s X:\<andere-map>\xidel.exe C:\Windows\system32\xidel.exe
 ```
+Als alternatief kun je deze map tijdelijk aan de `%PATH%` variabele toevoegen door `xivid.bat` in een tekstverwerker te openen en `SET "PATH=%PATH%;%~dp0"` te veranderen in `SET "PATH=%PATH%;X:\<andere-map>"`.
 
 ## Windows XP
 Steeds meer websites maken gebruik van TLS 1.2 encryptie/versleuteling. In Windows XP gaat de ondersteuning hiervoor niet verder dan TLS 1.0, waardoor het openen van http**s**-urls met de standaard Xidel Windows binary niet gaat lukken.  
 Xidel heeft ook een speciale Windows binary die voor https-connecties niet gebruik maakt van Windows's SChannel, maar van [OpenSSL](https://www.openssl.org), een andere beveiligingsbibliotheek.
 
-Download de Xidel (OpenSSL) [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads) en installeer deze in `C:\Windows\System32`, of ergens anders in `%PATH%`.
+Download de Xidel (OpenSSL) [Windows binary](http://videlibri.sourceforge.net/xidel.html#downloads) en plaats `xidel.exe` in dezelfde map als `xivid.bat`, `C:\Windows\system32`, of ergens anders in `%PATH%`.
 
-Installeer je Xidel liever ergens anders, dan kun je m.b.v. `SET "PATH=%PATH%;X:\<andere-map>"` deze map tijdelijk aan de `%PATH%` variabele toevoegen, waardoor Xidel toch gevonden kan worden. Dit kan op twee manieren:
-- Vóór het gebruik van `xivid.bat` voer je deze commando iedere keer in.
-- Voor een permanentere oplossing open je `xivid.bat` in een tekstverwerker en voeg je deze commando als nieuwe regel toe vóór `FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (`. 
+Pak je `xidel.exe` liever ergens anders uit, maar staat deze map niet in `%PATH%`, dan kun je deze map tijdelijk aan de `%PATH%` variabele toevoegen door `xivid.bat` in een tekstverwerker te openen en `SET "PATH=%PATH%;%~dp0"` te veranderen in `SET "PATH=%PATH%;X:\<andere-map>"`. Hierdoor kan `xidel.exe` toch gevonden worden.
 
-Deze `xidel.exe` heeft OpenSSL niet geïntegreerd en vereist daarom een aantal OpenSSL dll-bestanden in dezelfde map, `C:\Windows\System32`, of ergens in `%PATH%`:
+Deze `xidel.exe` heeft OpenSSL niet geïntegreerd en vereist daarom een aantal OpenSSL dll-bestanden in dezelfde map, `C:\Windows\system32`, of ergens in `%PATH%`:
 - `libcrypto-1_1.dll` en `libssl-1_1.dll` uit de OpenSSL 1.1.1 reeks.
 - of `libeay32.dll` en `ssleay32.dll` uit de verouderde OpenSSL 1.0.2 reeks.
 
@@ -149,7 +148,7 @@ FOR /F %A IN ('xivid.bat <url>') DO ffmpeg.exe -i %A -c copy <bestandsnaam>
 ```
 
 # Videofragment downloaden
-```
+```sh
 ./xivid.sh -i https://www.npostart.nl/POMS_NOS_7332477
 Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:     14-02-2017
@@ -171,8 +170,8 @@ Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 Dit een voorbeeld van een speciaal soort videofragment. De video-urls (van alle formaten) zijn die van de hele aflevering. Als je dit videofragment op npostart.nl bekijkt, dan krijg je keurig een video van iets langer dan een minuut te zien. Als je 't echter wilt downloaden, dan zul je 't zelf op de juiste momenten uit moeten knippen. Gelukkig kan dit prima met FFmpeg en Xivid geeft je in dit geval de commando waarmee je dit kunt doen.
 
 Als je de ondertiteling in dit geval ook wilt meenemen, dan kan dat, maar omdat Xivid geen directe optie heeft voor de ondertiteling, zul je de optie `-j` moeten gebruiken. Je krijgt de video-informatie dan als [JSON](https://nl.wikipedia.org/wiki/JSON) (hier iets ingekort):
-```sh
-./bashgemist.sh -j https://www.npostart.nl/POMS_NOS_7332477
+```bat
+xivid.bat -j https://www.npostart.nl/POMS_NOS_7332477
 {
   "name": "NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde",
   "date": "14-02-2017",
