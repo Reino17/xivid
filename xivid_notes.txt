@@ -44,6 +44,11 @@ $ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() != 5])'
 $ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(remove($a,5))'
 A B C D F G H I J
 
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() > 3][position() < 5])'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() = 4 to 7])'
+$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,4,4))'
+D E F G
+
 $ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 = 1])'
 A C E G I
 
@@ -850,9 +855,8 @@ Output commando:
 
 Xidel commando Unix --> Windows in Bash:
 
-$ sed -n 728,735p xivid_notes.txt
-$ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position()>727][position()<9]'
-$ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position()<736][position()>727]'
+$ sed -n 810,817p xivid_notes.txt
+$ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position() = 810 to 817]'
 -e '
   let $a:=string-join(
         tokenize($raw) ! x:integer-to-base(.,16)
@@ -862,16 +866,16 @@ $ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position()<736][position(
   concat("<^| ",$a," & ",$b," |%>")
 '
 
-$ sed -n 728,735p xivid_notes.txt | xidel -s - -e 'let $a:=x:lines($raw) return ($a[1],$a[last()])'
--e '
-'
+----------------------------------------------------------------
 
-$ sed -n 728,735p xivid_notes.txt | xidel -s - -e 'let $a:=x:lines($raw) return (replace($a[1],"'\''","^""")||"^",replace($a[last()],"'\''",""""))'
-$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",replace($a[last()],"&apos;","&quot;"))'
+$ xidel -s -e 'let $a:=file:read-text-lines("xivid_notes.txt")[position() = 810 to 817] return (replace($a[1],"'\''","^""")||"^",replace($a[last()],"'\''",""""))'
+$ xidel -s --xquery 'let $a:=file:read-text-lines("xivid_notes.txt") return (replace($a[810],"&apos;","^&quot;")||"^",replace($a[817],"&apos;","&quot;"))'
 -e ^"^
 "
 
-$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position()>1][position()<last()] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))'
+----------------------------------------------------------------
+
+$ xidel -s --xquery 'let $a:=file:read-text-lines("xivid_notes.txt") return (replace($a[810],"&apos;","^&quot;")||"^",$a[position() = 811 to 816] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[817],"&apos;","&quot;"))'
 -e ^"^
   let $a:=string-join(^
         tokenize($raw) ! x:integer-to-base(.,16)^
@@ -883,7 +887,7 @@ $ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) r
 
 Een here-string als input werkt ook, maar de $ moet dan wel ge-escaped worden:
 
-$ cat <<EOF | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position()>1][position()<last()] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))'
+$ xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position() = 2 to last() - 1] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))' <<EOF
 -e '
   let \$a:=string-join(
         tokenize(\$raw) ! x:integer-to-base(.,16)
@@ -906,12 +910,16 @@ EOF
 
 Xidel commando Unix --> Windows in Batch:
 
-xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'''','^\"')||'^',replace($a[last()],'''','\"'))"
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;'),replace($a[last()],'&apos;','&quot;'))"
+----------------------------------------------------------------
+
+xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position() = 810 to 817] return (replace($a[1],'''','^\"')^|^|'^',replace($a[last()],'''','\"'))"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[810],'&apos;','^&quot;'),replace($a[817],'&apos;','&quot;'))"
 -e ^"^
 "
 
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'([&amp;<>^|])','^$1')||'^'),replace($a[last()],'&apos;','&quot;'))"
+----------------------------------------------------------------
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[810],'&apos;','^&quot;')||'^',$a[position() = 811 to 816] ! (replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'([&amp;<>^|])','^$1')||'^'),replace($a[817],'&apos;','&quot;'))"
 -e ^"^
   let $a:=string-join(^
         tokenize($raw) ! x:integer-to-base(.,16)^
@@ -925,12 +933,16 @@ xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<73
 
 Xidel commando Windows --> Windows in Batch:
 
-xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'\"','^^\"')||'^',$a[last()])"
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;')||'^',$a[last()])"
+----------------------------------------------------------------
+
+xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position() = 821 to 828] return (replace($a[1],'\"','^^\"')||'^',$a[last()])"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[821],'&quot;','^&quot;')||'^',$a[828])"
 -e ^"^
 "
 
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(.,'%','%%'),'([&amp;<>^|])','^$1')||'^'),$a[last()])"
+----------------------------------------------------------------
+
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[821],'&quot;','^&quot;')||'^',$a[position() = 822 to 827] ! (replace(replace(.,'%','%%'),'([&amp;<>^|])','^$1')||'^'),$a[828])"
 -e ^"^
   let $a:=string-join(^
         tokenize($raw) ! x:integer-to-base(.,16)^
@@ -967,19 +979,19 @@ Output commando:
 
 Xidel commando Unix --> Windows in Bash:
 
-$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position()>1][position()<last()] ! (replace(replace(replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"\^","^^"),"!","^!"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))'
+$ xidel -s --xquery 'let $a:=file:read-text-lines("xivid_notes.txt") return (replace($a[810],"&apos;","^&quot;")||"^",$a[position() = 811 to 816] ! (replace(replace(replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"\^","^^"),"!","^!"),"([&amp;<>^|])","^$1")||"^"),replace($a[817],"&apos;","&quot;"))'
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Xidel commando Unix --> Windows in Batch:
 
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'\^','^^'),'!','^!'),'([&amp;<>^|])','^$1')||'^'),replace($a[last()],'&apos;','&quot;'))"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[810],'&apos;','^&quot;')||'^',$a[position() = 811 to 816] ! (replace(replace(replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'\^','^^'),'!','^!'),'([&amp;<>^|])','^$1')||'^'),replace($a[817],'&apos;','&quot;'))"
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Xidel commando Windows --> Windows in Batch:
 
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;')||'^',$a[position()>1][position()<last()] ! (replace(replace(replace(replace(.,'%','%%'),'\^','^^'),'!','^!'),'([&amp;<>^|])','^$1')||'^'),$a[last()])"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[821],'&quot;','^&quot;')||'^',$a[position() = 822 to 827] ! (replace(replace(replace(replace(.,'%','%%'),'\^','^^'),'!','^!'),'([&amp;<>^|])','^$1')||'^'),$a[828])"
 
 ------------------------------------------------------------------------------------------------
 
@@ -1009,19 +1021,19 @@ ECHO <^| B7E3 & 47075 |%>
 
 Xidel commando Unix --> Windows in Bash:
 
-$ sed -n 728,735p xivid_notes.txt | xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;"),$a[position()>1][position()<last()] ! replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|,;=()])","^$1"),replace($a[last()],"&apos;","^&quot;"))'
+$ xidel -s --xquery 'let $a:=file:read-text-lines("xivid_notes.txt") return (replace($a[810],"&apos;","^&quot;"),$a[position() = 811 to 816] ! replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|,;=()])","^$1"),replace($a[817],"&apos;","^&quot;"))'
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Xidel commando Unix --> Windows in Batch:
 
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<736][position()>727] return (replace($a[1],'&apos;','^&quot;'),$a[position()>1][position()<last()] ! replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'([&amp;<>^|,;=()])','^$1'),replace($a[last()],'&apos;','^&quot;'))"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[810],'&apos;','^&quot;'),$a[position() = 811 to 816] ! replace(replace(replace(.,'%','%%'),'&quot;','&apos;'),'([&amp;<>^|,;=()])','^$1'),replace($a[817],'&apos;','^&quot;'))"
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Xidel commando Windows --> Windows in Batch:
 
-xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<747][position()>738] return (replace($a[1],'&quot;','^&quot;'),$a[position()>1][position()<last()] ! replace(replace(.,'%','%%'),'([&amp;<>^|,;=()])','^$1'),replace($a[last()],'&quot;','^&quot;'))"
+xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[821],'&quot;','^&quot;'),$a[position() = 822 to 827] ! replace(replace(.,'%','%%'),'([&amp;<>^|,;=()])','^$1'),replace($a[828],'&quot;','^&quot;'))"
 
 ================================================================================================
 
@@ -1029,7 +1041,7 @@ xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt')[position()<74
 
 Alle attribuut-namen:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e '$json()'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e '$json()'
 name
 date
 duration
@@ -1039,7 +1051,7 @@ formats
 
 Alle attribuut-namen met een waarde die NIET null is:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e '$json()[$json(.)]'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e '$json()[$json(.)]'
 name
 date
 duration
@@ -1049,7 +1061,7 @@ formats
 
 Vertaalslag van attribuut-naam naar string:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $a()[$json(.)] ! $a(.)'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $a()[$json(.)] ! $a(.)'
 Naam:
 Datum:
 Tijdsduur:
@@ -1061,7 +1073,7 @@ Formaten:
 
 Aantal tekens:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $a()[$json(.)] ! $a(.) ! string-length()'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $a()[$json(.)] ! $a(.) ! string-length()'
 5
 6
 10
@@ -1071,7 +1083,7 @@ $ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","da
 
 String + spaties tot de lengte van de langste string + 1 spatie speling:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=$a()[$json(.)] ! $a(.) ! string-length() for $x at $i in $a()[$json(.)] return $a($x)||string-join((1 to max($b) - $b[$i] + 1) ! "-")'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=$a()[$json(.)] ! $a(.) ! string-length() for $x at $i in $a()[$json(.)] return $a($x)||string-join((1 to max($b) - $b[$i] + 1) ! "-")'
 Naam:------     # 10 - 5 + 1 = 6 spaties
 Datum:-----     # 10 - 6 + 1 = 5 spaties
 Tijdsduur:-     # etc.
@@ -1083,12 +1095,12 @@ Formaten:--
 
 Aantal tekens van de langste string:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return max($a()[$json(.)] ! $a(.) ! string-length())'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return max($a()[$json(.)] ! $a(.) ! string-length())'
 10
 
 String + 10 spaties:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()) return $a()[$json(.)] ! ($a(.)||string-join((1 to $b) ! "-"))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()) return $a()[$json(.)] ! ($a(.)||string-join((1 to $b) ! "-"))'
 Naam:----------
 Datum:----------
 Tijdsduur:----------
@@ -1098,7 +1110,7 @@ Formaten:----------
 
 String + 10 spaties, afgeknot na 10 + 1 = 11 tekens:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()) return $a()[$json(.)] ! substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1)'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()) return $a()[$json(.)] ! substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1)'
 Naam:------
 Datum:-----
 Tijdsduur:-
@@ -1108,7 +1120,7 @@ Formaten:--
 
 Met de attribuut-waarden erbij:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),$json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),$json(.))'
 Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:     14-02-2017
 Tijdsduur: 00:01:05
@@ -1120,7 +1132,7 @@ Formaten:
 
 De attribuut-namen die we in deze volgorde willen weergeven (dus niet "label" of "url"):
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"}] return $a(1)()'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"}] return $a(1)()'
 id
 format
 language
@@ -1131,7 +1143,7 @@ bitrate
 Van de legenda en de "formats"-objecten maken we één array voor het makkelijker achterhalen van de langste string per te vormen kolom.
 Alle aanwezige attribuut-namen in de "formats"-objecten met een waarde die NIET null is:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()] return $a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)])'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()] return $a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)])'
 id
 format
 language
@@ -1140,7 +1152,7 @@ bitrate
 
 Per attribuut-naam / kolom het aantal tekens van de langste string:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]) return $b ! max($a()(.) ! string-length())'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]) return $b ! max($a()(.) ! string-length())'
 5
 14
 4
@@ -1149,7 +1161,7 @@ $ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format
 
 Per object alle attribuut-waarden achter elkaar:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]) return $a() ! string-join(for $x in $b return .($x))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]) return $a() ! string-join(for $x in $b return .($x))'
 idformaattaalresolutiebitrate
 sub-1vttnl
 hls-0m3u8[manifest]
@@ -1162,7 +1174,7 @@ hls-6m3u8[h264+aac]1024x5761027|128kbps
 
 String + (5, 14, 4, 9, of 12) spaties + 2 spaties speling, afgeknot na (5, 14, 4, 9, of 12) + 2 tekens:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]),$c:=$b ! max($a()(.) ! string-length()) return $a() ! string-join(for $x at $i in $b return substring(.($x)||string-join((1 to $c[$i] + 2) ! "-"),1,$c[$i] + 2))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]),$c:=$b ! max($a()(.) ! string-length()) return $a() ! string-join(for $x at $i in $b return substring(.($x)||string-join((1 to $c[$i] + 2) ! "-"),1,$c[$i] + 2))'
 id-----formaat---------taal--resolutie--bitrate-------
 sub-1--vtt-------------nl-----------------------------
 hls-0--m3u8[manifest]---------------------------------
@@ -1177,14 +1189,14 @@ hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--
 
 Alles bij elkaar. Als "formats"="formats", dan verwerk "formats"-objecten, anders geef attribuut-waarde terug:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then $c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)) else $json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then $c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)) else $json(.))'
 Error:
 err:XPTY0004: Invalid conversion from ("id-----formaat---------taal--resolutie--bitrate-------", [...] "hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--") to type singleton
 
 concat() verwacht één enkele string, maar de tabel is een reeks van strings.
 Dit is op te lossen door van de tabel één string te maken m.b.v. new-line-characters (en weer wat spaties):
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! "-")) else $json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! "-")) else $json(.))'
 Naam:------NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:-----14-02-2017
 Tijdsduur:-00:01:05
@@ -1202,7 +1214,7 @@ Formaten:--id-----formaat---------taal--resolutie--bitrate-------
 
 Als gearriveerd bij laatste attribuut-waarde, dan plak " (best)" er achter, anders voeg spaties toe voor uitlijning:
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.))'
 Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:     14-02-2017
 Tijdsduur: 00:01:05
@@ -1220,20 +1232,20 @@ Formaten:  id     formaat         taal  resolutie  bitrate
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e '$json[start]/(start,duration)'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e '$json[start]/(start,duration)'
 00:09:02   # Begin.
 00:01:05   # Tijdsduur.
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e '$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e '$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))'
 542   # Begin in sec.
 65    # Tijdsduur in sec.
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return ($a[1] - $a[1] mod 30,$a[1] mod 30,$a[2])'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return ($a[1] - $a[1] mod 30,$a[1] mod 30,$a[2])'
 540   # Begin op 30 sec nauwkeurig.
 2     # Begin restant.
 65    # Tijdsduur.
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - -e 'let $a:=$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg -ss ",$a[1] - $a[1] mod 30," -i <url> -ss ",$a[1] mod 30," -t ",$a[2]," [...]")'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg -ss ",$a[1] - $a[1] mod 30," -i <url> -ss ",$a[1] mod 30," -t ",$a[2]," [...]")'
 Download: ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 
 Begin 00:00:29 :
@@ -1252,7 +1264,7 @@ Download: ffmpeg -ss 30 -i <url> -t 10 [...]
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
 Datum:     14-02-2017
 Tijdsduur: 00:01:05
 Begin:     00:09:02
@@ -1269,13 +1281,13 @@ Formaten:  id     formaat         taal  resolutie  bitrate
 
 Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 
-$ sed -n 2907,2912p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
+$ sed -n 3040,3045p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
 Naam:      Flikken Maastricht: Virtus et justitia
 Datum:     01-03-2019
 Tijdsduur: 00:47:27
 Formaten:  -
 
-$ sed -n '4178,4189p;4191,4205p;4207,4216p' xivid_notes.txt | xidel -s - --xquery '[...]'
+$ sed -n '4311,4322p;4324,4338p;4340,4349p' xivid_notes.txt | xidel -s - --xquery '[...]'
 Naam:      Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
 Datum:     01-02-2019
 Tijdsduur: 00:18:13
@@ -1287,7 +1299,7 @@ Formaten:  id       formaat        resolutie       frequentie  bitrate
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 2815,2877p xivid_notes.txt | xidel -s - --xquery 'declare function local:info ($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'declare function local:info ($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
 
 declare function xivid:info ($json as object()) as string* {
   let $a:={
