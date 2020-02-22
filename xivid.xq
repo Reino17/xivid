@@ -37,18 +37,31 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
           if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
         )
       },
+      for $x at $i in $b[contains(.,"PROGRESSIVE-URI")]
+      group by $bw:=extract($x,"BANDWIDTH=(\d+)",1)
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
+        "bitrate":round($bw div 1000)||"kbps",
+        "url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)
+      },
       {
         "id":"hls-0",
         "format":"m3u8[manifest]",
         "url":if (string-length($a/url) < 512) then $a/url else $url
       }[url],
       for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")]
-      order by extract($x,"BANDWIDTH=(\d+)",1)
+      group by $bw:=extract($x,"BANDWIDTH=(\d+)",1)
       count $i
       return {
         "id":"hls-"||$i,
         "format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then
-          "m3u8[h264+aac]"
+          if (contains($x,"TYPE=AUDIO")) then
+            "m3u8[aac]"
+          else
+            "m3u8[h264+aac]"
         else
           "m3u8[aac]",
         "resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],
@@ -64,14 +77,14 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
             )
           else
             (
-              round(extract($x,"BANDWIDTH=(\d+)",1)[.] div 1000),
+              round($bw[.] div 1000),
               extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
             ),
           "kbps"
         ),
         "url":(
-          extract($x,"URI=&quot;(.+?)&quot;",1),
-          extract($x,".+m3u8.*?$","m")
+          extract($x,"[^-]URI=&quot;(.+?)&quot;",1),
+          extract($x,".+m3u8(?:\?.+)?","m")
         )[.][1] ! (
           if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
         )
