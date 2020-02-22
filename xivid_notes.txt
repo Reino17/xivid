@@ -8529,3 +8529,77 @@ $ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" --xquery 'le
     ]
   }
 '
+
+================================================================================================
+
+[dailymotion]
+
+https://www.dailymotion.com/video/x5aa1uc
+
+$ xidel -s "https://www.dailymotion.com/video/x5aa1uc" -e 'json(//script/extract(.,"PLAYER_CONFIG__ = (.+);",1)[.])/context/metadata_template_url'
+https://www.dailymotion.com/player/metadata/video/:videoId?embedder=:embedder&referer=:referer&app=com.dailymotion.neon&locale=nl&client_type=website
+
+$ xidel -s -e 'extract("https://www.dailymotion.com/video/x5aa1uc",".+/(.+)",1)'
+x5aa1uc
+
+$ xidel -s --module=xivid.xq "https://www.dailymotion.com/player/metadata/video/x5aa1uc" -e '$json/{"name":"Dailymotion: "||title,"date":format-date(created_time * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(qualities//url)}'
+{
+  "name": "Dailymotion: PENOZA Seizoen 3 aflevering 9 (S03E09) [HD]",
+  "date": "01-02-2017",
+  "duration": "00:43:44",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "192x112",
+      "bitrate": "105kbps",
+      "url": "https://proxy-019.dc3.dailymotion.com/sec(JNfjoSit1pis0fshbrs9gqqK-lmDY1uHzpm8ezDICxXp749LCpknL-XXJHDovcSMRSo3CPCg5B9ZkLx6Gk8N_Q)/video/889/595/319595988_mp4_h264_aac_l2_1.mp4"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "836kbps",
+      "url": "https://proxy-019.dc3.dailymotion.com/sec(RdkuEEV9zFs2hDWhHYjSGdmjL6SOmuJ_UhY-KMiLy6IVrhCzqFeGFakxympqZyoOywDtFB9DSY-L8d6RZxR8cg)/video/889/595/319595988_mp4_h264_aac_hq_1.mp4"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?sec=eyMNx4dh_i1GpAS8KZdvuHFtoC6q42SoOn8LyvPeCydF5_ae0n5LyxXZ7lsIAuc0"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "192x112",
+      "bitrate": "105kbps",
+      "url": "https://proxy-019.dc3.dailymotion.com/sec(ODTxNQv7_D3l1m3AnKDufITG2YXRnbz60ZJPFHq_CnccA167riXfoN-CPEE4bS0JCDEq1B4PEDFIOKxIikmmrllatU6D0NM_10sBymwC4fQ)/video/889/595/319595988_mp4_h264_aac_l2_1.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-4",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "836kbps",
+      "url": "https://proxy-019.dc3.dailymotion.com/sec(ODTxNQv7_D3l1m3AnKDufITG2YXRnbz60ZJPFHq_CneU7hSKuFpu7niJlAz2vPTuGulbD_3cshknIU8Np_q-HLURQfnkbv_LCXGVkAYDDvk)/video/889/595/319595988_mp4_h264_aac_hq_1.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+-e '
+  $json/{
+    "name":"Dailymotion: "||title,
+    "date":format-date(
+      created_time * duration("PT1S") +
+      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(
+      duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":xivid:m3u8-to-json(qualities//url)
+  }
+'

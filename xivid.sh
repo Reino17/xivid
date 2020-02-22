@@ -817,6 +817,24 @@ vimeo() {
   ' --output-format=bash)"
 }
 
+dailymotion() {
+  eval "$(xidel "https://www.dailymotion.com/player/metadata/video/$1" -e '
+    json:=$json/{
+      "name":"Dailymotion: "||title,
+      "date":format-date(
+        created_time * duration("PT1S") +
+        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "formats":xivid:m3u8-to-json(qualities//url)
+    }
+  ' --output-format=bash)"
+}
+
 twitch() {
   eval "$(xidel "$1" --xquery '
     declare variable $id:=extract($url,".+/(.+)",1);
@@ -1148,6 +1166,8 @@ elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   youtube "$url"
 elif [[ $url =~ vimeo.com ]]; then
   vimeo "$url"
+elif [[ $url =~ dailymotion.com ]]; then
+  dailymotion "$(xidel -e 'extract("'$url'",".+/(.+)",1)')"
 elif [[ $url =~ twitch.tv ]]; then
   twitch "$url"
 elif [[ $url =~ facebook.com ]]; then

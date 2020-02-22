@@ -839,6 +839,24 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
+:dailymotion
+CALL :timezone
+FOR /F "delims=" %%A IN ('xidel "https://www.dailymotion.com/player/metadata/video/%~1" -e ^"
+  json:^=$json/{
+    'name':'Dailymotion: '^|^|title^,
+    'date':format-date^(
+      ^(created_time + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
+      '[D01]-[M01]-[Y]'
+    ^)^,
+    'duration':format-time^(
+      duration * duration^('PT1S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'formats':xivid:m3u8-to-json^(qualities//url^)
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :twitch
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   declare variable $id:^=extract^($url^,'.+/^(.+^)'^,1^)^;
@@ -1191,6 +1209,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :youtube "%url%"
 ) ELSE IF NOT "%url:vimeo.com=%"=="%url%" (
   CALL :vimeo "%url%"
+) ELSE IF NOT "%url:dailymotion.com=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','.+/(.+)',1)"') DO CALL :dailymotion %%A
 ) ELSE IF NOT "%url:twitch.tv=%"=="%url%" (
   CALL :twitch "%url%"
 ) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
