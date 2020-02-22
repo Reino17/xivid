@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2019 Reino Wijnsma
+# Copyright (C) 2020 Reino Wijnsma
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# https://github.com/Reino17/bashgemist
+# https://github.com/Reino17/xivid
 # door Reino Wijnsma (rwijnsma@xs4all.nl)
 
 help() {
