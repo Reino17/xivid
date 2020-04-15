@@ -39,11 +39,11 @@ Ondersteunde websites:
   kijk.nl                 rtvoost.nl            l1.nl
 
   dumpert.nl              vimeo.com
-  autojunk.nl             twitch.tv
-  telegraaf.nl            facebook.com
-  ad.nl                   twitter.com
-  lc.nl                   pornhub.com
-  youtube.com
+  autojunk.nl             dailymotion.com
+  telegraaf.nl            twitch.tv
+  ad.nl                   facebook.com
+  lc.nl                   twitter.com
+  youtube.com             pornhub.com
   youtu.be
 
 Voorbeelden:

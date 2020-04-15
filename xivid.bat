@@ -38,11 +38,11 @@ ECHO   rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
 ECHO   kijk.nl                 rtvoost.nl            l1.nl
 ECHO.
 ECHO   dumpert.nl              vimeo.com
-ECHO   autojunk.nl             twitch.tv
-ECHO   telegraaf.nl            facebook.com
-ECHO   ad.nl                   twitter.com
-ECHO   lc.nl                   pornhub.com
-ECHO   youtube.com
+ECHO   autojunk.nl             dailymotion.com
+ECHO   telegraaf.nl            twitch.tv
+ECHO   ad.nl                   facebook.com
+ECHO   lc.nl                   twitter.com
+ECHO   youtube.com             pornhub.com
 ECHO   youtu.be
 ECHO.
 ECHO Voorbeelden:
