@@ -2119,12 +2119,24 @@ https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8
 $ xidel -s -e 'x:request({"url":"https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl","error-handling":"4xx=accept"})/url'
 https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2VA_PSLbbNUp302PxtXXfQENkIA4s9mOL2qycWG-NZbrTMfVlwL05yCZg3q5VcghXoYLrAHSl9xn0eHZBymWIjmtnJpc005GKCimwfnYHEoEJFeuwBPwdMe5Qmb-OvhlSoUTRA6xZt2HSmFnt8wb8ayty9Wt2XQb9mL_arnk0OEQ7XOn7dUNXsLRg1RIjWVf18vhZOSNhMBrN3-hEIcJKb75fwIYhqdAD9w85IexSrYAJqcYmenrqAoyUZGeuCN3Hlc3PJgs6jV_qw_-wOen6neNGZBT8CFmNma85Vfdw7bt8y3-DtDkx70xjb8bhOmOESzetf7Aels7NghNP-WhI0iYyc7pL14p2pyJYoyW_QV_CxpktikfJ8GJ5BOghLBueYwcSiGwIkkt2z2TCTghCnHuRimM03xi292D4mp62uqM_7-iRlRHhztQVPlCu3jV4aSKNUNCo40I3c-mB2A2Nyr-hIJMmbThTIe-Hp1hMq2EX5BDKKGCdaqfjg4KYa7X_ERbjJNGcQ1cMmyMswvXY-uY8H9wBcEPQvuoEPXy5gRzFdORfgJiYRZJBk_DOjufq1Dxiy_55Bhmw-Bw2hRnMoHFz2j1eZ_UyIolJ76Xz1nsOjOt_AxY0eineGSHmmSF-kEUKGLRetXgEhuvR0UoX31Y3vtMG0v8PI-XPvgKATdBHc7jj9di2fZyQhukmjnQC1sEu9MM3nnHOqrSmbkvQtADsfFcuyTcfdJlnhcufU9QgdzjWsS3-EKq9-kcvf3TtqNQX1yWDLQPSfSjHEzkdZDAccx6FmXESQkfMeRluufUitGistOucgu89xRLty9--SlGxMpvvZs_uw_4hVC6ba7-vUsLO0bB4cP66tKb809uM9uqy2dVHwoBLSnYKGKti0RvRVkotgPpo1SsYBA49fq9IBTnFiBqKQMlm2IsNQthun1fM4WdI3MhePl68upVzm61qcCpwKIYEF55Bb3bzA&anvtrid=2c422506e010d9c092ad6564d06c7c9a&anvauth=tb=0~te=1570918109~sgn=422231fded672998b6d2cc3f7031c8a08349df211a8c303c79b28d44a3c441a4&t=1570918019
 
-- Creëer de JSON met de redirected-url door x:request() toe te voegen, maar gebruik de initiële url als de redirected-url vreselijk lang is, bijv. door een lang token.
+- Creëer de JSON met de redirected-url door 'x:request()' toe te voegen, maar gebruik de initiële url als de redirected-url vreselijk lang is, bijv. door een lang token.
+
+'kijk_4KH25s3dZRH.m3u8'   # Met de nieuwe "theplatform" api wordt het helaas bij de HLS playlist pas duidelijk dat de video beveiligd is met DRM.
+
+#EXTM3U
+#EXT-X-VERSION:4
+## Created with Unified Streaming Platform (version=1.10.18-20255)
+#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
+[...]
+
+- Filter deze in de 'x:request()' er al uit met 'not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))'.
+
 - Om bij 'ofr_live.m3u8' (het eerste voorbeeld hier) het ontbreken van "CODECS" informatie op te vangen is 'if (not(contains($x,"CODECS")))' nog nodig, omdat anders "m3u8[aac]" wordt weergegeven.
   Vervolgens is bij 'POW_04059460.m3u8' een extra 'if (contains($x,"TYPE=AUDIO"))' nodig, omdat anders alsnog "m3u8[h264+aac]" wordt weergegeven.
+
 - Creëer een m3u8-to-json functie van deze query.
 
-$ xidel -s --xquery 'declare function local:m3u8-to-json ($url as string?) as object()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"})[doc],$b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*") return ($b[contains(.,"TYPE=SUBTITLES")] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))},for $x at $i in $b[contains(.,"PROGRESSIVE-URI")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($bw div 1000)||"kbps","url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":if (string-length($a/url) < 512) then $a/url else $url}[url],for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then if (contains($x,"TYPE=AUDIO")) then "m3u8[aac]" else "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],$b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1) return if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,"bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else (round($bw[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":(extract($x,"[^-]URI=&quot;(.+?)&quot;",1),extract($x,".+m3u8(?:\?.+)?","m"))[.][1] ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; local:m3u8-to-json(<url>)'
+$ xidel -s --xquery 'declare function local:m3u8-to-json ($url as string?) as object()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"})[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*") return ($b[contains(.,"TYPE=SUBTITLES")] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))},for $x at $i in $b[contains(.,"PROGRESSIVE-URI")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($bw div 1000)||"kbps","url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":if (string-length($a/url) < 512) then $a/url else $url}[url],for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then if (contains($x,"TYPE=AUDIO")) then "m3u8[aac]" else "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],$b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1) return if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,"bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else (round($bw[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":(extract($x,"[^-]URI=&quot;(.+?)&quot;",1),extract($x,".+m3u8(?:\?.+)?","m"))[.][1] ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; local:m3u8-to-json(<url>)'
 
 string    # Een string.
 string+   # Eén of meerdere strings.
@@ -2138,7 +2150,7 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
     let $a:=x:request({
           "url":$url,
           "error-handling":"4xx=accept"
-        })[doc],
+        })[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
         $b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*")
     return (
       $b[contains(.,"TYPE=SUBTITLES")] ! {

@@ -26,7 +26,7 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
     let $a:=x:request({
           "url":$url,
           "error-handling":"4xx=accept"
-        })[doc],
+        })[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
         $b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*")
     return (
       $b[contains(.,"TYPE=SUBTITLES")] ! {
