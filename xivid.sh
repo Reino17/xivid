@@ -1025,7 +1025,7 @@ pornhub() {
 }
 
 if command -v xidel >/dev/null; then
-  if [[ $(xidel --version | xidel -s - -e 'number(string-join(extract(x:lines($raw)[1],"(\d+)",1,"*")))') < 98 ]]; then
+  if [[ $(xidel --version | xidel - -se 'replace(x:lines($raw)[1],"Xidel (.+)\.","$1")') < 0.98 ]]; then
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
 Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
