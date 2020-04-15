@@ -204,77 +204,28 @@ rtl() {
 }
 
 kijk() {
-  eval "$(xidel "https://embed.kijk.nl/video/$1" --xquery '
-    json:=if (//video) then
-      x:request({
-        "headers":"Accept: application/json;pk="||extract(
-          unparsed-text(//script[contains(@src,//@data-account)]/@src),
-          "policyKey:&quot;(.+?)&quot;",
-          1
-        ),
-        "url":concat(
-          "https://edge.api.brightcove.com/playback/v1/accounts/",
-          //@data-account,
-          "/videos/",
-          //@data-video-id
-        )
-      })/json/{
-        "name":concat(upper-case(custom_fields/sbs_station),": ",name),
-        "date":replace(
-          custom_fields/sko_dt,
-          "(\d{4})(\d{2})(\d{2})",
-          "$3-$2-$1"
-        ),
-        "duration":round(duration div 1000) * duration("PT1S") + time("00:00:00"),
-        "expdate":replace(
-          json("http://api.kijk.nl/v1/default/entitlement/'$1'")//enddate/date,
-          "(\d+)-(\d+)-(\d+) ([\d:]+).*",
-          "$3-$2-$1 $4"
-        ),
-        "formats":[
-          for $x at $i in (sources)()[stream_name]
-          order by $x/size
-          count $i
-          return {
-            "id":"pg-"||$i,
-            "format":"mp4[h264+aac]",
-            "resolution":concat($x/width,"x",$x/height),
-            "bitrate":round($x/avg_bitrate div 1000)||"kbps",
-            "url":replace(
-              $x/stream_name,
-              "mp4:",
-              extract((sources)()[size = 0]/src,"(.+?nl/)",1)
-            )
-          },
-          xivid:m3u8-to-json((sources)()[size = 0]/src)
-        ]
-      }
-    else
+  eval "$(xidel --xquery '
+    json:=try {
       json(
-        //script/extract(.,"playerConfig = (.+);",1)[.]
+        doc("https://embed.kijk.nl/video/'${1: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.]
       )/(playlist)()/{
-        "name":TAQ/concat(
-          upper-case(customLayer/c_media_station),
+        "name":concat(
+          upper-case(.//c_media_station),
           ": ",
-          customLayer/c_media_ispartof,
-          if (dataLayer/media_program_season != 0 and dataLayer/media_program_episodenumber <= 99) then
-            concat(
-              " S",
-              dataLayer/media_program_season ! (if (. < 10) then "0"||. else .),
-              "E",
-              dataLayer/media_program_episodenumber ! (if (. < 10) then "0"||. else .)
-            )
+          normalize-space(title),
+          if (description) then
+            " - "||description
           else
             ()
         ),
         "date":replace(
-          TAQ/customLayer/c_sko_dt,
+          .//c_sko_dt,
           "(\d{4})(\d{2})(\d{2})",
           "$3-$2-$1"
         ),
-        "duration":TAQ/customLayer/c_sko_cl * duration("PT1S") + time("00:00:00"),
+        "duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),
         "expdate":format-dateTime(
-          TAQ/customLayer/c_media_dateexpires * duration("PT1S") +
+          .//c_media_dateexpires * duration("PT1S") +
           (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
@@ -286,9 +237,53 @@ kijk() {
             "label":label,
             "url":file
           },
-          xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
+          xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"]/file)
         ]
       }
+    } catch err:FODC0002 {
+      x:request({
+        "headers":concat(
+          "Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",
+          random-seed(),
+          string-join((1 to 32) ! x:integer-to-base(random(16),16))
+        ),
+        "url":"'$1'"
+      })/json(
+        doc//script[@type="application/json"]
+      )//pageProps/{
+        "name":"Kijk: "||(
+          if (patheThuis) then
+            video/title
+          else
+            concat(
+              format/title,
+              " S",
+              video/seasonNumber ! (if (. lt 10) then "0"||. else .),
+              "E",
+              video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
+            )
+        ),
+        "date":format-date(
+          substring(video//availableDate,1,10) * duration("PT1S") +
+          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+          "[D01]-[M01]-[Y]"
+        ),
+        "duration":video/round(duration) * duration("PT1S") + time("00:00:00"),
+        "formats":[
+          (.//sourceUrl)[ends-with(.,"vtt")] ! {
+            "id":"sub-"||position(),
+            "format":"vtt",
+            "language":"nl",
+            "label":if (contains(.,"OPE")) then
+              "Doven en Slechthorenden"
+            else
+              "Nederlands",
+            "url":.
+          },
+          xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])
+        ]
+      }
+    }
   ' --output-format=bash)"
 }
 
@@ -1136,12 +1131,7 @@ elif [[ $url =~ rtl.nl ]]; then
 elif [[ $url =~ rtlnieuws.nl ]]; then
   rtl "$(xidel "$url" -e '//@data-uuid')"
 elif [[ $url =~ kijk.nl ]]; then
-  kijk "$(xidel -e '
-    if (contains("'$url'","preview.kijk.nl")) then
-      extract("'$url'",".+/(\w+)",1)
-    else
-      extract("'$url'","(?:video|videos)/(\w+)",1)
-  ')"
+  kijk "$url"
 elif [[ $url =~ omropfryslan.nl ]]; then
   regio_frl "$url"
 elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then
