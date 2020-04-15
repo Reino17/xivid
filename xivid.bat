@@ -1075,7 +1075,7 @@ FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
   EXIT /B 1
 )
-SET "XIDEL_OPTIONS=--silent --module=xivid.xq"
+SET "XIDEL_OPTIONS=--silent --module=xivid.xqm"
 SET "XIDEL_UA=Mozilla/5.0 Firefox/70.0"
 
 :options

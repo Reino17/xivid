@@ -1041,7 +1041,7 @@ Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
 fi
-export XIDEL_OPTIONS="--silent --module=xivid.xq"
+export XIDEL_OPTIONS="--silent --module=xivid.xqm"
 XIDEL_UA="Mozilla/5.0 Firefox/70.0"
 
 while true; do
