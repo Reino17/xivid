@@ -23,11 +23,14 @@ help() {
 Xivid, een video-url extractie script.
 Gebruik: ./xivid.sh [optie] url
 
-  -f ID    Forceer specifiek formaat. Zonder opgave wordt het best
-           beschikbare formaat gekozen.
-  -i       Toon video informatie, incl. een opsomming van alle
-           beschikbare formaten.
-  -j       Toon video informatie als JSON.
+  -f ID[+ID]    Selecteer specifiek formaat, of specifieke formaten.
+                Met een ID dat eindigt op een '#' wordt het formaat
+                met het hoogste nummer geselecteerd.
+                Zonder opgave wordt het formaat met de hoogste
+                resolutie en/of bitrate geselecteerd.
+  -i            Toon video informatie, incl. een opsomming van alle
+                beschikbare formaten.
+  -j            Toon video informatie als JSON.
 
 Ondersteunde websites:
   npostart.nl             omropfryslan.nl       omroepwest.nl
@@ -49,7 +52,7 @@ Ondersteunde websites:
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
   ./xivid.sh -i https://www.rtl.nl/video/26862f08-13c0-31d2-9789-49a3b286552d
-  ./xivid.sh -f hls-6 https://www.kijk.nl/video/jCimXJk75RP
+  ./xivid.sh -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EOF
 }
 
@@ -1095,7 +1098,7 @@ while true; do
       exit 1
       ;;
     *)
-      if [[ -z "$@" ]]; then
+      if [[ -z $@ ]]; then
         echo "xivid: url ontbreekt." 1>&2
         echo "Typ -h voor een lijst met alle opties." 1>&2
         exit 1
@@ -1178,19 +1181,33 @@ else
 fi
 
 if [[ $json ]]; then
-  eval "$(xidel - -e 'fmts:=string-join($json/(formats)()/id)' --output-format=bash <<< $json)"
+  fmts=($(xidel - -e 'join($json/(formats)()/id)' <<< $json))
 else
   echo "xivid: geen video(-informatie) beschikbaar." 1>&2
   exit 1
 fi
 if [[ $f ]]; then
-  if [[ $fmts ]]; then
-    if [[ $fmts =~ $f ]]; then
-      xidel - -e '$json/(formats)()[id="'$f'"]/url' <<< $json
-    else
-      echo "xivid: formaat id ongeldig." 1>&2
-      exit 1
-    fi
+  if [[ ${fmts[@]} ]]; then
+    for a in ${f/+/ }; do
+      if [[ ${a: -1} == \# ]]; then
+        if [[ ! ${fmts[@]} =~ ${a:0: -1} ]]; then
+          echo "xivid: formaat id '$a' ongeldig." 1>&2
+          exit 1
+        fi
+      else
+        if [[ ! ${fmts[@]} =~ $a ]]; then
+          echo "xivid: formaat id '$a' ongeldig." 1>&2
+          exit 1
+        fi
+      fi
+    done
+    xidel - -e '
+      for $x in tokenize("'$f'","\+") return
+      if (ends-with($x,"#")) then
+        $json/(formats)()[starts-with(id,substring($x,1,string-length($x) - 1))][last()]/url
+      else
+        $json/(formats)()[id=$x]/url
+    ' <<< $json
   else
     echo "xivid: geen video beschikbaar." 1>&2
     exit 1
@@ -1199,7 +1216,7 @@ elif [[ $i ]]; then
   xidel - -e 'xivid:info($json)' <<< $json
 elif [[ $j ]]; then
   xidel - -e '$json' <<< $json
-elif [[ $fmts ]]; then
+elif [[ ${fmts[@]} ]]; then
   xidel - -e '$json/(formats)()[last()]/url' <<< $json
 else
   echo "xivid: geen video beschikbaar." 1>&2

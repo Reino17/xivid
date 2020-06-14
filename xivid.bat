@@ -22,11 +22,14 @@
 ECHO Xivid, een video-url extractie script.
 ECHO Gebruik: xivid.bat [optie] url
 ECHO.
-ECHO   -f ID    Forceer specifiek formaat. Zonder opgave wordt het best
-ECHO            beschikbare formaat gekozen.
-ECHO   -i       Toon video informatie, incl. een opsomming van alle
-ECHO            beschikbare formaten.
-ECHO   -j       Toon video informatie als JSON.
+ECHO   -f ID[+ID]    Selecteer specifiek formaat, of specifieke formaten.
+ECHO                 Met een ID dat eindigt op een '#' wordt het formaat
+ECHO                 met het hoogste nummer geselecteerd.
+ECHO                 Zonder opgave wordt het formaat met de hoogste
+ECHO                 resolutie en/of bitrate geselecteerd.
+ECHO   -i            Toon video informatie, incl. een opsomming van alle
+ECHO                 beschikbare formaten.
+ECHO   -j            Toon video informatie als JSON.
 ECHO.
 ECHO Ondersteunde websites:
 ECHO   npostart.nl             omropfryslan.nl       omroepwest.nl
@@ -48,7 +51,7 @@ ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
 ECHO   xivid.bat -i https://www.rtl.nl/video/26862f08-13c0-31d2-9789-49a3b286552d
-ECHO   xivid.bat -f hls-6 https://www.kijk.nl/video/jCimXJk75RP
+ECHO   xivid.bat -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EXIT /B
 
 :npo
@@ -1221,9 +1224,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 )
 
 IF EXIST xivid.json (
-  FOR /F "delims=" %%A IN ('xidel xivid.json -e "fmts:=string-join($json/(formats)()/id)" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('xidel xivid.json -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd') DO %%A
 ) ELSE IF DEFINED json (
-  FOR /F "delims=" %%A IN ('ECHO %json% ^| xidel - -e "fmts:=string-join($json/(formats)()/id)" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('ECHO %json% ^| xidel - -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd') DO %%A
 ) ELSE (
   ECHO xivid: geen video^(-informatie^) beschikbaar.
   EXIT /B 1
@@ -1231,16 +1234,38 @@ IF EXIST xivid.json (
 IF DEFINED f (
   IF DEFINED fmts (
     SETLOCAL ENABLEDELAYEDEXPANSION
-    IF NOT "!fmts:%f%=!"=="!fmts!" (
-      IF EXIST xivid.json (
-        xidel xivid.json -e "$json/(formats)()[id='%f%']/url"
-      ) ELSE IF DEFINED json (
-        ECHO %json% | xidel - -e "$json/(formats)()[id='%f%']/url"
+    FOR %%A IN (%f:+= %) DO (
+      SET _f=%%A
+      IF "!_f:~-1!"=="#" (
+        CALL SET _fmts=%%fmts:!_f:~0,-1!=%%
+        IF "%fmts%"=="!_fmts!" (
+          ECHO xivid: formaat id '!_f!' ongeldig.
+          EXIT /B 1
+        )
+      ) ELSE (
+        CALL SET _fmts=%%fmts:!_f!=%%
+        IF "%fmts%"=="!_fmts!" (
+          ECHO xivid: formaat id '!_f!' ongeldig.
+          EXIT /B 1
+        )
       )
+    )
+    IF EXIST xivid.json (
+      xidel xivid.json -e ^"^
+        for $x in tokenize^('%f%'^,'\+'^) return^
+        if ^(ends-with^($x^,'#'^)^) then^
+          $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
+        else^
+          $json/^(formats^)^(^)[id^=$x]/url^
+      "
     ) ELSE (
-      ECHO xivid: formaat id ongeldig.
-      IF EXIST xivid.json DEL xivid.json
-      EXIT /B 1
+      ECHO %json% | xidel - -e ^"^
+        for $x in tokenize^('%f%'^,'\+'^) return^
+        if ^(ends-with^($x^,'#'^)^) then^
+          $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
+        else^
+          $json/^(formats^)^(^)[id^=$x]/url^
+      "
     )
   ) ELSE (
     ECHO xivid: geen video beschikbaar.
@@ -1250,19 +1275,19 @@ IF DEFINED f (
 ) ELSE IF DEFINED i (
   IF EXIST xivid.json (
     xidel xivid.json -e "xivid:info($json)"
-  ) ELSE IF DEFINED json (
+  ) ELSE (
     ECHO %json% | xidel - -e "xivid:info($json)"
   )
 ) ELSE IF DEFINED j (
   IF EXIST xivid.json (
     xidel xivid.json -e "$json"
-  ) ELSE IF DEFINED json (
+  ) ELSE (
     ECHO %json% | xidel - -e "$json"
   )
 ) ELSE IF DEFINED fmts (
   IF EXIST xivid.json (
     xidel xivid.json -e "$json/(formats)()[last()]/url"
-  ) ELSE IF DEFINED json (
+  ) ELSE (
     ECHO %json% | xidel - -e "$json/(formats)()[last()]/url"
   )
 ) ELSE (

@@ -1,4 +1,4 @@
-#### Xivid, een Windows en Linux video-url extractie commandoregel-script.
+### Xivid, een Windows en Linux video-url extractie commandoregel-script.
 
 - [Download](#download)
 - [Gebruik en opties](#gebruik-en-opties)
@@ -20,11 +20,14 @@ Of download de [tarball](https://github.com/Reino17/xivid/archive/master.zip).
 Gebruik (Windows): xivid.bat [optie] url
 Gebruik (Linux): ./xivid.sh [optie] url
 
-  -f ID    Forceer specifiek formaat. Zonder opgave wordt het best
-           beschikbare formaat gekozen.
-  -i       Toon video informatie, incl. een opsomming van alle
-           beschikbare formaten.
-  -j       Toon video informatie als JSON.
+  -f ID[+ID]    Selecteer specifiek formaat, of specifieke formaten.
+                Met een ID dat eindigt op een '#' wordt het formaat
+                met het hoogste nummer geselecteerd.
+                Zonder opgave wordt het formaat met de hoogste
+                resolutie en/of bitrate geselecteerd.
+  -i            Toon video informatie, incl. een opsomming van alle
+                beschikbare formaten.
+  -j            Toon video informatie als JSON.
 ```
 Deze websites worden op dit moment ondersteund:
 ```
@@ -48,11 +51,12 @@ Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekenin
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
 
 ## Voorbeelden
-Zonder optie geeft Xivid de video-url van het "beste" formaat:
+Zonder optie geeft Xivid de video-url van de video met de hoogste resolutie en/of bitrate:
 ```bat
 xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
-https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=1109000.m3u8
+https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03375558_v4-audio=128000-video=1109000.m3u8
 ```
+Met `-i` wordt video informatie getoond, incl. een opsomming van alle beschikbare formaten:
 ```sh
 ./xivid.sh -i https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
 Naam:      NOS Journaal 20.00 uur
@@ -68,10 +72,14 @@ Formaten:  id     formaat         taal  resolutie  bitrate
            hls-5  m3u8[h264+aac]        768x432    707|128kbps
            hls-6  m3u8[h264+aac]        1024x576   1109|128kbps (best)
 ```
-Gebruik `-f` voor een ander gewenst formaat:
+Met `-f` kun je een ander gewenst formaat, of meerdere formaten tegelijk, selecteren. Eindigt het `ID` op een '#', dan wordt het formaat met het hoogste nummer geselecteerd:
 ```bat
 xivid.bat -f hls-4 https://www.npostart.nl/POW_03375558
-https://pedgewarea28b.video.kpnstreaming.nl/session/7225c984-4daf-11e9-9f58-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/POW_03375558_v4-audio=128000-video=506000.m3u8
+https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03375558_v4-audio=128000-video=506000.m3u8
+
+xivid.bat -f hls-#+sub-1 https://www.npostart.nl/POW_03375558
+https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03375558_v4-audio=128000-video=1109000.m3u8
+https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt
 ```
 (Het 20:00u NOS Journaal van 28-02-2017 in dit voorbeeld is het laatste onversleutelde NOS Journaal. Alle uitzendingen daarna (en waarschijnlijk alle video's op npostart.nl vanaf 01-03-2017) zijn versleuteld en beveiligd met DRM en zijn daardoor niet te downloaden.)
 
@@ -189,14 +197,14 @@ xivid.bat -j https://www.npostart.nl/POMS_NOS_7332477
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/playlist.m3u8"
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/playlist.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "64kbps",
-      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=64000.m3u8"
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03373320_v4-audio=64000.m3u8"
     },
     [...]
     {
@@ -204,12 +212,12 @@ xivid.bat -j https://www.npostart.nl/POMS_NOS_7332477
       "format": "m3u8[h264+aac]",
       "resolution": "1024x576",
       "bitrate": "1027|128kbps",
-      "url": "https://nl-ams-p6-am5.cdn.streamgate.nl/[...]/vod/npo/usp/npo/hls_unencrypted/POW_03373320/POW_03373320_v4.ism/POW_03373320_v4-audio=128000-video=1027000.m3u8"
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03373320_v4-audio=128000-video=1027000.m3u8"
     }
   ]
 }
 ```
-Met Xidel, of elk ander programma dat goed met JSONs overweg kan, kun je hier zo de ondertiteling-url uit halen.  
+Met Xidel, of elk ander programma met goede ondersteuning voor JSON, kun je hier zo de ondertiteling-url uit halen.  
 De uiteindelijke FFmpeg commando wordt dan:
 ```
 ffmpeg -ss 540 -i <video-url> -ss 540 -i <ondertiteling-url> -ss 2 -t 65 -c copy -c:s srt -metadata:s:s language=dut <bestandsnaam>.mkv
