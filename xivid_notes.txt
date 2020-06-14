@@ -3445,6 +3445,78 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/vide
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+$ url=https://www.kijk.nl/programmas/wegmisbruikers/C5IYffeeRR8/seizoen/122814504378/afleveringen/video/empty_episode-wegmisbruikers-s25-e9-2020-03-15/NFYgzYn3Zie
+
+$ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
+{
+  "playlist": [
+    {
+      "sources": [
+        {
+          "type": "m3u8",
+          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092787824.m3u8"
+        },
+        {
+          "type": "m3u8",
+          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092788109.m3u8"
+        },
+        {
+          "type": "dash",
+          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092787824.mpd"
+        }
+      ],
+      [...]
+    }
+  ]
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"][1]/file)]}'
+{
+  "name": "SBS6: Wegmisbruikers - Aflevering 9, Seizoen 25",
+  "date": "15-03-2020",
+  "duration": "00:39:50",
+  "expdate": "15-03-2022 22:30:55",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Doven en Slechthorenden",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/91962201-b5c8-4429-8f61-a92ebef90c86/Wegmisbruikers_Season_25_Episode_9-webvtt-sd.vtt"
+    },
+    {
+      "id": "sub-2",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/91962201-b5c8-4429-8f61-a92ebef90c86/Wegmisbruikers_Season_25_Episode_9-webvtt-nl.vtt"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092787824.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": "160kbps",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/Wegmisbruikers_Season_25_Episode_9-index-audio=160000.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-7",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "6001|160kbps",
+      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/Wegmisbruikers_Season_25_Episode_9-index-audio=160000-video=6001371.m3u8"
+    }
+  ]
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 $ url=https://www.kijk.nl/films/video/the-talented-mr-ripley/H5ivILBO1SI
 
 $ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
@@ -3531,9 +3603,9 @@ $ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.
   [...]
 }
 
-(sources)()[not(drm) and type="m3u8"]/file om met DRM beveiligde/versleutelde video's er uit te filteren:
+(sources)()[not(drm) and type="m3u8"][1]/file om met DRM beveiligde/versleutelde video's er uit te filteren:
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"]/file)]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}'
 {
   "name": "SBS9: The Talented Mr Ripley",
   "date": "31-03-2020",
@@ -3769,7 +3841,7 @@ when talking to: https://embed.kijk.nl/video/lUZSeuK1yrl
 I.t.t. de Wegmisbruikers video hier boven is deze video alleen beschikbaar via de "theplatform" api.
 try {"talpaPlayer" api} catch err:FODC0002 {"theplatform" api}. Oftewel, probeer eerst de oude methode (zo lang die nog beschikbaar is). Werkt die niet, val dan terug op de nieuwe methode:
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("https://embed.kijk.nl/video/'${url: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"]/file)]}} catch err:FODC0002 {x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("https://embed.kijk.nl/video/'${url: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}} catch err:FODC0002 {x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}}'
 {
   "name": "Kijk: 50/50 S01E53",
   "date": "01-04-2020",
@@ -3840,7 +3912,7 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("ht
           "label":label,
           "url":file
         },
-        xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"]/file)
+        xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
       ]
     }
   } catch err:FODC0002 {

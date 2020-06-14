@@ -235,7 +235,7 @@ FOR /F "delims=" %%A IN ('xidel --xquery ^"
           'label':label^,
           'url':file
         }^,
-        xivid:m3u8-to-json^(^(sources^)^(^)[not^(drm^) and type^='m3u8']/file^)
+        xivid:m3u8-to-json^(^(sources^)^(^)[not^(drm^) and type^='m3u8'][1]/file^)
       ]
     }
   } catch err:FODC0002 {
