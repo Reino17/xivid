@@ -1020,7 +1020,15 @@ pornhub() {
 }
 
 if command -v xidel >/dev/null; then
-  if [[ $(xidel --version | xidel - -se 'replace(x:lines($raw)[1],"Xidel (.+)\.","$1")') < 0.98 ]]; then
+  ver=$(xidel --version | xidel - -se 'extract($raw,"\d{8}")')
+  if [[ $ver -ge 20180421 ]]; then
+    if [[ $ver -ge 20200201 ]]; then
+      export XIDEL_OPTIONS="--silent --module=xivid.xqm --json-mode=deprecated"
+    else
+      export XIDEL_OPTIONS="--silent --module=xivid.xqm"
+    fi
+    XIDEL_UA="Mozilla/5.0 Firefox/70.0"
+  else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
 Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
@@ -1036,8 +1044,6 @@ Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
 fi
-export XIDEL_OPTIONS="--silent --module=xivid.xqm"
-XIDEL_UA="Mozilla/5.0 Firefox/70.0"
 
 while true; do
   re='^https?://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'

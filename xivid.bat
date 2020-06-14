@@ -1057,11 +1057,20 @@ EXIT /B
 SETLOCAL DISABLEDELAYEDEXPANSION
 SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
-  FOR /F "tokens=2-4 delims=. " %%B IN ('xidel --version ^| FIND "Xidel"') DO IF %%B.%%C%%D LSS 0.98 (
-    ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
-    ECHO Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
-    ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
-    EXIT /B 1
+  FOR /F "delims=(." %%B IN ('xidel --version ^| FIND "("') DO (
+    IF %%B GEQ 20180421 (
+      IF %%B GEQ 20200201 (
+        SET "XIDEL_OPTIONS=--silent --module=xivid.xqm --json-mode=deprecated"
+      ) ELSE (
+        SET "XIDEL_OPTIONS=--silent --module=xivid.xqm"
+      )
+      SET "XIDEL_UA=Mozilla/5.0 Firefox/70.0"
+    ) ELSE (
+      ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
+      ECHO Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+      ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
+      EXIT /B 1
+    )
   )
 ) ELSE (
   ECHO xivid: 'xidel.exe' niet gevonden!
@@ -1069,8 +1078,6 @@ FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
   EXIT /B 1
 )
-SET "XIDEL_OPTIONS=--silent --module=xivid.xqm"
-SET "XIDEL_UA=Mozilla/5.0 Firefox/70.0"
 
 :options
 SET "prm1=%~1"
