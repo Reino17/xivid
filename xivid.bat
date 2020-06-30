@@ -37,7 +37,7 @@ ECHO   gemi.st                 rtvnoord.nl           rijnmond.nl
 ECHO   nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
 ECHO   tvblik.nl               nhnieuws.nl           omroepgelderland.nl
 ECHO   uitzendinggemist.net    at5.nl                omroepzeeland.nl
-ECHO   rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
+ECHO   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
 ECHO   kijk.nl                 rtvoost.nl            l1.nl
 ECHO.
 ECHO   dumpert.nl              vimeo.com
@@ -50,7 +50,7 @@ ECHO   youtu.be
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
-ECHO   xivid.bat -i https://www.rtl.nl/video/26862f08-13c0-31d2-9789-49a3b286552d
+ECHO   xivid.bat -i https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724-9a6f-91de543b8a4c
 ECHO   xivid.bat -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EXIT /B
 
@@ -1158,8 +1158,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :tvblik "%url%"
 ) ELSE IF NOT "%url:uitzendinggemist.net=%"=="%url%" (
   CALL :tvblik "%url%"
-) ELSE IF NOT "%url:rtl.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','video/([\w-]+)',1)"') DO CALL :rtl %%A
+) ELSE IF NOT "%url:rtlxl.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','.+/(.+)',1)"') DO CALL :rtl %%A
 ) ELSE IF NOT "%url:rtlnieuws.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel "%url%" -e "//@data-uuid"') DO CALL :rtl %%A
 ) ELSE IF NOT "%url:kijk.nl=%"=="%url%" (

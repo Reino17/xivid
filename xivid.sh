@@ -38,7 +38,7 @@ Ondersteunde websites:
   nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
   tvblik.nl               nhnieuws.nl           omroepgelderland.nl
   uitzendinggemist.net    at5.nl                omroepzeeland.nl
-  rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
+  rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
   dumpert.nl              vimeo.com
@@ -51,7 +51,7 @@ Ondersteunde websites:
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
-  ./xivid.sh -i https://www.rtl.nl/video/26862f08-13c0-31d2-9789-49a3b286552d
+  ./xivid.sh -i https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724-9a6f-91de543b8a4c
   ./xivid.sh -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EOF
 }
@@ -1135,8 +1135,8 @@ elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
       )
     )
   ')"
-elif [[ $url =~ rtl.nl ]]; then
-  rtl "$(xidel -e 'extract("'$url'","video/([\w-]+)",1)')"
+elif [[ $url =~ rtlxl.nl ]]; then
+  rtl "$(xidel -e 'extract("'$url'",".+/(.+)",1)')"
 elif [[ $url =~ rtlnieuws.nl ]]; then
   rtl "$(xidel "$url" -e '//@data-uuid')"
 elif [[ $url =~ kijk.nl ]]; then

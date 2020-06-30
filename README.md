@@ -36,7 +36,7 @@ Deze websites worden op dit moment ondersteund:
   nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
   tvblik.nl               nhnieuws.nl           omroepgelderland.nl
   uitzendinggemist.net    at5.nl                omroepzeeland.nl
-  rtl.nl                  omroepflevoland.nl    omroepbrabant.nl
+  rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
   dumpert.nl              vimeo.com
