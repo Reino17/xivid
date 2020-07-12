@@ -1023,7 +1023,7 @@ pornhub() {
 }
 
 if command -v xidel >/dev/null; then
-  ver=$(xidel --version | xidel - -se 'extract($raw,"\d{8}")')
+  ver=$(xidel --version | xidel - -se 'substring-before(substring-after($raw,"("),".")')
   if [[ $ver -ge 20180421 ]]; then
     if [[ $ver -ge 20200201 ]]; then
       export XIDEL_OPTIONS="--silent --module=xivid.xqm --json-mode=deprecated"
