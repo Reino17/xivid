@@ -42,10 +42,10 @@ Deze websites worden op dit moment ondersteund:
   dumpert.nl              vimeo.com
   autojunk.nl             dailymotion.com
   telegraaf.nl            twitch.tv
-  ad.nl                   facebook.com
-  lc.nl                   twitter.com
-  youtube.com             pornhub.com
-  youtu.be
+  ad.nl                   mixcloud.com
+  lc.nl                   facebook.com
+  youtube.com             twitter.com
+  youtu.be                pornhub.com
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
