@@ -421,6 +421,89 @@ $ xidel -s -e 'file:write-binary("nl.png",base64Binary("iVBORw0KGgoAAAANSUhEUgAA
 
 ================================================================================================
 
+[Exclusieve disjunctie (exclusive or / xor)]
+
+Zolang Xidel de "EXPath Binary Module" (met bin:xor()) niet aan boord heeft is een zelfgemaakte functie nodig.
+Zie https://github.com/benibela/xidel/issues/54.
+
+$ echo $((33 ^ 73))
+104
+
+$ xidel -se 'let $a:=33,$b:=73 return system(x"bash -c ""printf $(({$a} ^ {$b}))""")'
+104
+
+33_10  = 0100001_2
+73_10  = 1001001_2
+         ------- XOR
+104_10 = 1101000_2 # Output is alleen 1 als input 0 én 1 of 1 én 0 is.
+
+$ xidel -se '(33,73) ! x:integer-to-base(.,2)'
+100001
+1001001
+
+$ xidel -se 'let $bin:=(33,73) ! x:integer-to-base(.,2) return $bin ! string-length()'
+6
+7
+
+$ xidel -se 'let $bin:=(33,73) ! x:integer-to-base(.,2) return max($bin ! string-length())'
+7
+
+$ xidel -se 'let $bin:=(33,73) ! x:integer-to-base(.,2),$len:=max($bin ! string-length()) return $bin ! concat(string-join((1 to $len - string-length()) ! 0),.)'
+0100001
+1001001
+
+$ xidel -se 'let $bin:=(33,73) ! x:integer-to-base(.,2),$len:=max($bin ! string-length()),$val:=$bin ! concat(string-join((1 to $len - string-length()) ! 0),.) return string-join(for $x in 1 to $len return if (substring($val[1],$x,1) eq substring($val[2],$x,1)) then 0 else 1)'
+1101000
+
+$ xidel -se 'let $bin:=(33,73) ! x:integer-to-base(.,2),$len:=max($bin ! string-length()),$val:=$bin ! concat(string-join((1 to $len - string-length()) ! 0),.) return x:integer(string-join(for $x in 1 to $len return if (substring($val[1],$x,1) eq substring($val[2],$x,1)) then 0 else 1),2)'
+104
+
+$ xidel -se 'declare function local:bin-xor($a,$b){let $bin:=($a,$b) ! x:integer-to-base(.,2),$len:=max($bin ! string-length()),$val:=$bin ! concat(string-join((1 to $len - string-length()) ! 0),.) return x:integer(string-join(for $x in 1 to $len return if (substring($val[1],$x,1) eq substring($val[2],$x,1)) then 0 else 1),2)}; local:bin-xor(33,73)'
+104
+
+------------------------------------------------------------------------------------------------
+
+$ time xidel -se 'declare function local:bin-xor($a,$b){let $bin:=($a,$b) ! x:integer-to-base(.,2),$len:=max($bin ! string-length()),$val:=$bin ! concat(string-join((1 to $len - string-length()) ! 0),.) return x:integer(string-join(for $x in 1 to $len return if (substring($val[1],$x,1) eq substring($val[2],$x,1)) then 0 else 1),2)}; ((1 to 100000) ! local:bin-xor(33,73))[1]'
+104
+
+real    0m25.563s
+user    0m0.015s
+sys     0m0.015s
+
+$ time xidel -se 'declare function local:bin-xor($a,$b){let $bin:=($a,$b) ! x:integer-to-base(.,2),$len:=max($bin ! string-length()),$val:=$bin ! concat(string-join((1 to $len - string-length()) ! 0),.),$v1:=$val[1],$v2:=$val[2] return x:integer(string-join(for $x in 1 to $len return if (substring($v1,$x,1) eq substring($v2,$x,1)) then 0 else 1),2)}; ((1 to 100000) ! local:bin-xor(33,73))[1]'
+104
+
+real    0m23.109s
+user    0m0.015s
+sys     0m0.000s
+
+let $v1:=$val[1] return substring($v1,$x,1)
+...is dus iets sneller dan...
+substring($val[1],$x,1)
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:bin-xor($a as integer,$b as integer) as integer {
+  let $bin:=($a,$b) ! x:integer-to-base(.,2),
+      $len:=max($bin ! string-length()),
+      $val:=$bin ! concat(
+        string-join((1 to $len - string-length()) ! 0),
+        .
+      ),
+      $v1:=$val[1],
+      $v2:=$val[2]
+  return
+  x:integer(
+    string-join(
+      for $x in 1 to $len return
+      if (substring($v1,$x,1) eq substring($v2,$x,1)) then 0 else 1
+    ),
+    2
+  )
+};
+
+================================================================================================
+
 [Codepoints en tekensets]
 
 https://nl.wikipedia.org/wiki/ASCII_%28tekenset%29

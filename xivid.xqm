@@ -123,6 +123,25 @@ declare function xivid:shex-to-dec ($shex as string) as integer {
     $a
 };
 
+declare function xivid:bin-xor($a as integer,$b as integer) as integer {
+  let $bin:=($a,$b) ! x:integer-to-base(.,2),
+      $len:=max($bin ! string-length()),
+      $val:=$bin ! concat(
+        string-join((1 to $len - string-length()) ! 0),
+        .
+      ),
+      $v1:=$val[1],
+      $v2:=$val[2]
+  return
+  x:integer(
+    string-join(
+      for $x in 1 to $len return
+      if (substring($v1,$x,1) eq substring($v2,$x,1)) then 0 else 1
+    ),
+    2
+  )
+};
+
 declare function xivid:info ($json as object()) as string* {
   let $a:={
         "name":"Naam:",
