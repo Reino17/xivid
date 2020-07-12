@@ -916,7 +916,7 @@ mixcloud() {
       )
     };
     let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),
-        $us:=tokenize("'$url'","/")[position() gt last() - 2]
+        $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/")
     return
     json:=x:request(
       {

@@ -8720,7 +8720,7 @@ $ xidel -s --module=xivid.xqm "https://www.dailymotion.com/player/metadata/video
 
 $ url=https://www.mixcloud.com/EricVanKleef/clubbin-12-wildfm-30-mei-2020
 
-$ xidel -se 'tokenize("'$url'","/")[position() gt last() - 2]'
+$ xidel -se 'tokenize(substring-after("'$url'","mixcloud.com/"),"/")[.]'
 EricVanKleef
 clubbin-12-wildfm-30-mei-2020
 
@@ -8784,7 +8784,7 @@ $ xidel -s \
 
 $ csrf=$(xidel -s "$url" -e 'substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";")')
 
-$ xidel -s -H "Content-Type: application/json" -H "Referer: $url" -H "X-CSRFToken: $csrf" -H "Cookie: csrftoken=$csrf" -d '{let $us:=tokenize("'$url'","/")[position() gt last() - 2] return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")}' https://www.mixcloud.com/graphql -e '$json//cloudcastLookup'
+$ xidel -s -H "Content-Type: application/json" -H "Referer: $url" -H "X-CSRFToken: $csrf" -H "Cookie: csrftoken=$csrf" -d '{let $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")}' https://www.mixcloud.com/graphql -e '$json//cloudcastLookup'
 {
   "name": "CLUBBIN #12 @WILDFM 30 MEI 2020.",
   "owner": {
@@ -8800,16 +8800,16 @@ $ xidel -s -H "Content-Type: application/json" -H "Referer: $url" -H "X-CSRFToke
   }
 }
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
--d '{let $a:=tokenize("'$url'","/")[position() gt last() - 2] return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$a[1],"\"",slug:\""",$a[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")}'
+-d '{let $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")}'
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
--d '{let $a:=tokenize("'$url'","/")[position() gt last() - 2] return serialize-json({"query":concat("{cloudcastLookup(lookup:{username:""",$a[1],""",slug:""",$a[2],"""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}")})}'
+-d '{let $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return serialize-json({"query":concat("{cloudcastLookup(lookup:{username:""",$us[1],""",slug:""",$us[2],"""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}")})}'
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
--d "{let \$a:=tokenize('$url','/')[position() gt last() - 2] return concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',\$a[1],'\\\",slug:\\\"',\$a[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}')}"
+-d "{let \$us:=tokenize(substring-after('$url','mixcloud.com/'),'/') return concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',\$us[1],'\\\",slug:\\\"',\$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}')}"
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
--d "{let \$a:=tokenize('$url','/')[position() gt last() - 2] return serialize-json({'query':concat('{cloudcastLookup(lookup:{username:\"',\$a[1],'\",slug:\"',\$a[2],'\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}')})}"
+-d "{let \$us:=tokenize(substring-after('$url','mixcloud.com/'),'/') return serialize-json({'query':concat('{cloudcastLookup(lookup:{username:\"',\$us[1],'\",slug:\"',\$us[2],'\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}')})}"
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize("'$url'","/")[position() gt last() - 2] return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
+$ xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
 {
   "name": "CLUBBIN #12 @WILDFM 30 MEI 2020.",
   "owner": {
@@ -8825,9 +8825,9 @@ $ xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[conta
   }
 }
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$a[1],"\"",slug:\""",$a[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")
+"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-"post":serialize-json({"query":concat("{cloudcastLookup(lookup:{username:""",$a[1],""",slug:""",$a[2],"""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}")})
+"post":serialize-json({"query":concat("{cloudcastLookup(lookup:{username:""",$us[1],""",slug:""",$us[2],"""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}")})
 
 ----------------------------------------------------------------
 
@@ -8836,9 +8836,9 @@ Windows:
 SET url=https://www.mixcloud.com/EricVanKleef/clubbin-12-wildfm-30-mei-2020
 FOR /F "delims=" %A IN ('xidel -s "%url%" -e "substring-before(substring-after($headers[contains(.,'csrftoken')],'='),';')"') DO SET csrf=%A
 
-xidel -s -H "Content-Type: application/json" -H "Referer: %url%" -H "X-CSRFToken: %csrf%" -H "Cookie: csrftoken=%csrf%" -d "{let $a:=tokenize('%url%','/')[position() gt last() - 2] return concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$a[1],'\\\",slug:\\\"',$a[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}')}" https://www.mixcloud.com/graphql -e "$json//cloudcastLookup"
+xidel -s -H "Content-Type: application/json" -H "Referer: %url%" -H "X-CSRFToken: %csrf%" -H "Cookie: csrftoken=%csrf%" -d "{let $us:=tokenize(substring-after('%url%','mixcloud.com/'),'/') return concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$us[1],'\\\",slug:\\\"',$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}')}" https://www.mixcloud.com/graphql -e "$json//cloudcastLookup"
 
-xidel -s "%url%" -e "let $csrf:=substring-before(substring-after($headers[contains(.,'csrftoken')],'='),';'),$us:=tokenize('%url%','/')[position() gt last() - 2] return x:request({'headers':('Content-Type: application/json','Referer: %url%','X-CSRFToken: '||$csrf,'Cookie: csrftoken='||$csrf),'post':concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$us[1],'\\\",slug:\\\"',$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}'),'url':'https://www.mixcloud.com/graphql'})/json/data/cloudcastLookup"
+xidel -s "%url%" -e "let $csrf:=substring-before(substring-after($headers[contains(.,'csrftoken')],'='),';'),$us:=tokenize(substring-after('%url%','mixcloud.com/'),'/') return x:request({'headers':('Content-Type: application/json','Referer: %url%','X-CSRFToken: '||$csrf,'Cookie: csrftoken='||$csrf),'post':concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$us[1],'\\\",slug:\\\"',$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}'),'url':'https://www.mixcloud.com/graphql'})/json/data/cloudcastLookup"
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -8968,9 +8968,9 @@ $ xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTH
 https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
 https://stream12.mixcloud.com/secure/c/m4a/64/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a?sig=FJ29cabjN0VlZe_zdXQQcw
 
-xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize("'$url'","/")[position() gt last() - 2] return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
+xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "$url" -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; declare function local:decrypt($a as base64Binary) as string {let $url:=x:cps(binary-to-string($a)),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[$i])))}; let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize("'$url'","/")[position() gt last() - 2] return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup/{"name":concat(owner/displayName," - ",name),"date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),"duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"pg-1","format":"m4a[aac]","url":local:decrypt(base64Binary(streamInfo/url))},xivid:m3u8-to-json(local:decrypt(base64Binary(streamInfo/hlsUrl)))]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated "$url" -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; declare function local:decrypt($a as base64Binary) as string {let $url:=x:cps(binary-to-string($a)),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[$i])))}; let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup/{"name":concat(owner/displayName," - ",name),"date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),"duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"pg-1","format":"m4a[aac]","url":local:decrypt(base64Binary(streamInfo/url))},xivid:m3u8-to-json(local:decrypt(base64Binary(streamInfo/hlsUrl)))]}'
 {
   "name": "Eric van Kleef - CLUBBIN #12 @WILDFM 30 MEI 2020.",
   "date": "31-05-2020",
@@ -9017,7 +9017,7 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated "$url" -e 'declare variable
     )
   };
   let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),
-      $us:=tokenize("'$url'","/")[position() gt last() - 2]
+      $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/")
   return
   x:request(
     {

@@ -937,7 +937,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
     ^)
   }^;
   let $csrf:^=substring-before^(substring-after^($headers[contains^(.^,'csrftoken'^)]^,'^='^)^,'^;'^)^,
-      $us:^=tokenize^('%~1'^,'/'^)[position^(^) gt last^(^) - 2]
+      $us:^=tokenize^(substring-after^('%~1'^,'mixcloud.com/'^)^,'/'^)
   return
   json:^=x:request^(
     {
