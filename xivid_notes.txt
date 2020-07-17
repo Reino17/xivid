@@ -7561,117 +7561,107 @@ $ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bol
 
 [facebook]
 
-https://www.facebook.com/FacebookforDevelopers/videos/422572928569998/ (https://github.com/ytdl-org/youtube-dl/issues/22777)
+$ url=https://www.facebook.com/LEGONetherlands/videos/374747990176575/   # https://nl.hardware.info/nieuws/72584/
 
-$ xidel -s "https://www.facebook.com/FacebookforDevelopers/videos/422572928569998/" -e 'json(extract(.,"\((\{bootloadable.+?)\);",1))'
+$ xidel -s "$url" -e '(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2]'   # Alleen de tweede JSON is van belang.
+{sr_revision:1002368233,bootloadable:{"XUIAmbientNUX.react":[...]dash_manifest:null,[...]
+
+Deze video heeft ook een DASH manifest, maar zonder een user-agent wordt deze niet gegenereerd.
+
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2]'
+{sr_revision:1002368233,bootloadable:{"XUIAmbientNUX.react":[...]dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
+
+$ xidel -s "$url" -e 'json((//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2])'
 Error:
-jerr:JNDY0021: Failed to parse JSON: Invalid character at line 1, pos 22864: 'x' at  (tkColon) in [...]
+jerr:JNDY0021: Failed to parse JSON: Invalid character at line 1, pos 23354: 'x' at  (tkColon) in [...]
 
-[...]{__html:"\x3Ca href=\"/FacebookforDevelopers/videos/422572928569998/?fallback=1\"[...]
-              ^positie 22864
+[...]dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
+                    ^positie 23354
 
-$ xidel -s -e 'concat("3C = ",x:integer("3C",16)," = ",x:cps(x:integer("3C",16)))'
-3C = 60 = <
+$ xidel -se 'join(("3C_16",x:integer("3C",16)||"_10",x:cps(x:integer("3C",16)))," = ")'
+3C_16 = 60_10 = <
 
-Alle tekens met codepoint 1 t/m 255 (de extended ASCII range) kunnen, ge-escaped met "\x", gecodeerd worden. Dus \x01 t/m \xFF.
-Alle tekens met codepoint 1 t/m 65535 (Unicode) kunnen, ge-escaped met "\u", gecodeerd worden. Dus \u0001 t/m \uFFFF.
-In JSON is alleen Unicode codering toegestaan. Alle "\x" moeten dus vervangen worden met "\u00".
+Alle tekens met codepoint 1 t/m 255 (Extended ASCII) dienen als "\x<hexadecimaal>" gecodeerd worden. Dus \x01 t/m \xFF.
+Alle tekens met codepoint 1 t/m 65535 (Unicode) dienen als "\u<hexadecimaal>" gecodeerd worden. Dus \u0001 t/m \uFFFF.
+In JSON is alleen Unicode codering toegestaan. Alle "\x" moeten dus vervangen worden door "\u00".
 
-$ xidel -s "https://www.facebook.com/FacebookforDevelopers/videos/422572928569998/" -e 'json(replace(extract(.,"\((\{bootloadable.+?)\);",1),"\\\x","\\\u00"))/(.//videoData)()'
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)()'   # Alleen de "videoData"-array is van belang.
 {
-  [...]
-  "subtitles_src": null,
-  "dash_manifest": null,
-  [...]
-}
-
-Alleen de "videoData"-array is van belang.
-Deze video heeft een DASH manifest en ondertiteling, maar zonder een user-agent en "Accept-Language: en-us" in de header worden deze niet gegenereerd.
-
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" -H "Accept-Language: en-us" "https://www.facebook.com/FacebookforDevelopers/videos/422572928569998/" -e '//script/extract(.,"\((\{bootloadable.+?)\);",1)[.] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)()'
-{
-  "is_hds": false,
   "is_hls": false,
-  "video_id": "422572928569998",
+  "video_id": "374747990176575",
   "is_live_stream": false,
   "is_servable_via_fbms": false,
   "rotation": 0,
   "is_facecast_audio": false,
   "content_category": "general",
   "is_low_latency": false,
-  "desired_latency_ms": 0,
+  "desired_latency_ms": null,
+  "latency_tolerance_ms": null,
   "is_predictive_dash": false,
-  "is_live_trace_enabled_on_player": true,
+  "is_live_trace_enabled_on_player": false,
   "p2p_settings": null,
-  "hd_src_no_ratelimit": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/10000000_1002899736570388_4402264400916905984_n.mp4?_nc_cat=102&efg=eyJ2ZW5jb2RlX3RhZyI6ImhkX2Zyb21fbGl2ZV9kdnJfdjIifQ%3D%3D&_nc_oc=AQlJTbUrGZj9rk3vNnbN7Kg-T5bsoZpYCv017UlyjO756uXeFtb-h822GG_xA4tdFww&_nc_ht=video.fams1-2.fna&oh=c125219d4a1a3caa5f890bee8d01cfe6&oe=5DB9E32B",
-  "aspect_ratio": 1.7777777777778,
-  "hd_src": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/10000000_1002899736570388_4402264400916905984_n.mp4?_nc_cat=102&efg=eyJybHIiOjE1MDAsInJsYSI6NDA5NiwidmVuY29kZV90YWciOiJoZF9mcm9tX2xpdmVfZHZyX3YyIn0%3D&_nc_oc=AQlJTbUrGZj9rk3vNnbN7Kg-T5bsoZpYCv017UlyjO756uXeFtb-h822GG_xA4tdFww&rl=1500&vabr=627&_nc_ht=video.fams1-2.fna&oh=c125219d4a1a3caa5f890bee8d01cfe6&oe=5DB9E32B",
-  "sd_src": "https://video.fams1-1.fna.fbcdn.net/v/t42.26565-2/10000000_2502317379806411_4490636200460149156_n.mp4?_nc_cat=107&efg=eyJ2ZW5jb2RlX3RhZyI6Im9lcF9zZCJ9&_nc_oc=AQkpum_UfQxzExyGG3K8qwkibRTVDG-WAouoNl50YM1owBwlGnC6CD-Vo3bX6LBVo4I&_nc_ht=video.fams1-1.fna&oh=c151a61cc9133a682643ae50d2fc070c&oe=5DB9E50C",
+  "ms_param": null,
+  "captions_autogenerated_indicator_config": null,
+  "sd_src_no_ratelimit": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
+  "aspect_ratio": 0.8,
+  "hd_src": "https://video.fams1-2.fna.fbcdn.net/v/t39.24130-2/107979746_304302857604709_5707354064042508309_n.mp4?[...]",
+  "sd_src": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
   "hd_tag": "oep_hd",
-  "sd_tag": "oep_sd",
+  "sd_tag": "sve_sd",
   "stream_type": "dash",
   "live_routing_token": "",
   "projection": "flat",
-  "subtitles_src": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.2093-6/59751262_423536901806934_1582467909798592512_n.srt?_nc_cat=102&_nc_oc=AQlY5eivAYuWABR4nhYVkFwjPvX9R0VFUYG5zqA_7XlVquW8jxMJBHwTdur9K-DfsxI&_nc_ht=scontent.fams1-2.fna&oh=eba7ed8a4008044e0b4a9cdc040ee478&oe=5E6377BA",
+  "subtitles_src": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]",
   "dash_manifest": "<?xml version=\"1.0\"?>\n<MPD [...]",
-  "dash_prefetched_representation_ids": ["2205652916417046v", "2415211788717397ad"],
+  "dash_prefetched_representation_ids": ["389951148633569v", "405461810413399a"],
   "player_version_overwrite": "pleasantville",
   "spherical_config": {},
   "is_spherical": false,
-  "original_height": 720,
-  "original_width": 1280,
-  "video_url": "/FacebookforDevelopers/videos/422572928569998/",
-  "is_broadcast": true,
+  "original_height": 1080,
+  "original_width": 864,
+  "video_url": "https://www.facebook.com/LEGONetherlands/videos/374747990176575/",
+  "is_broadcast": false,
   "override_config": null,
   "prefetch_cache": null
 }
 
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" -H "Accept-Language: en-us" "https://www.facebook.com/FacebookforDevelopers/videos/422572928569998/" --xquery 'let $a:=//script/extract(.,"\((\{bootloadable.+?)\);",1)[.] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)() return {"name":replace(//title,"(.+) \| (.+)","$2: $1"),"date":format-date(//code/comment() ! parse-html(.)//@data-utime * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"sub-1","format":"srt","language":"en","url":$a/subtitles_src}[url],$a/(sd_src,hd_src_no_ratelimit) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url" --xquery 'let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)() return {"name":replace(//title,"(.+) \| (.+)","$2: $1"),"date":format-date(//code/comment() ! parse-html(.)//@data-utime * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"sub-1","format":"srt","url":$a/subtitles_src}[url],$a/((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
 {
-  "name": "Facebook: Facebook for Developers - F8 2019 Day 1 Keynote",
-  "date": "30-04-2019",
-  "duration": "01:44:13",
+  "name": "Facebook: LEGO - LEGO NES",
+  "date": "14-07-2020",
+  "duration": "00:01:07",
   "formats": [
     {
       "id": "sub-1",
       "format": "srt",
-      "language": "en",
-      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.2093-6/59751262_423536901806934_1582467909798592512_n.srt?_nc_cat=102&_nc_ohc=TGnyuHab8IwAQkSLpGLj-wjDhuE3PK7tE1-rhknyTJbwh_lMWE68gcWJg&_nc_ht=scontent.fams1-2.fna&oh=1f0d1dda323d0351a75f77e4b3acb288&oe=5E8B04BA"
+      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]"
     },
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.26565-2/10000000_177043126750911_7347594175194761666_n.mp4?_nc_cat=103&efg=eyJ2ZW5jb2RlX3RhZyI6Im9lcF9zZCJ9&_nc_ohc=PVWMfuoZp8EAQnuRzu30_WQqES5iSPjwKFwVArkWh8AmbSJ7ELqOOXdag&_nc_ht=video.fams1-2.fna&oh=66b6800d20ba156bc587a6695b0f8945&oe=5DDAE7B1"
+      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]"
     },
     {
       "id": "pg-2",
       "format": "mp4[h264+aac]",
-      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/10000000_1002899736570388_4402264400916905984_n.mp4?_nc_cat=102&efg=eyJ2ZW5jb2RlX3RhZyI6ImhkX2Zyb21fbGl2ZV9kdnJfdjIifQ==&_nc_ohc=GY3tFj3wtLEAQk9YJ-xiMm9KiPadAgxlTThvSsTDcZJlWfnB4pWHCed8A&_nc_ht=video.fams1-2.fna&oh=d3b6c8d551ba3f507ba5276d772eb00c&oe=5DDAE6BB"
+      "url": "https://video.fams1-2.fna.fbcdn.net/v/t39.24130-2/107979746_304302857604709_5707354064042508309_n.mp4?[...]"
     },
     {
       "id": "dash-1",
       "format": "mp4[aac]",
       "resolution": null,
       "samplerate": "48kHz",
-      "bitrate": "49kbps",
-      "url": "https://scontent.fams1-1.fna.fbcdn.net/v/t42.1790-29/10000000_2415211812050728_930308041075589120_n.mp4?_nc_cat=106&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjNfNDI2X2NyZl8yM19tYWluXzMuMF9mcmFnXzJfYXVkaW9fZnJvbV9saXZlX2R2cl92MiJ9&_nc_ohc=_xQHp87Z784AQlvkm3xD9IdRnhyh2n75otZg2nwBa68kfACAITDYEuz1g&_nc_ht=scontent.fams1-1.fna&oh=70eff97eb04440bb2564b2eba186de1d&oe=5DDAECAB"
-    },
-    {
-      "id": "dash-2",
-      "format": "mp4[h264]",
-      "resolution": "256x144",
-      "samplerate": null,
-      "bitrate": "62kbps",
-      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t42.1790-29/10000000_296431131259585_5219526390205906944_n.mp4?_nc_cat=101&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjNfMjU2X2NyZl8yM19tYWluXzMuMF9mcmFnXzJfdmlkZW9fZnJvbV9saXZlX2R2cl92MiJ9&_nc_ohc=eO5F9LD_ckgAQmPvg-XSr52atyQRoMPyDO_MhGy5rJdl6nphH5Y3G6GHA&_nc_ht=scontent.fams1-2.fna&oh=6a5c7749833f3b5f49e1b930de4d955b&oe=5DDAEB25"
+      "bitrate": "65kbps",
+      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.1790-2/109281327_405461813746732_178858496964516997_n.mp4?[...]"
     },
     [...]
     {
-      "id": "dash-6",
+      "id": "dash-5",
       "format": "mp4[h264]",
-      "resolution": "1280x720",
+      "resolution": "720x900",
       "samplerate": null,
-      "bitrate": "899kbps",
-      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t42.9040-29/10000000_2205653056417032_7032901577312567296_n.mp4?_nc_cat=105&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjNfMTI4MF9jcmZfMjNfaGlnaF8zLjFfZnJhZ18yX3ZpZGVvX2Zyb21fbGl2ZV9kdnJfdjIifQ==&_nc_ohc=nZeljlMIgawAQnPni8FOmLdO4HkS5RUsPKl5JHRZ8bKjWJwe1lfZgvuKQ&_nc_ht=scontent.fams1-2.fna&oh=09b22d25d142df5e6c4f5fe62012afae&oe=5DDAE940"
+      "bitrate": "414kbps",
+      "url": "https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/109304628_605794363632964_2667690113915675475_n.mp4?[...]"
     }
   ]
 }
@@ -7679,10 +7669,9 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" -H "Accept-Language: en-us" "
 ------------------------------------------------------------------------------------------------
 
 --xquery '
-  let $a:=//script/extract(.,"\((\{bootloadable.+?)\);",1)[.] ! json(
+  let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(
     replace(.,"\\\x","\\\u00")
-  )/(.//videoData)()
-  return {
+  )/(.//videoData)() return {
     "name":replace(//title,"(.+) \| (.+)","$2: $1"),
     "date":format-date(
       //code/comment() ! parse-html(.)//@data-utime * duration("PT1S") +
@@ -7697,10 +7686,12 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" -H "Accept-Language: en-us" "
       {
         "id":"sub-1",
         "format":"srt",
-        "language":"en",
         "url":$a/subtitles_src
       }[url],
-      $a/(sd_src,hd_src_no_ratelimit) ! {
+      $a/(
+        (sd_src_no_ratelimit,sd_src)[.][1],
+        (hd_src_no_ratelimit,hd_src)[.][1]
+      ) ! {
         "id":"pg-"||position(),
         "format":"mp4[h264+aac]",
         "url":uri-decode(.)
@@ -7713,7 +7704,9 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" -H "Accept-Language: en-us" "
         "format":concat(
           substring-after($x/@mimeType,"/"),
           "[",
-          extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),
+          extract($x/@codecs,"(^[\w]+)",1) ! (
+            if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .
+          ),
           "]"
         ),
         "resolution":$x/@width ! concat(.,"x",$x/@height),

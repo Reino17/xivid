@@ -981,8 +981,8 @@ EXIT /B
 
 :facebook
 CALL :timezone
-FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" -H "Accept-Language: en-us" "%~1" --xquery ^"
-  let $a:^=//script/extract^(.^,'\^(^(\{bootloadable.+?^)\^)^;'^,1^)[.] ! json^(
+FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
+  let $a:^=^(//script/substring-before^(substring-after^(.^,'onPageletArrive^('^)^,'^)^;}^)^)^;'^)[.]^)[2] ! json^(
     replace^(.^,'\\x'^,'\\u00'^)
   ^)/^(.//videoData^)^(^) return
   json:^={
@@ -1002,7 +1002,10 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" -H "Accept-Language: e
         'language':'en'^,
         'url':$a/subtitles_src
       }[url]^,
-      $a/^(sd_src^,hd_src_no_ratelimit^) ! {
+      $a/^(
+        ^(sd_src_no_ratelimit^,sd_src^)[.][1]^,
+        ^(hd_src_no_ratelimit^,hd_src^)[.][1]
+      ^) ! {
         'id':'pg-'^|^|position^(^)^,
         'format':'mp4[h264+aac]'^,
         'url':uri-decode^(.^)
@@ -1015,7 +1018,9 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" -H "Accept-Language: e
         'format':concat^(
           substring-after^($x/@mimeType^,'/'^)^,
           '['^,
-          extract^($x/@codecs^,'^(^^[\w]+^)'^,1^) ! ^(if ^(.^='avc1'^) then 'h264' else if ^(.^='mp4a'^) then 'aac' else .^)^,
+          extract^($x/@codecs^,'^(^^[\w]+^)'^,1^) ! ^(
+            if ^(.^='avc1'^) then 'h264' else if ^(.^='mp4a'^) then 'aac' else .
+          ^)^,
           ']'
         ^)^,
         'resolution':$x/@width ! concat^(.^,'x'^,$x/@height^)^,
