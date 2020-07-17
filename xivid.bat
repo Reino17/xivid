@@ -979,6 +979,50 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
+:soundcloud
+FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
+  let $cid:^=substring^(
+        substring-after^(
+          unparsed-text^(//script[@crossorigin][last^(^)]/@src^)^,
+          'client_id:'
+        ^)^,
+        2^,32
+      ^)^,
+      $a:^=json^(//script/extract^(.^,'^(\[\{.+^)\^)'^,1^)[.]^)^(^)[.//media]/^(data^)^(^)^,
+      $b:^=^($a//transcodings^)^(^)
+  return
+  json:^=$a/{
+    'name':concat^(user/^(full_name^,username^)[.][1]^,' - '^,title^)^,
+    'date':format-date^(dateTime^(created_at^)^,'[D01]-[M01]-[Y]'^)^,
+    'duration':format-time^(
+      round^(duration div 1000^) * duration^('PT1S'^)^,
+      '[H01]:[m01]:[s01]'
+    ^)^,
+    'format':[
+      $b[format/protocol^='progressive']/^(
+        let $url:^=json^(concat^(url^,'?client_id^='^,$cid^)^)/url return {
+          'id':'pg-1'^,
+          'format':substring-before^(preset^,'_'^)^,
+          'bitrate':extract^($url^,'\.^(\d+^)\.'^,1^)^|^|'kbps'^,
+          'url':$url
+        }
+      ^)^,
+      for $x at $i in $b
+      where $x/format/protocol^='hls'
+      order by $x/preset descending
+      count $i
+      let $url:^=json^(concat^($x/url^,'?client_id^='^,$cid^)^)/url
+      return {
+        'id':'hls-'^|^|$i^,
+        'format':concat^('m3u8['^,substring-before^($x/preset^,'_'^)^,']'^)^,
+        'bitrate':extract^($url^,'\.^(\d+^)\.'^,1^)^|^|'kbps'^,
+        'url':$url
+      }
+    ]
+  }
+^" --output-format^=cmd') DO %%A
+EXIT /B
+
 :facebook
 CALL :timezone
 FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
@@ -1281,6 +1325,8 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   CALL :twitch "%url%"
 ) ELSE IF NOT "%url:mixcloud.com=%"=="%url%" (
   CALL :mixcloud "%url%"
+) ELSE IF NOT "%url:soundcloud.com=%"=="%url%" (
+  CALL :soundcloud "%url%"
 ) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
   CALL :facebook "%url%"
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (

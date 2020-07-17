@@ -9050,3 +9050,230 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated "$url" -e 'declare variable
     ]
   }
 '
+
+================================================================================================
+
+[soundcloud]
+
+$ url=https://soundcloud.com/laidbackluke/laidback-luke-dj-set-live-at
+
+$ xidel -s "$url" -e 'json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(data)()'
+{
+  "comment_count": 675,
+  "full_duration": 3610982,
+  "downloadable": true,
+  "created_at": "2012-11-05T10:53:55Z",
+  "description": "",
+  "media": {
+    "transcodings": [
+      {
+        "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/hls",
+        "preset": "mp3_0_0",
+        "duration": 3610982,
+        "snipped": false,
+        "format": {
+          "protocol": "hls",
+          "mime_type": "audio/mpeg"
+        },
+        "quality": "sq"
+      },
+      {
+        "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/progressive",
+        "preset": "mp3_0_0",
+        "duration": 3610982,
+        "snipped": false,
+        "format": {
+          "protocol": "progressive",
+          "mime_type": "audio/mpeg"
+        },
+        "quality": "sq"
+      },
+      {
+        "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/354da271-3480-4c98-8b3d-8729d4014a9d/stream/hls",
+        "preset": "opus_0_0",
+        "duration": 3610982,
+        "snipped": false,
+        "format": {
+          "protocol": "hls",
+          "mime_type": "audio/ogg; codecs=\"opus\""
+        },
+        "quality": "sq"
+      }
+    ]
+  },
+  "title": "Laidback Luke DJ set Live At Escape From Wonderland Oct 2012",
+  "publisher_metadata": null,
+  "duration": 3610982,
+  "has_downloads_left": true,
+  "artwork_url": "https://i1.sndcdn.com/artworks-000033583042-nk61e0-large.jpg",
+  "public": true,
+  "streamable": true,
+  "tag_list": "",
+  "genre": "DJ Mix",
+  "id": 66196563,
+  "reposts_count": 1068,
+  "state": "finished",
+  "label_name": "",
+  "last_modified": "2020-02-26T06:13:28Z",
+  "commentable": true,
+  "policy": "MONETIZE",
+  "visuals": null,
+  "kind": "track",
+  "purchase_url": null,
+  "sharing": "public",
+  "uri": "https://api.soundcloud.com/tracks/66196563",
+  "secret_token": null,
+  "download_count": 19606,
+  "likes_count": 7306,
+  "urn": "soundcloud:tracks:66196563",
+  "license": "cc-by",
+  "purchase_title": null,
+  "display_date": "2012-11-05T10:53:55Z",
+  "embeddable_by": "all",
+  "release_date": null,
+  "user_id": 236295,
+  "monetization_model": "BLACKBOX",
+  "waveform_url": "https://wave.sndcdn.com/gF2U20J9lZfU_m.json",
+  "permalink": "laidback-luke-dj-set-live-at",
+  "permalink_url": "https://soundcloud.com/laidbackluke/laidback-luke-dj-set-live-at",
+  "user": {
+    "avatar_url": "https://i1.sndcdn.com/avatars-000332190570-lfp2jp-large.jpg",
+    "city": "",
+    "comments_count": 69,
+    "country_code": "NL",
+    "created_at": "2009-08-31T23:58:14Z",
+    "creator_subscriptions": [
+      {
+        "product": {
+          "id": "creator-pro-unlimited"
+        }
+      }
+    ],
+    "creator_subscription": {
+      "product": {
+        "id": "creator-pro-unlimited"
+      }
+    },
+    "description": "",
+    "followers_count": 428519,
+    "followings_count": 9,
+    "first_name": "Laidback",
+    "full_name": "Laidback Luke",
+    "groups_count": 0,
+    "id": 236295,
+    "kind": "user",
+    "last_modified": "2020-06-26T10:26:41Z",
+    "last_name": "Luke",
+    "likes_count": 49,
+    "playlist_likes_count": 8,
+    "permalink": "laidbackluke",
+    "permalink_url": "https://soundcloud.com/laidbackluke",
+    "playlist_count": 92,
+    "reposts_count": null,
+    "track_count": 375,
+    "uri": "https://api.soundcloud.com/users/236295",
+    "urn": "soundcloud:users:236295",
+    "username": "LaidbackLuke",
+    "verified": false,
+    "visuals": {
+      "urn": "soundcloud:users:236295",
+      "enabled": true,
+      "visuals": [
+        {
+          "urn": "soundcloud:visuals:102511671",
+          "entry_time": 0,
+          "visual_url": "https://i1.sndcdn.com/visuals-000000236295-JBYMVN-original.jpg"
+        }
+      ],
+      "tracking": null
+    }
+  },
+  "playback_count": 319259
+}
+
+$ xidel -s "$url" -e '//script[@crossorigin][last()]/@src'
+https://a-v2.sndcdn.com/assets/46-4d78cbe8-3.js
+
+$ xidel -s "$url" -e 'substring(substring-after(unparsed-text(//script[@crossorigin][last()]/@src),"client_id:"),2,32)'
+rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
+
+$ xidel -s "$url" -e 'let $cid:=substring(substring-after(unparsed-text(//script[@crossorigin][last()]/@src),"client_id:"),2,32) return json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(.//transcodings)()/concat(url,"?client_id=",$cid)'
+https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/hls?client_id=rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
+https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/progressive?client_id=rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
+https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/354da271-3480-4c98-8b3d-8729d4014a9d/stream/hls?client_id=rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
+
+$ xidel -s "$url" -e 'let $cid:=substring(substring-after(unparsed-text(//script[@crossorigin][last()]/@src),"client_id:"),2,32) return json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(.//transcodings)()/json(concat(url,"?client_id=",$cid))/url'
+https://cf-hls-media.sndcdn.com/playlist/gF2U20J9lZfU.128.mp3/playlist.m3u8?[...]
+https://cf-media.sndcdn.com/gF2U20J9lZfU.128.mp3?[...]
+https://cf-hls-opus-media.sndcdn.com/playlist/gF2U20J9lZfU.64.opus/playlist.m3u8?[...]
+
+$ xidel -s --json-mode=deprecated "$url" --xquery 'let $cid:=substring(substring-after(unparsed-text(//script[@crossorigin][last()]/@src),"client_id:"),2,32),$a:=json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(data)(),$b:=($a//transcodings)() return $a/{"name":concat(user/(full_name,username)[.][1]," - ",title),"date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),"duration":format-time(round(duration div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"format":[$b[format/protocol="progressive"]/(let $url:=json(concat(url,"?client_id=",$cid))/url return {"id":"pg-1","format":substring-before(preset,"_"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}),for $x at $i in $b where $x/format/protocol="hls" order by $x/preset descending count $i let $url:=json(concat($x/url,"?client_id=",$cid))/url return {"id":"hls-"||$i,"format":concat("m3u8[",substring-before($x/preset,"_"),"]"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}]}'
+{
+  "name": "Laidback Luke - Laidback Luke DJ set Live At Escape From Wonderland Oct 2012",
+  "date": "05-11-2012",
+  "duration": "01:00:11",
+  "format": [
+    {
+      "id": "pg-1",
+      "format": "mp3",
+      "bitrate": "128kbps",
+      "url": "https://cf-media.sndcdn.com/gF2U20J9lZfU.128.mp3?[...]"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[opus]",
+      "bitrate": "64kbps",
+      "url": "https://cf-hls-opus-media.sndcdn.com/playlist/gF2U20J9lZfU.64.opus/playlist.m3u8?[...]"
+    },
+    {
+      "id": "hls-2",
+      "format": "m3u8[mp3]",
+      "bitrate": "128kbps",
+      "url": "https://cf-hls-media.sndcdn.com/playlist/gF2U20J9lZfU.128.mp3/playlist.m3u8?[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+--xquery '
+  let $cid:=substring(
+        substring-after(
+          unparsed-text(//script[@crossorigin][last()]/@src),
+          "client_id:"
+        ),
+        2,32
+      ),
+      $a:=json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(data)(),
+      $b:=($a//transcodings)()
+  return
+  $a/{
+    "name":concat(user/(full_name,username)[.][1]," - ",title),
+    "date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),
+    "duration":format-time(
+      round(duration div 1000) * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "format":[
+      $b[format/protocol="progressive"]/(
+        let $url:=json(concat(url,"?client_id=",$cid))/url return {
+          "id":"pg-1",
+          "format":substring-before(preset,"_"),
+          "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
+          "url":$url
+        }
+      ),
+      for $x at $i in $b
+      where $x/format/protocol="hls"
+      order by $x/preset descending
+      count $i
+      let $url:=json(concat($x/url,"?client_id=",$cid))/url
+      return {
+        "id":"hls-"||$i,
+        "format":concat("m3u8[",substring-before($x/preset,"_"),"]"),
+        "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
+        "url":$url
+      }
+    ]
+  }
+'

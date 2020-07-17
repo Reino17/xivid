@@ -958,6 +958,50 @@ mixcloud() {
   ' --output-format=bash)"
 }
 
+soundcloud() {
+  eval "$(xidel "$1" --xquery '
+    let $cid:=substring(
+          substring-after(
+            unparsed-text(//script[@crossorigin][last()]/@src),
+            "client_id:"
+          ),
+          2,32
+        ),
+        $a:=json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(data)(),
+        $b:=($a//transcodings)()
+    return
+    json:=$a/{
+      "name":concat(user/(full_name,username)[.][1]," - ",title),
+      "date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),
+      "duration":format-time(
+        round(duration div 1000) * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "format":[
+        $b[format/protocol="progressive"]/(
+          let $url:=json(concat(url,"?client_id=",$cid))/url return {
+            "id":"pg-1",
+            "format":substring-before(preset,"_"),
+            "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
+            "url":$url
+          }
+        ),
+        for $x at $i in $b
+        where $x/format/protocol="hls"
+        order by $x/preset descending
+        count $i
+        let $url:=json(concat($x/url,"?client_id=",$cid))/url
+        return {
+          "id":"hls-"||$i,
+          "format":concat("m3u8[",substring-before($x/preset,"_"),"]"),
+          "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
+          "url":$url
+        }
+      ]
+    }
+  ' --output-format=bash)"
+}
+
 facebook() {
   eval "$(xidel --user-agent="$XIDEL_UA" "$1" --xquery '
     let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(
@@ -1237,6 +1281,8 @@ elif [[ $url =~ twitch.tv ]]; then
   twitch "$url"
 elif [[ $url =~ mixcloud.com ]]; then
   mixcloud "$url"
+elif [[ $url =~ soundcloud.com ]]; then
+  soundcloud "$url"
 elif [[ $url =~ facebook.com ]]; then
   facebook "$url"
 elif [[ $url =~ twitter.com ]]; then
