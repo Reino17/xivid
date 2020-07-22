@@ -998,7 +998,7 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
       round^(duration div 1000^) * duration^('PT1S'^)^,
       '[H01]:[m01]:[s01]'
     ^)^,
-    'format':[
+    'formats':[
       $b[format/protocol^='progressive']/^(
         let $url:^=json^(concat^(url^,'?client_id^='^,$cid^)^)/url return {
           'id':'pg-1'^,

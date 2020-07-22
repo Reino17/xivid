@@ -9207,12 +9207,12 @@ https://cf-hls-media.sndcdn.com/playlist/gF2U20J9lZfU.128.mp3/playlist.m3u8?[...
 https://cf-media.sndcdn.com/gF2U20J9lZfU.128.mp3?[...]
 https://cf-hls-opus-media.sndcdn.com/playlist/gF2U20J9lZfU.64.opus/playlist.m3u8?[...]
 
-$ xidel -s --json-mode=deprecated "$url" --xquery 'let $cid:=substring(substring-after(unparsed-text(//script[@crossorigin][last()]/@src),"client_id:"),2,32),$a:=json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(data)(),$b:=($a//transcodings)() return $a/{"name":concat(user/(full_name,username)[.][1]," - ",title),"date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),"duration":format-time(round(duration div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"format":[$b[format/protocol="progressive"]/(let $url:=json(concat(url,"?client_id=",$cid))/url return {"id":"pg-1","format":substring-before(preset,"_"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}),for $x at $i in $b where $x/format/protocol="hls" order by $x/preset descending count $i let $url:=json(concat($x/url,"?client_id=",$cid))/url return {"id":"hls-"||$i,"format":concat("m3u8[",substring-before($x/preset,"_"),"]"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}]}'
+$ xidel -s --json-mode=deprecated "$url" --xquery 'let $cid:=substring(substring-after(unparsed-text(//script[@crossorigin][last()]/@src),"client_id:"),2,32),$a:=json(//script/extract(.,"(\[\{.+)\)",1)[.])()[.//media]/(data)(),$b:=($a//transcodings)() return $a/{"name":concat(user/(full_name,username)[.][1]," - ",title),"date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),"duration":format-time(round(duration div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[$b[format/protocol="progressive"]/(let $url:=json(concat(url,"?client_id=",$cid))/url return {"id":"pg-1","format":substring-before(preset,"_"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}),for $x at $i in $b where $x/format/protocol="hls" order by $x/preset descending count $i let $url:=json(concat($x/url,"?client_id=",$cid))/url return {"id":"hls-"||$i,"format":concat("m3u8[",substring-before($x/preset,"_"),"]"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}]}'
 {
   "name": "Laidback Luke - Laidback Luke DJ set Live At Escape From Wonderland Oct 2012",
   "date": "05-11-2012",
   "duration": "01:00:11",
-  "format": [
+  "formats": [
     {
       "id": "pg-1",
       "format": "mp3",
@@ -9254,7 +9254,7 @@ $ xidel -s --json-mode=deprecated "$url" --xquery 'let $cid:=substring(substring
       round(duration div 1000) * duration("PT1S"),
       "[H01]:[m01]:[s01]"
     ),
-    "format":[
+    "formats":[
       $b[format/protocol="progressive"]/(
         let $url:=json(concat(url,"?client_id=",$cid))/url return {
           "id":"pg-1",
