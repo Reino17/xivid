@@ -40,13 +40,13 @@ ECHO   uitzendinggemist.net    at5.nl                omroepzeeland.nl
 ECHO   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
 ECHO   kijk.nl                 rtvoost.nl            l1.nl
 ECHO.
-ECHO   dumpert.nl              vimeo.com
+ECHO   dumpert.nl              vimeo.com             pornhub.com
 ECHO   autojunk.nl             dailymotion.com
 ECHO   telegraaf.nl            twitch.tv
 ECHO   ad.nl                   mixcloud.com
-ECHO   lc.nl                   facebook.com
-ECHO   youtube.com             twitter.com
-ECHO   youtu.be                pornhub.com
+ECHO   lc.nl                   soundcloud.com
+ECHO   youtube.com             facebook.com
+ECHO   youtu.be                twitter.com
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558

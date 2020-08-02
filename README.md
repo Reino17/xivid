@@ -39,13 +39,13 @@ Deze websites worden op dit moment ondersteund:
   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
-  dumpert.nl              vimeo.com
+  dumpert.nl              vimeo.com             pornhub.com
   autojunk.nl             dailymotion.com
   telegraaf.nl            twitch.tv
   ad.nl                   mixcloud.com
-  lc.nl                   facebook.com
-  youtube.com             twitter.com
-  youtu.be                pornhub.com
+  lc.nl                   soundcloud.com
+  youtube.com             facebook.com
+  youtu.be                twitter.com
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
