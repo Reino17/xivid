@@ -229,10 +229,10 @@ Check of de decimale waarde groter is dan 2^31:
   $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a'
   -120
 
-$ xidel -se 'declare function local:shex-to-dec ($shex as string) as integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
+$ xidel -se 'declare function local:shex-to-dec($shex as string) as integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
 -120
 
-declare function xivid:shex-to-dec ($shex as string) as integer {
+declare function xivid:shex-to-dec($shex as string) as integer {
   let $a:=x:integer($shex),
       $b:=integer(math:pow(2,(string-length($shex) - 2) * 4))
   return
@@ -282,10 +282,10 @@ Check of de hoeveelheid bits groter is dan 31:
   $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
   -120
 
-$ xidel -se 'declare function local:shex-to-dec ($shex as string) as integer {let $a:=x:integer($shex),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
+$ xidel -se 'declare function local:shex-to-dec($shex as string) as integer {let $a:=x:integer($shex),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
 -120
 
-declare function xivid:shex-to-dec ($shex as string) as integer {
+declare function xivid:shex-to-dec($shex as string) as integer {
   let $a:=x:integer($shex),
       $b:=x:integer-to-base($a,2)
   return
@@ -686,7 +686,7 @@ ALT+<cp> voor weergave (Windows).   # ALT 128 of ALT 253.
 
 ================================================================================================
 
-[Epoch/time conversions and timezone recovery]
+[Epoch/tijd/tijdzone conversies]
 
 "The Unix epoch (or Unix time or POSIX time or Unix timestamp) is the number of seconds that have elapsed since January 1, 1970." (https://www.epochconverter.com/)
 
@@ -694,123 +694,76 @@ $ date -d 2019-07-01T01:00:00 +%s
 1561935600
 
 $ date -d @1561935600 +%FT%T
-2019-07-01T01:00:00
-$ printf '%(%FT%T)T' 1561935600
+$ printf '%(%FT%T)T\n' 1561935600
 2019-07-01T01:00:00
 
 $ date -d @1561935600 +%d-%m-%Y
-01-07-2019
-$ printf '%(%d-%m-%Y)T' 1561935600
+$ printf '%(%d-%m-%Y)T\n' 1561935600
 01-07-2019
 
 $ xidel -se '1561935600 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
-2019-06-30T23:00:00
+2019-06-30T23:00:00   # UTC tijd.
 
-$ xidel -se 'format-date(1561935600 * duration("PT1S") + date("1970-01-01"),"[D01]-[M01]-[Y]")'
-30-06-2019
+I.t.t date/printf geeft Xidel bij het converteren van epoch naar datetime de UTC tijd weer.
+Je zult dus zelf de lokale tijdzone er in moeten verwerken.
 
-Date/printf houdt rekening met de lokale tijdzone, Xidel niet natuurlijk en print de UTC tijd.
-Zomertijd in Nederland betekent UTC+2 (GMT+2), dus 2 uren erbij.
+$ date +%:z
++02:00   # UTC+2 (GMT+2), zomertijd in Nederland.
 
-$ xidel -se '1561935600 * duration("PT1S") + duration("PT2H") + dateTime("1970-01-01T00:00:00")'
-2019-07-01T01:00:00
+$ xidel -se 'time("00:00:00") - time("00:00:00'$(date +%:z)'")'   # Was nodig vóórdat implicit-timezone() werkte.
+$ xidel -se 'implicit-timezone()'   # xidel-0.9.9.7433-8b7ba70 en nieuwer.
+PT2H   # Tijdzone als dayTimeDuration().
 
-$ xidel -se 'format-date(1561935600 * duration("PT1S") + duration("PT2H") + date("1970-01-01"),"[D01]-[M01]-[Y]")'
+$ xidel -se '1561935600 * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00")'
+2019-07-01T01:00:00   # UTC+2 zonder tijdzone.
+
+----------------------------------------------------------------
+
+$ xidel -se 'adjust-dateTime-to-timezone(dateTime("1970-01-01T00:00:00"),implicit-timezone())'
+1970-01-01T00:00:00+02:00
+
+$ xidel -se '1561935600 * duration("PT1S") + implicit-timezone() + adjust-dateTime-to-timezone(dateTime("1970-01-01T00:00:00"),implicit-timezone())'
+2019-07-01T01:00:00+02:00   # UTC+2 met tijdzone.
+
+----------------------------------------------------------------
+
+$ xidel -se 'format-date(1561935600 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]")'
 01-07-2019
 
-$ xidel -se '(dateTime("2019-07-01T01:00:00") - dateTime("1970-01-01T00:00:00") - duration("PT2H")) div dayTimeDuration("PT1S")'
+$ xidel -se '(dateTime("2019-07-01T01:00:00") - dateTime("1970-01-01T00:00:00") - implicit-timezone()) div dayTimeDuration("PT1S")'
 1561935600
 
 Voor een deling is expliciet dayTimeDuration() nodig. Zie https://sourceforge.net/p/videlibri/mailman/videlibri-xidel/thread/7e952f3d-18d5-ede8-17df-8480b2594b7c%40benibela.de/#msg36722060.
 
-----------------------------------------------------------------
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Bij het weergeven van de actuele tijd is Xidel wel bewust van de tijdzone.
 
 $ xidel -se '"'$(date +%FT%T)'",current-dateTime()'
-2019-07-18T22:17:03
-2019-07-18T22:17:03.265
+2020-07-31T19:15:50
+2020-07-31T19:15:50.687+02:00
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+------------------------------------------------------------------------------------------------
 
-Bash:
+Aanroepen externe programma's:
 
 $ xidel -se 'let $a:=1561935600 return [system(x"date -d @{$a} +%FT%T")]'
 ["2019-07-01T01:00:00\n"]
-$ xidel -se 'let $a:=1561935600 return x:lines(system(x"date -d @{$a} +%FT%T"))[1]'
-2019-07-01T01:00:00
+
+$ xidel -se 'let $a:=1561935600 return [replace(system(x"date -d @{$a} +%FT%T"),"\n","")]'
+$ xidel -se 'let $a:=1561935600 return [x:lines(system(x"date -d @{$a} +%FT%T"))[1]]'
+["2019-07-01T01:00:00"]
 
 Date, zoals bijna elk programma, voegt een nieuwe regel (Unix:'\n', Windows:'\r\n') toe aan het einde.
 
-$ xidel -se 'let $a:=1561935600 return system(x"bash -c ""echo -n $(date -d @{$a} +%FT%T)""")'
-2019-07-01T01:00:00
-
-$ xidel -se 'let $a:=1561935600 return system(x"bash -c ""printf '\''%(%FT%T)T'\'' {$a}""")'
-2019-07-01T01:00:00
-
+$ xidel -se         'let $a:=1561935600 return system(x"bash -c ""echo -n $(date -d @{$a} +%FT%T)""")'
+$ xidel -se         'let $a:=1561935600 return system(x"bash -c ""printf '\''%(%FT%T)T'\'' {$a}""")'
+$ xidel -se         'let $a:=1561935600 return system(x"bash -c ""printf """"%(%FT%T)T"""" {$a}""")'
 $ xidel -s --xquery 'let $a:=1561935600 return system(x"bash -c ""printf &apos;%(%FT%T)T&apos; {$a}""")'
 2019-07-01T01:00:00
 
-Printf voegt geen nieuwe regel toe en echo met de '-n' optie evenmin.
-I.t.t. date zijn printf en echo geen programma's, maar functies van Bash, waardoor ze d.m.v. een nieuwe instantie van bash aangeroepen moeten worden.
-
-----------------------------------------------------------------
-
-$ date +%:z
-+02:00
-
-$ xidel -se 'replace("'$(date +%:z)'","\+?(\d{2}):(\d{2})","PT$1H$2M")'
-PT02H00M
-
-$ xidel -se 'let $a:=1561935600 return $a * duration("PT1S") + duration(replace("'$(date +%:z)'","\+?(\d{2}):(\d{2})","PT$1H$2M")) + dateTime("1970-01-01T00:00:00")'
-2019-07-01T01:00:00
-
-Deze methode is vergelijkbaar met http://www.xqueryfunctions.com/xq/functx_duration-from-timezone.html, maar werkt wél met tijdzones als "+05:30" (India).
----
-
-$ xidel -se 'time("00:00:00") - time("00:00:00'$(date +%:z)'")'
-PT2H
-
-$ xidel -se 'let $a:=1561935600 return $a * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00")'
-2019-07-01T01:00:00
----
-
-$ xidel -se '(time("00:00:00") - time("00:00:00'$(date +%:z)'")) div dayTimeDuration("PT1S")'
-7200
-
-$ xidel -se 'let $a:=1561935600 return ($a + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) div dayTimeDuration("PT1S")) * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
-2019-07-01T01:00:00
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-Batch:
-
-https://www.informationbuilders.com/support/developers/timezone
-
-REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias
-
-! REG.EXE VERSION 3.0
-
-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation
-    ActiveTimeBias      REG_DWORD       0xffffff88
-
-FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @ECHO %A
-of
-xidel -se "tokenize(system('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'),'\s+')[.][last()]"
-(met xidel 0.9.9 kan het zonder 'separator': tokenize(system('REG QUERY [...]'))[last()] )
-0xffffff88   # Signed 32bit Hex
-
-xidel -se "let $a:=x:integer(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]),$b:=x:integer-to-base($a,2) return if (string-length($b) lt 32) then $a else $a - integer(math:pow(2,string-length($b)))"
-xidel -s --module=xivid.xqm -e "xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()])"
--120
-
-xidel -s --module=xivid.xqm -e "xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]) * duration('-PT1M')"
-PT2H
-
-xidel -s --module=xivid.xqm -e "let $a:=1561935600,$b:=xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]) return $a * duration('PT1S') + $b * duration('-PT1M') + dateTime('1970-01-01T00:00:00')"
-of
-xidel -s --module=xivid.xqm -e "let $a:=1561935600,$b:=xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]) return ($a + $b * -60) * duration('PT1S') + dateTime('1970-01-01T00:00:00')"
-2019-07-01T01:00:00
+Printf en echo (met de '-n' optie) voegen geen nieuwe regel toe.
+I.t.t. date zijn printf en echo geen programma's, maar functies van Bash, waardoor ze d.m.v. een nieuwe aanroep van bash aangeroepen moeten worden.
 
 ------------------------------------------------------------------------------------------------
 
@@ -850,7 +803,7 @@ $ xidel -se 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","
 $ xidel -se 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return join((if ($b[1] lt 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-")'
 17-02-2019
 
-declare function xivid:txt-to-date ($txt as string) as string {
+declare function xivid:txt-to-date($txt as string) as string {
   let $a:={
         "januari":"01","februari":"02","maart":"03",
         "april":"04","mei":"05","juni":"06",
@@ -1382,9 +1335,9 @@ Formaten:  id       formaat        resolutie       frequentie  bitrate
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'declare function local:info ($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'declare function local:info($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
 
-declare function xivid:info ($json as object()) as string* {
+declare function xivid:info($json as object()) as string* {
   let $a:={
         "name":"Naam:",
         "date":"Datum:",
@@ -2219,7 +2172,7 @@ https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2V
 
 - Creëer een m3u8-to-json functie van deze query.
 
-$ xidel -s --xquery 'declare function local:m3u8-to-json ($url as string?) as object()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"})[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*") return ($b[contains(.,"TYPE=SUBTITLES")] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))},for $x at $i in $b[contains(.,"PROGRESSIVE-URI")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($bw div 1000)||"kbps","url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":if (string-length($a/url) lt 512) then $a/url else $url}[url],for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then if (contains($x,"TYPE=AUDIO")) then "m3u8[aac]" else "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],$b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1) return if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,"bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else (round($bw[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":(extract($x,"[^-]URI=&quot;(.+?)&quot;",1),extract($x,".+m3u8(?:\?.+)?","m"))[.][1] ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; local:m3u8-to-json(<url>)'
+$ xidel -s --xquery 'declare function local:m3u8-to-json($url as string?) as object()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"})[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*") return ($b[contains(.,"TYPE=SUBTITLES")] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))},for $x at $i in $b[contains(.,"PROGRESSIVE-URI")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($bw div 1000)||"kbps","url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":if (string-length($a/url) lt 512) then $a/url else $url}[url],for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then if (contains($x,"TYPE=AUDIO")) then "m3u8[aac]" else "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],$b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1) return if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,"bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else (round($bw[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":(extract($x,"[^-]URI=&quot;(.+?)&quot;",1),extract($x,".+m3u8(?:\?.+)?","m"))[.][1] ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; local:m3u8-to-json(<url>)'
 
 string    # Een string.
 string+   # Eén of meerdere strings.
@@ -2228,7 +2181,7 @@ string?   # Nul of één string.
 
 ------------------------------------------------------------------------------------------------
 
-declare function xivid:m3u8-to-json ($url as string?) as object()* {
+declare function xivid:m3u8-to-json($url as string?) as object()* {
   if ($url) then
     let $a:=x:request({
           "url":$url,
@@ -3253,7 +3206,7 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b
 1.5582006E9
 00:19:06.040
 
-$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total gt 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
+$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total gt 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
 {
   "name": "RTL4: RTL Nieuws - 19:30 uur",
   "date": "18-05-2019",
@@ -3322,9 +3275,7 @@ $ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=e
 
 ------------------------------------------------------------------------------------------------
 
-Bash:
-
-$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e '
+-e '
   $json[meta/nr_of_videos_total gt 0]/{
     "name":concat(
       .//station,
@@ -3335,7 +3286,7 @@ $ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=e
     ),
     "date":format-date(
       (material)()/original_date * duration("PT1S") +
-      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+      implicit-timezone() + date("1970-01-01"),
       "[D01]-[M01]-[Y]"
     ),
     "duration":format-time(
@@ -3344,50 +3295,12 @@ $ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=e
     ),
     "expdate":format-dateTime(
       (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") +
-      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+      implicit-timezone() + dateTime("1970-01-01T00:00:00"),
       "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
     ),
     "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
   }
 '
-
-------------------------------------------------------------------------------------------------
-
-Batch:
-
-FOR /F "delims=" %A IN ('xidel -s --module=xivid.xqm -e "
-  tz:=xivid:shex-to-dec(
-    tokenize(
-      system('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'),
-      '\s+'
-    )[.][last()]
-  ) * -60
-" --output-format=cmd') DO %A
-xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e "
-  $json[meta/nr_of_videos_total gt 0]/{
-    'name':concat(
-      .//station,
-      ': ',
-      abstracts/name,
-      ' - ',
-      if (.//classname='uitzending') then episodes/name else .//title
-    ),
-    'date':format-date(
-      (material)()/(original_date + %tz%) * duration('PT1S') + date('1970-01-01'),
-      '[D01]-[M01]-[Y]'
-    ),
-    'duration':format-time(
-      time((material)()/duration) + duration('PT0.5S'),
-      '[H01]:[m01]:[s01]'
-    ),
-    'expdate':format-dateTime(
-      (.//ddr_timeframes)()[model='AVOD']/(stop + %tz%) *
-      duration('PT1S') + dateTime('1970-01-01T00:00:00'),
-      '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
-    ),
-    'formats':xivid:m3u8-to-json(.//videohost||.//videopath)
-  }
-"
 
 ================================================================================================
 
@@ -3482,7 +3395,7 @@ $ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"]/file)]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"]/file)]}'
 {
   "name": "SBS6: Wegmisbruikers - Aflevering 10, Seizoen 25",
   "date": "22-03-2020",
@@ -3554,7 +3467,7 @@ $ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"][1]/file)]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"][1]/file)]}'
 {
   "name": "SBS6: Wegmisbruikers - Aflevering 9, Seizoen 25",
   "date": "15-03-2020",
@@ -3688,7 +3601,7 @@ $ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.
 
 (sources)()[not(drm) and type="m3u8"][1]/file om met DRM beveiligde/versleutelde video's er uit te filteren:
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}'
 {
   "name": "SBS9: The Talented Mr Ripley",
   "date": "31-03-2020",
@@ -3799,7 +3712,7 @@ $ xidel -se 'x:request({"headers":"Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":concat("Kijk: ",format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":concat("Kijk: ",format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}'
 {
   "name": "Kijk: Wegmisbruikers S25E10",
   "date": "22-03-2020",
@@ -3896,7 +3809,7 @@ $ xidel -se 'x:request({"headers":"Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}'
 {
   "name": "Kijk: Independence Day",
   "date": "11-04-2020",
@@ -3924,7 +3837,7 @@ when talking to: https://embed.kijk.nl/video/lUZSeuK1yrl
 I.t.t. de Wegmisbruikers video hier boven is deze video alleen beschikbaar via de "theplatform" api.
 try {"talpaPlayer" api} catch err:FODC0002 {"theplatform" api}. Oftewel, probeer eerst de oude methode (zo lang die nog beschikbaar is). Werkt die niet, val dan terug op de nieuwe methode:
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("https://embed.kijk.nl/video/'${url: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}} catch err:FODC0002 {x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("https://embed.kijk.nl/video/'${url: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}} catch err:FODC0002 {x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}}'
 {
   "name": "Kijk: 50/50 S01E53",
   "date": "01-04-2020",
@@ -3984,7 +3897,7 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("ht
       "duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),
       "expdate":format-dateTime(
         .//c_media_dateexpires * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+        implicit-timezone() + dateTime("1970-01-01T00:00:00"),
         "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
       ),
       "formats":[
@@ -4023,7 +3936,7 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("ht
       ),
       "date":format-date(
         substring(video//availableDate,1,10) * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+        implicit-timezone() + dateTime("1970-01-01T00:00:00"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":video/round(duration) * duration("PT1S") + time("00:00:00"),
@@ -6768,7 +6681,7 @@ $ xidel -s --module=xivid.xqm "https://www.at5.nl/tv" -e '{"name":substring-afte
 
 https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur
 
-$ xidel -s --module=xivid.xqm "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur" -e 'json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/{"name":(.//media)(1)/concat(source,": ",title),"date":format-date(.//updated * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((.//media)()/videoUrl)}'
+$ xidel -s --module=xivid.xqm "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-de-wandel-in-kortenhoef-touw-is-losgegaan-dan-gaan-ze-op-avontuur" -e 'json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/{"name":(.//media)(1)/concat(source,": ",title),"date":format-date(.//updated * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((.//media)()/videoUrl)}'
 {
   "name": "NH Nieuws: Koeien aan de wandel in Kortenhoef",
   "date": "06-04-2019",
@@ -6798,7 +6711,7 @@ $ xidel -s --module=xivid.xqm "https://www.nhnieuws.nl/nieuws/243542/koeien-aan-
 
 https://www.at5.nl/artikelen/e27519/zaterdag-27-april
 
-$ xidel -s --module=xivid.xqm "https://www.at5.nl/artikelen/e27519/zaterdag-27-april" -e 'json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/pageData/{"name":if ((media)(1)/title) then (media)(1)/concat(source,": ",title) else concat((media)(1)/source,": ",title),"date":format-date(updated * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((media)()/videoUrl)}'
+$ xidel -s --module=xivid.xqm "https://www.at5.nl/artikelen/e27519/zaterdag-27-april" -e 'json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/pageData/{"name":if ((media)(1)/title) then (media)(1)/concat(source,": ",title) else concat((media)(1)/source,": ",title),"date":format-date(updated * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((media)()/videoUrl)}'
 {
   "name": "AT5: Zaterdag 27 april",   # Niet ideaal, geen "Nieuws" in de 'title'. AT5 hun schuld. Hoort gewoon in de 'title'.
   "date": "27-04-2019",
@@ -6830,7 +6743,7 @@ $ xidel -s --module=xivid.xqm "https://www.at5.nl/artikelen/e27519/zaterdag-27-a
 
 Eén query voor beide videostreams:
 
-$ xidel -s --module=xivid.xqm "https://www.at5.nl/artikelen/e27519/zaterdag-27-april" -e 'let $a:=json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/pageData return {"name":if ($a) then if ($a/(media)(1)/title) then $a/(media)(1)/concat(source,": ",title) else concat($a/(media)(1)/source,": ",$a/title) else substring-after(//title,"- ")||": Livestream","date":if ($a) then format-date($a/updated * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]") else format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(if ($a) then $a/(media)()/videoUrl else json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream)}'
+$ xidel -s --module=xivid.xqm "https://www.at5.nl/artikelen/e27519/zaterdag-27-april" -e 'let $a:=json(//script/extract(.,"INITIAL_PROPS__ = (.+)",1)[.])/pageData return {"name":if ($a) then if ($a/(media)(1)/title) then $a/(media)(1)/concat(source,": ",title) else concat($a/(media)(1)/source,": ",$a/title) else substring-after(//title,"- ")||": Livestream","date":if ($a) then format-date($a/updated * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]") else format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(if ($a) then $a/(media)()/videoUrl else json(//script/extract(.,"INIT_DATA__ = (.+)",1)[.])/videoStream)}'
 
 ------------------------------------------------------------------------------------------------
 
@@ -6849,7 +6762,7 @@ $ xidel -s --module=xivid.xqm "https://www.at5.nl/artikelen/e27519/zaterdag-27-a
     "date":if ($a) then
       format-date(
         $a/updated * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        implicit-timezone() + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       )
     else
@@ -7625,7 +7538,7 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substrin
   "prefetch_cache": null
 }
 
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url" --xquery 'let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)() return {"name":replace(//title,"(.+) \| (.+)","$2: $1"),"date":format-date(//code/comment() ! parse-html(.)//@data-utime * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"sub-1","format":"srt","url":$a/subtitles_src}[url],$a/((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url" --xquery 'let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)() return {"name":replace(//title,"(.+) \| (.+)","$2: $1"),"date":format-date(//code/comment() ! parse-html(.)//@data-utime * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"sub-1","format":"srt","url":$a/subtitles_src}[url],$a/((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
 {
   "name": "Facebook: LEGO - LEGO NES",
   "date": "14-07-2020",
@@ -7675,7 +7588,7 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url"
     "name":replace(//title,"(.+) \| (.+)","$2: $1"),
     "date":format-date(
       //code/comment() ! parse-html(.)//@data-utime * duration("PT1S") +
-      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+      implicit-timezone() + date("1970-01-01"),
       "[D01]-[M01]-[Y]"
     ),
     "duration":format-time(
@@ -7783,7 +7696,7 @@ $ xidel -se 'x:request({"method":"POST","headers":"Authorization: Bearer AAAAAAA
 $ xidel -s "https://twitter.com/themandalorian/status/1188986316194635777" -e 'declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"; let $a:=x:request({"method":"POST","headers":$head,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($head,"x-guest-token: "||$a),"url":concat("https://api.twitter.com/1.1/videos/tweet/config/",//@data-associated-tweet-id,".json")})//playbackUrl'
 https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13
 
-$ xidel -s --module=xivid.xqm "https://twitter.com/themandalorian/status/1188986316194635777" -e 'declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"; let $a:=x:request({"method":"POST","headers":$head,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$b:=x:request({"headers":($head,"x-guest-token: "||$a),"url":concat("https://api.twitter.com/1.1/videos/tweet/config/",//@data-associated-tweet-id,".json")}) return {"name"://title,"date":format-date(//div[@class="permalink-header"]//@data-time * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(round($b//durationMs div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json($b//playbackUrl)}'
+$ xidel -s --module=xivid.xqm "https://twitter.com/themandalorian/status/1188986316194635777" -e 'declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"; let $a:=x:request({"method":"POST","headers":$head,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$b:=x:request({"headers":($head,"x-guest-token: "||$a),"url":concat("https://api.twitter.com/1.1/videos/tweet/config/",//@data-associated-tweet-id,".json")}) return {"name"://title,"date":format-date(//div[@class="permalink-header"]//@data-time * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(round($b//durationMs div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json($b//playbackUrl)}'
 {
   "name": "The Mandalorian op Twitter: \""Mandalorian, look outside. They're waiting for you." Watch the brand new trailer for #TheMandalorian, an original Star Wars series. Start streaming Nov. 12, only on #DisneyPlus.. https://t.co/6sp4JYLsbg\"",
   "date": "29-10-2019",
@@ -7892,7 +7805,7 @@ $ xidel -s "https://twitter.com/ViviEducation/status/1136534865145286656" -e 'de
   "shareUrl": "https://twitter.com/i/broadcasts/1vOGwqejwoWxB"
 }
 
-$ xidel -s --module=xivid.xqm "https://twitter.com/ViviEducation/status/1136534865145286656" -e 'declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"; let $a:=x:request({"method":"POST","headers":$head,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$b:=x:request({"headers":($head,"x-guest-token: "||$a),"url":"https://api.twitter.com/1.1/"||(if (//@data-supports-broadcast-player) then concat("broadcasts/show.json?ids=",extract(//@data-expanded-url,".+/(.+)",1)) else concat("videos/tweet/config/",//@data-associated-tweet-id,".json"))})/json return {"name"://title,"date":format-date(//div[@class="permalink-header"]//@data-time * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(round(($b//durationMs,$b//end_ms - $b//start_ms) div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":if ($b/broadcasts) then [{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat($b//width,"x",$b//height),"url":x:request({"headers":($head,"x-guest-token: "||$a),"url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key})//location}] else xivid:m3u8-to-json($b//playbackUrl)}'
+$ xidel -s --module=xivid.xqm "https://twitter.com/ViviEducation/status/1136534865145286656" -e 'declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"; let $a:=x:request({"method":"POST","headers":$head,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$b:=x:request({"headers":($head,"x-guest-token: "||$a),"url":"https://api.twitter.com/1.1/"||(if (//@data-supports-broadcast-player) then concat("broadcasts/show.json?ids=",extract(//@data-expanded-url,".+/(.+)",1)) else concat("videos/tweet/config/",//@data-associated-tweet-id,".json"))})/json return {"name"://title,"date":format-date(//div[@class="permalink-header"]//@data-time * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(round(($b//durationMs,$b//end_ms - $b//start_ms) div 1000) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":if ($b/broadcasts) then [{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat($b//width,"x",$b//height),"url":x:request({"headers":($head,"x-guest-token: "||$a),"url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key})//location}] else xivid:m3u8-to-json($b//playbackUrl)}'
 {
   "name": "Vivi op Twitter: \"Vivi founder @lior_rauchy announcing our new student feedback tool live at @EduTECH_AU #EduTECH2019 https://t.co/HJOtr4djsW\"",
   "date": "06-06-2019",
@@ -7929,7 +7842,7 @@ $ xidel -s --module=xivid.xqm "https://twitter.com/ViviEducation/status/11365348
       "name"://title,
       "date":format-date(
         //div[@class="permalink-header"]//@data-time * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        implicit-timezone() + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -8645,7 +8558,7 @@ https://www.dailymotion.com/player/metadata/video/:videoId?embedder=:embedder&re
 $ xidel -se 'extract("https://www.dailymotion.com/video/x5aa1uc",".+/(.+)",1)'
 x5aa1uc
 
-$ xidel -s --module=xivid.xqm "https://www.dailymotion.com/player/metadata/video/x5aa1uc" -e '$json/{"name":"Dailymotion: "||title,"date":format-date(created_time * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(qualities//url)}'
+$ xidel -s --module=xivid.xqm "https://www.dailymotion.com/player/metadata/video/x5aa1uc" -e '$json/{"name":"Dailymotion: "||title,"date":format-date(created_time * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(qualities//url)}'
 {
   "name": "Dailymotion: PENOZA Seizoen 3 aflevering 9 (S03E09) [HD]",
   "date": "01-02-2017",
@@ -8696,7 +8609,7 @@ $ xidel -s --module=xivid.xqm "https://www.dailymotion.com/player/metadata/video
     "name":"Dailymotion: "||title,
     "date":format-date(
       created_time * duration("PT1S") +
-      (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+      implicit-timezone() + date("1970-01-01"),
       "[D01]-[M01]-[Y]"
     ),
     "duration":format-time(

@@ -176,7 +176,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 EXIT /B
 
 :rtl
-CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=%~1/fmt=adaptive/" -e ^"
   json:^=$json[meta/nr_of_videos_total gt 0]/{
     'name':concat^(
@@ -187,7 +186,8 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
       if ^(.//classname^='uitzending'^) then episodes/name else .//title
     ^)^,
     'date':format-date^(
-      ^(material^)^(^)/^(original_date + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
+      ^(material^)^(^)/original_date * duration^('PT1S'^) +
+      implicit-timezone^(^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -195,8 +195,8 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
       '[H01]:[m01]:[s01]'
     ^)^,
     'expdate':format-dateTime^(
-      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/^(stop + %tz%^) *
-      duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
+      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/stop * duration^('PT1S'^) +
+      implicit-timezone^(^) + dateTime^('1970-01-01T00:00:00'^)^,
       '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
     ^)^,
     'formats':xivid:m3u8-to-json^(.//videohost^|^|.//videopath^)
@@ -205,7 +205,6 @@ FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid
 EXIT /B
 
 :kijk
-CALL :timezone
 FOR /F "delims=" %%A IN ('xidel --xquery ^"
   json:^=try {
     json^(
@@ -227,7 +226,8 @@ FOR /F "delims=" %%A IN ('xidel --xquery ^"
       ^)^,
       'duration':.//c_sko_cl * duration^('PT1S'^) + time^('00:00:00'^)^,
       'expdate':format-dateTime^(
-        ^(.//c_media_dateexpires + %tz%^) * duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
+        .//c_media_dateexpires * duration^('PT1S'^) +
+        implicit-timezone^(^) + dateTime^('1970-01-01T00:00:00'^)^,
         '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
       ^)^,
       'formats':[
@@ -265,8 +265,8 @@ FOR /F "delims=" %%A IN ('xidel --xquery ^"
           ^)
       ^)^,
       'date':format-date^(
-        ^(substring^(video//availableDate^,1^,10^) + %tz%^) *
-        duration^('PT1S'^) + dateTime^('1970-01-01T00:00:00'^)^,
+        substring^(video//availableDate^,1^,10^) * duration^('PT1S'^) +
+        implicit-timezone^(^) + dateTime^('1970-01-01T00:00:00'^)^,
         '[D01]-[M01]-[Y]'
       ^)^,
       'duration':video/round^(duration^) * duration^('PT1S'^) + time^('00:00:00'^)^,
@@ -344,7 +344,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 EXIT /B
 
 :regio_nh
-CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
   let $a:^=json^(
     //script/extract^(.^,'INITIAL_PROPS__ ^= ^(.+^)'^,1^)[.]
@@ -359,7 +358,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
       substring-after^(//title^,'- '^)^|^|': Livestream'^,
     'date':if ^($a^) then
       format-date^(
-        $a/^(updated + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
+        $a/updated * duration^('PT1S'^) + 
+        implicit-timezone^(^) + date^('1970-01-01'^)^,
         '[D01]-[M01]-[Y]'
       ^)
     else
@@ -837,12 +837,12 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 EXIT /B
 
 :dailymotion
-CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "https://www.dailymotion.com/player/metadata/video/%~1" -e ^"
   json:^=$json/{
     'name':'Dailymotion: '^|^|title^,
     'date':format-date^(
-      ^(created_time + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
+      created_time * duration^('PT1S'^) +
+      implicit-timezone^(^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -1024,7 +1024,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 EXIT /B
 
 :facebook
-CALL :timezone
 FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
   let $a:^=^(//script/substring-before^(substring-after^(.^,'onPageletArrive^('^)^,'^)^;}^)^)^;'^)[.]^)[2] ! json^(
     replace^(.^,'\\x'^,'\\u00'^)
@@ -1032,7 +1031,8 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
   json:^={
     'name':replace^(//title^,'^(.+^) \^| ^(.+^)'^,'$2: $1'^)^,
     'date':format-date^(
-      //code/comment^(^) ! parse-html^(.^)/^(.//@data-utime + %tz%^) * duration^('PT1S'^) + date^('1970-01-01'^)^,
+      //code/comment^(^) ! parse-html^(.^)//@data-utime * duration^('PT1S'^) +
+      implicit-timezone^(^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -1078,7 +1078,6 @@ FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
 EXIT /B
 
 :twitter
-CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   declare variable $head:^='Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%%2F40K4moUkGsoc%%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw'^;
   let $a:^=x:request^({
@@ -1099,8 +1098,8 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   json:^={
     'name'://title^,
     'date':format-date^(
-      //div[@class^='permalink-header']/^(.//@data-time + %tz%^) *
-      duration^('PT1S'^) + date^('1970-01-01'^)^,
+      //div[@class^='permalink-header']//@data-time * duration^('PT1S'^) +
+      implicit-timezone^(^) + date^('1970-01-01'^)^,
       '[D01]-[M01]-[Y]'
     ^)^,
     'duration':format-time^(
@@ -1155,40 +1154,25 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:timezone
-FOR /F "delims=" %%A IN ('xidel -e ^"
-  tz:^=xivid:shex-to-dec^(
-    tokenize^(
-      system^('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'^)^,
-      '\s+'
-    ^)[.][last^(^)]
-  ^) * -60
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :start
 @ECHO off
 SETLOCAL DISABLEDELAYEDEXPANSION
 SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   FOR /F "delims=(." %%B IN ('xidel --version ^| FIND "("') DO (
-    IF %%B GEQ 20180421 (
-      IF %%B GEQ 20200201 (
-        SET "XIDEL_OPTIONS=--silent --module=xivid.xqm --json-mode=deprecated"
-      ) ELSE (
-        SET "XIDEL_OPTIONS=--silent --module=xivid.xqm"
-      )
+    IF %%B GEQ 20200726 (
+      SET "XIDEL_OPTIONS=--silent --module=xivid.xqm --json-mode=deprecated"
       SET "XIDEL_UA=Mozilla/5.0 Firefox/70.0"
     ) ELSE (
       ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
-      ECHO Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+      ECHO Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
       ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
       EXIT /B 1
     )
   )
 ) ELSE (
   ECHO xivid: 'xidel.exe' niet gevonden!
-  ECHO Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+  ECHO Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
   ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
   EXIT /B 1
 )

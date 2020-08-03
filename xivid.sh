@@ -189,7 +189,7 @@ rtl() {
       ),
       "date":format-date(
         (material)()/original_date * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        implicit-timezone() + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -198,7 +198,7 @@ rtl() {
       ),
       "expdate":format-dateTime(
         (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+        implicit-timezone() + dateTime("1970-01-01T00:00:00"),
         "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
       ),
       "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
@@ -229,7 +229,7 @@ kijk() {
         "duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),
         "expdate":format-dateTime(
           .//c_media_dateexpires * duration("PT1S") +
-          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+          implicit-timezone() + dateTime("1970-01-01T00:00:00"),
           "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
         ),
         "formats":[
@@ -268,7 +268,7 @@ kijk() {
         ),
         "date":format-date(
           substring(video//availableDate,1,10) * duration("PT1S") +
-          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),
+          implicit-timezone() + dateTime("1970-01-01T00:00:00"),
           "[D01]-[M01]-[Y]"
         ),
         "duration":video/round(duration) * duration("PT1S") + time("00:00:00"),
@@ -345,7 +345,7 @@ regio_nh() {
       "date":if ($a) then
         format-date(
           $a/updated * duration("PT1S") +
-          (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+          implicit-timezone() + date("1970-01-01"),
           "[D01]-[M01]-[Y]"
         )
       else
@@ -821,7 +821,7 @@ dailymotion() {
       "name":"Dailymotion: "||title,
       "date":format-date(
         created_time * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        implicit-timezone() + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -1011,7 +1011,7 @@ facebook() {
       "name":replace(//title,"(.+) \| (.+)","$2: $1"),
       "date":format-date(
         //code/comment() ! parse-html(.)//@data-utime * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        implicit-timezone() + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -1077,7 +1077,7 @@ twitter() {
       "name"://title,
       "date":format-date(
         //div[@class="permalink-header"]//@data-time * duration("PT1S") +
-        (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),
+        implicit-timezone() + date("1970-01-01"),
         "[D01]-[M01]-[Y]"
       ),
       "duration":format-time(
@@ -1134,17 +1134,13 @@ pornhub() {
 
 if command -v xidel >/dev/null; then
   ver=$(xidel --version | xidel - -se 'substring-before(substring-after($raw,"("),".")')
-  if [[ $ver -ge 20180421 ]]; then
-    if [[ $ver -ge 20200201 ]]; then
-      export XIDEL_OPTIONS="--silent --module=xivid.xqm --json-mode=deprecated"
-    else
-      export XIDEL_OPTIONS="--silent --module=xivid.xqm"
-    fi
+  if [[ $ver -ge 20200726 ]]; then
+    export XIDEL_OPTIONS="--silent --module=xivid.xqm --json-mode=deprecated"
     XIDEL_UA="Mozilla/5.0 Firefox/70.0"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
-Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
     exit 1
@@ -1152,7 +1148,7 @@ EOF
 else
   cat 1>&2 <<EOF
 xivid: 'xidel' niet gevonden!
-Installeer Xidel 0.9.8 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1

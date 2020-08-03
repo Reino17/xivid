@@ -21,7 +21,7 @@
 xquery version "3.0-xidel";
 module namespace xivid = "https://github.com/Reino17/xivid/";
 
-declare function xivid:m3u8-to-json ($url as string?) as object()* {
+declare function xivid:m3u8-to-json($url as string?) as object()* {
   if ($url) then
     let $a:=x:request({
           "url":$url,
@@ -94,7 +94,7 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
     ()
 };
 
-declare function xivid:txt-to-date ($txt as string) as string {
+declare function xivid:txt-to-date($txt as string) as string {
   let $a:={
         "januari":"01","februari":"02","maart":"03",
         "april":"04","mei":"05","juni":"06",
@@ -111,16 +111,6 @@ declare function xivid:txt-to-date ($txt as string) as string {
     ),
     "-"
   )
-};
-
-declare function xivid:shex-to-dec ($shex as string) as integer {
-  let $a:=x:integer($shex),
-      $b:=x:integer-to-base($a,2)
-  return
-  if (string-length($b) gt 31) then
-    $a - integer(math:pow(2,string-length($b)))
-  else
-    $a
 };
 
 declare function xivid:bin-xor($a as integer,$b as integer) as integer {
@@ -142,7 +132,7 @@ declare function xivid:bin-xor($a as integer,$b as integer) as integer {
   )
 };
 
-declare function xivid:info ($json as object()) as string* {
+declare function xivid:info($json as object()) as string* {
   let $a:={
         "name":"Naam:",
         "date":"Datum:",
