@@ -1161,7 +1161,7 @@ SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   FOR /F "delims=(." %%B IN ('xidel --version ^| FIND "("') DO (
     IF %%B GEQ 20200726 (
-      SET "XIDEL_OPTIONS=--silent --module=xivid.xqm --json-mode=deprecated"
+      SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm --json-mode=deprecated"
       SET "XIDEL_UA=Mozilla/5.0 Firefox/70.0"
     ) ELSE (
       ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.

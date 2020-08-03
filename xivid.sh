@@ -1135,7 +1135,7 @@ pornhub() {
 if command -v xidel >/dev/null; then
   ver=$(xidel --version | xidel - -se 'substring-before(substring-after($raw,"("),".")')
   if [[ $ver -ge 20200726 ]]; then
-    export XIDEL_OPTIONS="--silent --module=xivid.xqm --json-mode=deprecated"
+    export XIDEL_OPTIONS="--silent --module=${0%%/*}/xivid.xqm --json-mode=deprecated"
     XIDEL_UA="Mozilla/5.0 Firefox/70.0"
   else
     cat 1>&2 <<EOF
