@@ -22,76 +22,73 @@ xquery version "3.0-xidel";
 module namespace xivid = "https://github.com/Reino17/xivid/";
 
 declare function xivid:m3u8-to-json($url as string?) as object()* {
-  if ($url) then
-    let $a:=x:request({
-          "url":$url,
-          "error-handling":"4xx=accept"
-        })[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
-        $b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*")
-    return (
-      $b[contains(.,"TYPE=SUBTITLES")] ! {
-        "id":"sub-1",
-        "format":"m3u8[vtt]",
-        "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
-        "url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (
-          if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
-        )
-      },
-      for $x at $i in $b[contains(.,"PROGRESSIVE-URI")]
-      group by $bw:=extract($x,"BANDWIDTH=(\d+)",1)
-      count $i
-      return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
-        "bitrate":round($bw div 1000)||"kbps",
-        "url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)
-      },
-      {
-        "id":"hls-0",
-        "format":"m3u8[manifest]",
-        "url":if (string-length($a/url) lt 512) then $a/url else $url
-      }[url],
-      for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")]
-      group by $bw:=extract($x,"BANDWIDTH=(\d+)",1)
-      count $i
-      return {
-        "id":"hls-"||$i,
-        "format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then
-          if (contains($x,"TYPE=AUDIO")) then
-            "m3u8[aac]"
-          else
-            "m3u8[h264+aac]"
+  let $m3u8:=x:request(
+        {"url":$url,"error-handling":"4xx=accept"}[url]
+      )[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
+      $m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,
+      $streams:=extract(
+        $m3u8/doc,
+        "#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",
+        0,"ms*"
+      )
+  return (
+    extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(
+        extract(.,"URI=&quot;(.+?)&quot;",1),
+        $m3u8Url
+      )
+    },
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
+    let $br:=extract($x[1],"BANDWIDTH=(\d+)",1)
+    group by $br
+    count $i
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "resolution":extract($x[1],"RESOLUTION=([\dx]+)",1),
+      "bitrate":round($br div 1000)||"kbps",
+      "url":extract($x[1],"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)
+    },
+    {
+      "id":"hls-0",
+      "format":"m3u8[manifest]",
+      "url":$m3u8Url
+    }[url],
+    for $x at $i in $streams
+    let $br:=extract($x[1],"BANDWIDTH=(\d+)",1)
+    group by $br
+    count $i
+    return {
+      "id":"hls-"||$i,
+      "format":if (contains($x[1],"avc1")) then
+        "m3u8[h264+aac]"
+      else
+        "m3u8[aac]",
+      "resolution":concat(
+        extract($x[1],"RESOLUTION=([\dx]+)",1)[.],
+        extract($x[1],"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] !
+          concat("@",round-half-to-even(.,3),"fps")
+      )[.],
+      "bitrate":let $a:=extract($x[1],"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
+      concat(
+        if ($a[1]) then
+          join((round($a[2][.] div 1000),round($a[1] div 1000)),"|")
         else
-          "m3u8[aac]",
-        "resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],
-            $b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1)
-        return
-        if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,
-        "bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
-        concat(
-          if ($a[1]) then
-            join(
-              (round($a[2][.] div 1000),round($a[1] div 1000)),
-              "|"
-            )
-          else
-            (
-              round($bw[.] div 1000),
-              extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
-            ),
-          "kbps"
-        ),
-        "url":(
-          extract($x,"[^-]URI=&quot;(.+?)&quot;",1),
-          extract($x,".+m3u8(?:\?.+)?","m")
-        )[.][1] ! (
-          if (starts-with(.,"http")) then . else resolve-uri(.,$a/url)
-        )
-      }
-    )
-  else
-    ()
+          (
+            round($br[.] div 1000),
+            extract($x[1],"GROUP-ID=.+?-(\d+)",1)[.]
+          ),
+        "kbps"
+      ),
+      "url":resolve-uri(
+        extract($x[1],"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),
+        $m3u8Url
+      )
+    }
+  )
 };
 
 declare function xivid:txt-to-date($txt as string) as string {
