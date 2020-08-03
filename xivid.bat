@@ -178,7 +178,7 @@ EXIT /B
 :rtl
 CALL :timezone
 FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=%~1/fmt=adaptive/" -e ^"
-  json:^=$json[meta/nr_of_videos_total ^> 0]/{
+  json:^=$json[meta/nr_of_videos_total gt 0]/{
     'name':concat^(
       .//station^,
       ': '^,
@@ -774,7 +774,7 @@ xidel "%~1" --xquery ^"^
           ']'^
         ),^
         'resolution':concat($x/width,'x',$x/height),^
-        'bitrate':$x[itag != 43]/bitrate ! concat(round(. div 1000),'kbps'),^
+        'bitrate':$x[itag ne 43]/bitrate ! concat(round(. div 1000),'kbps'),^
         'url':$x/url^
       },^
       for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)]^

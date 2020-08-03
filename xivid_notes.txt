@@ -1,64 +1,64 @@
 [Reeksen en positionering]
 
-$ xidel -s -e 'join(1 to 10)'
-$ xidel -s -e 'join(for $x in 1 to 10 return $x)'
+$ xidel -se 'join(1 to 10)'
+$ xidel -se 'join(for $x in 1 to 10 return $x)'
 1 2 3 4 5 6 7 8 9 10
 
-$ xidel -s -e 'join((1 to 10) ! .[. mod 2 = 1])'
-$ xidel -s --xquery 'join(for $x in 1 to 10 where $x mod 2 = 1 return $x)
+$ xidel -se 'join((1 to 10) ! .[. mod 2 eq 1])'
+$ xidel -s --xquery 'join(for $x in 1 to 10 where $x mod 2 eq 1 return $x)
 1 3 5 7 9
 
-$ xidel -s -e 'join((1 to 10) ! .[. mod 2 = 0])'
-$ xidel -s --xquery 'join(for $x in 1 to 10 where $x mod 2 = 0 return $x)'
+$ xidel -se 'join((1 to 10) ! .[. mod 2 eq 0])'
+$ xidel -s --xquery 'join(for $x in 1 to 10 where $x mod 2 eq 0 return $x)'
 2 4 6 8 10
 
-$ xidel -s -e 'join((65 to 74) ! codepoints-to-string(.))'
-$ xidel -s -e 'join((65 to 74) ! x:cps(.))'
-$ xidel -s -e 'join(for $x in 65 to 74 return x:cps($x))'
+$ xidel -se 'join((65 to 74) ! codepoints-to-string(.))'
+$ xidel -se 'join((65 to 74) ! x:cps(.))'
+$ xidel -se 'join(for $x in 65 to 74 return x:cps($x))'
 A B C D E F G H I J
 
 ------------------------------------------------------------------------------------------------
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a)'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a)'
 A B C D E F G H I J
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return $a[1]'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return head($a)'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return $a[1]'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return head($a)'
 A
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return $a[10]'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return $a[last()]'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return $a[10]'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return $a[last()]'
 J
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(tail($a))'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() > 1])'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,2))'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join(tail($a))'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() gt 1])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,2))'
 B C D E F G H I J
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() < last()])'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() < 10])'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,1,count($a) - 1))'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() lt last()])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() lt 10])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,1,count($a) - 1))'
 A B C D E F G H I
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() != 5])'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(remove($a,5))'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() ne 5])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join(remove($a,5))'
 A B C D F G H I J
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() > 3][position() < 5])'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() = 4 to 7])'
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,4,4))'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() gt 3][position() lt 5])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() = 4 to 7])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join(subsequence($a,4,4))'
 D E F G
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 = 1])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 eq 1])'
 A C E G I
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 = 0])'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join($a[position() mod 2 eq 0])'
 B D F H J
 
-$ xidel -s -e 'let $a:=(65 to 74) ! x:cps(.) return join(reverse($a))'
+$ xidel -se 'let $a:=(65 to 74) ! x:cps(.) return join(reverse($a))'
 J I H G F E D C B A
 
-$ xidel -s -e 'let $a:=1 to 10 return (join($a),join($a ! x:cps(. + 64)),join(reverse($a)),join(reverse($a) ! x:cps(. + 64)))'
+$ xidel -se 'let $a:=1 to 10 return (join($a),join($a ! x:cps(. + 64)),join(reverse($a)),join(reverse($a) ! x:cps(. + 64)))'
 1 2 3 4 5 6 7 8 9 10
 A B C D E F G H I J
 10 9 8 7 6 5 4 3 2 1
@@ -68,7 +68,7 @@ J I H G F E D C B A
 
 [JSON filtering and selection]
 
-$ xidel -s -e '
+$ xidel -se '
   let $a:={"a":1,"b":2} return (
     {"foo":{"bar":$a/c}},
     {"foo":{"bar":$a/c}[bar]},
@@ -113,7 +113,7 @@ $ xidel -s -e '
 {"foo": [{"bar": 1}]}
 {"foo": null}                           # De enige manier voor de eis "Eén of meerdere objecten? Array. Nul objecten? null.
 
-$ xidel -s -e '
+$ xidel -se '
   let $a:={"a":1,"b":2},
       $b:={"a":"x","b":"y"}
   return (
@@ -142,39 +142,39 @@ Hexadecimal (Base 16)    1F = (1*16^1)+(15*16^0)                      = 16+15   
 
 Dec to Bin/Hex:
 
-$ xidel -s -e 'x:integer-to-base(31,2)'
+$ xidel -se 'x:integer-to-base(31,2)'
 11111
 
-$ xidel -s -e 'x:integer-to-base(31,16)'
+$ xidel -se 'x:integer-to-base(31,16)'
 1F
 
 Bin/Hex to Dec:
 
-$ xidel -s -e 'x:integer("11111",2)'
-$ xidel -s -e 'x:integer("0b11111")'
+$ xidel -se 'x:integer("11111",2)'
+$ xidel -se 'x:integer("0b11111")'
 31
 
-$ xidel -s -e 'x:integer("1F",16)'
-$ xidel -s -e 'x:integer("0x1F")'
+$ xidel -se 'x:integer("1F",16)'
+$ xidel -se 'x:integer("0x1F")'
 31
 
 Bin to Hex:
 
-$ xidel -s -e 'x:integer-to-base(x:integer("11111",2),16)'
-$ xidel -s -e 'x:integer-to-base(x:integer("0b11111"),16)'
+$ xidel -se 'x:integer-to-base(x:integer("11111",2),16)'
+$ xidel -se 'x:integer-to-base(x:integer("0b11111"),16)'
 1F
 
 Hex to Bin:
 
-$ xidel -s -e 'x:integer-to-base(x:integer("1F",16),2)'
-$ xidel -s -e 'x:integer-to-base(x:integer("0x1F"),2)'
+$ xidel -se 'x:integer-to-base(x:integer("1F",16),2)'
+$ xidel -se 'x:integer-to-base(x:integer("0x1F"),2)'
 11111
 
 ------------------------------------------------------------------------------------------------
 
 Unsigned (32bit) Hex to Dec:
 
-xidel -s -e "x:integer('0xffffff88')"
+xidel -se "x:integer('0xffffff88')"
 4294967176
 
 Signed (32bit) Hex to Dec:
@@ -190,53 +190,53 @@ Check of de decimale waarde groter is dan 2^31:
 
 - Tel het aantal bits.
 
-  $ xidel -s -e '(string-length("0xffffff88") - 2) * 4'
-  $ xidel -s -e 'string-length("ffffff88") * 4'
+  $ xidel -se '(string-length("0xffffff88") - 2) * 4'
+  $ xidel -se 'string-length("ffffff88") * 4'
   32
 
   x4, want F_16 is 1111_2 (4 bits):
-  $ xidel -s -e 'x:integer-to-base(x:integer("0xf"),2)'
+  $ xidel -se 'x:integer-to-base(x:integer("0xf"),2)'
   1111
 
 - Converteer als unsigned 32bit Hex en trek daar 2^(aantal bits) van af.
 
-  $ xidel -s -e 'math:pow(2,(string-length("0xffffff88") - 2) * 4)'
+  $ xidel -se 'math:pow(2,(string-length("0xffffff88") - 2) * 4)'
   4.294967296E9
 
-  $ xidel -s -e 'integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))'
+  $ xidel -se 'integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))'
   4294967296
 
-  $ xidel -s -e 'x:integer("0xffffff88") - integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))'
+  $ xidel -se 'x:integer("0xffffff88") - integer(math:pow(2,(string-length("0xffffff88") - 2) * 4))'
   -120
 
 - Dit geldt alleen voor 0x80000000 en hoger. Converteer 0x7fffffff en lager als unsigned 32bit Hex!
 
-  $ xidel -s -e 'x:integer("0x80000000")'
+  $ xidel -se 'x:integer("0x80000000")'
   2147483648
 
-  $ xidel -s -e 'integer(math:pow(2,(string-length("0x80000000") - 2) * 4 - 1))'
+  $ xidel -se 'integer(math:pow(2,(string-length("0x80000000") - 2) * 4 - 1))'
   2147483648   # 2^31
 
-  $ xidel -s -e 'integer(math:pow(2,(string-length("0x80000000") - 2) * 4)) div 2'
+  $ xidel -se 'integer(math:pow(2,(string-length("0x80000000") - 2) * 4)) div 2'
   2147483648
 
-  $ xidel -s -e 'let $a:=x:integer("0x80000000"),$b:=integer(math:pow(2,(string-length("0x80000000") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
+  $ xidel -se 'let $a:=x:integer("0x80000000"),$b:=integer(math:pow(2,(string-length("0x80000000") - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a'
   -2147483648
 
-  $ xidel -s -e 'let $a:=x:integer("0x7fffffff"),$b:=integer(math:pow(2,(string-length("0x7fffffff") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
+  $ xidel -se 'let $a:=x:integer("0x7fffffff"),$b:=integer(math:pow(2,(string-length("0x7fffffff") - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a'
   2147483647
 
-  $ xidel -s -e 'let $a:=x:integer("0xffffff88"),$b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a'
+  $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a'
   -120
 
-$ xidel -s -e 'declare function local:shex-to-dec ($shex as string) as integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a > $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
+$ xidel -se 'declare function local:shex-to-dec ($shex as string) as integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
 -120
 
 declare function xivid:shex-to-dec ($shex as string) as integer {
   let $a:=x:integer($shex),
       $b:=integer(math:pow(2,(string-length($shex) - 2) * 4))
   return
-  if ($a > $b div 2) then
+  if ($a gt $b div 2) then
     $a - $b
   else
     $a
@@ -248,48 +248,48 @@ Check of de hoeveelheid bits groter is dan 31:
 
 - Tel het aantal bits.
 
-  $ xidel -s -e 'x:integer-to-base(x:integer("0xffffff88"),2)'
+  $ xidel -se 'x:integer-to-base(x:integer("0xffffff88"),2)'
   11111111111111111111111110001000
 
-  $ xidel -s -e 'string-length(x:integer-to-base(x:integer("0xffffff88"),2))'
+  $ xidel -se 'string-length(x:integer-to-base(x:integer("0xffffff88"),2))'
   32
 
 - Converteer als unsigned 32bit Hex en trek daar 2^(aantal bits) van af.
 
-  $ xidel -s -e 'math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2)))'
+  $ xidel -se 'math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2)))'
   4.294967296E9
 
-  $ xidel -s -e 'integer(math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2))))'
+  $ xidel -se 'integer(math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2))))'
   4294967296
 
-  $ xidel -s -e 'let $a:=x:integer("0xffffff88") return $a - integer(math:pow(2,string-length(x:integer-to-base($a,2))))'
+  $ xidel -se 'let $a:=x:integer("0xffffff88") return $a - integer(math:pow(2,string-length(x:integer-to-base($a,2))))'
   -120
 
 - Dit geldt alleen voor 0x80000000 en hoger. Converteer 0x7fffffff en lager als unsigned 32bit Hex!
 
-  $ xidel -s -e 'x:integer-to-base(x:integer("0x80000000"),2)'
+  $ xidel -se 'x:integer-to-base(x:integer("0x80000000"),2)'
   10000000000000000000000000000000
 
-  $ xidel -s -e 'x:integer-to-base(x:integer("0x7fffffff"),2)'
+  $ xidel -se 'x:integer-to-base(x:integer("0x7fffffff"),2)'
   1111111111111111111111111111111
 
-  $ xidel -s -e 'let $a:=x:integer("0x80000000"),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  $ xidel -se 'let $a:=x:integer("0x80000000"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
   -2147483648
 
-  $ xidel -s -e 'let $a:=x:integer("0x7fffffff"),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  $ xidel -se 'let $a:=x:integer("0x7fffffff"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
   2147483647   # 2^31
 
-  $ xidel -s -e 'let $a:=x:integer("0xffffff88"),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
   -120
 
-$ xidel -s -e 'declare function local:shex-to-dec ($shex as string) as integer {let $a:=x:integer($shex),$b:=x:integer-to-base($a,2) return if (string-length($b) > 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
+$ xidel -se 'declare function local:shex-to-dec ($shex as string) as integer {let $a:=x:integer($shex),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
 -120
 
 declare function xivid:shex-to-dec ($shex as string) as integer {
   let $a:=x:integer($shex),
       $b:=x:integer-to-base($a,2)
   return
-  if (string-length($b) > 31) then
+  if (string-length($b) gt 31) then
     $a - integer(math:pow(2,string-length($b)))
   else
     $a
@@ -299,16 +299,16 @@ declare function xivid:shex-to-dec ($shex as string) as integer {
 
 Genereer een willekeurig 128bit hexadecimaal getal:
 
-$ xidel -s -e 'join((1 to 32))'
+$ xidel -se 'join((1 to 32))'
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
 
-$ xidel -s -e 'random-seed(),join((1 to 32) ! random(16))'
+$ xidel -se 'random-seed(),join((1 to 32) ! random(16))'
 8 5 3 4 15 0 13 7 15 2 7 3 13 1 10 8 6 7 11 5 5 8 9 3 11 5 5 1 10 8 0 1
 
-$ xidel -s -e 'random-seed(),join((1 to 32) ! x:integer-to-base(random(16),16))'
+$ xidel -se 'random-seed(),join((1 to 32) ! x:integer-to-base(random(16),16))'
 8 5 3 4 F 0 D 7 F 2 7 3 D 1 A 8 6 7 B 5 5 8 9 3 B 5 5 1 A 8 0 1
 
-$ xidel -s -e 'random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))'
+$ xidel -se 'random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))'
 8534F0D7F273D1A867B55893B551A801
 
 ------------------------------------------------------------------------------------------------
@@ -317,7 +317,7 @@ Base64:
 
 https://en.wikipedia.org/wiki/Base64
 
-$ xidel -s -e 'string-to-base64Binary("Xivid")'
+$ xidel -se 'string-to-base64Binary("Xivid")'
 WGl2aWQ=
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -328,7 +328,7 @@ String to Base64 (zonder string-to-base64Binary() ):
 
 Base64 tekens:
 
-$ xidel -s -e 'string-join((for $x in (65 to 90,97 to 122,48 to 57) return x:cps($x),"+","/"))'
+$ xidel -se 'string-join((for $x in (65 to 90,97 to 122,48 to 57) return x:cps($x),"+","/"))'
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
 |        65 t/m 90       ||        97 t/m 122      ||48 t/m57|     # Codepoints in ASCII tabel.
 0                                                              63  # 64 tekens, range: 0-63.
@@ -344,70 +344,70 @@ W      G      l      2      a      W      Q        =   # naar base64 met eventue
 
 ----------------------------------------------------------------
 
-$ xidel -s -e 'join(string-to-codepoints("Xivid"))'
-$ xidel -s -e 'join(x:cps("Xivid"))'
+$ xidel -se 'join(string-to-codepoints("Xivid"))'
+$ xidel -se 'join(x:cps("Xivid"))'
 88 105 118 105 100
 
-$ xidel -s -e 'join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2)))'
+$ xidel -se 'join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2)))'
 01011000 01101001 01110110 01101001 01100100
 
-$ xidel -s -e 'string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2)))'
+$ xidel -se 'string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2)))'
 0101100001101001011101100110100101100100
 
 Deze string moet opgedeeld worden in substrings met een lengte van 6 tekens.
 
-$ xidel -s -e 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return substring($bin,1,6)'
+$ xidel -se 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return substring($bin,1,6)'
 010110
 
-$ xidel -s -e 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return substring($bin,37,6)'
+$ xidel -se 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return substring($bin,37,6)'
 0100
 
 Dus opdelen op de indexes 1, 7, 13, 19, 25, 31, 37.
 
-$ xidel -s -e 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return join((1 to string-length($bin)) ! .[. mod 6 = 1])'
-$ xidel -s --xquery 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return join(for $x in 1 to string-length($bin) where $x mod 6 = 1 return $x)'
+$ xidel -se 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return join((1 to string-length($bin)) ! .[. mod 6 eq 1])'
+$ xidel -s --xquery 'let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) return join(for $x in 1 to string-length($bin) where $x mod 6 eq 1 return $x)'
 1 7 13 19 25 31 37
 
-$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 return substring($bin,$x,6))'
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 return substring($bin,$x,6))'
 010110 000110 100101 110110 011010 010110 0100
 
 De binaire getallen dienen altijd 6 bits te bevatten.
 
-$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return substring($a||"0000",1,6))'
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return substring($a||"0000",1,6))'
 010110 000110 100101 110110 011010 010110 010000
 
 De extra nullen worden later als padding (=) toegevoegd. 00 wordt =, 0000 wordt ==.
 
-$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return string-length($a))'
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return string-length($a))'
 6 6 6 6 6 6 4
 
-$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return (1 to (6 - string-length($a)[. != 6]) div 2) ! "=")'
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return (1 to (6 - string-length($a)[. ne 6]) div 2) ! "=")'
 =
 
-$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return (substring($a||"0000",1,6),(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return (substring($a||"0000",1,6),(1 to (6 - string-length($a)[. ne 6]) div 2) ! "="))'
 010110 000110 100101 110110 011010 010110 010000 =
 
-$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return (x:integer(substring($a||"0000",1,6),2),(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+$ xidel -s --xquery 'join(let $bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return (x:integer(substring($a||"0000",1,6),2),(1 to (6 - string-length($a)[. ne 6]) div 2) ! "="))'
 22 6 37 54 26 22 16 =
 
-$ xidel -s --xquery 'join(let $base64:=(for $x in (65 to 90,97 to 122,48 to 57) return codepoints-to-string($x),"+","/"),$bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return ($base64[x:integer(substring($a||"0000",1,6),2) + 1],(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+$ xidel -s --xquery 'join(let $base64:=(for $x in (65 to 90,97 to 122,48 to 57) return codepoints-to-string($x),"+","/"),$bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return ($base64[x:integer(substring($a||"0000",1,6),2) + 1],(1 to (6 - string-length($a)[. ne 6]) div 2) ! "="))'
 W G l 2 a W Q =
 
-$ xidel -s --xquery 'string-join(let $base64:=(for $x in (65 to 90,97 to 122,48 to 57) return codepoints-to-string($x),"+","/"),$bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 = 1 let $a:=substring($bin,$x,6) return ($base64[x:integer(substring($a||"0000",1,6),2) + 1],(1 to (6 - string-length($a)[. != 6]) div 2) ! "="))'
+$ xidel -s --xquery 'string-join(let $base64:=(for $x in (65 to 90,97 to 122,48 to 57) return codepoints-to-string($x),"+","/"),$bin:=string-join(x:cps("Xivid") ! ("0"||x:integer-to-base(.,2))) for $x in 1 to string-length($bin) where $x mod 6 eq 1 let $a:=substring($bin,$x,6) return ($base64[x:integer(substring($a||"0000",1,6),2) + 1],(1 to (6 - string-length($a)[. ne 6]) div 2) ! "="))'
 WGl2aWQ=
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Base64 to string:
 
-$ xidel -s -e 'binary-to-string(base64Binary("WGl2aWQ="))'
+$ xidel -se 'binary-to-string(base64Binary("WGl2aWQ="))'
 Xivid
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 File to Base64:
 
-$ xidel -s -e 'file:read-binary("nl.png")'   # Nederlandse vlag van 18 bij 12 pixels.
+$ xidel -se 'file:read-binary("nl.png")'   # Nederlandse vlag van 18 bij 12 pixels.
 iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAG0lEQVQoz2P4z8BABmIYGtrIAkND21CJAjIQAF2WZqj5EZlfAAAAAElFTkSuQmCC
 
 File to Base64 (html):
@@ -417,7 +417,7 @@ $ xidel -s --xquery 'concat("<img src=&quot;data:image/png;base64,",file:read-bi
 
 Base64 to file:
 
-$ xidel -s -e 'file:write-binary("nl.png",base64Binary("iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAG0lEQVQoz2P4z8BABmIYGtrIAkND21CJAjIQAF2WZqj5EZlfAAAAAElFTkSuQmCC"))'
+$ xidel -se 'file:write-binary("nl.png",base64Binary("iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAG0lEQVQoz2P4z8BABmIYGtrIAkND21CJAjIQAF2WZqj5EZlfAAAAAElFTkSuQmCC"))'
 
 ================================================================================================
 
@@ -514,7 +514,7 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 
 - 0 t/m 127 in 16 rijen van 8.
 
-  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x])'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x])'
   0 16 32 48 64 80 96 112
   1 17 33 49 65 81 97 113
   2 18 34 50 66 82 98 114
@@ -532,9 +532,9 @@ ASCII 7bit (2^7=128), 0 t/m 127:
   14 30 46 62 78 94 110 126
   15 31 47 63 79 95 111 127
 
-- Uitlijnen. I.p.v. if ((. = 0) or (. = 1) or ...) then... geeft een vergelijking met een reeks ook een boolean.
+- Uitlijnen. I.p.v. if ((. eq 0) or (. eq 1) or ...) then... geeft een vergelijking met een reeks ook een boolean.
 
-  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x] ! (if (. = (0 to 9,96 to 99)) then " "||. else .))'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x] ! (if (. = (0 to 9,96 to 99)) then " "||. else .))'
    0 16 32 48 64 80  96 112
    1 17 33 49 65 81  97 113
    2 18 34 50 66 82  98 114
@@ -554,7 +554,7 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 
 - Hexadecimale getallen erbij, met | als scheiding en een extra 0 voor 0 t/m 9.
 
-  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) = 1) then "0"||. else .))))'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .))))'
    0|00 16|10 32|20 48|30 64|40 80|50  96|60 112|70
    1|01 17|11 33|21 49|31 65|41 81|51  97|61 113|71
    2|02 18|12 34|22 50|32 66|42 82|52  98|62 114|72
@@ -574,7 +574,7 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 
 - Tekens erbij, maar vervang 0, 7, 8, 9, 10 en 13 met spaties, omdat dit beheertekens (control characters) betreft.
 
-  $ xidel -s -e 'for $x in 0 to 15 return join((0 to 127)[. mod 16 = $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) = 1) then "0"||. else .)),if (. = (0,7,8,9,10,13)) then " " else x:cps(.)))'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .)),if (. = (0,7,8,9,10,13)) then " " else x:cps(.)))'
    0|00   16|10 ► 32|20   48|30 0 64|40 @ 80|50 P  96|60 ` 112|70 p
    1|01 ☺ 17|11 ◄ 33|21 ! 49|31 1 65|41 A 81|51 Q  97|61 a 113|71 q
    2|02 ☻ 18|12 ↕ 34|22 " 50|32 2 66|42 B 82|52 R  98|62 b 114|72 r
@@ -612,8 +612,8 @@ Extended ASCII 8bit (2^8=256), 127 t/m 255:
 
 - ISO 8859-1 / Latin-1 / "Unicode" in charmap.exe (Character Map).
 
-  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),x:cps(.)))' [--output-encoding=oem]
-  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),binary-to-string(xs:hexBinary(x:integer-to-base(.,16)),"latin1")))'
+  $ xidel -se 'for $x in 0 to 15 return join((128 to 255)[. mod 16 eq $x] ! (concat(.,"|",x:integer-to-base(.,16)),x:cps(.)))' [--output-encoding=oem]
+  $ xidel -se 'for $x in 0 to 15 return join((128 to 255)[. mod 16 eq $x] ! (concat(.,"|",x:integer-to-base(.,16)),binary-to-string(xs:hexBinary(x:integer-to-base(.,16)),"latin1")))'
   128|80 ? 144|90 ? 160|A0   176|B0 ° 192|C0 A 208|D0 D 224|E0 à 240|F0 d
   129|81 ? 145|91 ? 161|A1 ¡ 177|B1 ± 193|C1 A 209|D1 Ñ 225|E1 á 241|F1 ñ
   130|82 ? 146|92 ? 162|A2 ¢ 178|B2 ² 194|C2 A 210|D2 O 226|E2 â 242|F2 ò
@@ -661,8 +661,8 @@ ALT+0<cp> voor weergave (Windows).   # ALT 0163 of ALT 0255.
 
 - Code page 437 / CP437 / OEM-US / "DOS: United States" in charmap.exe.
 
-  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),x:cps(.)))' --output-encoding=latin1
-  $ xidel -s -e 'for $x in 0 to 15 return join((128 to 255)[. mod 16 = $x] ! (concat(.,"|",x:integer-to-base(.,16)),binary-to-string(xs:hexBinary(x:integer-to-base(.,16)),"oem")))'
+  $ xidel -se 'for $x in 0 to 15 return join((128 to 255)[. mod 16 eq $x] ! (concat(.,"|",x:integer-to-base(.,16)),x:cps(.)))' --output-encoding=latin1
+  $ xidel -se 'for $x in 0 to 15 return join((128 to 255)[. mod 16 eq $x] ! (concat(.,"|",x:integer-to-base(.,16)),binary-to-string(xs:hexBinary(x:integer-to-base(.,16)),"oem")))'
   128|80 Ç 144|90 É 160|A0 á 176|B0 ░ 192|C0 └ 208|D0 ╨ 224|E0 α 240|F0 ≡
   129|81 ü 145|91 æ 161|A1 í 177|B1 ▒ 193|C1 ┴ 209|D1 ╤ 225|E1 ß 241|F1 ±
   130|82 é 146|92 Æ 162|A2 ó 178|B2 ▓ 194|C2 ┬ 210|D2 ╥ 226|E2 Γ 242|F2 ≥
@@ -703,22 +703,22 @@ $ date -d @1561935600 +%d-%m-%Y
 $ printf '%(%d-%m-%Y)T' 1561935600
 01-07-2019
 
-$ xidel -s -e '1561935600 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
+$ xidel -se '1561935600 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
 2019-06-30T23:00:00
 
-$ xidel -s -e 'format-date(1561935600 * duration("PT1S") + date("1970-01-01"),"[D01]-[M01]-[Y]")'
+$ xidel -se 'format-date(1561935600 * duration("PT1S") + date("1970-01-01"),"[D01]-[M01]-[Y]")'
 30-06-2019
 
 Date/printf houdt rekening met de lokale tijdzone, Xidel niet natuurlijk en print de UTC tijd.
 Zomertijd in Nederland betekent UTC+2 (GMT+2), dus 2 uren erbij.
 
-$ xidel -s -e '1561935600 * duration("PT1S") + duration("PT2H") + dateTime("1970-01-01T00:00:00")'
+$ xidel -se '1561935600 * duration("PT1S") + duration("PT2H") + dateTime("1970-01-01T00:00:00")'
 2019-07-01T01:00:00
 
-$ xidel -s -e 'format-date(1561935600 * duration("PT1S") + duration("PT2H") + date("1970-01-01"),"[D01]-[M01]-[Y]")'
+$ xidel -se 'format-date(1561935600 * duration("PT1S") + duration("PT2H") + date("1970-01-01"),"[D01]-[M01]-[Y]")'
 01-07-2019
 
-$ xidel -s -e '(dateTime("2019-07-01T01:00:00") - dateTime("1970-01-01T00:00:00") - duration("PT2H")) div dayTimeDuration("PT1S")'
+$ xidel -se '(dateTime("2019-07-01T01:00:00") - dateTime("1970-01-01T00:00:00") - duration("PT2H")) div dayTimeDuration("PT1S")'
 1561935600
 
 Voor een deling is expliciet dayTimeDuration() nodig. Zie https://sourceforge.net/p/videlibri/mailman/videlibri-xidel/thread/7e952f3d-18d5-ede8-17df-8480b2594b7c%40benibela.de/#msg36722060.
@@ -727,7 +727,7 @@ Voor een deling is expliciet dayTimeDuration() nodig. Zie https://sourceforge.ne
 
 Bij het weergeven van de actuele tijd is Xidel wel bewust van de tijdzone.
 
-$ xidel -s -e '"'$(date +%FT%T)'",current-dateTime()'
+$ xidel -se '"'$(date +%FT%T)'",current-dateTime()'
 2019-07-18T22:17:03
 2019-07-18T22:17:03.265
 
@@ -735,17 +735,17 @@ $ xidel -s -e '"'$(date +%FT%T)'",current-dateTime()'
 
 Bash:
 
-$ xidel -s -e 'let $a:=1561935600 return [system(x"date -d @{$a} +%FT%T")]'
+$ xidel -se 'let $a:=1561935600 return [system(x"date -d @{$a} +%FT%T")]'
 ["2019-07-01T01:00:00\n"]
-$ xidel -s -e 'let $a:=1561935600 return x:lines(system(x"date -d @{$a} +%FT%T"))[1]'
+$ xidel -se 'let $a:=1561935600 return x:lines(system(x"date -d @{$a} +%FT%T"))[1]'
 2019-07-01T01:00:00
 
 Date, zoals bijna elk programma, voegt een nieuwe regel (Unix:'\n', Windows:'\r\n') toe aan het einde.
 
-$ xidel -s -e 'let $a:=1561935600 return system(x"bash -c ""echo -n $(date -d @{$a} +%FT%T)""")'
+$ xidel -se 'let $a:=1561935600 return system(x"bash -c ""echo -n $(date -d @{$a} +%FT%T)""")'
 2019-07-01T01:00:00
 
-$ xidel -s -e 'let $a:=1561935600 return system(x"bash -c ""printf '\''%(%FT%T)T'\'' {$a}""")'
+$ xidel -se 'let $a:=1561935600 return system(x"bash -c ""printf '\''%(%FT%T)T'\'' {$a}""")'
 2019-07-01T01:00:00
 
 $ xidel -s --xquery 'let $a:=1561935600 return system(x"bash -c ""printf &apos;%(%FT%T)T&apos; {$a}""")'
@@ -759,26 +759,26 @@ I.t.t. date zijn printf en echo geen programma's, maar functies van Bash, waardo
 $ date +%:z
 +02:00
 
-$ xidel -s -e 'replace("'$(date +%:z)'","\+?(\d{2}):(\d{2})","PT$1H$2M")'
+$ xidel -se 'replace("'$(date +%:z)'","\+?(\d{2}):(\d{2})","PT$1H$2M")'
 PT02H00M
 
-$ xidel -s -e 'let $a:=1561935600 return $a * duration("PT1S") + duration(replace("'$(date +%:z)'","\+?(\d{2}):(\d{2})","PT$1H$2M")) + dateTime("1970-01-01T00:00:00")'
+$ xidel -se 'let $a:=1561935600 return $a * duration("PT1S") + duration(replace("'$(date +%:z)'","\+?(\d{2}):(\d{2})","PT$1H$2M")) + dateTime("1970-01-01T00:00:00")'
 2019-07-01T01:00:00
 
 Deze methode is vergelijkbaar met http://www.xqueryfunctions.com/xq/functx_duration-from-timezone.html, maar werkt wél met tijdzones als "+05:30" (India).
 ---
 
-$ xidel -s -e 'time("00:00:00") - time("00:00:00'$(date +%:z)'")'
+$ xidel -se 'time("00:00:00") - time("00:00:00'$(date +%:z)'")'
 PT2H
 
-$ xidel -s -e 'let $a:=1561935600 return $a * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00")'
+$ xidel -se 'let $a:=1561935600 return $a * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00")'
 2019-07-01T01:00:00
 ---
 
-$ xidel -s -e '(time("00:00:00") - time("00:00:00'$(date +%:z)'")) div dayTimeDuration("PT1S")'
+$ xidel -se '(time("00:00:00") - time("00:00:00'$(date +%:z)'")) div dayTimeDuration("PT1S")'
 7200
 
-$ xidel -s -e 'let $a:=1561935600 return ($a + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) div dayTimeDuration("PT1S")) * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
+$ xidel -se 'let $a:=1561935600 return ($a + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) div dayTimeDuration("PT1S")) * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
 2019-07-01T01:00:00
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -796,11 +796,11 @@ HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation
 
 FOR /F "skip=4 tokens=3" %A IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias') DO @ECHO %A
 of
-xidel -s -e "tokenize(system('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'),'\s+')[.][last()]"
+xidel -se "tokenize(system('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v ActiveTimeBias'),'\s+')[.][last()]"
 (met xidel 0.9.9 kan het zonder 'separator': tokenize(system('REG QUERY [...]'))[last()] )
 0xffffff88   # Signed 32bit Hex
 
-xidel -s -e "let $a:=x:integer(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]),$b:=x:integer-to-base($a,2) return if (string-length($b) < 32) then $a else $a - integer(math:pow(2,string-length($b)))"
+xidel -se "let $a:=x:integer(tokenize(system('REG QUERY [...]'),'\s+')[.][last()]),$b:=x:integer-to-base($a,2) return if (string-length($b) lt 32) then $a else $a - integer(math:pow(2,string-length($b)))"
 xidel -s --module=xivid.xqm -e "xivid:shex-to-dec(tokenize(system('REG QUERY [...]'),'\s+')[.][last()])"
 -120
 
@@ -816,38 +816,38 @@ xidel -s --module=xivid.xqm -e "let $a:=1561935600,$b:=xivid:shex-to-dec(tokeniz
 
 Tekst naar datum:
 
-$ xidel -s -e 'x:parse-date("17 february 2019  7:45","dd mmmm yyyy")'
+$ xidel -se 'x:parse-date("17 february 2019  7:45","dd mmmm yyyy")'
 2019-02-17
 
-$ xidel -s -e 'x:parse-dateTime("17 february 2019  7:45","dd mmmm yyyy  h:nn")'
+$ xidel -se 'x:parse-dateTime("17 february 2019  7:45","dd mmmm yyyy  h:nn")'
 2019-02-17T07:45:00
 
 Het Pascal format (https://www.freepascal.org/docs-html/rtl/sysutils/formatchars.html) komt heel precies,
 MAAR Xidel ondersteunt (op dit moment) alleen Engels en Duits:
 
-$ xidel -s -e 'x:parse-date("17 februari 2019  7:45","dd mmmm yyyy")'
+$ xidel -se 'x:parse-date("17 februari 2019  7:45","dd mmmm yyyy")'
 Error:
 err:FORG0001: Invalid conversion from 17 februari 2019  7:45 to date format dd mmmm yyyy
 
 Het kan ook handmatig:
 
-$ xidel -s -e 'tokenize("17 februari 2019  7:45","\s+")'
+$ xidel -se 'tokenize("17 februari 2019  7:45","\s+")'
 17
 februari
 2019
 7:45
 
-$ xidel -s -e 'extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))'
+$ xidel -se 'extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))'
 17
 februari
 2019
 
-$ xidel -s -e 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return (if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3])'
+$ xidel -se 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return (if ($b[1] lt 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3])'
 17
 02
 2019
 
-$ xidel -s -e 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return join((if ($b[1] < 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-")'
+$ xidel -se 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return join((if ($b[1] lt 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-")'
 17-02-2019
 
 declare function xivid:txt-to-date ($txt as string) as string {
@@ -861,7 +861,7 @@ declare function xivid:txt-to-date ($txt as string) as string {
   return
   join(
     (
-      if ($b[1] < 10) then "0"||$b[1] else $b[1],
+      if ($b[1] lt 10) then "0"||$b[1] else $b[1],
       $a($b[2]),
       $b[3]
     ),
@@ -873,13 +873,13 @@ declare function xivid:txt-to-date ($txt as string) as string {
 
 Afronden:
 
-$ xidel -s -e 'format-time(time("00:19:06.040"),"[H01]:[m01]:[s01]")'
+$ xidel -se 'format-time(time("00:19:06.040"),"[H01]:[m01]:[s01]")'
 00:19:06
 
-$ xidel -s -e 'format-time(time("00:19:06.540"),"[H01]:[m01]:[s01]")'
+$ xidel -se 'format-time(time("00:19:06.540"),"[H01]:[m01]:[s01]")'
 00:19:06
 
-$ xidel -s -e 'format-time(time("00:19:06.540") + duration("PT0.5S"),"[H01]:[m01]:[s01]")'
+$ xidel -se 'format-time(time("00:19:06.540") + duration("PT0.5S"),"[H01]:[m01]:[s01]")'
 00:19:07
 
 ================================================================================================
@@ -939,7 +939,7 @@ Output commando:
 Xidel commando Unix --> Windows in Bash:
 
 $ sed -n 810,817p xivid_notes.txt
-$ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position() = 810 to 817]'
+$ xidel -se 'file:read-text-lines("xivid_notes.txt")[position() = 810 to 817]'
 -e '
   let $a:=string-join(
         tokenize($raw) ! x:integer-to-base(.,16)
@@ -951,7 +951,7 @@ $ xidel -s -e 'file:read-text-lines("xivid_notes.txt")[position() = 810 to 817]'
 
 ----------------------------------------------------------------
 
-$ xidel -s -e 'let $a:=file:read-text-lines("xivid_notes.txt")[position() = 810 to 817] return (replace($a[1],"'\''","^""")||"^",replace($a[last()],"'\''",""""))'
+$ xidel -se 'let $a:=file:read-text-lines("xivid_notes.txt")[position() = 810 to 817] return (replace($a[1],"'\''","^""")||"^",replace($a[last()],"'\''",""""))'
 $ xidel -s --xquery 'let $a:=file:read-text-lines("xivid_notes.txt") return (replace($a[810],"&apos;","^&quot;")||"^",replace($a[817],"&apos;","&quot;"))'
 -e ^"^
 "
@@ -995,7 +995,7 @@ Xidel commando Unix --> Windows in Batch:
 
 ----------------------------------------------------------------
 
-xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position() = 810 to 817] return (replace($a[1],'''','^\"')^|^|'^',replace($a[last()],'''','\"'))"
+xidel -se "let $a:=file:read-text-lines('xivid_notes.txt')[position() = 810 to 817] return (replace($a[1],'''','^\"')^|^|'^',replace($a[last()],'''','\"'))"
 xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[810],'&apos;','^&quot;'),replace($a[817],'&apos;','&quot;'))"
 -e ^"^
 "
@@ -1018,7 +1018,7 @@ Xidel commando Windows --> Windows in Batch:
 
 ----------------------------------------------------------------
 
-xidel -s -e "let $a:=file:read-text-lines('xivid_notes.txt')[position() = 821 to 828] return (replace($a[1],'\"','^^\"')||'^',$a[last()])"
+xidel -se "let $a:=file:read-text-lines('xivid_notes.txt')[position() = 821 to 828] return (replace($a[1],'\"','^^\"')||'^',$a[last()])"
 xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (replace($a[821],'&quot;','^&quot;')||'^',$a[828])"
 -e ^"^
 "
@@ -1226,7 +1226,7 @@ bitrate
 Van de legenda en de "formats"-objecten maken we één array voor het makkelijker achterhalen van de langste string per te vormen kolom.
 Alle aanwezige attribuut-namen in de "formats"-objecten met een waarde die NIET null is:
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()] return $a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)])'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()] return $a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)])'
 id
 format
 language
@@ -1235,7 +1235,7 @@ bitrate
 
 Per attribuut-naam / kolom het aantal tekens van de langste string:
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]) return $b ! max($a()(.) ! string-length())'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)]) return $b ! max($a()(.) ! string-length())'
 5
 14
 4
@@ -1244,7 +1244,7 @@ $ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format
 
 Per object alle attribuut-waarden achter elkaar:
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]) return $a() ! string-join(for $x in $b return .($x))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - -e 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)]) return $a() ! string-join(for $x in $b return .($x))'
 idformaattaalresolutiebitrate
 sub-1vttnl
 hls-0m3u8[manifest]
@@ -1257,7 +1257,7 @@ hls-6m3u8[h264+aac]1024x5761027|128kbps
 
 String + (5, 14, 4, 9, of 12) spaties + 2 spaties speling, afgeknot na (5, 14, 4, 9, of 12) + 2 tekens:
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() > 1] return .[$x(.)]),$c:=$b ! max($a()(.) ! string-length()) return $a() ! string-join(for $x at $i in $b return substring(.($x)||string-join((1 to $c[$i] + 2) ! "-"),1,$c[$i] + 2))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$b:=$a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)]),$c:=$b ! max($a()(.) ! string-length()) return $a() ! string-join(for $x at $i in $b return substring(.($x)||string-join((1 to $c[$i] + 2) ! "-"),1,$c[$i] + 2))'
 id-----formaat---------taal--resolutie--bitrate-------
 sub-1--vtt-------------nl-----------------------------
 hls-0--m3u8[manifest]---------------------------------
@@ -1272,14 +1272,14 @@ hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--
 
 Alles bij elkaar. Als "formats"="formats", dan verwerk "formats"-objecten, anders geef attribuut-waarde terug:
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then $c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)) else $json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then $c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)) else $json(.))'
 Error:
 err:XPTY0004: Invalid conversion from ("id-----formaat---------taal--resolutie--bitrate-------", [...] "hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--") to type singleton
 
 concat() verwacht één enkele string, maar de tabel is een reeks van strings.
 Dit is op te lossen door van de tabel één string te maken m.b.v. new-line-characters (en weer wat spaties):
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! "-")) else $json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! "-")) else $json(.))'
 Naam:------NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:-----14-02-2017
 Tijdsduur:-00:01:05
@@ -1297,7 +1297,7 @@ Formaten:--id-----formaat---------taal--resolutie--bitrate-------
 
 Als gearriveerd bij laatste attribuut-waarde, dan plak " (best)" er achter, anders voeg spaties toe voor uitlijning:
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.))'
 Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:     14-02-2017
 Tijdsduur: 00:01:05
@@ -1333,12 +1333,12 @@ Download: ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 
 Begin 00:00:29 :
 
-$ xidel -s -e 'let $a:=("00:00:29","00:00:10") ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg",($a[1] - $a[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url> -ss ",$a[1] mod 30," -t ",$a[2]," [...]")'
+$ xidel -se 'let $a:=("00:00:29","00:00:10") ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg",($a[1] - $a[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url> -ss ",$a[1] mod 30," -t ",$a[2]," [...]")'
 Download: ffmpeg -i <url> -ss 29 -t 10 [...]
 
 Begin 00:00:30 :
 
-$ xidel -s -e 'let $a:=("00:00:30","00:00:10") ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg",($a[1] - $a[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($a[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$a[2]," [...]")'
+$ xidel -se 'let $a:=("00:00:30","00:00:10") ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg",($a[1] - $a[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($a[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$a[2]," [...]")'
 Download: ffmpeg -ss 30 -i <url> -t 10 [...]
 
 00:00:29 --> ffmpeg -i <url> -ss 29 -t 10 [...]
@@ -1347,7 +1347,7 @@ Download: ffmpeg -ss 30 -i <url> -t 10 [...]
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
 Datum:     14-02-2017
 Tijdsduur: 00:01:05
 Begin:     00:09:02
@@ -1364,7 +1364,7 @@ Formaten:  id     formaat         taal  resolutie  bitrate
 
 Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 
-$ sed -n 3040,3045p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
+$ sed -n 3040,3045p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
 Naam:      Flikken Maastricht: Virtus et justitia
 Datum:     01-03-2019
 Tijdsduur: 00:47:27
@@ -1382,7 +1382,7 @@ Formaten:  id       formaat        resolutie       frequentie  bitrate
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'declare function local:info ($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() > 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() = count($c()) and $i = count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
+$ sed -n 2948,3010p xivid_notes.txt | xidel -s - --xquery 'declare function local:info ($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[$json(.)] ! $a(.) ! string-length()),$c:=[{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()],$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[$json(.)] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if ($c(2)) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
 
 declare function xivid:info ($json as object()) as string* {
   let $a:={
@@ -1409,7 +1409,7 @@ declare function xivid:info ($json as object()) as string* {
         $json/(formats)()
       ],
       $d:=$c(1)() ! distinct-values(
-        for $x in $c()[position() > 1] return
+        for $x in $c()[position() gt 1] return
         .[$x(.)]
       ),
       $e:=$d ! max($c()(.) ! string-length())
@@ -1424,7 +1424,7 @@ declare function xivid:info ($json as object()) as string* {
           join(
             $c() ! string-join(
               for $x at $i in $d return
-              if (position() = count($c()) and $i = count($d)) then
+              if (position() eq count($c()) and $i eq count($d)) then
                 .($x)||" (best)"
               else
                 substring(
@@ -1450,9 +1450,9 @@ declare function xivid:info ($json as object()) as string* {
           1,$b + 1
         ),
         "ffmpeg",
-        ($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+        ($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
         " -i <url>",
-        ($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+        ($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
         " -t ",
         $f[2],
         " [...]"
@@ -2196,10 +2196,10 @@ $ xidel -s dm_x5aa1uc.m3u8 --xquery 'let $a:="https://www.dailymotion.com/cdn/ma
 
 ------------------------------------------------------------------------------------------------
 
-$ xidel -s -e 'x:request({"url":"https://streams.rtvoost.nl/video/tv/hls.m3u8","error-handling":"4xx=accept"})/url'
+$ xidel -se 'x:request({"url":"https://streams.rtvoost.nl/video/tv/hls.m3u8","error-handling":"4xx=accept"})/url'
 https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8
 
-$ xidel -s -e 'x:request({"url":"https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl","error-handling":"4xx=accept"})/url'
+$ xidel -se 'x:request({"url":"https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl","error-handling":"4xx=accept"})/url'
 https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2VA_PSLbbNUp302PxtXXfQENkIA4s9mOL2qycWG-NZbrTMfVlwL05yCZg3q5VcghXoYLrAHSl9xn0eHZBymWIjmtnJpc005GKCimwfnYHEoEJFeuwBPwdMe5Qmb-OvhlSoUTRA6xZt2HSmFnt8wb8ayty9Wt2XQb9mL_arnk0OEQ7XOn7dUNXsLRg1RIjWVf18vhZOSNhMBrN3-hEIcJKb75fwIYhqdAD9w85IexSrYAJqcYmenrqAoyUZGeuCN3Hlc3PJgs6jV_qw_-wOen6neNGZBT8CFmNma85Vfdw7bt8y3-DtDkx70xjb8bhOmOESzetf7Aels7NghNP-WhI0iYyc7pL14p2pyJYoyW_QV_CxpktikfJ8GJ5BOghLBueYwcSiGwIkkt2z2TCTghCnHuRimM03xi292D4mp62uqM_7-iRlRHhztQVPlCu3jV4aSKNUNCo40I3c-mB2A2Nyr-hIJMmbThTIe-Hp1hMq2EX5BDKKGCdaqfjg4KYa7X_ERbjJNGcQ1cMmyMswvXY-uY8H9wBcEPQvuoEPXy5gRzFdORfgJiYRZJBk_DOjufq1Dxiy_55Bhmw-Bw2hRnMoHFz2j1eZ_UyIolJ76Xz1nsOjOt_AxY0eineGSHmmSF-kEUKGLRetXgEhuvR0UoX31Y3vtMG0v8PI-XPvgKATdBHc7jj9di2fZyQhukmjnQC1sEu9MM3nnHOqrSmbkvQtADsfFcuyTcfdJlnhcufU9QgdzjWsS3-EKq9-kcvf3TtqNQX1yWDLQPSfSjHEzkdZDAccx6FmXESQkfMeRluufUitGistOucgu89xRLty9--SlGxMpvvZs_uw_4hVC6ba7-vUsLO0bB4cP66tKb809uM9uqy2dVHwoBLSnYKGKti0RvRVkotgPpo1SsYBA49fq9IBTnFiBqKQMlm2IsNQthun1fM4WdI3MhePl68upVzm61qcCpwKIYEF55Bb3bzA&anvtrid=2c422506e010d9c092ad6564d06c7c9a&anvauth=tb=0~te=1570918109~sgn=422231fded672998b6d2cc3f7031c8a08349df211a8c303c79b28d44a3c441a4&t=1570918019
 
 - Creëer de JSON met de redirected-url door 'x:request()' toe te voegen, maar gebruik de initiële url als de redirected-url vreselijk lang is, bijv. door een lang token.
@@ -2219,7 +2219,7 @@ https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2V
 
 - Creëer een m3u8-to-json functie van deze query.
 
-$ xidel -s --xquery 'declare function local:m3u8-to-json ($url as string?) as object()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"})[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*") return ($b[contains(.,"TYPE=SUBTITLES")] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))},for $x at $i in $b[contains(.,"PROGRESSIVE-URI")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($bw div 1000)||"kbps","url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":if (string-length($a/url) < 512) then $a/url else $url}[url],for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then if (contains($x,"TYPE=AUDIO")) then "m3u8[aac]" else "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],$b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1) return if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,"bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else (round($bw[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":(extract($x,"[^-]URI=&quot;(.+?)&quot;",1),extract($x,".+m3u8(?:\?.+)?","m"))[.][1] ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; local:m3u8-to-json(<url>)'
+$ xidel -s --xquery 'declare function local:m3u8-to-json ($url as string?) as object()* {if ($url) then let $a:=x:request({"url":$url,"error-handling":"4xx=accept"})[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$b:=extract($a/doc,"(#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$)",1,"ms*") return ($b[contains(.,"TYPE=SUBTITLES")] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":extract(.,"URI=&quot;(.+?)&quot;",1) ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))},for $x at $i in $b[contains(.,"PROGRESSIVE-URI")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($bw div 1000)||"kbps","url":extract($x,"URI=&quot;(.+?)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":if (string-length($a/url) lt 512) then $a/url else $url}[url],for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")] group by $bw:=extract($x,"BANDWIDTH=(\d+)",1) count $i return {"id":"hls-"||$i,"format":if (not(contains($x,"CODECS")) or contains($x,"avc1")) then if (contains($x,"TYPE=AUDIO")) then "m3u8[aac]" else "m3u8[h264+aac]" else "m3u8[aac]","resolution":let $a:=extract($x,"RESOLUTION=([\dx]+)",1)[.],$b:=extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d.]+)(?:\s|,|&quot;)",1) return if ($b) then concat($a,"@",round-half-to-even($b,3),"fps") else $a,"bitrate":let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($a[1]) then join((round($a[2][.] div 1000),round($a[1] div 1000)),"|") else (round($bw[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":(extract($x,"[^-]URI=&quot;(.+?)&quot;",1),extract($x,".+m3u8(?:\?.+)?","m"))[.][1] ! (if (starts-with(.,"http")) then . else resolve-uri(.,$a/url))}) else ()}; local:m3u8-to-json(<url>)'
 
 string    # Een string.
 string+   # Eén of meerdere strings.
@@ -2257,7 +2257,7 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
       {
         "id":"hls-0",
         "format":"m3u8[manifest]",
-        "url":if (string-length($a/url) < 512) then $a/url else $url
+        "url":if (string-length($a/url) lt 512) then $a/url else $url
       }[url],
       for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")]
       group by $bw:=extract($x,"BANDWIDTH=(\d+)",1)
@@ -2370,7 +2370,7 @@ https://www.npostart.nl/live/npo-1 (huidige API)
 
 $ xidel -s -H "X-Requested-With: XMLHttpRequest" "https://www.npostart.nl/api/token" -e '$json'
 of
-$ xidel -s -e 'x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json'
+$ xidel -se 'x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json'
 {
   "token": "dXbagD2EBAsa43aAQ1lEDMp1ZvUpQbHs0SEPAByt"
 }
@@ -2671,7 +2671,7 @@ when talking to: http://ida.omroep.nl/app.php/LI_NL1_4188102?token=3r9d72h0opmhc
 
 https://www.npostart.nl/nos-journaal/15-03-2019/POW_04059374
 
-$ xidel -s -e 'json(concat("http://ida.omroep.nl/app.php/POW_04059374?token=",json("http://ida.omroep.nl/app.php/auth")/token))'
+$ xidel -se 'json(concat("http://ida.omroep.nl/app.php/POW_04059374?token=",json("http://ida.omroep.nl/app.php/auth")/token))'
 {
   "limited": false,
   "site": null,
@@ -2705,7 +2705,7 @@ $ xidel -s -e 'json(concat("http://ida.omroep.nl/app.php/POW_04059374?token=",js
   ]
 }
 
-$ xidel -s -e 'json(concat("http://ida.omroep.nl/app.php/POW_04059374?token=",json("http://ida.omroep.nl/app.php/auth")/token))//url ! json(replace(.,"jsonp","json"))/url'
+$ xidel -se 'json(concat("http://ida.omroep.nl/app.php/POW_04059374?token=",json("http://ida.omroep.nl/app.php/auth")/token))//url ! json(replace(.,"jsonp","json"))/url'
 https://content.omroep.nl/streams/doeg/vodnotavailable.m4v?odiredirecturl=/video/ida/adaptive/2b39f51e5a4d9e865fe7c95340ffd0af/5c8d0c98/POW_04059374/1?extension=m3u8&type=json&callback=?
 https://content.omroep.nl/streams/doeg/vodnotavailable.m4v?odiredirecturl=/video/ida/h264_std/6d301b8d73b7e8ef4eab42845f536eff/5c8d0c98/POW_04059374/1?type=json&callback=?
 https://content.omroep.nl/streams/doeg/vodnotavailable.m4v?odiredirecturl=/video/ida/h264_bb/6ce7a8fe765d62925943cd3ba8d0dcc2/5c8d0c98/POW_04059374/1?type=json&callback=?
@@ -2717,14 +2717,14 @@ https://content.omroep.nl/streams/doeg/vodnotavailable.m4v?odiredirecturl=/video
 
 https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558 (laatste NOS Journaal 20:00 zonder DRM)
 
-$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json return $b'
+$ xidel -se 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json return $b'
 {
   "token": "eyJ0eXA[...]fFLtQQU",
   "embedUrl": "https://start-player.npo.nl/embed/eyJ0eXA[...]fFLtQQU",
   "embedCode": "<script async>if (typeof(NPOFrame) === \"function\") { NPOFrame('player-POW_03375558',  'https://start-player.npo.nl/embed/eyJ0eXA[...]fFLtQQU', 'POW_03375558'); } else { var el = document.createElement('script'); el.src = 'https://start-player.npo.nl/js/embed.min.js'; el.onload = function(){NPOFrame('player-POW_03375558',  'https://start-player.npo.nl/embed/eyJ0eXA[...]fFLtQQU', 'POW_03375558');};document.getElementById('player-POW_03375558').appendChild(el);}</script>"
 }
 
-$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $c'
+$ xidel -se 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $c'
 {
   "id": "POW_03375558",
   "type": "broadcast",
@@ -2806,7 +2806,7 @@ $ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-Wi
   "channel": "NED1"
 }
 
-$ xidel -s -e 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token)) return $d'
+$ xidel -se 'let $prid:="POW_03375558",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token)) return $d'
 {
   "stream": {
     "src": "https://pedgewarea28a.video.kpnstreaming.nl/session/61318042-a74f-11e9-a539-9cb654975bc0/u7df45/hls/vod/nponep/vod/npo/usp/npo/hls_unencrypted/POW_03375558/POW_03375558_v4.ism/playlist.m3u8?token=4825852375b33792a341d5d141b665ae_1563315898_1563315898",
@@ -2864,7 +2864,7 @@ $ xidel -s --module=xivid.xqm -e 'let $prid:="POW_03375558",$a:=x:request({"head
 
 https://www.npostart.nl/nos-journaal/15-07-2019/POW_04059460 (video met DRM)
 
-$ xidel -s -e 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token)) return $d'
+$ xidel -se 'let $prid:="POW_04059460",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"})/json, $b:=x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]),$d:=json(concat("https://start-player.npo.nl/video/",$prid,"/streams?profile=hls&quality=npo&tokenId=",$b/token)) return $d'
 {
   "stream": {
     "src": "https://nl-ams-p22-am3.cdn.streamgate.nl/eyJ0eXA[...]zYAx6JM/vod/npo/fps/TEST/npo/hls/POW_04059460_v1563215505/playlist.m3u8",
@@ -2964,7 +2964,7 @@ $ xidel -s --module=xivid.xqm -e 'let $prid:="POW_04059460",$a:=x:request({"head
 
 https://www.npostart.nl/stop-verkeerslicht-voor-telefoonverslaafde/14-02-2017/POMS_NOS_7332477 (videofragment)
 
-$ xidel -s -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"}), $b:=json/x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $c'
+$ xidel -se 'let $prid:="POMS_NOS_7332477",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"}), $b:=json/x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return $c'
 {
   "id": "POMS_NOS_7332477",
   "type": "fragment",
@@ -3108,7 +3108,7 @@ $ xidel -s --module=xivid.xqm -e 'let $prid:="POMS_NOS_7332477",$a:=x:request({"
 
 https://www.npostart.nl/flikken-maastricht/01-03-2019/AT_2105037
 
-$ xidel -s -e 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"}), $b:=json/x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return unparsed-text($b/embedUrl)'
+$ xidel -se 'let $prid:="AT_2105037",$a:=x:request({"header":"X-Requested-With: XMLHttpRequest","url":"https://www.npostart.nl/api/token"}), $b:=json/x:request({"post":"_token="||$a/token,"url":"https://www.npostart.nl/player/"||$prid})/json,$c:=json(doc($b/embedUrl)//script/extract(.,"var video =(.+);",1)[.]) return unparsed-text($b/embedUrl)'
 <!DOCTYPE html>
 <html>
 <head>
@@ -3249,11 +3249,11 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=d4e31e66-e403-33d5-8
 
 https://www.rtl.nl/video/cefbd40f-34a0-3f94-b3d8-1705119c79f4/ (RTL Nieuws van 18-05-2019)
 
-$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total > 0]/(material)()/(original_date,duration)'
+$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total gt 0]/(material)()/(original_date,duration)'
 1.5582006E9
 00:19:06.040
 
-$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total > 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
+$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total gt 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
 {
   "name": "RTL4: RTL Nieuws - 19:30 uur",
   "date": "18-05-2019",
@@ -3325,7 +3325,7 @@ $ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=e
 Bash:
 
 $ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e '
-  $json[meta/nr_of_videos_total > 0]/{
+  $json[meta/nr_of_videos_total gt 0]/{
     "name":concat(
       .//station,
       ": ",
@@ -3364,7 +3364,7 @@ FOR /F "delims=" %A IN ('xidel -s --module=xivid.xqm -e "
   ) * -60
 " --output-format=cmd') DO %A
 xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e "
-  $json[meta/nr_of_videos_total > 0]/{
+  $json[meta/nr_of_videos_total gt 0]/{
     'name':concat(
       .//station,
       ': ',
@@ -4194,7 +4194,7 @@ $ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" -e 'let $a:=json(//scri
 
 https://github.com/ytdl-org/youtube-dl/blob/c2d125d99f81aa33429b2158acd9a90524575378/youtube_dl/extractor/youtube.py#L1948: "# bitrate for itag 43 is always 2147483647".
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response) return [for $x at $i in $b/streamingData/(formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url}]'
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response) return [for $x at $i in $b/streamingData/(formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url}]'
 [
   {
     "id": "pg-1",
@@ -4248,7 +4248,7 @@ $ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(
   }
 ]
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response) return {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in $b/streamingData/(formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in $b/streamingData/(adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response) return {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in $b/streamingData/(formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in $b/streamingData/(adaptiveFormats)() order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
 {
   "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
   "date": "01-02-2019",
@@ -4321,7 +4321,7 @@ $ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(
 
 Nu de attributen van deze reeks dezelfde naam hebben als die in de "player_response" JSON kan voor de te creëren JSON (bijna) dezelfde query gebruikt worden.
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|} return [for $x at $i in reverse($b) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url}]'
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|} return [for $x at $i in reverse($b) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url}]'
 [
   {
     "id": "pg-1",
@@ -4417,7 +4417,7 @@ $ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(
 
 Combineer queries voor beide bronnen.
 
-$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response),$c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|},$d:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return if ($a[1]="size") then let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]}) else {if ($a[1]="type") then "mimeType" else if ($a[1]="audio_sample_rate") then "audioSampleRate" else $a[1]:uri-decode($a[2])}|} return {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)() else reverse($c) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)() else $d order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
+$ xidel -s "https://www.youtube.com/watch?v=nG_LtCRRZ20" --xquery 'let $a:=json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response),$c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|},$d:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return if ($a[1]="size") then let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]}) else {if ($a[1]="type") then "mimeType" else if ($a[1]="audio_sample_rate") then "audioSampleRate" else $a[1]:uri-decode($a[2])}|} return {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)() else reverse($c) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)() else $d order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
 {
   "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
   "date": "01-02-2019",
@@ -4714,7 +4714,7 @@ $ xidel -s "https://www.youtube.com/watch?v=GuoxLggqI_g" -e 'let $a:=json(//scri
 
 De formaten uit het "url_encoded_fmt_stream_map"- en "adaptive_fmts"-attribuut hebben wel een "url"-attribuut, maar de signature ook; $c[not(s)] en $d[not(s)].
 
-$ xidel -s --module=xivid.xqm "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response),$c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|},$d:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return if ($a[1]="size") then let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]}) else {if ($a[1]="type") then "mimeType" else if ($a[1]="audio_sample_rate") then "audioSampleRate" else $a[1]:uri-decode($a[2])}|} return if ($b/videoDetails/isLive) then {"name"://meta[@property="og:title"]/@content,"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($b/streamingData/hlsManifestUrl)} else {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[($b//captionTracks)()[languageCode="nl"]/{"id":"sub-1","format":"ttml","language":"nl","label":name/simpleText,"url":baseUrl},for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)]) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)] order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
+$ xidel -s --module=xivid.xqm "https://www.youtube.com/watch?v=GuoxLggqI_g" --xquery 'let $a:=if (//meta[@property="og:restrictions:age"]) then {|for $x in tokenize(unparsed-text(concat("https://www.youtube.com/get_video_info?video_id=",//meta[@itemprop="videoId"]/@content,"&amp;eurl=",uri-encode("https://youtube.googleapis.com/v/"||//meta[@itemprop="videoId"]/@content),"&amp;sts=",json(doc("https://www.youtube.com/embed/"||//meta[@itemprop="videoId"]/@content)//script/extract(.,"setConfig\((.+?)\)",1,"*")[3])//sts)),"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} else json(//script/extract(.,"ytplayer.config = (.+?\});",1)[.])/args,$b:=$a/json(player_response),$c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,",") return {|let $a:=extract(tokenize($a/fmt_list,",")[$i],"/(\d+)x(\d+)",(1,2)) return ({"width":$a[1]},{"height":$a[2]}),for $y in tokenize($x,"&amp;") let $a:=tokenize($y,"=") return {if ($a[1]="type") then "mimeType" else $a[1]:uri-decode($a[2])}|},$d:=tokenize($a/adaptive_fmts,",") ! {|for $x in tokenize(.,"&amp;") let $a:=tokenize($x,"=") return if ($a[1]="size") then let $a:=tokenize($a[2],"x") return ({"width":$a[1]},{"height":$a[2]}) else {if ($a[1]="type") then "mimeType" else if ($a[1]="audio_sample_rate") then "audioSampleRate" else $a[1]:uri-decode($a[2])}|} return if ($b/videoDetails/isLive) then {"name"://meta[@property="og:title"]/@content,"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($b/streamingData/hlsManifestUrl)} else {"name"://meta[@property="og:title"]/@content,"date":format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]"),"duration":duration(//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[($b//captionTracks)()[languageCode="nl"]/{"id":"sub-1","format":"ttml","language":"nl","label":name/simpleText,"url":baseUrl},for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)]) order by $x/width count $i return {"id":"pg-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat($x/width,"x",$x/height),"bitrate":$x[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":$x/url},for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)] order by $x/boolean(width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $a:=extract($x/mimeType,"/(.+);.+&quot;(\w+)",(1,2)) return concat($a[1],"[",if ($a[2]="avc1") then "h264" else if ($a[2]="mp4a") then "aac" else $a[2],"]"),"resolution":$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate":$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url}]}'
 {
   "name": "The Uncertainty Has Settled (Full film)",
   "date": "07-11-2018",
@@ -4776,7 +4776,7 @@ Kv.up(a,2);Kv.y9(a,23);Kv.y9(a,22);Kv.Rp(a,52);Kv.up(a,3);Kv.y9(a,1);Kv.up(a,1);
 
 - String bewerking.
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:="fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g==",
         $a:=substring($sig,3),                          # Kv.up(a,2)
         $b:=replace($a,"^(.)(.{22})(.)","$3$2$1"),      # Kv.y9(a,23)
@@ -4800,7 +4800,7 @@ Kv.up(a,2);Kv.y9(a,23);Kv.y9(a,22);Kv.Rp(a,52);Kv.up(a,3);Kv.y9(a,1);Kv.up(a,1);
   ALALgxI2wwRgIhANxVrUOk-fmXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg=
   ALgxI2wwRgIhANxVrUOk-fmXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg=
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:="fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g==" return
     substring($sig,3) ! replace(.,"^(.)(.{22})(.)","$3$2$1") ! replace(.,"^(.)(.{21})(.)","$3$2$1") !
     codepoints-to-string(reverse(x:cps(.))) ! substring(.,4) ! replace(.,"^(.)(.{0})(.)","$3$2$1") !
@@ -4814,7 +4814,7 @@ Kv.up(a,2);Kv.y9(a,23);Kv.y9(a,22);Kv.Rp(a,52);Kv.up(a,3);Kv.y9(a,1);Kv.up(a,1);
 
 - Sequence (reeks) bewerking.
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:=x:cps("fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g=="),
         $a:=subsequence($sig,3),
         $b:=($a[24],subsequence($a,2,22),$a[1],subsequence($a,25)),
@@ -4829,14 +4829,14 @@ Kv.up(a,2);Kv.y9(a,23);Kv.y9(a,22);Kv.Rp(a,52);Kv.up(a,3);Kv.y9(a,1);Kv.up(a,1);
   '
   ALgxI2wwRgIhANxVrUOk-fmXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg=
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:="fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g==" return
     subsequence(x:cps($sig),3) ! (.[24],subsequence(.,2,22),.[1],subsequence(.,25)) ...
   
   Dit werkt niet, omdat met ! de reeks is opengebroken waardoor positionering niet meer mogelijk is.
   Deze omslachtige methode, telkens een array ervan maken om de positionering te behouden, werkt wel:
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:="fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g==" return
     [subsequence(x:cps($sig),3)] ! [.(24),subsequence(.(),2,22),.(1),subsequence(.(),25)] ! [.(23),subsequence(.(),2,21),.(1),subsequence(.(),24)] !
     [reverse(.())] ! [subsequence(.(),4)] ! [.(2),subsequence(.(),2,0),.(1),subsequence(.(),3)] ! [subsequence(.(),2)] ! [reverse(.())] !
@@ -4912,20 +4912,20 @@ Kv.up(a,2);Kv.y9(a,23);Kv.y9(a,22);Kv.Rp(a,52);Kv.up(a,3);Kv.y9(a,1);Kv.up(a,1);
 
 - itag=22 uit de "player_response" JSON als voorbeeld:
 
-  $ xidel -s GuoxLggqI_g.json --xquery 'let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag = 22]/cipher'
+  $ xidel -s GuoxLggqI_g.json --xquery 'let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag eq 22]/cipher'
   sp=sig&url=https%3A%2F%2Fr2---sn-mn4vg5aa-5hns.googlevideo.com%2Fvideoplayback%3F[...]itag%3D22[...]
 
-  $ xidel -s GuoxLggqI_g.json --xquery 'let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag = 22]/{|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|}'
+  $ xidel -s GuoxLggqI_g.json --xquery 'let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag eq 22]/{|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|}'
   {
     "sp": "sig",
     "url": "https://r2---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback?expire=1564689970&ei=0vFCXdm5Buaz8gOSt56YDg&ip=x.x.x.x&id=o-AM1ibvM0Feuk9dfaoOg3JIDE2bGsRFvUjonCfjXC4doV&itag=22&source=youtube&requiressl=yes&mm=31%2C29&mn=sn-mn4vg5aa-5hns%2Csn-5hnekn7l&ms=au%2Crdu&mv=m&mvi=1&pl=15&initcwndbps=1722500&mime=video%2Fmp4&ratebypass=yes&dur=5306.015&lmt=1541644163348912&mt=1564668289&fvip=2&beids=23806810&c=WEB&txp=5531432&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cmime%2Cratebypass%2Cdur%2Clmt&lsparams=mm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AHylml4wRAIgYgfiMLa-3zEHAFw3G3NVL2b-nktzrDnHqm-dMZoGkjsCIFgGrQFtuM9R3IwnKUpJ_k476H49zDJDOqhU0-6DodfL",
     "s": "fLfLALgxI2wwRgIhANxVrUOkA-mXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg==g=="
   }
 
-  $ xidel -s GuoxLggqI_g.json --xquery 'declare function local:swap($a,$b){replace($a,x"^(.)(.{{{$b - 1}}})(.)","$3$2$1")}; declare function local:reverse($a){codepoints-to-string(reverse(x:cps($a)))}; let $a:=$json/args,$b:=$a/json(player_response),$c:=$b/streamingData/(formats)()[itag = 22]/{|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return substring($c/s,2 + 1) ! local:swap(.,23) ! local:swap(.,22) ! local:reverse(.) ! substring(.,3 + 1) ! local:swap(.,1) ! substring(.,1 + 1) ! local:reverse(.) ! substring(.,2 + 1)'
+  $ xidel -s GuoxLggqI_g.json --xquery 'declare function local:swap($a,$b){replace($a,x"^(.)(.{{{$b - 1}}})(.)","$3$2$1")}; declare function local:reverse($a){codepoints-to-string(reverse(x:cps($a)))}; let $a:=$json/args,$b:=$a/json(player_response),$c:=$b/streamingData/(formats)()[itag eq 22]/{|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return substring($c/s,2 + 1) ! local:swap(.,23) ! local:swap(.,22) ! local:reverse(.) ! substring(.,3 + 1) ! local:swap(.,1) ! substring(.,1 + 1) ! local:reverse(.) ! substring(.,2 + 1)'
   ALgxI2wwRgIhANxVrUOk-fmXsaZlUh7MzPzSJHjgXUvzCQ1T3fITrFBgAiEAnRabUOqA_Vz2oojySSX6Vm3uKMKgYvjg219PiORK6Kg=
 
-  $ xidel -s GuoxLggqI_g.json --xquery 'declare function local:swap($a,$b){replace($a,x"^(.)(.{{{$b - 1}}})(.)","$3$2$1")}; declare function local:reverse($a){codepoints-to-string(reverse(x:cps($a)))}; let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag = 22]/{"id":"pg-1","format":let $a:=extract(mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":.[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":if (cipher) then let $a:={|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return concat($a/url,"&amp;sig=",substring($a/s,2 + 1) ! local:swap(.,23) ! local:swap(.,22) ! local:reverse(.) ! substring(.,3 + 1) ! local:swap(.,1) ! substring(.,1 + 1) ! local:reverse(.) ! substring(.,2 + 1)) else url}'
+  $ xidel -s GuoxLggqI_g.json --xquery 'declare function local:swap($a,$b){replace($a,x"^(.)(.{{{$b - 1}}})(.)","$3$2$1")}; declare function local:reverse($a){codepoints-to-string(reverse(x:cps($a)))}; let $a:=$json/args,$b:=$a/json(player_response) return $b/streamingData/(formats)()[itag eq 22]/{"id":"pg-1","format":let $a:=extract(mimeType,"/(.+);.+&quot;(\w+)\..+ (\w+)(?:\.|&quot;)",(1 to 3)) return concat(if ($a[1]="3gpp") then "3gp" else $a[1],"[",if ($a[2]="avc1") then "h264" else $a[2],"+",if ($a[3]="mp4a") then "aac" else $a[3],"]"),"resolution":concat(width,"x",height),"bitrate":.[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),"url":if (cipher) then let $a:={|for $x in tokenize(cipher,"&amp;") let $a:=tokenize($x,"=") return {$a[1]:uri-decode($a[2])}|} return concat($a/url,"&amp;sig=",substring($a/s,2 + 1) ! local:swap(.,23) ! local:swap(.,22) ! local:reverse(.) ! substring(.,3 + 1) ! local:swap(.,1) ! substring(.,1 + 1) ! local:reverse(.) ! substring(.,2 + 1)) else url}'
   {
     "id": "pg-1",
     "format": "mp4[h264+aac]",
@@ -4978,7 +4978,7 @@ hv.Qe(a,38);hv.w1(a,63);hv.Qe(a,7);hv.Qe(a,18);hv.w1(a,80);hv.Qe(a,21)
 
 - String bewerking.
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:="8710A392B27B0B768805F4FE07A1FADA816278E6.532DEA360BAD3768AD2EF61152A9932FF3CAC796",
         $a:=replace($sig,"^(.)(.{37})(.)","$3$2$1"),    # hv.Qe(a,38)
         $b:=codepoints-to-string(reverse(x:cps($a))),   # hv.w1(a,63)
@@ -5000,7 +5000,7 @@ hv.Qe(a,38);hv.w1(a,63);hv.Qe(a,7);hv.Qe(a,18);hv.w1(a,80);hv.Qe(a,21)
 
 - Sequence (reeks) bewerking.
 
-  $ xidel -s -e '
+  $ xidel -se '
     let $sig:=x:cps("8710A392B27B0B768805F4FE07A1FADA816278E6.532DEA360BAD3768AD2EF61152A9932FF3CAC796"),
         $a:=($sig[39],subsequence($sig,2,37),$sig[1],subsequence($sig,40)),
         $b:=reverse($a),
@@ -5106,7 +5106,7 @@ hv.Qe(a,38);hv.w1(a,63);hv.Qe(a,7);hv.Qe(a,18);hv.w1(a,80);hv.Qe(a,21)
           "]"
         ),
         "resolution":concat($x/width,"x",$x/height),
-        "bitrate":$x[itag != 43]/bitrate ! concat(round(. div 1000),"kbps"),
+        "bitrate":$x[itag ne 43]/bitrate ! concat(round(. div 1000),"kbps"),
         "url":$x/url
       },
       for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)]
@@ -7777,7 +7777,7 @@ $ xidel -s -H "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxq
   "translations": {[...]}
 }
 
-$ xidel -s -e 'x:request({"method":"POST","headers":"Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw","url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token'
+$ xidel -se 'x:request({"method":"POST","headers":"Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw","url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token'
 1185211608508878854
 
 $ xidel -s "https://twitter.com/themandalorian/status/1188986316194635777" -e 'declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"; let $a:=x:request({"method":"POST","headers":$head,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($head,"x-guest-token: "||$a),"url":concat("https://api.twitter.com/1.1/videos/tweet/config/",//@data-associated-tweet-id,".json")})//playbackUrl'
@@ -8642,7 +8642,7 @@ https://www.dailymotion.com/video/x5aa1uc
 $ xidel -s "https://www.dailymotion.com/video/x5aa1uc" -e 'json(//script/extract(.,"PLAYER_CONFIG__ = (.+);",1)[.])/context/metadata_template_url'
 https://www.dailymotion.com/player/metadata/video/:videoId?embedder=:embedder&referer=:referer&app=com.dailymotion.neon&locale=nl&client_type=website
 
-$ xidel -s -e 'extract("https://www.dailymotion.com/video/x5aa1uc",".+/(.+)",1)'
+$ xidel -se 'extract("https://www.dailymotion.com/video/x5aa1uc",".+/(.+)",1)'
 x5aa1uc
 
 $ xidel -s --module=xivid.xqm "https://www.dailymotion.com/player/metadata/video/x5aa1uc" -e '$json/{"name":"Dailymotion: "||title,"date":format-date(created_time * duration("PT1S") + (time("00:00:00") - time("00:00:00'$(date +%:z)'")) + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(qualities//url)}'

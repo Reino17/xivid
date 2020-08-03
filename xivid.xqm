@@ -50,7 +50,7 @@ declare function xivid:m3u8-to-json ($url as string?) as object()* {
       {
         "id":"hls-0",
         "format":"m3u8[manifest]",
-        "url":if (string-length($a/url) < 512) then $a/url else $url
+        "url":if (string-length($a/url) lt 512) then $a/url else $url
       }[url],
       for $x at $i in $b[contains(.,"STREAM-INF") or contains(.,"TYPE=AUDIO")]
       group by $bw:=extract($x,"BANDWIDTH=(\d+)",1)
@@ -105,7 +105,7 @@ declare function xivid:txt-to-date ($txt as string) as string {
   return
   join(
     (
-      if ($b[1] < 10) then "0"||$b[1] else $b[1],
+      if ($b[1] lt 10) then "0"||$b[1] else $b[1],
       $a($b[2]),
       $b[3]
     ),
@@ -117,7 +117,7 @@ declare function xivid:shex-to-dec ($shex as string) as integer {
   let $a:=x:integer($shex),
       $b:=x:integer-to-base($a,2)
   return
-  if (string-length($b) > 31) then
+  if (string-length($b) gt 31) then
     $a - integer(math:pow(2,string-length($b)))
   else
     $a
@@ -167,7 +167,7 @@ declare function xivid:info ($json as object()) as string* {
         $json/(formats)()
       ],
       $d:=$c(1)() ! distinct-values(
-        for $x in $c()[position() > 1] return
+        for $x in $c()[position() gt 1] return
         .[$x(.)]
       ),
       $e:=$d ! max($c()(.) ! string-length())
@@ -182,7 +182,7 @@ declare function xivid:info ($json as object()) as string* {
           join(
             $c() ! string-join(
               for $x at $i in $d return
-              if (position() = count($c()) and $i = count($d)) then
+              if (position() eq count($c()) and $i eq count($d)) then
                 .($x)||" (best)"
               else
                 substring(
@@ -208,9 +208,9 @@ declare function xivid:info ($json as object()) as string* {
           1,$b + 1
         ),
         "ffmpeg",
-        ($f[1] - $f[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+        ($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
         " -i <url>",
-        ($f[1] mod 30) ! (if (. = 0) then () else " -ss "||.),
+        ($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
         " -t ",
         $f[2],
         " [...]"
