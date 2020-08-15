@@ -85,35 +85,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:rtl
-FOR /F "delims=" %%A IN ('xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=%~1/fmt=adaptive/" -e ^"
-  json:^=$json[meta/nr_of_videos_total gt 0]/{
-    'name':concat^(
-      .//station^,
-      ': '^,
-      abstracts/name^,
-      ' - '^,
-      if ^(.//classname^='uitzending'^) then episodes/name else .//title
-    ^)^,
-    'date':format-date^(
-      ^(material^)^(^)/original_date * duration^('PT1S'^) +
-      implicit-timezone^(^) + date^('1970-01-01'^)^,
-      '[D01]-[M01]-[Y]'
-    ^)^,
-    'duration':format-time^(
-      time^(^(material^)^(^)/duration^) + duration^('PT0.5S'^)^,
-      '[H01]:[m01]:[s01]'
-    ^)^,
-    'expdate':format-dateTime^(
-      ^(.//ddr_timeframes^)^(^)[model^='AVOD']/stop * duration^('PT1S'^) +
-      implicit-timezone^(^) + dateTime^('1970-01-01T00:00:00'^)^,
-      '[D01]-[M01]-[Y] [H01]:[m01]:[s01]'
-    ^)^,
-    'formats':xivid:m3u8-to-json^(.//videohost^|^|.//videopath^)
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :kijk
 FOR /F "delims=" %%A IN ('xidel --xquery ^"
   json:^=try {
@@ -1164,9 +1135,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:uitzendinggemist.net=%"=="%url%" (
   CALL :tvblik "%url%"
 ) ELSE IF NOT "%url:rtlxl.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','.+/(.+)',1)"') DO CALL :rtl %%A
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtl('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:rtlnieuws.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel "%url%" -e "//@data-uuid"') DO CALL :rtl %%A
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtl('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:kijk.nl=%"=="%url%" (
   CALL :kijk "%url%"
 ) ELSE IF NOT "%url:omropfryslan.nl=%"=="%url%" (

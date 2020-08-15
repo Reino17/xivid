@@ -3067,9 +3067,14 @@ declare function xivid:npo($url as string) as object()? {
 
 [rtl]
 
-https://www.rtl.nl/video/d4e31e66-e403-33d5-8f44-a3886e42be51/ (RTL Nieuws van 18-11-2017 met expiredate 19-11-2018 05:48:44, zie BatchGemist notes)
+# oude, maar nog steeds werkende api:
 
-$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=d4e31e66-e403-33d5-8f44-a3886e42be51/fmt=adaptive/" -e '$json'
+$ url=https://www.rtlxl.nl/programma/rtl-nieuws/cefbd40f-34a0-3f94-b3d8-1705119c79f4/ (RTL Nieuws van 18-05-2019 19:30, met expiration-date "18-05-2020 06:52:29")
+
+$ xidel -se 'concat("http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",extract("'$url'",".+/(.+)",1),"/fmt=adaptive/")'
+http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/
+
+$ xidel -se 'json(concat("http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",extract("'$url'",".+/(.+)",1),"/fmt=adaptive/"))'
 {
   "meta": {
     [...]
@@ -3080,83 +3085,204 @@ $ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=d4e31e66-e403-33d5-8
   [...]
 }
 
-https://www.rtl.nl/video/cefbd40f-34a0-3f94-b3d8-1705119c79f4/ (RTL Nieuws van 18-05-2019)
+$ url=https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724-9a6f-91de543b8a4c (RTL Nieuws van 26-06-2020 19:30)
 
-$ xidel -s "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total gt 0]/(material)()/(original_date,duration)'
-1.5582006E9
-00:19:06.040
+$ xidel -se 'json(concat("http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",extract("'$url'",".+/(.+)",1),"/fmt=adaptive/"))[meta/nr_of_videos_total gt 0]'
+{
+  "meta": {
+    "jsonp": "0",
+    "sort": "date desc",
+    "product": "rtlxl",
+    "context": "nocontext",
+    "output": "json",
+    "uuid": "bf475894-02ce-3724-9a6f-91de543b8a4c",
+    "fmt": "adaptive",
+    "fun": "abstract",
+    "pg": "1",
+    "supports_drm": "0",
+    "version": "2",
+    "d": "pc",
+    "videohost": "http://manifest.us.rtl.nl",
+    "nr_of_videos_total": 1,
+    "nr_of_videos_onpage": 1,
+    "nicam_base_url": "http://data.rtl.nl/active/s4mlib/nicam/xl3/*.png",
+    "proglogo_base_url": "http://logos.rtl.nl/logo/s/240/",
+    "thumb_base_url": "http://screenshots.rtl.nl/sz=355x200/uuid=",
+    "poster_base_url": "http://screenshots.rtl.nl/sz=720x404/uuid=",
+    "cover_base_url": "http://covers.rtl.nl/system/cover/l/pc/"
+  },
+  "classes": [
+    {
+      "abstract_key": "",
+      "classname": "uitzending",
+      "display": "afleveringen",
+      "sko_ty": "tv.ep"
+    }
+  ],
+  "genres": [],
+  "collection": {
+    "key": "132237",
+    "name": "RTL Nieuws",
+    "rtl_source": "rtlnieuws"
+  },
+  "abstracts": [
+    {
+      "key": "132237",
+      "on_page": true,
+      "name": "RTL Nieuws",
+      "progsubtype": "nieuws",
+      "is_telekids": false,
+      "is_sport": false,
+      "website": "http://www.rtl.nl/actueel/rtlnieuws/",
+      "alias": "journaal",
+      "synopsis": "Dagelijks het laatste nieuws uit binnen- en buitenland. Voor nog meer nieuws kunt u ook gebruikmaken van onze mobiele apps."
+    }
+  ],
+  "seasons": [
+    {
+      "key": "504188",
+      "abstract_key": "132237",
+      "on_page": true,
+      "name": "19:30 uur",
+      "synopsis": "Dagelijks het laatste nieuws uit binnen- en buitenland. Voor nog meer nieuws kunt u ook gebruikmaken van onze mobiele apps.",
+      "website": "",
+      "volgnr": 122
+    }
+  ],
+  "episodes": [
+    {
+      "key": "504366",
+      "name": "19:30 uur",
+      "volgnr": 178,
+      "nicam": "",
+      "genre": "",
+      "product_genre": "Nieuws En Actualiteit",
+      "prodyear": "",
+      "synopsis": "Dagelijks het laatste nieuws uit binnen- en buitenland. Voor nog meer nieuws kunt u ook gebruikmaken van onze mobiele apps."
+    }
+  ],
+  "material": [
+    {
+      "uuid": "bf475894-02ce-3724-9a6f-91de543b8a4c",
+      "abstract_key": "132237",
+      "season_key": "504188",
+      "episode_key": "504366",
+      "classname": "uitzending",
+      "duration": "00:21:10.120",
+      "image": "bf475894-02ce-3724-9a6f-91de543b8a4c",
+      "title": "",
+      "nicam": "",
+      "display_date": 1593192600,
+      "original_date": 1593192600,
+      "ddr_audience": "DRM",
+      "ddr_tariff": "AVOD",
+      "ddr_model": "AVOD",
+      "quality": "HD",
+      "fov": "",
+      "station": "RTL4",
+      "ddr_allow_sharing": true,
+      "thumb_id": "0",
+      "marketing_params": [...],
+      "videopath": "/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/504188/bf475894-02ce-3724-9a6f-91de543b8a4c.ssm/bf475894-02ce-3724-9a6f-91de543b8a4c.m3u8",
+      "user_rating": "",
+      "date_source": "broadcasted",
+      "breakpoints": [],
+      "ddr_timeframes": [
+        {
+          "start": 1593192638,
+          "stop": 1624728638,
+          "tariff": 0,
+          "is_preview": false,
+          "expiration": "1x",
+          "model": "AVOD"
+        }
+      ],
+      "keywords": "",
+      "synopsis": ""
+    }
+  ]
+}
 
-$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=cefbd40f-34a0-3f94-b3d8-1705119c79f4/fmt=adaptive/" -e '$json[meta/nr_of_videos_total gt 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'json(concat("http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",extract("'$url'",".+/(.+)",1),"/fmt=adaptive/"))[meta/nr_of_videos_total gt 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
 {
   "name": "RTL4: RTL Nieuws - 19:30 uur",
-  "date": "18-05-2019",
-  "duration": "00:19:06",
-  "expdate": "18-05-2020 06:52:29",
+  "date": "26-06-2020",
+  "duration": "00:21:10",
+  "expdate": "26-06-2021 19:30:38",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.m3u8"
+      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/[...]/bf475894-02ce-3724-9a6f-91de543b8a4c.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ism/cefbd40f-34a0-3f94-b3d8-1705119c79f4-audio=125437.m3u8"
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/[...]/bf475894-02ce-3724-9a6f-91de543b8a4c-audio=125437.m3u8"
     },
     [...]
     {
       "id": "hls-4",
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720",
-      "bitrate": "4117|125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ssm/cefbd40f-34a0-3f94-b3d8-1705119c79f4.ism/cefbd40f-34a0-3f94-b3d8-1705119c79f4-audio=125437-video=4117000.m3u8"
+      "bitrate": "3819|125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/[...]/bf475894-02ce-3724-9a6f-91de543b8a4c-audio=125437-video=3819000.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://www.rtlnieuws.nl/nieuws/laatste-videos-nieuws/video/4694701/game-thrones-dubbelganger-droomt-van-het-witte-doek
+$ url=https://www.rtlnieuws.nl/nieuws/video/video/5167967/snel-dooiende-permafrost-tikkende-klimaattijdbom
 
-$ xidel -s "https://www.rtlnieuws.nl/nieuws/laatste-videos-nieuws/video/4694701/game-thrones-dubbelganger-droomt-van-het-witte-doek" -e '//@data-uuid'
-ed3d420a-4741-4ea9-afdf-8dc8271ff9c9
+$ xidel -se 'concat("http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//@data-uuid else extract("'$url'",".+/(.+)",1),"/fmt=adaptive/")'
+http://www.rtl.nl/system/s4m/vfd/version=2/uuid=91625309-23cd-4ea2-84a2-aeceaa9920a3/fmt=adaptive/
 
-$ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=ed3d420a-4741-4ea9-afdf-8dc8271ff9c9/fmt=adaptive/" -e '[...]'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'json(concat("http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//@data-uuid else extract("'$url'",".+/(.+)",1),"/fmt=adaptive/"))[meta/nr_of_videos_total gt 0]/{"name":concat(.//station,": ",abstracts/name," - ",if (.//classname="uitzending") then episodes/name else .//title),"date":format-date((material)()/original_date * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(time((material)()/duration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"expdate":format-dateTime((.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(.//videohost||.//videopath)}'
 {
-  "name": "RTL4: RTL Nieuws - Game of Thrones-dubbelganger droomt van het witte doek",
-  "date": "29-04-2019",
-  "duration": "00:01:33",
+  "name": "RTL4: RTL Nieuws - Snel dooiende permafrost is tikkende klimaattijdbom",
+  "date": "26-06-2020",
+  "duration": "00:02:19",
   "expdate": null,
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/415972/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ssm/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.m3u8"
+      "url": "http://manifest.us.rtl.nl/rtlxl/v166/network/pc/adaptive/components/actueel/rtlnieuws/[...]/91625309-23cd-4ea2-84a2-aeceaa9920a3.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ssm/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ism/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9-audio_eng=125422.m3u8"
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/[...]/91625309-23cd-4ea2-84a2-aeceaa9920a3-audio_eng=125413.m3u8"
     },
     [...]
     {
-      "id": "hls-4",
+      "id": "hls-3",
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720",
-      "bitrate": "3733|125kbps",
-      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/415972/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ssm/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9.ism/ed3d420a-4741-4ea9-afdf-8dc8271ff9c9-audio_eng=125422-video=3733000.m3u8"
+      "bitrate": "3291|125kbps",
+      "url": "http://manifest.us.rtl.nl/10/v166/aes/adaptive/components/actueel/rtlnieuws/[...]/91625309-23cd-4ea2-84a2-aeceaa9920a3-audio_eng=125413-video=3291000.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
--e '
-  $json[meta/nr_of_videos_total gt 0]/{
+declare function xivid:rtl($url as string) as object()? {
+  json(
+    concat(
+      "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",
+      if (contains($url,"rtlnieuws.nl")) then
+        doc($url)//@data-uuid
+      else
+        extract($url,".+/(.+)",1),
+      "/fmt=adaptive/"
+    )
+  )[meta/nr_of_videos_total gt 0]/{
     "name":concat(
       .//station,
       ": ",
@@ -3180,7 +3306,7 @@ $ xidel -s --module=xivid.xqm "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=e
     ),
     "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
   }
-'
+};
 
 ================================================================================================
 

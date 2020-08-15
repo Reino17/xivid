@@ -87,35 +87,6 @@ nos() {
   ' --output-format=bash)"
 }
 
-rtl() {
-  eval "$(xidel "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=$1/fmt=adaptive/" -e '
-    json:=$json[meta/nr_of_videos_total gt 0]/{
-      "name":concat(
-        .//station,
-        ": ",
-        abstracts/name,
-        " - ",
-        if (.//classname="uitzending") then episodes/name else .//title
-      ),
-      "date":format-date(
-        (material)()/original_date * duration("PT1S") +
-        implicit-timezone() + date("1970-01-01"),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        time((material)()/duration) + duration("PT0.5S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "expdate":format-dateTime(
-        (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") +
-        implicit-timezone() + dateTime("1970-01-01T00:00:00"),
-        "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
-      ),
-      "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
-    }
-  ' --output-format=bash)"
-}
-
 kijk() {
   eval "$(xidel --xquery '
     json:=try {
@@ -1151,10 +1122,8 @@ elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
       )
     )
   ')"
-elif [[ $url =~ rtlxl.nl ]]; then
-  rtl "$(xidel -e 'extract("'$url'",".+/(.+)",1)')"
-elif [[ $url =~ rtlnieuws.nl ]]; then
-  rtl "$(xidel "$url" -e '//@data-uuid')"
+elif [[ $url =~ rtlxl.nl|rtlnieuws.nl ]]; then
+  eval "$(xidel -e 'json:=xivid:rtl("'$url'")' --output-format=bash)"
 elif [[ $url =~ kijk.nl ]]; then
   kijk "$url"
 elif [[ $url =~ omropfryslan.nl ]]; then

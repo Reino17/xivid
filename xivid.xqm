@@ -299,3 +299,38 @@ declare function xivid:npo($url as string) as object()? {
     }
   |}
 };
+
+declare function xivid:rtl($url as string) as object()? {
+  json(
+    concat(
+      "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",
+      if (contains($url,"rtlnieuws.nl")) then
+        doc($url)//@data-uuid
+      else
+        extract($url,".+/(.+)",1),
+      "/fmt=adaptive/"
+    )
+  )[meta/nr_of_videos_total gt 0]/{
+    "name":concat(
+      .//station,": ",
+      abstracts/name,
+      " - ",
+      if (.//classname="uitzending") then episodes/name else .//title
+    ),
+    "date":format-date(
+      (material)()/original_date * duration("PT1S") +
+      implicit-timezone() + date("1970-01-01"),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(
+      time((material)()/duration) + duration("PT0.5S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "expdate":format-dateTime(
+      (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") +
+      implicit-timezone() + dateTime("1970-01-01T00:00:00"),
+      "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+    ),
+    "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
+  }
+};
