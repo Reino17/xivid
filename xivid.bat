@@ -54,96 +54,6 @@ ECHO   xivid.bat -i https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724
 ECHO   xivid.bat -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EXIT /B
 
-:npo
-FOR /F "delims=" %%A IN ('xidel -e ^"
-  let $a:^=x:request^({
-        'header':'X-Requested-With: XMLHttpRequest'^,
-        'url':'https://www.npostart.nl/api/token'
-      }^)/json^,
-      $b:^=x:request^({
-        'post':'_token^='^|^|$a/token^,
-        'url':'https://www.npostart.nl/player/%~1'
-      }^)/json^,
-      $c:^=json^(
-        doc^($b/embedUrl^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
-      ^)^,
-      $d:^=json^(
-        concat^(
-          'https://start-player.npo.nl/video/%~1'^,
-          '/streams?profile^=hls^&quality^=npo^&tokenId^='^,
-          $b/token
-        ^)
-      ^)/stream[not^(protection^)]/src
-  return
-  json:^={^|
-    if ^($c^) then $c/{
-      'name':concat^(
-        franchiseTitle^,
-        if ^(contains^(franchiseTitle^,title^)^) then ^(^) else ': '^|^|title
-      ^)^,
-      'date':format-date^(
-        dateTime^(broadcastDate^)^,
-        '[D01]-[M01]-[Y]'
-      ^)^,
-      'duration':format-time^(
-        duration * duration^('PT1S'^)^,
-        '[H01]:[m01]:[s01]'
-      ^)^,
-      'start':if ^(startAt^) then
-        format-time^(
-          startAt * duration^('PT1S'^)^,
-          '[H01]:[m01]:[s01]'
-        ^)
-      else
-        ^(^)^,
-      'end':if ^(startAt^) then
-        format-time^(
-          ^(startAt + duration^) * duration^('PT1S'^)^,
-          '[H01]:[m01]:[s01]'
-        ^)
-      else
-        ^(^)
-    } else
-      doc^('https://www.npostart.nl/%~1'^)/{
-        'name':.//div[@class^='npo-header-episode-content']/concat^(
-          normalize-space^(h1^)^,
-          ': '^,
-          .//h2
-        ^)^,
-        'date':.//npo-player/extract^(@current-url^,'^(\d+-\d+-\d+^)'^,1^)^,
-        'duration':format-time^(
-          .//@duration * duration^('PT1S'^)^,
-          '[H01]:[m01]:[s01]'
-        ^)
-      }^,
-    {
-      'formats':[
-        ^(
-          if ^(not^($c/^(subtitles^)^(^)^) and $c/parentId^) then
-            json^(
-              doc^(
-                x:request^({
-                  'post':'_token^='^|^|$a/token^,
-                  'url':'https://www.npostart.nl/player/'^|^|$c/parentId
-                }^)/json/embedUrl
-              ^)//script/extract^(.^,'var video ^=^(.+^)^;'^,1^)[.]
-            ^)
-          else
-            $c
-        ^)/^(subtitles^)^(^)/{
-          'id':'sub-1'^,
-          'format':'vtt'^,
-          'language':language^,
-          'label':label^,
-          'url':src
-        }^,
-        xivid:m3u8-to-json^($d^)
-      ]
-    }
-  ^|}
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :nos
 FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
   let $a:^=json^(
@@ -1246,7 +1156,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
     ECHO xivid: url wordt niet ondersteund.
     EXIT /B 1
   )
-  FOR /F "delims=" %%A IN ('xidel -e "extract('%url%','.+/([\w_]+)',1)"') DO CALL :npo %%A
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:npo('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:nos.nl=%"=="%url%" (
   CALL :nos "%url%"
 ) ELSE IF NOT "%url:tvblik.nl=%"=="%url%" (
