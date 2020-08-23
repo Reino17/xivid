@@ -295,38 +295,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:dumpert
-FOR /F "delims=" %%A IN ('xidel -H "Cookie: nsfw=1;cpc=10" "%~1" --xquery ^"
-  json:^=json^(
-    json^(
-      //script/extract^(.^,'JSON\.parse\^(^(.+^)\^)'^,1^)[.]
-    ^)
-  ^)/items/item/item[^(media^)^(^)[mediatype^='VIDEO']]/^(
-    if ^(^(.//variants^)^(^)/version^='embed'^) then
-      replace^(^(.//variants^)^(^)/uri^,'youtube:'^,'https://youtu.be/'^)
-    else
-      {
-        'name':'Dumpert: '^|^|title^,
-        'date':format-date^(dateTime^(date^)^,'[D01]-[M01]-[Y]'^)^,
-        'duration':^(media^)^(^)/duration * duration^('PT1S'^) + time^('00:00:00'^)^,
-        'formats':for $x at $i in ^('mobile'^,'tablet'^,'720p'^,'original'^)
-        let $a:^=^(.//variants^)^(^)[version^=$x]/uri
-        return {
-          'id':'pg-'^|^|$i^,
-          'format':'mp4[h264+aac]'^,
-          'url':$a
-        }[url]
-      }
-  ^)
-^" --output-format^=cmd') DO %%A
-SETLOCAL ENABLEDELAYEDEXPANSION
-IF NOT "!json:youtu.be=!"=="!json!" (
-  ENDLOCAL
-  CALL :youtube %json%
-)
-ENDLOCAL
-EXIT /B
-
 :autojunk
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   let $a:^=//div[@id^='playerWrapper']/script[1] return
@@ -1069,7 +1037,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:l1.nl=%"=="%url%" (
   CALL :regio "%url%"
 ) ELSE IF NOT "%url:dumpert.nl=%"=="%url%" (
-  CALL :dumpert "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:dumpert('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:autojunk.nl=%"=="%url%" (
   CALL :autojunk "%url%"
 ) ELSE IF NOT "%url:telegraaf.nl=%"=="%url%" (

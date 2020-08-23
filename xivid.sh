@@ -297,35 +297,6 @@ regio() {
   ' --output-format=bash)"
 }
 
-dumpert() {
-  eval "$(xidel -H "Cookie: nsfw=1;cpc=10" "$1" --xquery '
-    json:=json(
-      json(
-        //script/extract(.,"JSON\.parse\((.+)\)",1)[.]
-      )
-    )/items/item/item[(media)()[mediatype="VIDEO"]]/(
-      if ((.//variants)()/version="embed") then
-        replace((.//variants)()/uri,"youtube:","https://youtu.be/")
-      else
-        {
-          "name":"Dumpert: "||title,
-          "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
-          "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
-          "formats":for $x at $i in ("mobile","tablet","720p","original")
-          let $a:=(.//variants)()[version=$x]/uri
-          return {
-            "id":"pg-"||$i,
-            "format":"mp4[h264+aac]",
-            "url":$a
-          }[url]
-        }
-    )
-  ' --output-format=bash)"
-  if [[ $json =~ youtu.be ]]; then
-    youtube "$json"
-  fi
-}
-
 autojunk() {
   eval "$(xidel "$1" --xquery '
     let $a:=//div[@id="playerWrapper"]/script[1] return
@@ -1041,7 +1012,7 @@ elif [[ $url =~ rtvutrecht.nl ]]; then
 elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepgelderland.nl|omroepwest.nl|rijnmond.nl|omroepzeeland.nl|omroepbrabant.nl|l1.nl) ]]; then
   regio "$url"
 elif [[ $url =~ dumpert.nl ]]; then
-  dumpert "$url"
+  eval "$(xidel -e 'json:=xivid:dumpert("'$url'")' --output-format=bash)"
 elif [[ $url =~ autojunk.nl ]]; then
   autojunk "$url"
 elif [[ $url =~ telegraaf.nl ]]; then

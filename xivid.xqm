@@ -405,3 +405,22 @@ declare function xivid:tvblik($url as string) as object()? {
   else
     xivid:kijk("https://kijk.nl/video/"||$host[2])
 };
+
+declare function xivid:dumpert($url as string) {
+  json(
+    json(
+      doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
+    )
+  )/items/item/item[(media)()[mediatype="VIDEO"]]/{
+    "name":"Dumpert: "||title,
+    "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
+    "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
+    "formats":for $x at $i in ("mobile","tablet","720p","original")
+    let $vid:=(.//variants)()[version=$x]/uri
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "url":$vid
+    }[url]
+  }
+};

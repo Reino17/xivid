@@ -5300,228 +5300,214 @@ $ xidel -s --module=xivid.xqm "https://nos.nl/livestream/npo-nieuws.html" -e 'le
 
 [dumpert]
 
-https://www.dumpert.nl/item/7756131_98154132
+$ url=https://www.dumpert.nl/item/7971943_ce706a57
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7756131_98154132" -e '//script/extract(.,"JSON\.parse\((.+)\)",1)[.]'
-"{\"items\":{\"item\":{\"item\":{\"date\":\"2019-09-15T22:30:14+02:00\",\"description\":\"Mevrouw schrikt er een klein beetje van\",\"id\":\"7756131_98154132\",[...],\"application\":{\"menuActive\":false,\"uploadFormActive\":false}}"
+$ xidel -se 'doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]'
+"{\"ads\":{\"kachingInstance\":null,\"kachingInitialized\":false,\"adsShowBlockerConsent\":true},\"items\":{\"item\":{\"item\":{\"date\":\"2020-08-22T10:22:56+02:00\",\"description\":\"Lekker begin van de dag ouwe\",\"id\":\"7971943_ce706a57\",[...]}"
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7756131_98154132" -e 'json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.])'
-{"items":{"item":{"item":{"date":"2019-09-15T22:30:14+02:00","description":"Mevrouw schrikt er een klein beetje van","id":"7756131_98154132",[...],"application":{"menuActive":false,"uploadFormActive":false}}
+$ xidel -se 'json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.])'
+{"ads":{"kachingInstance":null,"kachingInitialized":false,"adsShowBlockerConsent":true},"items":{"item":{"item":{"date":"2020-08-22T10:22:56+02:00","description":"Lekker begin van de dag ouwe","id":"7971943_ce706a57",[...]}
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7756131_98154132" -e 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))'
+$ xidel -se 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item'
 {
-  "items": {
-    "item": {
-      "item": {
-        "date": "2019-09-15T22:30:14+02:00",
-        "description": "Mevrouw schrikt er een klein beetje van",
-        "id": "7756131_98154132",
-  [...]
-  "application": {
-    "menuActive": false,
-    "uploadFormActive": false
-  }
-}
-
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7756131_98154132" -e 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item'
-{
-  "date": "2019-09-15T22:30:14+02:00",
-  "description": "Mevrouw schrikt er een klein beetje van",
-  "id": "7756131_98154132",
+  "date": "2020-08-22T10:22:56+02:00",
+  "description": "Lekker begin van de dag ouwe",
+  "id": "7971943_ce706a57",
   "media": [
     {
       "description": "",
-      "duration": 13,
+      "duration": 30,
       "mediatype": "VIDEO",
       "variants": [
         {
-          "uri": "https://media.dumpert.nl/tablet/98154132_IMG_5042.MOV.mp4.mp4",
+          "uri": "https://media.dumpert.nl/tablet/ce706a57_Fietser_Impact.mp4.mp4.mp4",
           "version": "tablet"
         },
         {
-          "uri": "https://media.dumpert.nl/mobile/98154132_IMG_5042.MOV.mp4.mp4",
+          "uri": "https://media.dumpert.nl/mobile/ce706a57_Fietser_Impact.mp4.mp4.mp4",
           "version": "mobile"
+        },
+        {
+          "uri": "https://media.dumpert.nl/720p/ce706a57_Fietser_Impact.mp4.mp4.mp4",
+          "version": "720p"
         }
       ]
     }
   ],
-  "nopreroll": true,
-  "nsfw": false,
-  "stats": {
-    "kudos_today": 117,
-    "kudos_total": 5218,
-    "views_today": 4922,
-    "views_total": 332308
-  },
-  "still": "https://media.dumpert.nl/stills/7756131_98154132.jpg",
-  "stills": {
-    "still": "https://media.dumpert.nl/stills/7756131_98154132.jpg",
-    "still-large": "https://media.dumpert.nl/stills/large/7756131_98154132.jpg",
-    "still-medium": "https://media.dumpert.nl/stills/medium/7756131_98154132.jpg",
-    "thumb": "https://media.dumpert.nl/sq_thumbs/7756131_98154132.jpg",
-    "thumb-medium": "https://media.dumpert.nl/sq_thumbs/medium/7756131_98154132.jpg"
-  },
-  "tags": "schrikken oeps vrouw vallen schrik schreeuwen jongen step gillen mevrouw",
-  "thumbnail": "https://media.dumpert.nl/sq_thumbs/7756131_98154132.jpg",
-  "title": "Jongen valt met stepje",
-  "upload_id": ""
+  [...]
+  "title": "Telefoon checken tijdens het fietsen",
+  [...]
 }
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7756131_98154132" -e 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/{"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":reverse((.//variants)())/{"id":"pg-"||position(),"format":"mp4[h264+aac]","url":uri}}'
+Dumpert formaten van lage naar hoge resolutie: "mobile","tablet","720p","original", ook al zie je die laatste niet vaak.
+
+$ xidel -s --xquery 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/{"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $vid:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$vid}[url]}'
 {
-  "name": "Dumpert: Jongen valt met stepje",
-  "date": "15-09-2019",
-  "duration": "00:00:13",
+  "name": "Dumpert: Telefoon checken tijdens het fietsen",
+  "date": "22-08-2020",
+  "duration": "00:00:30",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "url": "https://media.dumpert.nl/mobile/98154132_IMG_5042.MOV.mp4.mp4"
+      "url": "https://media.dumpert.nl/mobile/ce706a57_Fietser_Impact.mp4.mp4.mp4"
     },
     {
       "id": "pg-2",
       "format": "mp4[h264+aac]",
-      "url": "https://media.dumpert.nl/tablet/98154132_IMG_5042.MOV.mp4.mp4"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-https://www.dumpert.nl/item/7757871_5659371a
-
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7757871_5659371a" --xquery 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/{"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $a:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$a}[url]}'
-{
-  "name": "Dumpert: The Godfather van DUMPERTREETEN (192)",
-  "date": "18-09-2019",
-  "duration": "00:19:14",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://media.dumpert.nl/mobile/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "url": "https://media.dumpert.nl/tablet/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4.mp4"
+      "url": "https://media.dumpert.nl/tablet/ce706a57_Fietser_Impact.mp4.mp4.mp4"
     },
     {
       "id": "pg-3",
       "format": "mp4[h264+aac]",
-      "url": "https://media.dumpert.nl/720p/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4.mp4"
+      "url": "https://media.dumpert.nl/720p/ce706a57_Fietser_Impact.mp4.mp4.mp4"
     }
   ]
 }
 
-Voor de zekerheid toch maar de "original" variant erbij betrekken, ondanks dat op de item-pagina (van de laatste DUMPERTREETEN video) zelf de "original" variant vreemd genoeg niet staat vermeld. Hier wel:
-
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl" --xquery 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))//dumperttv/(list)()[id="7757871_5659371a"]//variants'
-[
-  {
-    "uri": "https://media.dumpert.nl/tablet/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4.mp4",
-    "version": "tablet"
-  },
-  {
-    "uri": "https://media.dumpert.nl/mobile/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4.mp4",
-    "version": "mobile"
-  },
-  {
-    "uri": "https://media.dumpert.nl/720p/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4.mp4",
-    "version": "720p"
-  },
-  {
-    "uri": "https://media.dumpert.nl/original/5659371a_190917_DUMPERTREETEN_191_DUMP.mp4.mp4",
-    "version": "original"
-  }
-]
-
 ------------------------------------------------------------------------------------------------
 
-https://www.dumpert.nl/item/7758059_21a7ab9d (embedded youtube video)
+$ url=https://www.dumpert.nl/item/7971991_95a8ef78 (foto, geen video)
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7758059_21a7ab9d" --xquery 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item//variants'
-[
-  {
-    "uri": "youtube:3PqAPXpvC-4",
-    "version": "embed"
-  }
-]
-
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7758059_21a7ab9d" --xquery 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/(if ((.//variants)()/version="embed") then replace((.//variants)()/uri,"youtube:","https://youtu.be/") else {"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $a:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$a}[url]})'
-https://youtu.be/3PqAPXpvC-4
-
-------------------------------------------------------------------------------------------------
-
-https://www.dumpert.nl/item/7758863_849bf087 (foto, geen video)
-
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7758863_849bf087" --xquery 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/(media)()'
+$ xidel -se 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item'
 {
-  "description": "",
-  "duration": 0,
-  "mediatype": "FOTO",
-  "variants": [
+  "date": "2020-08-22T11:47:46+02:00",
+  "description": "FB gebruikert spotte ze veel <a href=\"https://www.dumpert.nl/item/7970941_6d833581\" target=\"_blank\">vaker</a>!",
+  "id": "7971991_95a8ef78",
+  "media": [
     {
-      "uri": "https://media.dumpert.nl/foto/849bf087_20190920_104212.jpg.jpg",
-      "version": "foto"
+      "description": "",
+      "duration": 0,
+      "mediatype": "FOTO",
+      "variants": [
+        {
+          "uri": "https://media.dumpert.nl/foto/95a8ef78_Schermafbeelding_2020_08_22_om_11.43.19.png.png",
+          "version": "foto"
+        }
+      ]
     }
-  ]
+  ],
+  [...]
+  "title": "Onschuldige dames zijn stiekem rellertjes",
+  [...]
 }
 
-[(media)()[mediatype="VIDEO"]]:
-
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl/item/7758863_849bf087" --xquery 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[(media)()[mediatype="VIDEO"]]/(if ((.//variants)()/version="embed") then replace((.//variants)()/uri,"youtube:","https://youtu.be/") else {"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $a:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$a}[url]})'
+[(media)()[mediatype="VIDEO"]] om alleen de video's te ontleden.
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
+$ url=https://www.dumpert.nl/item/7944807_3df1ea7a (embedded youtube video)
+
+$ xidel -se 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[(media)()[mediatype="VIDEO"]]'
+{
+  "date": "2020-08-03T17:00:39+02:00",
+  "description": "Alle sadisten opgelet: er staat weer een nieuwe #FAIL-compilatie voor je klaar. Genieten!",
+  "id": "7944807_3df1ea7a",
+  "media": [
+    {
+      "description": "",
+      "duration": 382,
+      "mediatype": "VIDEO",
+      "variants": [
+        {
+          "uri": "youtube:uF1ztwahGeA",
+          "version": "embed"
+        }
+      ]
+    }
+  ],
+  [...]
+  "title": "Deze mensen kunnen echt helemaal niks! #FAIL (6) | Dumpert Tags",
+  [...]
+}
+
+$ xidel -s --xquery 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[(media)()[mediatype="VIDEO"]]/{"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $vid:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$vid}[url]}'
+{
+  "name": "Dumpert: De weg naar VeeKay's eerste Indy 500",
+  "date": "21-08-2020",
+  "duration": "00:01:44",
+  "formats": null
+}
+
+$ url=https://www.dumpert.nl/item/7971823_1f7a4dfc (embedded twitter video)
+
+$ xidel -se 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[(media)()[mediatype="VIDEO"]]'
+{
+  "date": "2020-08-21T21:43:10+02:00",
+  "description": "Scoort zijn tweede in de finale",
+  "id": "7971823_1f7a4dfc",
+  "media": [
+    {
+      "description": "",
+      "duration": 67,
+      "mediatype": "VIDEO",
+      "variants": [
+        {
+          "uri": "twitter:1296893972804247552",
+          "version": "embed"
+        }
+      ]
+    }
+  ],
+  [...]
+  "title": "Kopbaas de Jong",
+  [...]
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Nog te doen: af laten handelen door xivid:youtube() en xivid:twitter() als die klaar zijn.
+
+$ xidel -s --xquery 'json(json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[(media)()[mediatype="VIDEO"]]/(if ((.//variants)()/version="embed") then (.//variants)()/(if (starts-with(uri,"youtube")) then xivid:youtube(replace(uri,"youtube:","https://youtu.be/")) else xivid:twitter(replace(uri,"twitter:","https://twitter.com/i/status/"))) else {"name":"Dumpert: "||title,"date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),"duration":(media)()/duration * duration("PT1S") + time("00:00:00"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $vid:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$vid}[url]})'
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:dumpert($url as string) as object()? {
   json(
     json(
-      //script/extract(.,"JSON\.parse\((.+)\)",1)[.]
+      doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
     )
-  )/items/item/item[(media)()[mediatype="VIDEO"]]/(
-    if ((.//variants)()/version="embed") then
-      replace((.//variants)()/uri,"youtube:","https://youtu.be/")
-    else
-      {
-        "name":"Dumpert: "||title,
-        "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
-        "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
-        "formats":for $x at $i in ("mobile","tablet","720p","original")
-        let $a:=(.//variants)()[version=$x]/uri
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "url":$a
-        }[url]
-      }
-  )
-'
+  )/items/item/item[(media)()[mediatype="VIDEO"]]/{
+    "name":"Dumpert: "||title,
+    "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
+    "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
+    "formats":for $x at $i in ("mobile","tablet","720p","original")
+    let $vid:=(.//variants)()[version=$x]/uri
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "url":$vid
+    }[url]
+  }
+};
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 Opsomming van alle Dumpert toppers video's, gewoon voor de fun:
 
-$ xidel -s -H "Cookie: nsfw=1;cpc=10" "https://www.dumpert.nl" --xquery '$json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))//toppers/(list)()/(media)()[mediatype="VIDEO"]/(if ((variants)()/version="embed") then replace((variants)()/uri,"youtube:","https://youtu.be/") else for $x in ("mobile","tablet","720p","original","embed") return (variants)()[version=$x]/uri)[last()]'
-https://media.dumpert.nl/tablet/0ed634a9_B2F82BDB_2BB8_4FE3_8570_22FBED98D71F.MOV.mp4.mp4
-https://youtu.be/nFeatPLXgxg
-https://media.dumpert.nl/720p/f1140b40_19_09_19_18_44_05_01.mp4.mp4.mp4
-https://media.dumpert.nl/720p/ec5506b7_Kayakers_help_save_seal_pups_entangled_in_netting.mp4.mp4.mp4
-https://media.dumpert.nl/tablet/2c744d78_mp4.mp4.mp4
-https://youtu.be/sF6SK3Y-JCs
-https://media.dumpert.nl/tablet/54f98fc9_Tifo_confettis_du_Borussia_Dortmund.mp4.mp4.mp4
-https://media.dumpert.nl/tablet/7492c72d_trim.25020DA8_C7AB_4B12_85F9_E621904DE5A6.MOV.mp4.mp4
-https://media.dumpert.nl/tablet/3a62e183_Liveleak.com___Russian_Police_take_mans_DNA.mp4.mp4.mp4
-https://media.dumpert.nl/tablet/93c3fb91_IMG_9360.MP4.mp4.mp4
-https://youtu.be/0ZD0_0xPDhA
-https://media.dumpert.nl/720p/68d2aa81_20190919_motor_a12_als_racebaan_dodge_em.mp4.mp4.mp4
-https://media.dumpert.nl/720p/794f4b7f_IMG_9483.MOV.mp4.mp4
-https://media.dumpert.nl/tablet/a7e34fbc_50229683_213963522768092_6861029660575137792_n.mp4.mp4.mp4
-https://media.dumpert.nl/tablet/5d7a4f07_IMG_3254.MP4.mp4.mp4
-https://media.dumpert.nl/tablet/dc17e719_verschnitt_des_todes_____pr0gramm.com_____Die_Datingplattform_fu__.mp4.mp4.mp4
-https://media.dumpert.nl/720p/407fffd5_IMG_2473.MOV.mp4.mp4
-https://media.dumpert.nl/720p/ad097e98_nicht_so_tief_Ru__diger_____pr0gramm.com_____Die_Datingplattform_f.mp4.mp4.mp4
-https://media.dumpert.nl/tablet/2e3e1a31_IMG_2873.MOV.mp4.mp4
+$ xidel -s "https://www.dumpert.nl" -e 'json(json(//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))//toppers/(list)()/(media)()[mediatype="VIDEO"]/(for $x in ("mobile","tablet","720p","original","embed") return (variants)()[version=$x]/(if (starts-with(uri,"youtube")) then replace(uri,"youtube:","https://youtu.be/") else if (starts-with(uri,"twitter")) then replace(uri,"twitter:","https://twitter.com/i/status/") else uri))[last()]'
+https://media.dumpert.nl/tablet/2e296d00_IMG_4411.MP4.mp4.mp4
+https://media.dumpert.nl/tablet/cfae0e8c_httpsadmin.dumpert.nlmediabaseoriginal035b620d_IMG_1850.MP4._online_video_cutter.com.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/cc620f7d_IMG_3907.MP4.mp4.mp4
+https://media.dumpert.nl/720p/ce706a57_Fietser_Impact.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/112679e2_Gorilla_s_observeren_een_rups_Videoman.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/80225d59_Quand_vais_je_perdre_mon_pucelage_.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/c7a3a5d0_WhatsApp_Video_2020_08_21_at_00.38.28.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/8a4f1964_WhatsApp_Video_2020_08_21_at_18.46.30.mp4.mp4.mp4
+https://youtu.be/NSuaUok-wTY
+https://media.dumpert.nl/tablet/9e026ec0_Michael_Jackson_____pr0gramm.com_____Die_Datingplattform_fu__r_Kel.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/7cc27945_26a12e159420b0d25e2336840f1277fe.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/606bfb07_96596306_561359294796030_4278977649484383195_n.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/8ef9229a_Een_Formule_1_coureur_test_zijn_reflexen_voor_de_race_Videom.mp4.mp4.mp4
+https://media.dumpert.nl/720p/393c40ad_Fooled_by_salt...or_a_nipple___Mario_Lopez_on_Penn___Teller_Fool_Us_.mp4.mp4.mp4
+https://media.dumpert.nl/720p/6d833581_Icm_ETN7ZF_pb_ta.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/18b27a35_SC7T7uxg_wNS07at_online_video_cutter.com.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/b479e8c3_awww_____pr0gramm.com_____Die_Datingplattform_fu__r_Kellerkinder.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/6dd1846e_teenagestepmother_118247223_189511735880161_4429800162563342589_n.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/_79e3b6af_YTDL_1.mp4.mp4.mp4
+https://twitter.com/i/status/1296893972804247552
+https://media.dumpert.nl/tablet/30388844_De_ninjamoeder_Videoman.mp4.mp4.mp4
+https://media.dumpert.nl/tablet/_9bfd3dc6_YTDL_1.mp4.mp4.mp4
 
 ================================================================================================
 
