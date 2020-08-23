@@ -334,3 +334,56 @@ declare function xivid:rtl($url as string) as object()? {
     "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
   }
 };
+
+declare function xivid:kijk($url as string) as object()? {
+  let $json:=json(doc($url)//script[@type="application/json"])/props,
+      $info:=for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x)
+  return {
+    "name":"Kijk: "||$info[__typename="Program"]/(
+      if (type="MOVIE") then
+        title
+      else
+        concat(
+          $json/pageProps/format/title,
+          " S",
+          seasonNumber ! (if (. lt 10) then "0"||. else .),
+          "E",
+          tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
+        )
+    ),
+    "date":format-date(
+      (
+        $info[__typename="Program"]//media_datepublished,
+        $info[__typename="Media"]/availableDate
+      )[1] div 1000 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),
+    "formats":[
+      for $x at $i in (
+        if ($info[type="webvtt"]) then
+          $info[type="webvtt"]/file
+        else
+          $info[ends-with(sourceUrl,"vtt")]/sourceUrl
+      )
+      order by $x
+      count $i
+      return {
+        "id":"sub-"||$i,
+        "format":"vtt",
+        "language":"nl",
+        "label":if (contains($x,"OPE")) then
+          "Doven en Slechthorenden"
+        else
+          "Nederlands",
+        "url":$x
+      },
+      xivid:m3u8-to-json(
+        (
+          $info[type="m3u8" and not(drm)]/extract(file,".+m3u8"),
+          $info[ends-with(sourceUrl,"m3u8")]/sourceUrl
+        )[1]
+      )
+    ]
+  }
+};

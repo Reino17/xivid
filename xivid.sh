@@ -87,90 +87,6 @@ nos() {
   ' --output-format=bash)"
 }
 
-kijk() {
-  eval "$(xidel --xquery '
-    json:=try {
-      json(
-        doc("https://embed.kijk.nl/video/'${1: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.]
-      )/(playlist)()/{
-        "name":concat(
-          upper-case(.//c_media_station),
-          ": ",
-          normalize-space(title),
-          if (description) then
-            " - "||description
-          else
-            ()
-        ),
-        "date":replace(
-          .//c_sko_dt,
-          "(\d{4})(\d{2})(\d{2})",
-          "$3-$2-$1"
-        ),
-        "duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),
-        "expdate":format-dateTime(
-          .//c_media_dateexpires * duration("PT1S") +
-          implicit-timezone() + dateTime("1970-01-01T00:00:00"),
-          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
-        ),
-        "formats":[
-          (tracks)()[kind="captions"]/{
-            "id":"sub-"||position(),
-            "format":"vtt",
-            "language":"nl",
-            "label":label,
-            "url":file
-          },
-          xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
-        ]
-      }
-    } catch err:FODC0002 {
-      x:request({
-        "headers":concat(
-          "Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",
-          random-seed(),
-          string-join((1 to 32) ! x:integer-to-base(random(16),16))
-        ),
-        "url":"'$1'"
-      })/json(
-        doc//script[@type="application/json"]
-      )//pageProps/{
-        "name":"Kijk: "||(
-          if (patheThuis) then
-            video/title
-          else
-            concat(
-              format/title,
-              " S",
-              video/seasonNumber ! (if (. lt 10) then "0"||. else .),
-              "E",
-              video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
-            )
-        ),
-        "date":format-date(
-          substring(video//availableDate,1,10) * duration("PT1S") +
-          implicit-timezone() + dateTime("1970-01-01T00:00:00"),
-          "[D01]-[M01]-[Y]"
-        ),
-        "duration":video/round(duration) * duration("PT1S") + time("00:00:00"),
-        "formats":[
-          (.//sourceUrl)[ends-with(.,"vtt")] ! {
-            "id":"sub-"||position(),
-            "format":"vtt",
-            "language":"nl",
-            "label":if (contains(.,"OPE")) then
-              "Doven en Slechthorenden"
-            else
-              "Nederlands",
-            "url":.
-          },
-          xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])
-        ]
-      }
-    }
-  ' --output-format=bash)"
-}
-
 regio_frl() {
   eval "$(xidel "$1" --xquery '
     let $a:=//meta[@itemprop="embedURL"]/extract(
@@ -1125,7 +1041,7 @@ elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
 elif [[ $url =~ rtlxl.nl|rtlnieuws.nl ]]; then
   eval "$(xidel -e 'json:=xivid:rtl("'$url'")' --output-format=bash)"
 elif [[ $url =~ kijk.nl ]]; then
-  kijk "$url"
+  eval "$(xidel -e 'json:=xivid:kijk("'$url'")' --output-format=bash)"
 elif [[ $url =~ omropfryslan.nl ]]; then
   regio_frl "$url"
 elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then

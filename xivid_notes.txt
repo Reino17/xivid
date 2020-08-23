@@ -3312,413 +3312,138 @@ declare function xivid:rtl($url as string) as object()? {
 
 [kijk]
 
-# "talpaPlayer" api:
-
 $ url=https://www.kijk.nl/programmas/wegmisbruikers/C5IYffeeRR8/seizoen/122814504378/afleveringen/video/empty_episode-wegmisbruikers-s25-e10-2020-03-22/p6jYhd96olD
 
-$ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
+$ xidel -se 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props return $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)]'
+Program:129350184257
+Program:129350184257.media.0
+Program:129350184257.media.0.mediaContent.0
+Program:129350184257.media.0.mediaContent.1
+Program:129350184257.media.0.mediaContent.2
+Program:129350184257.media.0.mediaContent.3
+Program:129350184257.media.0.mediaContent.4
+Program:129350184257.imageMedia.0
+Program:129350184257.sources.0
+Program:129350184257.sources.1
+Program:129350184257.sources.2
+Program:129350184257.tracks.0
+Program:129350184257.tracks.1
+Program:129350184257.ratings.0
+
+$ xidel -se 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props return ($json/pageProps/format,for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x))'
 {
-  "playlist": [
-    {
-      "sources": [
-        {
-          "type": "dash",
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/bd907df3-1c3d-40a2-881b-377ac3e38a59/Wegmisbruikers_Season_25_Episode_10-index.ism/1584715353769.mpd"
-        },
-        {
-          "type": "m3u8",
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/bd907df3-1c3d-40a2-881b-377ac3e38a59/Wegmisbruikers_Season_25_Episode_10-index.ism/1584715353769.m3u8"
-        }
-      ],
-      "image": "https://img.kijk.nl/media/cache/computer_nonretina_series_image/imgsrc06/images/redactioneel/1094252-LS---20200317160952--4c0bab2eb957c3c2e1d1f5658187e49f.jpg?lu=e386a70f2a972b20cdadcbbd755b141b",
-      "mediaid": "p6jYhd96olD",
-      "title": "Wegmisbruikers",
-      "description": "Aflevering 10, Seizoen 25",
-      "displaytitle": true,
-      "tracks": [
-        {
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/8976f252-1394-459f-85e3-3bf60dedb5b6/Wegmisbruikers_Season_25_Episode_10-webvtt-sd.vtt",
-          "type": "webvtt",
-          "kind": "captions",
-          "label": "Doven en Slechthorenden"
-        },
-        {
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/8976f252-1394-459f-85e3-3bf60dedb5b6/Wegmisbruikers_Season_25_Episode_10-webvtt-nl.vtt",
-          "type": "webvtt",
-          "kind": "captions",
-          "label": "Nederlands"
-        },
-        {
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/bd907df3-1c3d-40a2-881b-377ac3e38a59/Wegmisbruikers_Season_25_Episode_10-thumbnails.vtt",
-          "type": "webvtt",
-          "kind": "thumbnails"
-        }
-      ],
-      "fwassetid": "p6jYhd96olD",
-      "TAQ": {
-        "dataLayer": {
-          "media_datecreated": 1584905400,
-          "media_datemodified": 1584905400,
-          "media_datepublished": 1584905400,
-          "media_duration": "2381",
-          "media_genre": "Scripted Reality",
-          "media_id": "p6jYhd96olD",
-          "media_name": "Wegmisbruikers",
-          "media_program_episodenumber": "10",
-          "media_program_name": "Wegmisbruikers",
-          "media_program_season": "25",
-          "media_videotype": "vod",
-          "player_channel": "embedded_3p",
-          "player_channelid": "embedded_3p",
-          "player_embedurl": "http://www.kijk.nl/video/p6jYhd96olD",
-          "player_id": "embedded_3p",
-          "player_name": "jwplayer",
-          "player_source": "embedded_3p",
-          "player_version": "8.2.4"
-        },
-        "customLayer": {
-          "c_media_dateexpires": 1647980666,
-          "c_media_duration_type": "long",
-          "c_media_genre_code": "Overige",
-          "c_media_ispartof": "Wegmisbruikers",
-          "c_media_live": 0,
-          "c_media_outlet": "embedded_3p",
-          "c_media_partner": "embedded3p",
-          "c_media_playbacktype": "vod",
-          "c_media_station": "sbs6",
-          "c_sko_cl": 2381,
-          "c_sko_dt": "20200322",
-          "c_sko_gen": 21190,
-          "c_sko_pr": "wegmisbruikers",
-          "c_sko_prid": "698551043",
-          "c_sko_stid": 63,
-          "c_sko_t": "2030",
-          "c_sko_ty": "tv.ep"
-        }
-      }
-    }
-  ],
+  "id": "108132904109",
+  "guid": "C5IYffeeRR8",
+  "slug": "wegmisbruikers",
+  "tvSeasonId": "122814504378",
+  "type": "SERIES",
+  "title": "Wegmisbruikers",
+  "description": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
+  "epgDate": null,
+  "longDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
+  "shortDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
+  "displayGenre": "Reality",
+  "tvSeasonEpisodeNumber": null,
+  "seasonNumber": null,
+  "seriesEpisodeNumber": null,
+  "seriesId": null,
+  "duration": null,
+  "episodeTitleGenerator": "EPISODE_TITLE",
+  "updated": 1579104755000,
   [...]
 }
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"]/file)]}'
 {
-  "name": "SBS6: Wegmisbruikers - Aflevering 10, Seizoen 25",
-  "date": "22-03-2020",
-  "duration": "00:39:41",
-  "expdate": "22-03-2022 22:24:26",
-  "formats": [
-    {
-      "id": "sub-1",
-      "format": "vtt",
-      "language": "nl",
-      "label": "Doven en Slechthorenden",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/8976f252-1394-459f-85e3-3bf60dedb5b6/Wegmisbruikers_Season_25_Episode_10-webvtt-sd.vtt"
-    },
-    {
-      "id": "sub-2",
-      "format": "vtt",
-      "language": "nl",
-      "label": "Nederlands",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/8976f252-1394-459f-85e3-3bf60dedb5b6/Wegmisbruikers_Season_25_Episode_10-webvtt-nl.vtt"
-    },
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/bd907df3-1c3d-40a2-881b-377ac3e38a59/Wegmisbruikers_Season_25_Episode_10-index.ism/1584715353769.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "160kbps",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/bd907df3-1c3d-40a2-881b-377ac3e38a59/Wegmisbruikers_Season_25_Episode_10-index.ism/Wegmisbruikers_Season_25_Episode_10-index-audio=160000.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-7",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080@25fps",
-      "bitrate": "6001|160kbps",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/p6jYhd96olD/bd907df3-1c3d-40a2-881b-377ac3e38a59/Wegmisbruikers_Season_25_Episode_10-index.ism/Wegmisbruikers_Season_25_Episode_10-index-audio=160000-video=6001259.m3u8"
-    }
-  ]
-}
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-$ url=https://www.kijk.nl/programmas/wegmisbruikers/C5IYffeeRR8/seizoen/122814504378/afleveringen/video/empty_episode-wegmisbruikers-s25-e9-2020-03-15/NFYgzYn3Zie
-
-$ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
-{
-  "playlist": [
-    {
-      "sources": [
-        {
-          "type": "m3u8",
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092787824.m3u8"
-        },
-        {
-          "type": "m3u8",
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092788109.m3u8"
-        },
-        {
-          "type": "dash",
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092787824.mpd"
-        }
-      ],
-      [...]
-    }
-  ]
+  "id": "129350184257",
+  "slug": "empty_episode-wegmisbruikers-s25-e10-2020-03-22",
+  "seriesId": "http://data.entertainment.tv.theplatform.eu/entertainment/data/Program/guid/2707491435/C5IYffeeRR8",
+  "tvSeasonId": "http://data.entertainment.tv.theplatform.eu/entertainment/data/TvSeason/122814504378",
+  "seasonNumber": 25,
+  "tvSeasonEpisodeNumber": 10,
+  "shortDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
+  "duration": 2380.96,
+  "epgDate": 1584835200000,
   [...]
-}
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",title," - ",description),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[type="m3u8"][1]/file)]}'
-{
-  "name": "SBS6: Wegmisbruikers - Aflevering 9, Seizoen 25",
-  "date": "15-03-2020",
-  "duration": "00:39:50",
-  "expdate": "15-03-2022 22:30:55",
-  "formats": [
-    {
-      "id": "sub-1",
-      "format": "vtt",
-      "language": "nl",
-      "label": "Doven en Slechthorenden",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/91962201-b5c8-4429-8f61-a92ebef90c86/Wegmisbruikers_Season_25_Episode_9-webvtt-sd.vtt"
-    },
-    {
-      "id": "sub-2",
-      "format": "vtt",
-      "language": "nl",
-      "label": "Nederlands",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/91962201-b5c8-4429-8f61-a92ebef90c86/Wegmisbruikers_Season_25_Episode_9-webvtt-nl.vtt"
-    },
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/1584092787824.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "160kbps",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/Wegmisbruikers_Season_25_Episode_9-index-audio=160000.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-7",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080@25fps",
-      "bitrate": "6001|160kbps",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/NFYgzYn3Zie/e7e77fac-8d36-4167-955d-1bff1599edc3/Wegmisbruikers_Season_25_Episode_9-index.ism/Wegmisbruikers_Season_25_Episode_9-index-audio=160000-video=6001371.m3u8"
+  "__typename": "Program",
+  "guid": "p6jYhd96olD",
+  "type": "EPISODE",
+  "title": null,
+  "description": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
+  "longDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
+  "displayGenre": "Scripted Reality",
+  "seriesEpisodeNumber": 434,
+  "series": {
+    "type": "id",
+    "generated": false,
+    "id": "Program:108132904109",
+    "typename": "Program"
+  },
+  "updated": 1584458350000,
+  "metadata": {
+    "type": "json",
+    "json": {
+      "media_datecreated": 1584400800000,
+      "media_datemodified": 1584458350000,
+      "media_datepublished": 1584905400000,
+      "media_duration": 2380.96,
+      "media_genre": "Scripted Reality",
+      "media_id": "p6jYhd96olD",
+      "media_name": null,
+      "media_program_episodenumber": 10,
+      "media_program_name": "EMPTY_Episode: Wegmisbruikers - S:25 - E:10 - 2020-03-22",
+      "media_program_season": 25,
+      "media_videotype": "episode",
+      "player_embedurl": "https://www.kijk.nl/video/p6jYhd96olD",
+      "c_media_duration_type": "long",
+      "c_media_live": null,
+      "c_media_playbacktype": "vod",
+      "c_media_genre_code": "Overige",
+      "c_sko_ty": "tv.ep",
+      "c_sko_stid": null,
+      "c_sko_t": null,
+      "c_sko_dt": null,
+      "c_sko_gen": null,
+      "c_sko_pr": null,
+      "c_sko_prid": null
     }
-  ]
-}
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-$ url=https://www.kijk.nl/films/video/the-talented-mr-ripley/H5ivILBO1SI
-
-$ xidel -s "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])'
-{
-  "playlist": [
-    {
-      "sources": [
-        [...]
-        {
-          "type": "m3u8",
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/H5ivILBO1SI/353cb70f-c7c2-425d-ad73-ef92f22735cf/H5ivILBO1SI_1585581961847.ism/master.m3u8",
-          "drm": {
-            "fairplay": {
-              "releasePid": "u_4oDZtqKles",
-              "certificateUrl": "https://vod-tpc-prod-1.talpatvcdn.nl/fairplay.cer",
-              "processSpcUrl": "https://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay?form=json&schema=1.0&token=Y3BbNLYk2yO-LZTW0SdeUTAKQDDywNCW&account=http%3A%2F%2Faccess.auth.theplatform.com%2Fdata%2FAccount%2F2702725319&releasePid=u_4oDZtqKles"
-            }
-          }
-        },
-        [...]
-      ],
-      "image": "https://img.kijk.nl/media/cache/computer_nonretina_series_image/imgsrc06/images/redactioneel/1092128-LS---20200226134745--0027622745a34137b908b4a5dee66e53.jpg?lu=059b6d6386781480ec74c5efe3bb01dd",
-      "mediaid": "H5ivILBO1SI",
-      "title": "The Talented Mr Ripley",
-      "description": "",
-      "displaytitle": true,
-      "tracks": [
-        {
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/H5ivILBO1SI/353cb70f-c7c2-425d-ad73-ef92f22735cf/The_Talented_Mr_Ripley-webvtt-nl.vtt",
-          "type": "webvtt",
-          "kind": "captions",
-          "label": "Nederlands"
-        },
-        {
-          "file": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/H5ivILBO1SI/353cb70f-c7c2-425d-ad73-ef92f22735cf/The_Talented_Mr_Ripley-thumbnails.vtt",
-          "type": "webvtt",
-          "kind": "thumbnails"
-        }
-      ],
-      "fwassetid": "H5ivILBO1SI",
-      "TAQ": {
-        "dataLayer": {
-          "media_datecreated": 1585679400,
-          "media_datemodified": 1585679400,
-          "media_datepublished": 1585679626,
-          "media_duration": "7677",
-          "media_genre": "Crime",
-          "media_id": "H5ivILBO1SI",
-          "media_name": "The Talented Mr Ripley",
-          "media_program_episodenumber": null,
-          "media_program_name": null,
-          "media_program_season": null,
-          "media_videotype": "vod",
-          "player_channel": "embedded_3p",
-          "player_channelid": "embedded_3p",
-          "player_embedurl": "http://www.kijk.nl/video/H5ivILBO1SI",
-          "player_id": "embedded_3p",
-          "player_name": "jwplayer",
-          "player_source": "embedded_3p",
-          "player_version": "8.2.4"
-        },
-        "customLayer": {
-          "c_media_dateexpires": 1586293895,
-          "c_media_duration_type": "long",
-          "c_media_genre_code": "Misdaad",
-          "c_media_ispartof": null,
-          "c_media_live": 0,
-          "c_media_outlet": "embedded_3p",
-          "c_media_partner": "embedded3p",
-          "c_media_playbacktype": "vod",
-          "c_media_station": "sbs9",
-          "c_sko_cl": 7677,
-          "c_sko_dt": "20200331",
-          "c_sko_gen": 22290,
-          "c_sko_pr": "film_the_talented_mr._ripley",
-          "c_sko_prid": "694933693",
-          "c_sko_stid": 552,
-          "c_sko_t": "2033",
-          "c_sko_ty": "tv.ep"
-        }
-      }
-    }
-  ],
-  [...]
-}
-
-(sources)()[not(drm) and type="m3u8"][1]/file om met DRM beveiligde/versleutelde video's er uit te filteren:
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "https://embed.kijk.nl/video/${url: -11}" -e 'json(//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}'
-{
-  "name": "SBS9: The Talented Mr Ripley",
-  "date": "31-03-2020",
-  "duration": "02:07:57",
-  "expdate": "07-04-2020 23:11:35",
-  "formats": [
-    {
-      "id": "sub-1",
-      "format": "vtt",
-      "language": "nl",
-      "label": "Nederlands",
-      "url": "https://vod-tpc-prod-1.talpatvcdn.nl/SBS/H5ivILBO1SI/353cb70f-c7c2-425d-ad73-ef92f22735cf/The_Talented_Mr_Ripley-webvtt-nl.vtt"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-# nieuwe "theplatform" api:
-
-$ url=https://www.kijk.nl/programmas/wegmisbruikers/C5IYffeeRR8/seizoen/122814504378/afleveringen/video/empty_episode-wegmisbruikers-s25-e10-2020-03-22/p6jYhd96olD
-
-$ xidel -s "$url" -e '$headers'
-Error:
-Internet Error: -4
-when talking to: https://consent.talpanetwork.com?TN_REFERAL_URL=https%3A%2F%2Fwww.kijk.nl%2Fprogrammas%2Fwegmisbruikers%2FC5IYffeeRR8%2Fseizoen%2F122814504378%2Fafleveringen%2Fvideo%2Fempty_episode-wegmisbruikers-s25-e10-2020-03-22%2Fp6jYhd96olD&TN_REFERAL_ORIGIN=https%3A%2F%2Fwww.kijk.nl
-
-$ xidel -s -H "Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=17ee1d2d-0814-4165-8f46-386e53a6c632" "$url" -e '$headers'
-HTTP/1.1 200 OK
-[...]
-
-# Minimale vereiste zijn "OPTOUTMULTI" en "TN_UUID". Vervolgens zou je denken dat de gepositioneerde streepjes belangrijk zijn en dat iets als...
-
-$ xidel -se 'let $a:=(random-seed(),string-join((1 to 32) ! lower-case(x:integer-to-base(random(16),16)))) return join((substring($a,1,8),substring($a,9,4),substring($a,13,4),substring($a,17,4),substring($a,21)),"-")'
-d1f63564-8794-7b6d-b916-03a309e7a02e
-
-...nodig is. Maar nee! lower-case() is niet eens nodig:
-
-$ xidel -se 'x:request({"headers":"Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID="||(random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])'
-{
-  "props": {
-    "pageProps": {
-      "format": {
-        "id": "108132904109",
-        "guid": "C5IYffeeRR8",
-        "slug": "wegmisbruikers",
-        "tvSeasonId": "122814504378",
-        "type": "SERIES",
-        "title": "Wegmisbruikers",
-        "description": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
-        "lastPubDate": null,
-        "longDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
-        "shortDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
-        "displayGenre": "Reality",
-        "tvSeasonEpisodeNumber": null,
-        "seasonNumber": null,
-        "seriesEpisodeNumber": null,
-        "seriesId": null,
-        "duration": null,
-        "episodeTitleGenerator": "EPISODE_TITLE",
-        "updated": 1579104755000,
-        [...]
-      },
-      "video": {
-        "id": "129350184257",
-        "slug": "empty_episode-wegmisbruikers-s25-e10-2020-03-22",
-        "seriesId": "http://data.entertainment.tv.theplatform.eu/entertainment/data/Program/guid/2707491435/C5IYffeeRR8",
-        "tvSeasonId": "http://data.entertainment.tv.theplatform.eu/entertainment/data/TvSeason/122814504378",
-        "seasonNumber": 25,
-        "tvSeasonEpisodeNumber": 10,
-        "shortDescription": "Aan de hand van videobeelden van de Nationale Politie worden automobilisten, motorrijders, vrachtwagenchauffeurs en fietsers met de mogelijke gevolgen van hun gevaarlijke rijgedrag geconfronteerd.",
-        "duration": 2380.96,
-        "lastAirDateTime": "2020-03-22T21:26:18.000Z",
-        "media": [
-          {
-            "availableDate": "1584905400000",
-            "mediaContent": [
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/p6jYhd96olD/ffc9e6f7-f998-0b73-2838-eb18a27226e6/p6jYhd96olD-index.ism/p6jYhd96olD.mpd",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/p6jYhd96olD/ffc9e6f7-f998-0b73-2838-eb18a27226e6/p6jYhd96olD-index.ism/p6jYhd96olD.ismc",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/p6jYhd96olD/ffc9e6f7-f998-0b73-2838-eb18a27226e6/p6jYhd96olD-index.ism/p6jYhd96olD.m3u8",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/772248E1.vtt",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/772248E1OPE.vtt",
-                "__typename": "MediaFile"
-              }
-            ],
-            "__typename": "Media"
-          }
-        ],
-        [...]
-      },
-      [...]
-    },
-    [...]
   },
   [...]
 }
+[...]
+{
+  "type": "dash",
+  "file": "https://vod-kijk2-prod.talpatvcdn.nl/p6jYhd96olD/ffc9e6f7-f998-0b73-2838-eb18a27226e6/p6jYhd96olD-index.ism/p6jYhd96olD.mpd?filter=(systemBitrate%3C3500000)",
+  "drm": null,
+  "__typename": "Source"
+}
+{
+  "type": "ism",
+  "file": "https://vod-kijk2-prod.talpatvcdn.nl/p6jYhd96olD/ffc9e6f7-f998-0b73-2838-eb18a27226e6/p6jYhd96olD-index.ism/p6jYhd96olD.ismc?filter=(systemBitrate%3C3500000)",
+  "drm": null,
+  "__typename": "Source"
+}
+{
+  "type": "m3u8",
+  "file": "https://vod-kijk2-prod.talpatvcdn.nl/p6jYhd96olD/ffc9e6f7-f998-0b73-2838-eb18a27226e6/p6jYhd96olD-index.ism/p6jYhd96olD.m3u8?filter=(systemBitrate%3C3500000)",
+  "drm": null,
+  "__typename": "Source"
+}
+{
+  "type": "webvtt",
+  "file": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/772248E1.vtt",
+  "kind": "captions",
+  "label": "Nederlands",
+  "__typename": "Track"
+}
+{
+  "type": "webvtt",
+  "file": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/772248E1OPE.vtt",
+  "kind": "captions",
+  "label": "Doven en Slechthorenden",
+  "__typename": "Track"
+}
+[...]
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":concat("Kijk: ",format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props,$info:=for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x) return {"name":"Kijk: "||$info[__typename="Program"]/concat($json/pageProps/format/title," S",seasonNumber ! (if (. lt 10) then "0"||. else .),"E",tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)),"date":format-date($info[__typename="Program"]//media_datepublished div 1000 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $info[type="webvtt"] order by $x/label descending count $i return $x/{"id":"sub-"||$i,"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json($info[type="m3u8"]/extract(file,".+m3u8"))]}'
 {
   "name": "Kijk: Wegmisbruikers S25E10",
   "date": "22-03-2020",
@@ -3763,205 +3488,238 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":co
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-$ url=https://www.kijk.nl/films/video/independence-day/4KH25s3dZRH
+$ url=https://www.kijk.nl/films/video/pulp-fiction/q7p76rNvQyx (video met DRM)
 
-$ xidel -se 'x:request({"headers":"Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID="||(random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])'
+$ xidel -se 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props return ($json/pageProps/format,for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x))'
 {
-  "props": {
-    "pageProps": {
-      "patheThuis": [...],
-      "video": {
-        "id": "131392552363",
-        "guid": "4KH25s3dZRH",
-        "title": "Independence Day",
-        "slug": "independence-day",
-        "lastAirDateTime": "2020-04-11T22:42:58.000Z",
-        "shortDescription": "Gigantische buitenaardse schepen komen richting de aarde en hangen boven enkele grote steden. David Levison komt er achter dat de aliens in minder dan een dag aan zullen gaan vallen.",
-        "duration": 7810.04,
-        "media": [
-          {
-            "availableDate": "1586628014000",
-            "mediaContent": [
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/694329E1.vtt",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/4KH25s3dZRH/e8de6271-ed1f-c0c3-14c3-4e92476285c1/4KH25s3dZRH_1586170135775.ism/Manifest.",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/4KH25s3dZRH/e8de6271-ed1f-c0c3-14c3-4e92476285c1/4KH25s3dZRH_1586170135775.ism/master.m3u8",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/4KH25s3dZRH/e8de6271-ed1f-c0c3-14c3-4e92476285c1/4KH25s3dZRH_1586170135775.ism/index.mpd",
-                "__typename": "MediaFile"
-              },
-              {
-                "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/4KH25s3dZRH/e8de6271-ed1f-c0c3-14c3-4e92476285c1/4KH25s3dZRH_1586170135775.ism/index.mpd",
-                "__typename": "MediaFile"
-              }
-            ],
-            "__typename": "Media"
-          }
-        ],
-        [...]
-      },
-      [...]
-    },
-    [...]
+  "id": "107752488190",
+  "guid": "q7p76rNvQyx",
+  "title": "Pulp Fiction",
+  "slug": "pulp-fiction",
+  "epgDate": 1596758400000,
+  "shortDescription": "Jules en Vincent werken voor de machtige misdadiger Marsellus Wallace. Vincent komt in de problemen als hij Mia, de vrouw van Wallace, een avondje gezelschap moet houden.",
+  "duration": 8554.04,
+  [...]
+  "__typename": "Program",
+  "tvSeasonId": null,
+  "type": "MOVIE",
+  "description": "Jules en Vincent werken voor de machtige misdadiger Marsellus Wallace. Vincent komt in de problemen als hij Mia, de vrouw van Wallace, een avondje gezelschap moet houden. Ondertussen is Wallace verwikkeld in een deal met de bokser Butch, die Wallace belazert en er met z'n geld vandoor gaat.",
+  "longDescription": "Jules en Vincent werken voor de machtige misdadiger Marsellus Wallace. Vincent komt in de problemen als hij Mia, de vrouw van Wallace, een avondje gezelschap moet houden. Ondertussen is Wallace verwikkeld in een deal met de bokser Butch, die Wallace belazert en er met z'n geld vandoor gaat.",
+  "displayGenre": "Crime",
+  "tvSeasonEpisodeNumber": null,
+  "seasonNumber": null,
+  "seriesId": null,
+  "updated": 1596320337000,
+  "metadata": {
+    "type": "json",
+    "json": {
+      "media_datecreated": 1564653199000,
+      "media_datemodified": 1596320337000,
+      "media_datepublished": 1596825003000,
+      "media_duration": 8554.04,
+      "media_genre": "Crime",
+      "media_id": "q7p76rNvQyx",
+      "media_name": null,
+      "media_program_episodenumber": null,
+      "media_program_name": "Pulp Fiction",
+      "media_program_season": null,
+      "media_videotype": "movie",
+      "player_embedurl": "https://www.kijk.nl/video/q7p76rNvQyx",
+      "c_media_duration_type": "long",
+      "c_media_live": null,
+      "c_media_playbacktype": "vod",
+      "c_media_genre_code": "Misdaad",
+      "c_sko_ty": "tv.ep",
+      "c_sko_stid": null,
+      "c_sko_t": null,
+      "c_sko_dt": null,
+      "c_sko_gen": null,
+      "c_sko_pr": null,
+      "c_sko_prid": null
+    }
   },
   [...]
 }
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}'
+[...]
 {
-  "name": "Kijk: Independence Day",
-  "date": "11-04-2020",
-  "duration": "02:10:10",
+  "type": "m3u8",
+  "file": "https://vod-kijk2-prod.talpatvcdn.nl/q7p76rNvQyx/16716a11-b040-b006-68d0-8bba50dbe995/q7p76rNvQyx_1570005369323.ism/master.m3u8?filter=(systemBitrate%3C3500000)",
+  "drm": {
+    "type": "json",
+    "json": {
+      "fairplay": {
+        "releasePid": "GkqfqVRivPjr",
+        "url": null,
+        "certificateUrl": "https://vod-kijk2-prod.talpatvcdn.nl/fairplay.cer",
+        "processSpcUrl": "https://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay?releasePid=GkqfqVRivPjr&form=json&schema=1.0"
+      }
+    }
+  },
+  "__typename": "Source"
+}
+[...]
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props,$info:=for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x) return {"name":"Kijk: "||$info[__typename="Program"]/(if (type="MOVIE") then title else concat($json/pageProps/format/title," S",seasonNumber ! (if (. lt 10) then "0"||. else .),"E",tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date($info[__typename="Program"]//media_datepublished div 1000 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $info[type="webvtt"] order by $x/label descending count $i return $x/{"id":"sub-"||$i,"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json($info[type="m3u8" and not(drm)]/extract(file,".+m3u8"))]}'
+{
+  "name": "Kijk: Pulp Fiction",
+  "date": "07-08-2020",
+  "duration": "02:22:34",
   "formats": [
     {
       "id": "sub-1",
       "format": "vtt",
       "language": "nl",
       "label": "Nederlands",
-      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/694329E1.vtt"
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/686999E1.vtt"
     }
   ]
 }
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-$ url=https://www.kijk.nl/programmas/5050/lsuaQSUAgiY/seizoen/123618344406/afleveringen/video/empty_episode-5050-s1-e53-2020-04-02/lUZSeuK1yrl
+$ url=https://www.kijk.nl/programmas/the-king-of-queens/2GZVeOKkUQq/seizoen/147382824350/afleveringen/video/dog-days/YA4tYzxFNyk
 
-$ xidel -se 'doc("https://embed.kijk.nl/video/'${url: -11}'")'
-Error:
-err:FODC0002: Internet/HTTP Error: 404
-when talking to: https://embed.kijk.nl/video/lUZSeuK1yrl
-
-I.t.t. de Wegmisbruikers video hier boven is deze video alleen beschikbaar via de "theplatform" api.
-try {"talpaPlayer" api} catch err:FODC0002 {"theplatform" api}. Oftewel, probeer eerst de oude methode (zo lang die nog beschikbaar is). Werkt die niet, val dan terug op de nieuwe methode:
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'try {json(doc("https://embed.kijk.nl/video/'${url: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.])/(playlist)()/{"name":concat(upper-case(.//c_media_station),": ",normalize-space(title),if (description) then " - "||description else ()),"date":replace(.//c_sko_dt,"(\d{4})(\d{2})(\d{2})","$3-$2-$1"),"duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),"expdate":format-dateTime(.//c_media_dateexpires * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[(tracks)()[kind="captions"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":label,"url":file},xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)]}} catch err:FODC0002 {x:request({"headers":concat("Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",random-seed(),string-join((1 to 32) ! x:integer-to-base(random(16),16))),"url":"'$url'"})/json(doc//script[@type="application/json"])//pageProps/{"name":"Kijk: "||(if (patheThuis) then video/title else concat(format/title," S",video/seasonNumber ! (if (. lt 10) then "0"||. else .),"E",video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(substring(video//availableDate,1,10) * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"),"[D01]-[M01]-[Y]"),"duration":video/round(duration) * duration("PT1S") + time("00:00:00"),"formats":[(.//sourceUrl)[ends-with(.,"vtt")] ! {"id":"sub-"||position(),"format":"vtt","language":"nl","label":if (contains(.,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":.},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])]}}'
+$ xidel -se 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props return ($json/pageProps/format,for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x))'
 {
-  "name": "Kijk: 50/50 S01E53",
-  "date": "01-04-2020",
-  "duration": "00:23:21",
+  "id": "144131624301",
+  "guid": "2GZVeOKkUQq",
+  "slug": "the-king-of-queens",
+  "tvSeasonId": "149352488010",
+  "type": "SERIES",
+  "title": "The King of Queens",
+  "description": "Doug en Carrie Heffernan zijn een gelukkig echtpaar in Queens, New York, die hun huishouden delen met Carries excentrieke vader Arthur. Doug is een wijsneuzige pakketbezorger met een liefde voor sport, tv, junkfood en natuurlijk zijn cynische vrouw Carrie.",
+  "epgDate": null,
+  "longDescription": "Doug en Carrie Heffernan zijn een gelukkig echtpaar in Queens, New York, die hun huishouden delen met Carries excentrieke vader Arthur. Doug is een wijsneuzige pakketbezorger met een liefde voor sport, tv, junkfood en natuurlijk zijn cynische vrouw Carrie.",
+  "shortDescription": "Doug en Carrie Heffernan zijn een gelukkig echtpaar uit Queens, New York, die hun huishouden delen met Carries excentrieke vader Arthur.",
+  "displayGenre": "Comedyserie",
+  "tvSeasonEpisodeNumber": null,
+  "seasonNumber": null,
+  "seriesEpisodeNumber": null,
+  "seriesId": null,
+  "duration": null,
+  "episodeTitleGenerator": null,
+  "updated": 1597241967000,
+  "__typename": "Program",
+  [...]
+}
+{
+  "id": "149861928246",
+  "slug": "dog-days",
+  "seriesId": "http://data.entertainment.tv.theplatform.eu/entertainment/data/Program/guid/2707491435/2GZVeOKkUQq",
+  "tvSeasonId": "http://data.entertainment.tv.theplatform.eu/entertainment/data/TvSeason/147382824350",
+  "seasonNumber": 1,
+  "tvSeasonEpisodeNumber": 14,
+  "shortDescription": "De hond van de nieuwe buren houdt Doug en Carrie de hele nacht wakker.",
+  "duration": 1264.48,
+  "epgDate": 1597881600000,
+  [...]
+  "__typename": "Program"
+}
+{
+  "availableDate": "1597940158000",
+  "mediaContent": [...],
+  "__typename": "Media"
+}
+{
+  "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/784340E1.vtt",
+  "__typename": "MediaFile"
+}
+{
+  "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/YA4tYzxFNyk/c1ea2603-2e68-aca0-b932-23eb24be4958/YA4tYzxFNyk-index.ism/YA4tYzxFNyk.m3u8",
+  "__typename": "MediaFile"
+}
+[...]
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(doc("'$url'")//script[@type="application/json"])/props,$info:=for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x) return {"name":"Kijk: "||$info[__typename="Program"]/(if (type="MOVIE") then title else concat($json/pageProps/format/title," S",seasonNumber ! (if (. lt 10) then "0"||. else .),"E",tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(($info[__typename="Program"]//media_datepublished,$info[__typename="Media"]/availableDate)[1] div 1000 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (if ($info[type="webvtt"]) then $info[type="webvtt"]/file else $info[ends-with(sourceUrl,"vtt")]/sourceUrl) order by $x count $i return {"id":"sub-"||$i,"format":"vtt","language":"nl","label":if (contains($x,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":$x},xivid:m3u8-to-json(($info[type="m3u8" and not(drm)]/extract(file,".+m3u8"),$info[ends-with(sourceUrl,"m3u8")]/sourceUrl)[1])]}'
+{
+  "name": "Kijk: The King of Queens S01E14",
+  "date": "20-08-2020",
+  "duration": "00:21:04",
   "formats": [
     {
       "id": "sub-1",
       "format": "vtt",
       "language": "nl",
-      "label": "Doven en Slechthorenden",
-      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/774421E1OPE.vtt"
+      "label": "Nederlands",
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/784340E1.vtt"
     },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://vod-kijk2-prod.talpatvcdn.nl/lUZSeuK1yrl/184c9676-cdc8-03ab-52a8-5bd59d7229af/lUZSeuK1yrl-index.ism/lUZSeuK1yrl.m3u8"
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/YA4tYzxFNyk/c1ea2603-2e68-aca0-b932-23eb24be4958/YA4tYzxFNyk-index.ism/YA4tYzxFNyk.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "160kbps",
-      "url": "https://vod-kijk2-prod.talpatvcdn.nl/lUZSeuK1yrl/184c9676-cdc8-03ab-52a8-5bd59d7229af/lUZSeuK1yrl-index.ism/lUZSeuK1yrl-index-audio=160000.m3u8"
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/YA4tYzxFNyk/c1ea2603-2e68-aca0-b932-23eb24be4958/YA4tYzxFNyk-index.ism/YA4tYzxFNyk-index-audio=160000.m3u8"
     },
     [...]
     {
       "id": "hls-7",
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080@25fps",
-      "bitrate": "6094|160kbps",
-      "url": "https://vod-kijk2-prod.talpatvcdn.nl/lUZSeuK1yrl/184c9676-cdc8-03ab-52a8-5bd59d7229af/lUZSeuK1yrl-index.ism/lUZSeuK1yrl-index-audio=160000-video=6094462.m3u8"
+      "bitrate": "6096|160kbps",
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/YA4tYzxFNyk/c1ea2603-2e68-aca0-b932-23eb24be4958/YA4tYzxFNyk-index.ism/YA4tYzxFNyk-index-audio=160000-video=6095691.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
-  try {
-    json(
-      doc("https://embed.kijk.nl/video/'${url: -11}'")//script/extract(.,"playerConfig = (.+);",1)[.]
-    )/(playlist)()/{
-      "name":concat(
-        upper-case(.//c_media_station),
-        ": ",
-        normalize-space(title),
-        if (description) then
-          " - "||description
+declare function xivid:kijk($url as string) as object()? {
+  let $json:=json(doc($url)//script[@type="application/json"])/props,
+      $info:=for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x)
+  return {
+    "name":"Kijk: "||$info[__typename="Program"]/(
+      if (type="MOVIE") then
+        title
+      else
+        concat(
+          $json/pageProps/format/title,
+          " S",
+          seasonNumber ! (if (. lt 10) then "0"||. else .),
+          "E",
+          tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
+        )
+    ),
+    "date":format-date(
+      (
+        $info[__typename="Program"]//media_datepublished,
+        $info[__typename="Media"]/availableDate
+      )[1] div 1000 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),
+    "formats":[
+      for $x at $i in (
+        if ($info[type="webvtt"]) then
+          $info[type="webvtt"]/file
         else
-          ()
-      ),
-      "date":replace(
-        .//c_sko_dt,
-        "(\d{4})(\d{2})(\d{2})",
-        "$3-$2-$1"
-      ),
-      "duration":.//c_sko_cl * duration("PT1S") + time("00:00:00"),
-      "expdate":format-dateTime(
-        .//c_media_dateexpires * duration("PT1S") +
-        implicit-timezone() + dateTime("1970-01-01T00:00:00"),
-        "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
-      ),
-      "formats":[
-        (tracks)()[kind="captions"]/{
-          "id":"sub-"||position(),
-          "format":"vtt",
-          "language":"nl",
-          "label":label,
-          "url":file
-        },
-        xivid:m3u8-to-json((sources)()[not(drm) and type="m3u8"][1]/file)
-      ]
-    }
-  } catch err:FODC0002 {
-    x:request({
-      "headers":concat(
-        "Cookie: OPTOUTMULTI=0:0%7Cc5:0%7Cc1:0%7Cc4:0%7Cc3:0%7Cc2:0; TN_UUID=",
-        random-seed(),
-        string-join((1 to 32) ! x:integer-to-base(random(16),16))
-      ),
-      "url":"'$url'"
-    })/json(
-      doc//script[@type="application/json"]
-    )//pageProps/{
-      "name":"Kijk: "||(
-        if (patheThuis) then
-          video/title
+          $info[ends-with(sourceUrl,"vtt")]/sourceUrl
+      )
+      order by $x
+      count $i
+      return {
+        "id":"sub-"||$i,
+        "format":"vtt",
+        "language":"nl",
+        "label":if (contains($x,"OPE")) then
+          "Doven en Slechthorenden"
         else
-          concat(
-            format/title,
-            " S",
-            video/seasonNumber ! (if (. lt 10) then "0"||. else .),
-            "E",
-            video/tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
-          )
-      ),
-      "date":format-date(
-        substring(video//availableDate,1,10) * duration("PT1S") +
-        implicit-timezone() + dateTime("1970-01-01T00:00:00"),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":video/round(duration) * duration("PT1S") + time("00:00:00"),
-      "formats":[
-        (.//sourceUrl)[ends-with(.,"vtt")] ! {
-          "id":"sub-"||position(),
-          "format":"vtt",
-          "language":"nl",
-          "label":if (contains(.,"OPE")) then
-            "Doven en Slechthorenden"
-          else
-            "Nederlands",
-          "url":.
-        },
-        xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])
-      ]
-    }
+          "Nederlands",
+        "url":$x
+      },
+      xivid:m3u8-to-json(
+        (
+          $info[type="m3u8" and not(drm)]/extract(file,".+m3u8"),
+          $info[ends-with(sourceUrl,"m3u8")]/sourceUrl
+        )[1]
+      )
+    ]
   }
-'
+};
 
 ================================================================================================
 
