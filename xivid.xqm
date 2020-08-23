@@ -387,3 +387,21 @@ declare function xivid:kijk($url as string) as object()? {
     ]
   }
 };
+
+declare function xivid:tvblik($url as string) as object()? {
+  let $host:=extract(
+    doc($url)//(
+      div[@id="embed-player"]/(@data-episode,a/@href),
+      div[@class="video_thumb"]//@onclick,
+      iframe[@class="sbsEmbed"]/@src
+    ),
+    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
+    (1,2)
+  ) return
+  if ($host[1]="npo") then
+    xivid:npo("https://www.npostart.nl/"||$host[2])
+  else if ($host[1]="rtl") then
+    xivid:rtl("https://www.rtlxl.nl/video/"||$host[2])
+  else
+    xivid:kijk("https://kijk.nl/video/"||$host[2])
+};

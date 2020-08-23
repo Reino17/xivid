@@ -3725,54 +3725,110 @@ declare function xivid:kijk($url as string) as object()? {
 
 [tvblik,uitzendinggemist]
 
-$ cat <<EOF | while read a; do xidel -s "$a" -e '//div[@id="embed-player"]/(@data-episode,.//@href)'; done
-https://tvblik.nl/journaal/nos-851
-https://tvblik.nl/rtl-nieuws/laat-997
-https://tvblik.nl/hart-van-nederland/15-januari-2019
-EOF
-//www.npostart.nl/embed/nos-journaal/15-01-2019/POW_04060130
-http://www.rtlxl.nl/#!/_rtl-nieuws-132237/02b2833d-48dd-3a08-b6cd-8dbadcf8fba4?utm_medium=refferal&utm_source=tvblik
-//embed.kijk.nl/?width=640&height=360&video=GgO61doGeqZ&autoplay=1
+$ xidel -se '
+  for $x in (
+    "https://tvblik.nl/nos-journaal/21-augustus-2020",
+    "https://tvblik.nl/rtl-nieuws/0630-uur-545",
+    "https://tvblik.nl/hart-van-nederland/21-augustus-2020"
+  ) return
+  doc($x)//div[@id="embed-player"]/(@data-episode,a/@href)
+'
+//www.npostart.nl/embed/nos-journaal/21-08-2020/POW_04508799
+http://www.rtlxl.nl/#!/_rtl-nieuws-132237/c061ef9a-1fb9-356d-87b0-df9ca473ca7c?utm_medium=refferal&utm_source=tvblik
+//embed.kijk.nl/?width=640&height=360&video=rik02l1H0Fl&autoplay=1
 
-$ cat <<EOF | while read a; do xidel -s "$a" -e '//a[@rel="nofollow"]/@onclick,//iframe[@class="sbsEmbed"]/@src'; done
-https://www.uitzendinggemist.net/aflevering/461995/Nos_Journaal.html
-https://www.uitzendinggemist.net/aflevering/462016/Rtl_Nieuws_1930_Uur.html
-https://www.uitzendinggemist.net/aflevering/462122/Hart_Van_Nederland.html
-EOF
-window.open('http://www.npo.nl/aa-aa/01-01-2015/POW_04059331','winname',"directories=0,titlebar=0,toolbar=0,location=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=800,height=600");
-window.open('http://www.rtlxl.nl/#!/zzzz/9483a466-6424-3dff-99fd-2d558a950e3e','winname',"directories=0,titlebar=0,toolbar=0,location=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=1024,height=600");
-https://embed.kijk.nl/?width=720&height=410&video=GgO61doGeqZ
+$ xidel -se '
+  for $x in (
+    "https://www.uitzendinggemist.net/aflevering/526238/Nos_Journaal.html",
+    "https://www.uitzendinggemist.net/aflevering/526267/Rtl_Nieuws_1930_Uur.html",
+    "https://www.uitzendinggemist.net/aflevering/521164/Hart_Van_Nederland.html"
+  ) return
+  doc($x)//(div[@class="video_thumb"]//@onclick,iframe[@class="sbsEmbed"]/@src)
+'
+window.open('http://www.npo.nl/aa-aa/01-01-2015/POW_04508799','winname',"directories=0,titlebar=0,toolbar=0,location=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=760,height=600");
+window.open('http://www.rtlxl.nl/#!/zzzz/7b0ef07f-359f-3c3c-a784-47398a3dab25','winname',"directories=0,titlebar=0,toolbar=0,location=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=840,height=600");
+https://embed.kijk.nl/?width=720&height=410&video=NFH6Mbjln35
 
-$ cat <<EOF | while read a; do xidel -s "$a" -e 'join(extract((//div[@id="embed-player"]/(@data-episode,.//@href),//a[@rel="nofollow"]/@onclick,//iframe[@class="sbsEmbed"]/@src),"(npo|rtl|kijk).+(?:/|video=)([\w-]+)",(1,2)))'; done
-https://tvblik.nl/journaal/nos-851
-https://tvblik.nl/rtl-nieuws/laat-997
-https://tvblik.nl/hart-van-nederland/15-januari-2019
-https://www.uitzendinggemist.net/aflevering/461995/Nos_Journaal.html
-https://www.uitzendinggemist.net/aflevering/462016/Rtl_Nieuws_1930_Uur.html
-https://www.uitzendinggemist.net/aflevering/462122/Hart_Van_Nederland.html
-EOF
-npo POW_04060130
-rtl 02b2833d-48dd-3a08-b6cd-8dbadcf8fba4
-kijk rEFjefrsn1A
-npo POW_04059331
-rtl 9483a466-6424-3dff-99fd-2d558a950e3e
-kijk GgO61doGeqZ
-
-------------------------------------------------------------------------------------------------
-
--e '
+$ xidel -se '
+  for $x in (
+    "https://tvblik.nl/nos-journaal/21-augustus-2020",
+    "https://tvblik.nl/rtl-nieuws/0630-uur-545",
+    "https://tvblik.nl/hart-van-nederland/21-augustus-2020",
+    "https://www.uitzendinggemist.net/aflevering/526238/Nos_Journaal.html",
+    "https://www.uitzendinggemist.net/aflevering/526267/Rtl_Nieuws_1930_Uur.html",
+    "https://www.uitzendinggemist.net/aflevering/521164/Hart_Van_Nederland.html"
+  ) return
   join(
     extract(
-      (
-        //div[@id="embed-player"]/(@data-episode,.//@href),
-        //a[@rel="nofollow"]/@onclick,
-        //iframe[@class="sbsEmbed"]/@src
+      doc($x)//(
+        div[@id="embed-player"]/(@data-episode,a/@href),
+        div[@class="video_thumb"]//@onclick,
+        iframe[@class="sbsEmbed"]/@src
       ),
       "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
       (1,2)
     )
   )
 '
+npo POW_04508799
+rtl c061ef9a-1fb9-356d-87b0-df9ca473ca7c
+kijk rik02l1H0Fl
+npo POW_04508799
+rtl 7b0ef07f-359f-3c3c-a784-47398a3dab25
+kijk NFH6Mbjln35
+
+$ xidel -s --xquery '
+  for $x in (
+    "https://tvblik.nl/nos-journaal/21-augustus-2020",
+    "https://tvblik.nl/rtl-nieuws/0630-uur-545",
+    "https://tvblik.nl/hart-van-nederland/21-augustus-2020",
+    "https://www.uitzendinggemist.net/aflevering/526238/Nos_Journaal.html",
+    "https://www.uitzendinggemist.net/aflevering/526267/Rtl_Nieuws_1930_Uur.html",
+    "https://www.uitzendinggemist.net/aflevering/521164/Hart_Van_Nederland.html"
+  )
+  let $host:=extract(
+    doc($x)//(
+      div[@id="embed-player"]/(@data-episode,a/@href),
+      div[@class="video_thumb"]//@onclick,
+      iframe[@class="sbsEmbed"]/@src
+    ),
+    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
+    (1,2)
+  )
+  return
+  if ($host[1]="npo") then
+    "xivid:npo(""https://www.npostart.nl/"||$host[2]||""")"
+  else if ($host[1]="rtl") then
+    "xivid:rtl(""https://www.rtlxl.nl/video/"||$host[2]||""")"
+  else
+    "xivid:kijk(""https://kijk.nl/video/"||$host[2]||""")"
+'
+xivid:npo("https://www.npostart.nl/POW_04508799")
+xivid:rtl("https://www.rtlxl.nl/video/c061ef9a-1fb9-356d-87b0-df9ca473ca7c")
+xivid:kijk("https://kijk.nl/video/rik02l1H0Fl")
+xivid:npo("https://www.npostart.nl/POW_04508799")
+xivid:rtl("https://www.rtlxl.nl/video/7b0ef07f-359f-3c3c-a784-47398a3dab25")
+xivid:kijk("https://kijk.nl/video/NFH6Mbjln35")
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:tvblik($url as string) as object()? {
+  let $host:=extract(
+    doc($url)//(
+      div[@id="embed-player"]/(@data-episode,a/@href),
+      div[@class="video_thumb"]//@onclick,
+      iframe[@class="sbsEmbed"]/@src
+    ),
+    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
+    (1,2)
+  ) return
+  if ($host[1]="npo") then
+    xivid:npo("https://www.npostart.nl/"||$host[2])
+  else if ($host[1]="rtl") then
+    xivid:rtl("https://www.rtlxl.nl/video/"||$host[2])
+  else
+    xivid:kijk("https://kijk.nl/video/"||$host[2])
+};
 
 ================================================================================================
 

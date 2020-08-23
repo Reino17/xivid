@@ -85,22 +85,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:tvblik
-FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
-  'CALL :'^|^|join^(
-    extract^(
-      ^(
-        //div[@id^='embed-player']/^(@data-episode^,.//@href^)^,
-        //a[@rel^='nofollow']/@onclick^,
-        //iframe[@class^='sbsEmbed']/@src
-      ^)^,
-      '^(npo^|rtl^|kijk^).+^(?:/^|video^=^)^([\w-]+^)'^,
-      ^(1^,2^)
-    ^)
-  ^)
-^"') DO %%A
-EXIT /B
-
 :regio_frl
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   let $a:^=//meta[@itemprop^='embedURL']/extract^(
@@ -1047,9 +1031,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:nos.nl=%"=="%url%" (
   CALL :nos "%url%"
 ) ELSE IF NOT "%url:tvblik.nl=%"=="%url%" (
-  CALL :tvblik "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:tvblik('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:uitzendinggemist.net=%"=="%url%" (
-  CALL :tvblik "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:tvblik('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:rtlxl.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtl('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:rtlnieuws.nl=%"=="%url%" (

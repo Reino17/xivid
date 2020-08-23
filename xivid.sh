@@ -1025,19 +1025,7 @@ if [[ $url =~ (npostart.nl|gemi.st) ]]; then
 elif [[ $url =~ nos.nl ]]; then
   nos "$url"
 elif [[ $url =~ (tvblik.nl|uitzendinggemist.net) ]]; then
-  eval "$(xidel "$url" -e '
-    join(
-      extract(
-        (
-          //div[@id="embed-player"]/(@data-episode,.//@href),
-          //a[@rel="nofollow"]/@onclick,
-          //iframe[@class="sbsEmbed"]/@src
-        ),
-        "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
-        (1,2)
-      )
-    )
-  ')"
+  eval "$(xidel -e 'json:=xivid:tvblik("'$url'")' --output-format=bash)"
 elif [[ $url =~ rtlxl.nl|rtlnieuws.nl ]]; then
   eval "$(xidel -e 'json:=xivid:rtl("'$url'")' --output-format=bash)"
 elif [[ $url =~ kijk.nl ]]; then
