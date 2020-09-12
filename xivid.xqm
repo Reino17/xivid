@@ -477,3 +477,55 @@ declare function xivid:telegraaf($url as string) as object()? {
     ]
   }
 };
+
+declare function xivid:ad($url as string) as object()? {
+  let $id:=extract($url,"~p(\d+)",1),
+      $json:=json(
+        concat(
+          "https://embed.mychannels.video/sdk/production/",
+          if ($id) then
+            $id
+          else
+            x:request({
+              "headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5",
+              "url":$url
+            })/doc/(
+              if (//*[@class="mc-embed"]) then
+                //*[@class="mc-embed"]/extract(@src,"\d+")
+              else
+                //div[@data-mychannels-type="video"]/@data-mychannels-id
+            ),
+          "?options=FUTFU_default"
+        )
+      )
+  return
+  $json/{|
+    {
+      "name":concat(
+        "AD: ",
+        (shows)()/title,
+        " - ",
+        (productions)()/title
+      )
+    },
+    (productions)()/{
+      "date":format-date(
+        date(tokenize(publicationDate)[1]),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "formats":[
+        for $x at $i in reverse((sources)()[type="video/mp4"]) return {
+          "id":"pg-"||$i,
+          "resolution":("640x360","1280x720")[$i],
+          "format":"mp4[h264+aac]",
+          "url":$x/src
+        },
+        xivid:m3u8-to-json((sources)(1)/src)
+      ]
+    }
+  |}
+};

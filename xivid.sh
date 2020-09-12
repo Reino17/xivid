@@ -332,38 +332,6 @@ autojunk() {
   ' --output-format=bash)"
 }
 
-ad() {
-  eval "$(xidel -H "Cookie: pwv=2;pws=functional" "$1" --xquery '
-    json:=json(
-      (
-        doc(
-          (
-            extract(
-              unparsed-text(//script[@class="mc-embed"]/@src),
-              "embed_uri = &apos;(.+)&apos;;",
-              1
-            ),
-            //iframe[@class="mc-embed"]/@src
-          )[.]
-        ),
-        .
-      )//script[@data-mc-object-type="production"]
-    )/{
-      "name":"AD: "||title,
-      "date":replace(
-        publicationDate,
-        "(\d+)-(\d+)-(\d+).+",
-        "$3-$2-$1"
-      ),
-      "duration":format-time(
-        duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":xivid:m3u8-to-json((sources)()/src)
-    }
-  ' --output-format=bash)"
-}
-
 lc() {
   eval "$(xidel "$1" --xquery '
     json:=json(
@@ -984,7 +952,7 @@ elif [[ $url =~ autojunk.nl ]]; then
 elif [[ $url =~ telegraaf.nl ]]; then
   eval "$(xidel -e 'json:=xivid:telegraaf("'$url'")' --output-format=bash)"
 elif [[ $url =~ ad.nl ]]; then
-  ad "$url"
+  eval "$(xidel -e 'json:=xivid:ad("'$url'")' --output-format=bash)"
 elif [[ $url =~ lc.nl ]]; then
   lc "$url"
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then

@@ -6961,52 +6961,93 @@ declare function xivid:telegraaf($url as string) as object()? {
 
 [ad]
 
-https://www.ad.nl/video/kanalen/brabants-dagblad~c416/series/korte-reportage~s962/brabantse-boeren-gaan-los-op-links-rechts-van-snollebollekes~p104067
+$ url=https://www.ad.nl/video/loekasjenko-voorziet-val-poetin-bij-zijn-vertrek~p167517
 
-$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/video/kanalen/brabants-dagblad~c416/series/korte-reportage~s962/brabantse-boeren-gaan-los-op-links-rechts-van-snollebollekes~p104067" -e 'json(//script[@data-mc-object-type="production"])'
+$ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else (),"?options=FUTFU_default")'
+https://embed.mychannels.video/sdk/production/167517?options=FUTFU_default
+
+$ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else (),"?options=FUTFU_default"))'
 {
-  "adsEnabled": true,
-  "clickoutUrl": null,
-  "clickoutUrlTimeOffset": null,
-  "displayLogo": true,
-  "duration": 22,
-  "genreId": 10,
-  "id": 104067,
-  "live": false,
-  "ooyalaId": null,
-  "origin": "origin_online_source",
-  "playerSkin": "default",
-  "posterUrl": "https://imgix.mychannels.video/imgix/629c2387-cdfd-4e1d-8742-1bdb9c49587b/VVS%20Still%20links%20rechts.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.5&fp-y=0.5",
-  "publicationDate": "2019-10-01 11:59:00",
-  "publication_status": "published",
-  "showId": 962,
-  "sources": [
+  "shows": [
     {
-      "src": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl",
-      "type": "application/vnd.apple.mpegurl"
+      "title": "Snel Nieuws",
+      "id": 921,
+      "channelId": 401,
+      "adsForbidden": false
     }
   ],
-  "theme": "News",
-  "title": "Brabantse boeren gaan los op Links Rechts van Snollebollekes"
+  "productions": [
+    {
+      "title": "Loekasjenko voorziet val Poetin bij zijn vertrek",
+      "theme": "News",
+      "sources": [
+        {
+          "type": "application/vnd.apple.mpegurl",
+          "src": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+        },
+        {
+          "type": "video/mp4",
+          "src": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~s2i9P90Fbwq6eGBWZVaiE7k?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+        },
+        {
+          "type": "video/mp4",
+          "src": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~s2i9P90ObQr0eChTZxDs?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+        }
+      ],
+      "showId": 921,
+      "publication_status": "published",
+      "publicationDate": "2020-09-08 20:24:00",
+      "premium": "free",
+      "posterUrl": "https://img.mychannels.video/imgix/e1517301-3717-462f-9672-491dc3bc66fdU3RpbGwxLmpwZw==.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.5&fp-y=0.35",
+      "playerSkin": "default",
+      "origin": "origin_ap_associated_press",
+      "ooyalaId": "10189472",
+      "live": false,
+      "interactiveAdsEnabled": true,
+      "id": 167517,
+      "genreId": 10,
+      "durationFormatted": "01:03",
+      "duration": 63,
+      "displayLogo": true,
+      "description": null,
+      "clickoutUrlTimeOffset": null,
+      "clickoutUrl": null,
+      "clickoutTitle": null,
+      "adsEnabled": true
+    }
+  ],
+  [...]
 }
 
-$ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/video/kanalen/brabants-dagblad~c416/series/korte-reportage~s962/brabantse-boeren-gaan-los-op-links-rechts-van-snollebollekes~p104067" -e 'json(//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else (),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
-  "name": "AD: Brabantse boeren gaan los op Links Rechts van Snollebollekes",
-  "date": "01-10-2019",
-  "duration": "00:00:22",
+  "name": "AD: Snel Nieuws - Loekasjenko voorziet val Poetin bij zijn vertrek",
+  "date": "08-09-2020",
+  "duration": "00:01:03",
   "formats": [
+    {
+      "id": "pg-1",
+      "resolution": "640x360",
+      "format": "mp4[h264+aac]",
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~s2i9P90ObQr0eChTZxDs?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+    },
+    {
+      "id": "pg-2",
+      "resolution": "1280x720",
+      "format": "mp4[h264+aac]",
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~s2i9P90Fbwq6eGBWZVaiE7k?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
       "resolution": "320x180@30fps",
       "bitrate": "481kbps",
-      "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i176422914-na1f6458e-2586-4547-9491-fea1ea11c357&anvtrid=1bf60e79c0e5f3967f858c0627ead193"
+      "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i177995814-n9cf68072-49de-4ea2-bb30-8091382629a5&anvtrid=44f60006fd92471886f64add2915d34d"
     },
     [...]
     {
@@ -7014,48 +7055,75 @@ $ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720@30fps",
       "bitrate": "2510kbps",
-      "url": "https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i176422914-na1f6458e-2586-4547-9491-fea1ea11c357&anvtrid=1bf60e79c0e5f3967f858c0627ead193"
+      "url": "https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i177995814-n9cf68072-49de-4ea2-bb30-8091382629a5&anvtrid=44f60006fd92471886f64add2915d34d"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/
+$ url=https://www.ad.nl/koken-en-eten/keukenheks-pasta-droog-en-klef-bij-het-opwarmen-niet-met-deze-truc~ae79204f/
 
-$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/" -e '//iframe[@class="mc-embed"]/@src'
-https://mychannels.video/embed/66560?automute=true&autoplay=true&autoplay_onscreen=true&display_logo=true&play_ads=true&single_play=true
+$ xidel -se 'x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//div[@data-mychannels-type="video"]/outer-html()'   # Is "authId" altijd hetzelfde?
+<div xmlns="http://www.w3.org/2000/svg" class="mychannels" data-mychannels-type="video" data-mychannels-id="138236" data-mychannels-options="FUTFU_default"></div>
 
-$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/" -f '//iframe[@class="mc-embed"]/@src' -e 'json(//script[@data-mc-object-type="production"])'
+$ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//div[@data-mychannels-type="video"]/@data-mychannels-id,"?options=FUTFU_default")'
+https://embed.mychannels.video/sdk/production/138236?options=FUTFU_default
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//div[@data-mychannels-type="video"]/@data-mychannels-id,"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
-  "adsEnabled": true,
-  "clickoutUrl": null,
-  "clickoutUrlTimeOffset": null,
-  "displayLogo": true,
-  "duration": 544,
-  "genreId": 10,
-  "id": 66560,
-  "live": false,
-  "ooyalaId": "N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy",
-  "origin": "origin_dpn_original",
-  "playerSkin": "default",
-  "posterUrl": "https://imgix.mychannels.video/imgix/a022bbee-be17-4424-b208-0075cecef841/imgix_e1ff0aab-0142-4d47-a04e-08186ccfadb1_stilltesla0.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.71&fp-y=0.04",
-  "publicationDate": "2019-03-04 13:52:00",
-  "publication_status": "published",
-  "showId": 1630,
-  "sources": [
+  "name": "AD: Keuken Heks - Pasta droog en klef bij het opwarmen? Niet met deze truc",
+  "date": "30-07-2020",
+  "duration": "00:00:44",
+  "formats": [
     {
-      "src": "https://video.persgroep.be/N0Mm43aDE6trOJW5e2SKTFb5NO9Mm7gy/index.m3u8",
-      "type": "application/vnd.apple.mpegurl"
+      "id": "pg-1",
+      "resolution": "640x360",
+      "format": "mp4[h264+aac]",
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10131662~~s2i9P90ObQr0eChTZxDs?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+    },
+    {
+      "id": "pg-2",
+      "resolution": "1280x720",
+      "format": "mp4[h264+aac]",
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10131662~~s2i9P90Fbwq6eGBWZVaiE7k?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10131662~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "320x180@30fps",
+      "bitrate": "481kbps",
+      "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i176422958-nf6457c55-cbe0-404d-8bbb-230c0e6a7a7e&anvtrid=acc8a8532bedfd557d7c79bb19a237f0"
+    },
+    [...]
+    {
+      "id": "hls-5",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720@30fps",
+      "bitrate": "2510kbps",
+      "url": "https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i176422958-nf6457c55-cbe0-404d-8bbb-230c0e6a7a7e&anvtrid=acc8a8532bedfd557d7c79bb19a237f0"
     }
-  ],
-  "theme": "News",
-  "title": "Teslatest"
+  ]
 }
 
-$ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/" -f '//iframe[@class="mc-embed"]/@src' -e 'json(//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.ad.nl/dossier-autotest/test-tesla-model-3-geniaal-maar-ook-onhandig~aaf9e018/
+
+$ xidel -se 'x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//iframe[@class="mc-embed"]/outer-html()'
+<iframe xmlns="http://www.w3.org/2000/svg" allowfullscreen="" class="mc-embed" height="100%" mozallowfullscreen="" src="https://mychannels.video/embed/66560?automute=true&amp;autoplay=true&amp;autoplay_onscreen=true&amp;display_logo=true&amp;play_ads=true&amp;single_play=true" style="border: 0; position: absolute; left:0; top: 0; overflow:hidden;" webkitallowfullscreen="" width="100%"></iframe>
+
+$ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//iframe[@class="mc-embed"]) then //iframe[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")'
+https://embed.mychannels.video/sdk/production/66560?options=FUTFU_default
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//iframe[@class="mc-embed"]) then //iframe[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
-  "name": "AD: Teslatest",
+  "name": "AD: Auto - Teslatest",
   "date": "04-03-2019",
   "duration": "00:09:04",
   "formats": [
@@ -7084,44 +7152,17 @@ $ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.
 
 ------------------------------------------------------------------------------------------------
 
-https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/
+$ url=https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/
 
-$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -e '//script[@class="mc-embed"]/@src'
-https://embed.mychannels.video/script/production/53235?options=TUTF_default&mode=iframe
+$ xidel -se 'x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//script[@class="mc-embed"]/outer-html()'
+<script xmlns="http://www.w3.org/2000/svg" class="mc-embed" src="https://embed.mychannels.video/script/production/53235?options=TUTF_default&amp;mode=iframe"></script>
 
-$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -f '//script[@class="mc-embed"]/@src' --xquery 'extract($raw,"embed_uri = &apos;(.+)&apos;;",1)'
-https://embed.mychannels.video/production/53235?options=TUTF_default
+$ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//*[@class="mc-embed"]) then //*[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")'
+https://embed.mychannels.video/sdk/production/53235?options=FUTFU_default
 
-$ xidel -s -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -f '//script[@class="mc-embed"]/@src' --follow-kind=xquery3 -f 'extract($raw,"embed_uri = &apos;(.+)&apos;;",1)' -e 'json(//script[@data-mc-object-type="production"])'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//*[@class="mc-embed"]) then //*[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
-  "adsEnabled": true,
-  "clickoutUrl": null,
-  "clickoutUrlTimeOffset": null,
-  "displayLogo": true,
-  "duration": 30,
-  "genreId": 10,
-  "id": 53235,
-  "live": false,
-  "ooyalaId": "k3MGNmZzE62C7JZZBxHCWgECXn8756TG",
-  "origin": "origin_dpn_original",
-  "playerSkin": "default",
-  "posterUrl": "https://imgix.mychannels.video/imgix/0b11f1d5-122e-4c07-a0f8-a5b89b2710e7/Tijdlijn.00_00_30_05.Still003.jpg?dpr=1&h=383&w=680&fit=cover&auto=format%2Ccompress&fm=jpg&q=75&crop=focalpoint&fp-x=0.5&fp-y=0.5",
-  "publicationDate": "2019-02-03 20:03:57",
-  "publication_status": "published",
-  "showId": 911,
-  "sources": [
-    {
-      "src": "https://video.persgroep.be/k3MGNmZzE62C7JZZBxHCWgECXn8756TG/index.m3u8",
-      "type": "application/vnd.apple.mpegurl"
-    }
-  ],
-  "theme": "News",
-  "title": "De nummers op benzinepompen zijn veranderd"
-}
-
-$ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" -f '//script[@class="mc-embed"]/@src' --follow-kind=xquery3 -f 'extract($raw,"embed_uri = &apos;(.+)&apos;;",1)' -e 'json(//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
-{
-  "name": "AD: De nummers op benzinepompen zijn veranderd",
+  "name": "AD: Snel Nieuws - De nummers op benzinepompen zijn veranderd",
   "date": "03-02-2019",
   "duration": "00:00:30",
   "formats": [
@@ -7150,39 +7191,57 @@ $ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.
 
 ------------------------------------------------------------------------------------------------
 
-$ xidel -s --module=xivid.xqm -H "Cookie: pwv=2;pws=functional" "https://www.ad.nl/auto/je-gaat-anders-tanken-euro-95-wordt-e10-op-1-oktober~a497450a/" --xquery 'json((doc((extract(unparsed-text(//script[@class="mc-embed"]/@src),"embed_uri = &apos;(.+)&apos;;",1),//iframe[@class="mc-embed"]/@src)[.]),.)//script[@data-mc-object-type="production"])/{"name":"AD: "||title,"date":replace(publicationDate,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json((sources)()/src)}'
-
-------------------------------------------------------------------------------------------------
-
---xquery '
-  json(
-    (
-      doc(
-        (
-          extract(
-            unparsed-text(//script[@class="mc-embed"]/@src),
-            "embed_uri = &apos;(.+)&apos;;",
-            1
-          ),
-          //iframe[@class="mc-embed"]/@src
-        )[.]
+declare function xivid:ad($url as string) as object()? {
+  let $id:=extract($url,"~p(\d+)",1),
+      $json:=json(
+        concat(
+          "https://embed.mychannels.video/sdk/production/",
+          if ($id) then
+            $id
+          else
+            x:request({
+              "headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5",
+              "url":$url
+            })/doc/(
+              if (//*[@class="mc-embed"]) then
+                //*[@class="mc-embed"]/extract(@src,"\d+")
+              else
+                //div[@data-mychannels-type="video"]/@data-mychannels-id
+            ),
+          "?options=FUTFU_default"
+        )
+      )
+  return
+  $json/{|
+    {
+      "name":concat(
+        "AD: ",
+        (shows)()/title,
+        " - ",
+        (productions)()/title
+      )
+    },
+    (productions)()/{
+      "date":format-date(
+        date(tokenize(publicationDate)[1]),
+        "[D01]-[M01]-[Y]"
       ),
-      .
-    )//script[@data-mc-object-type="production"]
-  )/{
-    "name":"AD: "||title,
-    "date":replace(
-      publicationDate,
-      "(\d+)-(\d+)-(\d+).+",
-      "$3-$2-$1"
-    ),
-    "duration":format-time(
-      duration * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "formats":xivid:m3u8-to-json((sources)()/src)
-  }
-'
+      "duration":format-time(
+        duration * duration("PT1S"),
+        "[H01]:[m01]:[s01]"
+      ),
+      "formats":[
+        for $x at $i in reverse((sources)()[type="video/mp4"]) return {
+          "id":"pg-"||$i,
+          "resolution":("640x360","1280x720")[$i],
+          "format":"mp4[h264+aac]",
+          "url":$x/src
+        },
+        xivid:m3u8-to-json((sources)(1)/src)
+      ]
+    }
+  |}
+};
 
 ================================================================================================
 
