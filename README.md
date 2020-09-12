@@ -50,6 +50,8 @@ Deze websites worden op dit moment ondersteund:
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
 
+Voor bug reports en verzoeken ga naar https://github.com/Reino17/xivid/issues. Geen garanties.
+
 ## Voorbeelden
 Zonder optie geeft Xivid de video-url van de video met de hoogste resolutie en/of bitrate:
 ```bat
@@ -118,7 +120,7 @@ Deze `xidel.exe` heeft OpenSSL niet geïntegreerd en vereist daarom een aantal O
 - `libcrypto-1_1.dll` en `libssl-1_1.dll` uit de OpenSSL 1.1.1 reeks.
 - of `libeay32.dll` en `ssleay32.dll` uit de verouderde OpenSSL 1.0.2 reeks.
 
-Deze OpenSSL dll-bestanden heb ik zelf gecompileerd en kun je op [mijn website](http://rwijnsma.home.xs4all.nl/files/other/) vinden.
+Deze OpenSSL dll-bestanden heb ik zelf gecompileerd en kun je op [mijn website](https://rwijnsma.home.xs4all.nl/files/openssl/) vinden.
 
 # Video rechtstreeks bekijken
 ## Linux
@@ -135,15 +137,15 @@ FOR /F %A IN ('xivid.bat <url>') DO vlc.exe %A
 Ik raad aan om [FFmpeg](https://ffmpeg.org) te gebruiken voor het downloaden van audio- en video-bestanden. Voor dynamische (of adaptive) videostreams (`hls-#` / `dash-#`) heb je FFmpeg sowieso nodig, maar ook voor progressieve (of progressive/muxed) videostreams (`pg-#`) raad ik het aan, omdat sommige smart tv's niet alle gedownloade mp4-bestanden goed af kunnen spelen en vanwege '[overhead](https://nl.wikipedia.org/wiki/Overhead_%28informatica%29)'. Mp4-bestanden gedownload met FFmpeg kunnen een tot wel 7% kleinere bestandsgrootte hebben en smart tv's hebben er nagenoeg geen problemen mee.
 
 - Linux binaries: https://johnvansickle.com/ffmpeg.
-- Windows binaries: http://ffmpeg.zeranoe.com/builds.
+- Windows binaries: https://ffmpeg.zeranoe.com/builds (voor zolang het nog duurt).
 - Windows XP:  
 
   Wat voor Xidel geldt, geldt ook voor FFmpeg. Als het geen andere beveiligingsbibliotheek aan boord heeft, dan kun je geen https-urls met TLS 1.2 encryptie/versleuteling openen. Daarnaast wordt Windows XP officieel ook niet meer ondersteund door FFmpeg.
 
   Sinds voorjaar 2017 ben ik daarom zelf FFmpeg gaan compileren. Mijn binaries zijn gecompileerd met de [mbedTLS](https://tls.mbed.org/) beveiligingsbibliotheek (volledig geïntegreerd), zijn Windows XP compatible én werken op oude cpu's zonder SSE2 instructies.
-  - Windows XP binaries: http://rwijnsma.home.xs4all.nl/files/ffmpeg.
+  - Windows XP binaries: https://rwijnsma.home.xs4all.nl/files/ffmpeg.
   - Github repo: https://github.com/Reino17/ffmpeg-windows-build-helpers.
-  - Zeranoe forum thread: https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=6930.
+  - Doom9 forum thread: https://forum.doom9.org/showthread.php?t=181802.
 
 ## Linux
 ```sh
