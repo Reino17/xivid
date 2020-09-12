@@ -1,3 +1,7 @@
+--------------------------------
+Xivid notities
+--------------------------------
+
 [Reeksen en positionering]
 
 $ xidel -se 'join(1 to 10)'

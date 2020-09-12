@@ -1,4 +1,7 @@
 #!/bin/bash
+# --------------------------------
+# Xivid bash script
+# --------------------------------
 #
 # Copyright (C) 2020 Reino Wijnsma
 #
@@ -15,8 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# Reino Wijnsma (rwijnsma@xs4all.nl)
 # https://github.com/Reino17/xivid
-# door Reino Wijnsma (rwijnsma@xs4all.nl)
 
 help() {
   cat <<EOF

@@ -1,4 +1,8 @@
 (:~
+ : --------------------------------
+ : Xivid function module
+ : --------------------------------
+ :
  : Copyright (C) 2020 Reino Wijnsma
  :
  : This program is free software: you can redistribute it and/or modify
@@ -14,12 +18,18 @@
  : You should have received a copy of the GNU General Public License
  : along with this program.  If not, see <http://www.gnu.org/licenses/>.
  :
- : https://github.com/Reino17/xivid
- : door Reino Wijnsma (rwijnsma@xs4all.nl)
+ : @author Reino Wijnsma (rwijnsma@xs4all.nl)
+ : @see    https://github.com/Reino17/xivid
  :)
 
 xquery version "3.0-xidel";
 module namespace xivid = "https://github.com/Reino17/xivid/";
+
+(:~
+ : --------------------------------
+ : Helper functions
+ : --------------------------------
+ :)
 
 declare function xivid:m3u8-to-json($url as string?) as object()* {
   let $m3u8:=x:request(
@@ -205,6 +215,12 @@ declare function xivid:info($json as object()) as string* {
     )
   )
 };
+
+(:~
+ : --------------------------------
+ : Extractors
+ : --------------------------------
+ :)
 
 declare function xivid:npo($url as string) as object()? {
   let $prid:=extract($url,".+/([\w_]+)",1),
