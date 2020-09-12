@@ -440,3 +440,40 @@ declare function xivid:dumpert($url as string) {
     }[url]
   }
 };
+
+declare function xivid:telegraaf($url as string) as object()? {
+  json(
+    concat(
+      "https://content.tmgvideo.nl/playlist/item=",
+      json(
+        doc($url)//script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
+      )/(.//videoId)[1],
+      "/playlist.json"
+    )
+  )/(items)()/{
+    "name":"Telegraaf: "||title,
+    "date":format-date(
+      date(tokenize(publishedstart)[1]),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(
+      duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "expdate":publishedend ! format-dateTime(
+      dateTime(replace(.,"\s","T")),
+      "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      locations/reverse((progressive)())/{
+        "id":"pg-"||position(),
+        "format":"mp4[h264+aac]",
+        "resolution":concat(width,"x",height),
+        "url":.//src
+      },
+      xivid:m3u8-to-json(
+        locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8")
+      )
+    ]
+  }
+};

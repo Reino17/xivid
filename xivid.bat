@@ -330,43 +330,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:telegraaf
-FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
-  let $a:^=json^(
-    concat^(
-      'https://content.tmgvideo.nl/playlist/item^='^,
-      json^(
-        //script/extract^(.^,'APOLLO_STATE__^=^(.+^)^;'^,1^)[.]
-      ^)/^(.//videoId^)[1]^,
-      '/playlist.json'
-    ^)
-  ^) return
-  json:^={
-    'name':'Telegraaf: '^|^|$a//title^,
-    'date':replace^(
-      $a//datecreated^,
-      '^(\d+^)-^(\d+^)-^(\d+^).+'^,
-      '$3-$2-$1'
-    ^)^,
-    'duration':format-time^(
-      $a//duration * duration^('PT1S'^)^,
-      '[H01]:[m01]:[s01]'
-    ^)^,
-    'formats':[
-      $a//locations/reverse^(^(progressive^)^(^)^)/{
-        'id':'pg-'^|^|position^(^)^,
-        'format':'mp4[h264+aac]'^,
-        'resolution':concat^(width^,'x'^,height^)^,
-        'url':.//src
-      }^,
-      xivid:m3u8-to-json^(
-        $a//locations/^(adaptive^)^(^)[ends-with^(type^,'x-mpegURL'^)]/extract^(src^,'^(.+m3u8^)'^,1^)
-      ^)
-    ]
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :ad
 FOR /F "delims=" %%A IN ('xidel -H "Cookie: pwv=2;pws=functional" "%~1" --xquery ^"
   json:^=json^(
@@ -1044,7 +1007,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:autojunk.nl=%"=="%url%" (
   CALL :autojunk "%url%"
 ) ELSE IF NOT "%url:telegraaf.nl=%"=="%url%" (
-  CALL :telegraaf "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:telegraaf('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:ad.nl=%"=="%url%" (
   CALL :ad "%url%"
 ) ELSE IF NOT "%url:lc.nl=%"=="%url%" (

@@ -6816,128 +6816,96 @@ $ xidel -s --module=xivid.xqm "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'if
 
 [telegraaf]
 
-https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd
+$ url=https://www.telegraaf.nl/video/823947308/ordinaire-verkeersruzie-op-snelweg-a10
 
-$ xidel -s "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd" -e 'concat("https://content.tmgvideo.nl/playlist/item=",json(//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")'
-https://content.tmgvideo.nl/playlist/item=cCQFDoebv5A0/playlist.json
+$ xidel -se 'concat("https://content.tmgvideo.nl/playlist/item=",json(doc("'$url'")//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")'
+https://content.tmgvideo.nl/playlist/item=WiVkrqlbQ5OW/playlist.json
 
-$ xidel -s "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd" -f 'concat("https://content.tmgvideo.nl/playlist/item=",json(//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")' -e '$json'
+$ xidel -se 'json(concat("https://content.tmgvideo.nl/playlist/item=",json(doc("'$url'")//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json"))/(items)()'
 {
-  "items": [
-    {
-      "id": "cCQFDoebv5A0",
-      "account": "Kx1PKc",
-      "audioonly": false,
-      "live": false,
-      "title": "Kamikaze-actie op N377",
-      "description": "Een motorrijder neemt op de provinciale weg in Drenthe de meest grote risico's om op tijd op z'n bestemming te komen. Ook iets gefilmd op de weg? Mail het de redactie via verkeer@telegraaf.nl.",
-      "poster": "//content.tmgvideo.nl/img/account=Kx1PKc/item=cCQFDoebv5A0/thumbid=2/image.jpg?v=20190412202826",
-      "datecreated": "2019-04-12 20:26:34",
-      "duration": 34,
-      "locations": {
-        "progressive": [
+  "id": "WiVkrqlbQ5OW",
+  "account": "Kx1PKc",
+  "audioonly": false,
+  "live": false,
+  "title": "Ordinaire verkeersruzie op snelweg A10_duplicated",
+  "description": "Twee automobilisten krijgen op de ring van Amsterdam dusdanig ruzie dat ze elkaar van de weg proberen te rijden. Ook iets gefilmd? Mail het ons via verkeer@telegraaf.nl ",
+  "poster": "//content.tmgvideo.nl/img/account=Kx1PKc/item=WiVkrqlbQ5OW/thumbid=1/image.jpg?v=20200904190849",
+  "datecreated": "2020-09-04 19:07:28",
+  "duration": 53,
+  "locations": {
+    "progressive": [
+      {
+        "label": "1080p",
+        "height": 1080,
+        "width": 1920,
+        "sources": [
           {
-            "label": "1080p",
-            "height": 1080,
-            "width": 1920,
-            "sources": [
-              {
-                "type": "video/mp4",
-                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YLRECscb9lIw/cCQFDoebv5A0.mp4"
-              }
-            ]
-          },
-          {
-            "label": "720p",
-            "height": 720,
-            "width": 1280,
-            "sources": [
-              {
-                "type": "video/mp4",
-                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YoAMCo4bv9M0/cCQFDoebv5A0.mp4"
-              }
-            ]
-          },
-          {
-            "label": "480p",
-            "height": 480,
-            "width": 854,
-            "sources": [
-              {
-                "type": "video/mp4",
-                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YiRND4KZvwEQ/cCQFDoebv5A0.mp4"
-              }
-            ]
-          },
-          {
-            "label": "360p",
-            "height": 360,
-            "width": 640,
-            "sources": [
-              {
-                "type": "video/mp4",
-                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4oIELuOJtkIQ/cCQFDoebv5A0.mp4"
-              }
-            ]
-          },
-          {
-            "label": "270p",
-            "height": 270,
-            "width": 480,
-            "sources": [
-              {
-                "type": "video/mp4",
-                "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4JAEDuMLtlIQ/cCQFDoebv5A0.mp4"
-              }
-            ]
-          }
-        ],
-        "adaptive": [
-          {
-            "type": "application/dash+xml",
-            "src": "https://media.tmgvideo.nl/dash/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0.mpd?v=20190412202826_5"
-          },
-          {
-            "type": "application/x-mpegURL",
-            "src": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0.m3u8?v=20190412202826_5"
+            "type": "video/mp4",
+            "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=WiVkrqlbQ5OW/file=XqFlquTLAxuy/WiVkrqlbQ5OW.mp4"
           }
         ]
       },
       [...]
-    }
-  ]
+      {
+        "label": "270p",
+        "height": 270,
+        "width": 480,
+        "sources": [
+          {
+            "type": "video/mp4",
+            "src": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=WiVkrqlbQ5OW/file=TgVlr6FLSJiS/WiVkrqlbQ5OW.mp4"
+          }
+        ]
+      }
+    ],
+    "adaptive": [
+      {
+        "type": "application/dash+xml",
+        "src": "https://media.tmgvideo.nl/dash/account=Kx1PKc/item=WiVkrqlbQ5OW/WiVkrqlbQ5OW.mpd?v=20200904190849_5"
+      },
+      {
+        "type": "application/x-mpegURL",
+        "src": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=WiVkrqlbQ5OW/WiVkrqlbQ5OW.m3u8?v=20200904190849_5"
+      }
+    ]
+  },
+  [...]
+  "publishedstart": "2020-09-04 18:57:14",
+  "publishedend": "2035-09-04 19:07:14",
+  [...]
 }
 
-$ xidel -s --module=xivid.xqm "https://www.telegraaf.nl/video/3439197/kamikaze-actie-op-n377-gefilmd" -e 'let $a:=json(concat("https://content.tmgvideo.nl/playlist/item=",json(//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json")) return {"name":"Telegraaf: "||$a//title,"date":replace($a//datecreated,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":format-time($a//duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[$a//locations/reverse((progressive)())/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"url":.//src},xivid:m3u8-to-json($a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1))]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'json(concat("https://content.tmgvideo.nl/playlist/item=",json(doc("'$url'")//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json"))/(items)()/{"name":"Telegraaf: "||title,"date":format-date(date(tokenize(publishedstart)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"expdate":publishedend ! format-dateTime(dateTime(replace(.,"\s","T")),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]"),"formats":[locations/reverse((progressive)())/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"url":.//src},xivid:m3u8-to-json(locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8"))]}'
 {
-  "name": "Telegraaf: Kamikaze-actie op N377",
-  "date": "12-04-2019",
-  "duration": "00:00:34",
+  "name": "Telegraaf: Ordinaire verkeersruzie op snelweg A10_duplicated",
+  "date": "04-09-2020",
+  "duration": "00:00:53",
+  "expdate": "04-09-2035 19:07:14",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
       "resolution": "480x270",
-      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=4JAEDuMLtlIQ/cCQFDoebv5A0.mp4"
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=WiVkrqlbQ5OW/file=TgVlr6FLSJiS/WiVkrqlbQ5OW.mp4"
     },
     [...]
     {
       "id": "pg-5",
       "format": "mp4[h264+aac]",
       "resolution": "1920x1080",
-      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=cCQFDoebv5A0/file=YLRECscb9lIw/cCQFDoebv5A0.mp4"
+      "url": "https://media.tmgvideo.nl/progressive/account=Kx1PKc/item=WiVkrqlbQ5OW/file=XqFlquTLAxuy/WiVkrqlbQ5OW.mp4"
     },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0.m3u8"
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=WiVkrqlbQ5OW/WiVkrqlbQ5OW.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "64kbps",
-      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=64000.m3u8"
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=WiVkrqlbQ5OW/WiVkrqlbQ5OW-19700101_1-audio=64000.m3u8"
     },
     [...]
     {
@@ -6945,46 +6913,49 @@ $ xidel -s --module=xivid.xqm "https://www.telegraaf.nl/video/3439197/kamikaze-a
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "3600|128kbps",
-      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=cCQFDoebv5A0/cCQFDoebv5A0-19700101_1-audio=128000-video=3600000.m3u8"
+      "url": "https://media.tmgvideo.nl/hls/account=Kx1PKc/item=WiVkrqlbQ5OW/WiVkrqlbQ5OW-19700101_1-audio=128000-video=3600000.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
--e '
-  let $a:=json(
+declare function xivid:telegraaf($url as string) as object()? {
+  json(
     concat(
       "https://content.tmgvideo.nl/playlist/item=",
       json(
-        //script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
+        doc($url)//script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
       )/(.//videoId)[1],
       "/playlist.json"
     )
-  ) return {
-    "name":"Telegraaf: "||$a//title,
-    "date":replace(
-      $a//datecreated,
-      "(\d+)-(\d+)-(\d+).+",
-      "$3-$2-$1"
+  )/(items)()/{
+    "name":"Telegraaf: "||title,
+    "date":format-date(
+      date(tokenize(publishedstart)[1]),
+      "[D01]-[M01]-[Y]"
     ),
     "duration":format-time(
-      $a//duration * duration("PT1S"),
+      duration * duration("PT1S"),
       "[H01]:[m01]:[s01]"
     ),
+    "expdate":publishedend ! format-dateTime(
+      dateTime(replace(.,"\s","T")),
+      "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+    ),
     "formats":[
-      $a//locations/reverse((progressive)())/{
+      locations/reverse((progressive)())/{
         "id":"pg-"||position(),
         "format":"mp4[h264+aac]",
         "resolution":concat(width,"x",height),
         "url":.//src
       },
       xivid:m3u8-to-json(
-        $a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1)
+        locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8")
       )
     ]
   }
-'
+};
 
 ================================================================================================
 

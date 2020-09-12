@@ -332,43 +332,6 @@ autojunk() {
   ' --output-format=bash)"
 }
 
-telegraaf() {
-  eval "$(xidel "$1" -e '
-    let $a:=json(
-      concat(
-        "https://content.tmgvideo.nl/playlist/item=",
-        json(
-          //script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
-        )/(.//videoId)[1],
-        "/playlist.json"
-      )
-    ) return
-    json:={
-      "name":"Telegraaf: "||$a//title,
-      "date":replace(
-        $a//datecreated,
-        "(\d+)-(\d+)-(\d+).+",
-        "$3-$2-$1"
-      ),
-      "duration":format-time(
-        $a//duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":[
-        $a//locations/reverse((progressive)())/{
-          "id":"pg-"||position(),
-          "format":"mp4[h264+aac]",
-          "resolution":concat(width,"x",height),
-          "url":.//src
-        },
-        xivid:m3u8-to-json(
-          $a//locations/(adaptive)()[ends-with(type,"x-mpegURL")]/extract(src,"(.+m3u8)",1)
-        )
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 ad() {
   eval "$(xidel -H "Cookie: pwv=2;pws=functional" "$1" --xquery '
     json:=json(
@@ -1019,7 +982,7 @@ elif [[ $url =~ dumpert.nl ]]; then
 elif [[ $url =~ autojunk.nl ]]; then
   autojunk "$url"
 elif [[ $url =~ telegraaf.nl ]]; then
-  telegraaf "$url"
+  eval "$(xidel -e 'json:=xivid:telegraaf("'$url'")' --output-format=bash)"
 elif [[ $url =~ ad.nl ]]; then
   ad "$url"
 elif [[ $url =~ lc.nl ]]; then
