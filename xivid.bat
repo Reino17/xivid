@@ -1110,7 +1110,7 @@ IF DEFINED f (
           $json/^(formats^)^(^)[id^=$x]/url^
       "
     ) ELSE (
-      ECHO %json% | xidel - -e ^"^
+      ECHO !json! | xidel - -e ^"^
         for $x in tokenize^('%f%'^,'\+'^) return^
         if ^(ends-with^($x^,'#'^)^) then^
           $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
