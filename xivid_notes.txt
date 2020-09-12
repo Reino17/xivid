@@ -7247,23 +7247,105 @@ declare function xivid:ad($url as string) as object()? {
 
 [leeuwarder courant]
 
-https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bolsward-luid-klingelend-verscheept-naar-Sneek-24902697.html
+$ url=https://www.lc.nl/friesland/heerenveen/Alle-gratis-perenbomen-weggegeven-in-Friesland-25949273.html
 
-$ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bolsward-luid-klingelend-verscheept-naar-Sneek-24902697.html" -e '//figure[@class="video"]//@src'
-//ndc.bbvms.com/p/lc_videoplayer_v2/c/3422620.js   # Blue Billywig
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")'
+3892522
 
-$ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bolsward-luid-klingelend-verscheept-naar-Sneek-24902697.html" --xquery 'json(extract(unparsed-text(//figure[@class="video"]//@src),"var opts = (.+);",1))/{"name":concat("LC: ",clipData/title),"date":format-date(dateTime(clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":clipData/length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,publicationData/defaultMediaAssetPath)}]}'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+De door internet browser gegenereerde cookie:
+
+Cookie: ndc_consent=%7B%22createdAt%22%3A%222020-09-11T14%3A43%3A51.315Z%22%2C%22validTill%22%3A%222020-09-12T02%3A43%3A51.315Z%22%2C%22ID%22%3A%22c0c45272-9fcf-4ea5-9ee7-a24ab45f999a%22%2C%22templateID%22%3A%22lc%22%2C%22userID%22%3A%226d4c2b2f-9927-4fba-bac4-e6a9f56235e1%22%2C%22permissions%22%3A%7B%22analytics%22%3Afalse%2C%22personalization%22%3Afalse%2C%22functional%22%3Atrue%2C%22advertising%22%3Afalse%2C%22socialMedia%22%3Afalse%7D%7D
+
+Url-decoded:
+
+Cookie: ndc_consent={"createdAt":"2020-09-11T14:43:51.315Z","validTill":"2020-09-12T02:43:51.315Z","ID":"c0c45272-9fcf-4ea5-9ee7-a24ab45f999a","templateID":"lc","userID":"6d4c2b2f-9927-4fba-bac4-e6a9f56235e1","permissions":{"analytics":false,"personalization":false,"functional":true,"advertising":false,"socialMedia":false}}
+
+Minimale wat voor mij (en hopelijk iedereen) werkt:
+
+Cookie: ndc_consent={"permissions":{"functional":true}}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return //script/tokenize(.,",")[contains(.,$id)])'
+"https:\u002F\u002Fndc.bbvms.com\u002Fp\u002Flc_videoplayer_v2\u002Fc\u002F3892522.html?inheritDimensions=true"
+
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return json(//script/tokenize(.,",")[contains(.,$id)]))'
+https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.html?inheritDimensions=true
+
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return json(//script/tokenize(.,",")[contains(.,$id)]) ! replace(.,"html.+","js"))'
+https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.js   # Blue Billywig
+
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),$bbvms:=json(//script/tokenize(.,",")[contains(.,$id)]) ! replace(.,"html.+","js") return json(extract(unparsed-text($bbvms),"var opts = (.+);",1))/(clipData,s3Info,publicationData/defaultMediaAssetPath))'
 {
-  "name": "LC: Gammele toren op transport",
-  "date": "08-10-2019",
-  "duration": "00:01:45",
+  "id": "3892522",
+  [...]
+  "length": "102",
+  "sourceid": "",
+  "title": "Enorme belangstelling voor gratis perenbomen in Heerenveen",
+  [...]
+  "publisheddate": "2020-08-22T10:03:48Z",
+  [...]
+  "originalWidth": 1920,
+  "originalHeight": 1080,
+  [...]
+  "assets": [
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "1598093328914448",
+      "status": "active",
+      "src": "/ndc/media/2020/08/22/asset-3892522-1598093328914448.mp4",
+      "length": "102",
+      "exactlength": "102379",
+      "width": "1280",
+      "height": "720",
+      "bandwidth": "2000",
+      "jobdefid": "mp4_main-1280x720-2000",
+      "jobqid": "mp4_main-1280x720-2000"
+    },
+    [...]
+  ],
+  [...]
+  "s3Info": "[...]{\"filename\": \"https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4\"[...]",
+  [...]
+}
+{
+  [...]
+  "format": {
+    "filename": "https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4",
+    "nb_streams": 2,
+    "nb_programs": 0,
+    "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+    "format_long_name": "QuickTime / MOV",
+    "start_time": "0:00:00.000000",
+    "duration": "0:01:42.293333",
+    "size": "122.606459 Mibyte",
+    "bit_rate": "10.054394 Mbit/s",
+    "probe_score": 100,
+    "tags": {
+      "major_brand": "mp42",
+      "minor_version": "0",
+      "compatible_brands": "mp42mp41",
+      "creation_time": "2020-08-22T10:29:23.000000Z"
+    }
+  },
+  [...]
+}
+https://d3jbi46382yahz.cloudfront.net
+
+$ xidel -s --json-mode=deprecated --xquery 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),$bbvms:=json(//script/tokenize(.,",")[contains(.,$id)]) ! replace(.,"html.+","js"),$json:=json(extract(unparsed-text($bbvms),"var opts = (.+);",1)),$orig:=json($json/clipData/s3Info)/format,$host:=$json/publicationData/defaultMediaAssetPath return $json/clipData/{"name":"LC: "||title,"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}]})'
+{
+  "name": "LC: Enorme belangstelling voor gratis perenbomen in Heerenveen",
+  "date": "22-08-2020",
+  "duration": "00:01:42",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
       "resolution": "512x288",
       "bitrate": "400kbps",
-      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2019/10/08/asset-3422620-1570538762646090.mp4"
+      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2020/08/22/asset-3892522-1598093329299560.mp4"
     },
     [...]
     {
@@ -7271,44 +7353,66 @@ $ xidel -s "https://www.lc.nl/friesland/sudwest-fryslan/Wrakke-stadhuistoren-Bol
       "format": "mp4[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "3000kbps",
-      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2019/10/08/asset-3422620-1570538764549080.mp4"
+      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2020/08/22/asset-3892522-1598093329696575.mp4"
+    },
+    {
+      "id": "pg-7",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "10296kbps",
+      "url": "https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
-  json(
-    extract(
-      unparsed-text(//figure[@class="video"]//@src),
-      "var opts = (.+);",
-      1
-    )
-  )/{
-    "name":concat("LC: ",clipData/title),
-    "date":format-date(
-      dateTime(clipData/publisheddate),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":clipData/length * duration("PT1S") + time("00:00:00"),
-    "formats":[
-      for $x at $i in clipData/(assets)()
-      order by $x/bandwidth
-      count $i
-      return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":concat($x/width,"x",$x/height),
-        "bitrate":$x/bandwidth||"kbps",
-        "url":resolve-uri(
-          $x/src,
-          publicationData/defaultMediaAssetPath
-        )
-      }
-    ]
-  }
-'
+declare function xivid:lc($url as string) as object()? {
+  x:request({
+    "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
+    "url":$url
+  })/doc/(
+    let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),
+        $bbvms:=json(
+          //script/tokenize(.,",")[contains(.,$id)]
+        ) ! replace(.,"html.+","js"),
+        $json:=json(
+          extract(unparsed-text($bbvms),"var opts = (.+);",1)
+        ),
+        $orig:=json($json/clipData/s3Info)/format,
+        $host:=$json/publicationData/defaultMediaAssetPath
+    return
+    $json/clipData/{
+      "name":"LC: "||title,
+      "date":format-date(
+        dateTime(publisheddate) + implicit-timezone(),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":length * duration("PT1S") + time("00:00:00"),
+      "formats":[
+        for $x at $i in (assets)()
+        order by $x/bandwidth
+        count $i
+        return $x/{
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":concat(width,"x",height),
+          "bitrate":bandwidth||"kbps",
+          "url":resolve-uri(src,$host)
+        },
+        {
+          "id":"pg-"||count((assets)()) + 1,
+          "format":"mp4[h264+aac]",
+          "resolution":concat(originalWidth,"x",originalHeight),
+          "bitrate":round(
+            tokenize($orig/bit_rate)[1] * 1024
+          )||"kbps",
+          "url":$orig/filename
+        }
+      ]
+    }
+  )
+};
 
 ================================================================================================
 
