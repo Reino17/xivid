@@ -480,6 +480,35 @@ declare function xivid:ofr($url as string) as object()? {
   )
 };
 
+declare function xivid:nhnieuws($url as string) as object()? {
+  doc($url)/(
+    if (//article) then
+      json(
+        //script/substring-after(.,"INITIAL_PROPS__ = ")[.]
+      )/pageData/{
+        "name":let $info:=(blocks)()[type=("video","headerVideo")]/video return
+        if ($info/caption) then
+          $info/concat(author,": ",caption)
+        else
+          concat(media//author,": ",title),
+        "date":format-date(
+          updated * duration("PT1S") + implicit-timezone() + date("1970-01-01"),
+          "[D01]-[M01]-[Y]"
+        ),
+        "formats":xivid:m3u8-to-json(.//stream/url)
+      }
+    else {
+      "name":substring-after(//title,"Media - ")||": Livestream",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json(
+        json(
+          //script/substring-after(.,"INIT_DATA__ = ")[.]
+        )/videoStream
+      )
+    }
+  )
+};
+
 declare function xivid:dumpert($url as string) {
   json(
     json(

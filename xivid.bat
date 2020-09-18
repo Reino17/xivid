@@ -88,39 +88,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:regio_nh
-FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
-  let $a:^=json^(
-    //script/extract^(.^,'INITIAL_PROPS__ ^= ^(.+^)'^,1^)[.]
-  ^)/pageData return
-  json:^={
-    'name':if ^($a^) then
-      if ^($a/^(media^)^(1^)/title^) then
-        $a/^(media^)^(1^)/concat^(source^,': '^,title^)
-      else
-        concat^($a/^(media^)^(1^)/source^,': '^,$a/title^)
-    else
-      substring-after^(//title^,'- '^)^|^|': Livestream'^,
-    'date':if ^($a^) then
-      format-date^(
-        $a/updated * duration^('PT1S'^) + 
-        implicit-timezone^(^) + date^('1970-01-01'^)^,
-        '[D01]-[M01]-[Y]'
-      ^)
-    else
-      format-date^(current-date^(^)^,'[D01]-[M01]-[Y]'^)^,
-    'formats':xivid:m3u8-to-json^(
-      if ^($a^) then
-        $a/^(media^)^(^)/videoUrl
-      else
-        json^(
-          //script/extract^(.^,'INIT_DATA__ ^= ^(.+^)'^,1^)[.]
-        ^)/videoStream
-    ^)
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :regio_fll
 FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
   let $a:^=//div[ends-with^(@class^,'videoplayer'^)] return
@@ -872,9 +839,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:omropfryslan.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:ofr('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:nhnieuws.nl=%"=="%url%" (
-  CALL :regio_nh "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:nhnieuws('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:at5.nl=%"=="%url%" (
-  CALL :regio_nh "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:nhnieuws('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:omroepflevoland.nl=%"=="%url%" (
   CALL :regio_fll "%url%"
 ) ELSE IF NOT "%url:rtvutrecht.nl=%"=="%url%" (
