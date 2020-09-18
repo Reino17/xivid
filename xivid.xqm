@@ -476,7 +476,7 @@ declare function xivid:ofr($url as string) as object()? {
         $url
       )
     ),
-    "Omrop Frysl‚n"
+    "Omrop Frysl√¢n"
   )
 };
 
