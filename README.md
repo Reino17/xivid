@@ -137,7 +137,7 @@ FOR /F %A IN ('xivid.bat <url>') DO vlc.exe %A
 Ik raad aan om [FFmpeg](https://ffmpeg.org) te gebruiken voor het downloaden van audio- en video-bestanden. Voor dynamische (of adaptive) videostreams (`hls-#` / `dash-#`) heb je FFmpeg sowieso nodig, maar ook voor progressieve (of progressive/muxed) videostreams (`pg-#`) raad ik het aan, omdat sommige smart tv's niet alle gedownloade mp4-bestanden goed af kunnen spelen en vanwege '[overhead](https://nl.wikipedia.org/wiki/Overhead_%28informatica%29)'. Mp4-bestanden gedownload met FFmpeg kunnen een tot wel 7% kleinere bestandsgrootte hebben en smart tv's hebben er nagenoeg geen problemen mee.
 
 - Linux binaries: https://johnvansickle.com/ffmpeg.
-- Windows binaries: https://ffmpeg.zeranoe.com/builds (voor zolang het nog duurt).
+- Windows binaries: https://ffmpeg.org/download.html#build-windows.
 - Windows XP:  
 
   Wat voor Xidel geldt, geldt ook voor FFmpeg. Als het geen andere beveiligingsbibliotheek aan boord heeft, dan kun je geen https-urls met TLS 1.2 encryptie/versleuteling openen. Daarnaast wordt Windows XP officieel ook niet meer ondersteund door FFmpeg.
