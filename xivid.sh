@@ -90,43 +90,6 @@ nos() {
   ' --output-format=bash)"
 }
 
-regio_utr() {
-  eval "$(xidel "$1" -e '
-    json:=if (//script[@async]) then
-      json(
-        extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1)
-      )/{
-        "name":publicationData/label||": Livestream",
-        "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-        "formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)
-      }
-    else
-      let $a:=json(
-        //script/extract(.,"setup\((.+)\)",1,"s")[.]
-      )//file return {
-        "name":concat(
-          //meta[@name="publisher"]/@content,
-          ": ",
-          (
-            substring-before(
-              normalize-space(//h3[@class="article-title"]),
-              " -"
-            )[.],
-            normalize-space(//h1[@class="article-title"])
-          )[1]
-        ),
-        "date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
-        "formats":[
-          {
-            "id":"pg-1",
-            "format":"mp4[h264+aac]",
-            "url":$a
-          }
-        ]
-      }
-  ' --output-format=bash)"
-}
-
 regio() {
   eval "$(xidel "$1" --xquery '
     let $a:=doc(
@@ -809,7 +772,7 @@ elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then
 elif [[ $url =~ omroepflevoland.nl ]]; then
   eval "$(xidel -e 'json:=xivid:ofl("'$url'")' --output-format=bash)"
 elif [[ $url =~ rtvutrecht.nl ]]; then
-  regio_utr "$url"
+  eval "$(xidel -e 'json:=xivid:rtvu("'$url'")' --output-format=bash)"
 elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepgelderland.nl|omroepwest.nl|rijnmond.nl|omroepzeeland.nl|omroepbrabant.nl|l1.nl) ]]; then
   regio "$url"
 elif [[ $url =~ dumpert.nl ]]; then

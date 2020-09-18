@@ -2268,6 +2268,79 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(e
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3911399.js   # RTV Utrecht
+
+$ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/clipData/(assets)()[mediatype="MP4_HLS"]'
+{
+  "mediatype": "MP4_HLS",
+  "id": "1600381184068100",
+  "status": "active",
+  "src": "/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-160027203,1930323,2549578,2793708,3014217,3233646,3742861,.mp4.urlset/master.m3u8",
+  "length": "",
+  "exactlength": "",
+  "width": "auto",
+  "height": "auto",
+  "bandwidth": "auto",
+  "jobdefid": "4536",
+  "language-id": "",
+  "language-name": "",
+  "language-isocode": ""
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-text("'$url'"),"var opts = (.+);",1)),$publ:="RTV Utrecht",$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/(if (sourcetype="live") then {"name":$publ||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((assets)()/src)} else {"name":concat($publ,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[xivid:m3u8-to-json((assets)()[mediatype="MP4_HLS"]/resolve-uri(src,$host)),for $x at $i in (assets)()[mediatype!="MP4_HLS"] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[mediatype!="MP4_HLS"]) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]})'
+{
+  "name": "RTV Utrecht: Toch geen auto's over fietspad Wolvenstraat Utrecht, andere omleidingsroute
+gevonden",
+  "date": "16-09-2020",
+  "duration": "00:01:18",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-160027203,1930323,2549578,2793708,3014217,3233646,3742861,.mp4.urlset/master.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "512x288@25fps",
+      "bitrate": "363kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-1600272031930323.mp4/index-v1-a1.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "2967kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-1600272033742861.mp4/index-v1-a1.m3u8"
+    },
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "400kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/rtvutrecht/media/2020/09/16/asset-3911399-1600272031930323.mp4"
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3500kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/rtvutrecht/media/2020/09/16/asset-3911399-1600272033742861.mp4"
+    },
+    {
+      "id": "pg-7",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "53855kbps",
+      "url": "https://s3.eu-west-1.amazonaws.com/mm.rtvutrecht.bbvms.com/upload/rtvutrecht/RTVU_2676436_1080p.mxf"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string,$publ as string) as object()? {
   let $json:=json(
         extract(unparsed-text($url),"var opts = (.+);",1)
@@ -2288,7 +2361,10 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
       ),
       "duration":length * duration("PT1S") + time("00:00:00"),
       "formats":[
-        for $x at $i in (assets)()
+        xivid:m3u8-to-json(
+          (assets)()[mediatype="MP4_HLS"]/resolve-uri(src,$host)
+        ),
+        for $x at $i in (assets)()[mediatype!="MP4_HLS"]
         order by $x/bandwidth
         count $i
         return
@@ -2300,7 +2376,7 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
           "url":resolve-uri(src,$host)
         },
         {
-          "id":"pg-"||count((assets)()) + 1,
+          "id":"pg-"||count((assets)()[mediatype!="MP4_HLS"]) + 1,
           "format":"mp4[h264+aac]",
           "resolution":concat(originalWidth,"x",originalHeight),
           "bitrate":round(
@@ -6905,12 +6981,16 @@ declare function xivid:ofl($url as string) as object()? {
 
 [rtv utrecht]
 
-https://www.rtvutrecht.nl/live/rtvutrecht/
+$ url=https://www.rtvutrecht.nl/live/rtvutrecht/
 
-$ xidel -s --module=xivid.xqm "https://www.rtvutrecht.nl/live/rtvutrecht/" -f '//script[@async]/@src' -e 'json(extract($raw,"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)}'
+$ xidel -se 'doc("'$url'")//iframe ! (@src,substring-before(@src,"html")||"js")'
+https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3742011.html?inheritDimensions=true
+https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3742011.js   # Blue Billywig
+
+$ xidel -s --module=xivid.xqm -e 'xivid:bbvms(doc("'$url'")//iframe/substring-before(@src,"html")||"js","RTV Utrecht")'
 {
   "name": "RTV Utrecht: Livestream",
-  "date": "02-08-2019",
+  "date": "17-09-2020",
   "formats": [
     {
       "id": "hls-0",
@@ -6922,7 +7002,7 @@ $ xidel -s --module=xivid.xqm "https://www.rtvutrecht.nl/live/rtvutrecht/" -f '/
       "format": "m3u8[aac]",
       "resolution": null,
       "bitrate": "142kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1562916731-au-index.m3u8"
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1597825675-au-index.m3u8"
     },
     [...]
     {
@@ -6930,85 +7010,132 @@ $ xidel -s --module=xivid.xqm "https://www.rtvutrecht.nl/live/rtvutrecht/" -f '/
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "3030kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1562916731-faster-1920-1080-2750000-index.m3u8"
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1597825675-faster-1920-1080-2750000-index.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/
+$ url=https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20200916-1700/
 
-$ xidel -s "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20190427-1700/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",substring-before(normalize-space(//h3[@class="article-title"])," -")),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$a}]}'
+$ xidel -se 'let $url:=doc("'$url'")/json(//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.])//file return ($url,x:request({"url":$url,"error-handling":"xxx=accept"})/raw,x:request({"url":$url,"method":"HEAD"})/url)'
+https://content.omroep.nl/rtvutrecht/uitzendinggemist/rtvutrecht/2020/09/16/RTV2076581_MQ.mp4
+<html><head>
+<meta http-equiv="refresh" content="0;URL=https://content10c2a.omroep.nl/[...]/2020/09/16/RTV2076581_MQ.mp4"></head><body></body></html>
+
+https://content10c2b.omroep.nl/[...]/2020/09/16/RTV2076581_MQ.mp4
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'let $html:=doc("'$url'"),$vid:=x:request({"url":json($html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.])//file,"method":"HEAD"}[url])/url return if ($vid) then {"name":"RTV Utrecht: "||substring-before(normalize-space($html//h3[@class="article-title"])," -"),"date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$vid}]} else xivid:bbvms($html//iframe/substring-before(@src,"html")||"js","RTV Utrecht")'
 {
   "name": "RTV Utrecht: UNieuws",
-  "date": "27-04-2019",
+  "date": "16-09-2020",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "url": "https://content.omroep.nl/rtvutrecht/uitzendinggemist/rtvutrecht/2019/04/27/RTV1889856_MQ.mp4"
+      "url": "https://content10c2a.omroep.nl/[...]/2020/09/16/RTV2076581_MQ.mp4"
     }
   ]
 }
 
-https://www.rtvutrecht.nl/nieuws/1908421/
+------------------------------------------------------------------------------------------------
 
-$ xidel -s "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(normalize-space(//h3[@class="article-title"])," -")[.],normalize-space(//h1[@class="article-title"]))[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$a}]}'
+$ url=https://www.rtvutrecht.nl/nieuws/2097206/smalle-utrechtse-wolvenstraat-wordt-toch-geen-omleidingsroute-voor-autos.html
+
+$ xidel -s $url -e '//script[@async="true"]/@src[1]'
+https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3911399.js
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'let $html:=doc("'$url'"),$vid:=x:request({"url":json($html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.])//file,"method":"HEAD"}[url])/url return if ($vid) then {"name":"RTV Utrecht: "||substring-before(normalize-space($html//h3[@class="article-title"])," -"),"date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$vid}]} else xivid:bbvms($html/(//iframe/concat(substring-before(@src,"html"),"js"),//script[@async="true"]/@src[1]),"RTV Utrecht")'
+
 {
-  "name": "RTV Utrecht: Fantastische energie en geen wanklank: trotse burgemeester is tevreden over Koningsdag Amersfoort",
-  "date": "27-04-2019",
+  "name": "RTV Utrecht: Toch geen auto's over fietspad Wolvenstraat Utrecht, andere omleidingsroute
+gevonden",
+  "date": "16-09-2020",
+  "duration": "00:01:18",
   "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-160027203,1930323,2549578,2793708,3014217,3233646,3742861,.mp4.urlset/master.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "512x288@25fps",
+      "bitrate": "363kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-1600272031930323.mp4/index-v1-a1.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "2967kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-1600272033742861.mp4/index-v1-a1.m3u8"
+    },
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "url": "https://content.omroep.nl/rtvutrecht/reportages/video/2019/04/27/2188794_MQ.mp4"
+      "resolution": "512x288",
+      "bitrate": "400kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/rtvutrecht/media/2020/09/16/asset-3911399-1600272031930323.mp4"
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3500kbps",
+      "url": "https://d18rwjdhpr8dcw.cloudfront.net/rtvutrecht/media/2020/09/16/asset-3911399-1600272033742861.mp4"
+    },
+    {
+      "id": "pg-7",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "53855kbps",
+      "url": "https://s3.eu-west-1.amazonaws.com/mm.rtvutrecht.bbvms.com/upload/rtvutrecht/RTVU_2676436_1080p.mxf"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-Eén query voor beide videostreams:
-
-$ xidel -s --module=xivid.xqm "https://www.rtvutrecht.nl/nieuws/1908421/" -e 'if (//script[@async]) then json(extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1))/{"name":publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)} else let $a:=json(//script/extract(.,"setup\((.+)\)",1,"s")[.])//file return {"name":concat(//meta[@name="publisher"]/@content,": ",(substring-before(normalize-space(//h3[@class="article-title"])," -")[.],normalize-space(//h1[@class="article-title"]))[1]),"date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$a}]}'
-
-------------------------------------------------------------------------------------------------
-
--e '
-  if (//script[@async]) then
-    json(
-      extract(unparsed-text(//script[@async]/@src),"var opts = (.+);",1)
-    )/{
-      "name":publicationData/label||": Livestream",
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-      "formats":xivid:m3u8-to-json(clipData/(assets)()[mediatype="MP4_HLS"]/src)
-    }
+declare function xivid:rtvu($url as string) as object()? {
+  let $html:=doc($url),
+      $vid:=x:request({
+        "url":json(
+          $html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]
+        )//file,
+        "method":"HEAD"
+      }[url])/url
+  return
+  if ($vid) then {
+    "name":"RTV Utrecht: "||substring-before(
+      normalize-space($html//h3[@class="article-title"]),
+      " -"
+    ),
+    "date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
+    "formats":[
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "url":$vid
+      }
+    ]
+  }
   else
-    let $a:=json(
-      //script/extract(.,"setup\((.+)\)",1,"s")[.]
-    )//file return {
-      "name":concat(
-        //meta[@name="publisher"]/@content,
-        ": ",
-        (
-          substring-before(
-            normalize-space(//h3[@class="article-title"]),
-            " -"
-          )[.],
-          normalize-space(//h1[@class="article-title"])
-        )[1]
+    xivid:bbvms(
+      $html/(
+        //iframe/concat(
+          substring-before(@src,"html"),
+          "js"
+        ),
+        //script[@async="true"]/@src[1]
       ),
-      "date":replace($a,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
-      "formats":[
-        {
-          "id":"pg-1",
-          "format":"mp4[h264+aac]",
-          "url":$a
-        }
-      ]
-    }
-'
+      "RTV Utrecht"
+    )
+};
 
 ================================================================================================
 

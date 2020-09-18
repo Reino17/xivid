@@ -88,43 +88,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:regio_utr
-FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
-  json:^=if ^(//script[@async]^) then
-    json^(
-      extract^(unparsed-text^(//script[@async]/@src^)^,'var opts ^= ^(.+^)^;'^,1^)
-    ^)/{
-      'name':publicationData/label^|^|': Livestream'^,
-      'date':format-date^(current-date^(^)^,'[D01]-[M01]-[Y]'^)^,
-      'formats':xivid:m3u8-to-json^(clipData/^(assets^)^(^)[mediatype^='MP4_HLS']/src^)
-    }
-  else
-    let $a:^=json^(
-      //script/extract^(.^,'setup\^(^(.+^)\^)'^,1^,'s'^)[.]
-    ^)//file return {
-      'name':concat^(
-        //meta[@name^='publisher']/@content^,
-        ': '^,
-        ^(
-          substring-before^(
-            normalize-space^(//h3[@class^='article-title']^)^,
-            ' -'
-          ^)[.]^,
-          normalize-space^(//h1[@class^='article-title']^)
-        ^)[1]
-      ^)^,
-      'date':replace^($a^,'.+?^(\d+^)/^(\d+^)/^(\d+^).+'^,'$3-$2-$1'^)^,
-      'formats':[
-        {
-          'id':'pg-1'^,
-          'format':'mp4[h264+aac]'^,
-          'url':$a
-        }
-      ]
-    }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :regio
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   let $a:^=doc^(
@@ -818,7 +781,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:omroepflevoland.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:ofl('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:rtvutrecht.nl=%"=="%url%" (
-  CALL :regio_utr "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtvu('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:rtvnoord.nl=%"=="%url%" (
   CALL :regio "%url%"
 ) ELSE IF NOT "%url:rtvdrenthe.nl=%"=="%url%" (

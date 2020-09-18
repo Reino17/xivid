@@ -236,7 +236,10 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
       ),
       "duration":length * duration("PT1S") + time("00:00:00"),
       "formats":[
-        for $x at $i in (assets)()
+        xivid:m3u8-to-json(
+          (assets)()[mediatype="MP4_HLS"]/resolve-uri(src,$host)
+        ),
+        for $x at $i in (assets)()[mediatype!="MP4_HLS"]
         order by $x/bandwidth
         count $i
         return
@@ -248,7 +251,7 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
           "url":resolve-uri(src,$host)
         },
         {
-          "id":"pg-"||count((assets)()) + 1,
+          "id":"pg-"||count((assets)()[mediatype!="MP4_HLS"]) + 1,
           "format":"mp4[h264+aac]",
           "resolution":concat(originalWidth,"x",originalHeight),
           "bitrate":round(
@@ -541,6 +544,42 @@ declare function xivid:ofl($url as string) as object()? {
       ]
     }
   )
+};
+
+declare function xivid:rtvu($url as string) as object()? {
+  let $html:=doc($url),
+      $vid:=x:request({
+        "url":json(
+          $html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]
+        )//file,
+        "method":"HEAD"
+      }[url])/url
+  return
+  if ($vid) then {
+    "name":"RTV Utrecht: "||substring-before(
+      normalize-space($html//h3[@class="article-title"]),
+      " -"
+    ),
+    "date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
+    "formats":[
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "url":$vid
+      }
+    ]
+  }
+  else
+    xivid:bbvms(
+      $html/(
+        //iframe/concat(
+          substring-before(@src,"html"),
+          "js"
+        ),
+        //script[@async="true"]/@src[1]
+      ),
+      "RTV Utrecht"
+    )
 };
 
 declare function xivid:dumpert($url as string) {
