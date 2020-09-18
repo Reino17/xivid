@@ -509,6 +509,40 @@ declare function xivid:nhnieuws($url as string) as object()? {
   )
 };
 
+declare function xivid:ofl($url as string) as object()? {
+  doc($url)/(
+    let $info:=//div[@class="fn-jw-player fn-videoplayer"] return
+    if ($info/@data-has-streams) then {
+      "name":"Omroep Flevoland: Livestream",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json($info/@data-file)
+    } else {
+      "name":concat(
+        "Omroep Flevoland: ",
+        if ($info/normalize-space(@data-title)) then
+          $info/@data-title
+        else
+          normalize-space(//h2)
+      ),
+      "date":if (//meta[@itemprop="datePublished"]) then
+        format-date(
+          date(//meta[@itemprop="datePublished"]/@content),
+          "[D01]-[M01]-[Y]"
+        )
+      else
+        extract(//span[starts-with(@class,"t--red")],"[\d-]+"),
+      "formats":[
+        {
+          "id":"pg-1",
+          "format":"mp4[h264+aac]",
+          "resolution":"960x540",
+          "url":$info/@data-file
+        }
+      ]
+    }
+  )
+};
+
 declare function xivid:dumpert($url as string) {
   json(
     json(

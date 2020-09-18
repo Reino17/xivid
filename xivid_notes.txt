@@ -6799,12 +6799,12 @@ declare function xivid:nhnieuws($url as string) as object()? {
 
 [omroep flevoland]
 
-https://www.omroepflevoland.nl/
+$ url=https://www.omroepflevoland.nl/
 
-$ xidel -s --module=xivid.xqm "https://www.omroepflevoland.nl/" -e '{"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(//div[ends-with(@class,"videoplayer")]/@data-file)}'
+$ xidel -s --module=xivid.xqm -e '{"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(doc("'$url'")//div[@class="fn-jw-player fn-videoplayer"]/@data-file)}'
 {
   "name": "Omroep Flevoland: Livestream",
-  "date": "02-08-2019",
+  "date": "16-09-2020",
   "formats": [
     {
       "id": "hls-0",
@@ -6831,84 +6831,75 @@ $ xidel -s --module=xivid.xqm "https://www.omroepflevoland.nl/" -e '{"name":"Omr
 
 ------------------------------------------------------------------------------------------------
 
-https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a
+$ url=https://www.omroepflevoland.nl/gemist/video/200915-dif
 
-$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e '(outer-html(//h2),outer-html(//span[starts-with(@class,"t--red")]))'
-<h2>
-
-            Dit is Flevoland
-        </h2>
-<span class="t--red t--strong t--capitalize d--inl-block">
-        Vr 12-04-2019
-    </span>
-
-$ xidel -s "https://www.omroepflevoland.nl/gemist/video/dit-is-flevoland-5cb0a4aa9c08a" -e '{"name":"Omroep Flevoland: "||normalize-space(//h2),"date":substring(normalize-space(//span[starts-with(@class,"t--red")]),4),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'doc("'$url'")/(let $info:=//div[@class="fn-jw-player fn-videoplayer"] return if ($info/@data-has-streams) then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($info/@data-file)} else {"name":"Omroep Flevoland: "||$info/@data-title,"date":extract(//span[starts-with(@class,"t--red")],"[\d-]+"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","resolution":"960x540","url":$info/@data-file}]})'
 {
-  "name": "Omroep Flevoland: Dit is Flevoland",
-  "date": "12-04-2019",
+  "name": "Omroep Flevoland: Dit is Flevoland nieuws",
+  "date": "15-09-2020",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "url": "https://d5ms27yy6exnf.cloudfront.net/video/middel/190412_DIF.mp4"
-    }
-  ]
-}
-
-https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop
-
-$ xidel -s "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e 'outer-html(//span[@class="d--block--sm"])'
-<span class="d--block--sm">
-
-                                        Za 13 april 2019 | 17:18
-
-        </span>
-
-$ xidel -s --module=xivid.xqm "https://www.omroepflevoland.nl/sport/170116/team-de-corner-wint-dorpenloop" -e '{"name":"Omroep Flevoland: "||normalize-space(//h2),"date":xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
-{
-  "name": "Omroep Flevoland: Team De Corner wint dorpenloop",
-  "date": "13-04-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://d5ms27yy6exnf.cloudfront.net/video/middel/190413_Dorpenloop_00000SVO.mp4"
+      "resolution": "960x540",
+      "url": "https://d5ms27yy6exnf.cloudfront.net/video/middel/200915_DIF.mp4"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-Eén query voor beide videostreams:
+$ url=https://www.omroepflevoland.nl/nieuws/193656/massale-zoekactie-naar-verdachte-van-misdrijf
 
-$ xidel -s --module=xivid.xqm "https://www.omroepflevoland.nl/" -e 'let $a:=//div[ends-with(@class,"videoplayer")] return if ($a/@data-page-type="home") then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/@data-file)} else {"name":"Omroep Flevoland: "||normalize-space(//h2),"date":if ($a/@data-page-type="missed") then substring(normalize-space(//span[starts-with(@class,"t--red")]),4) else xivid:txt-to-date(//span[@class="d--block--sm"]),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url"://div[ends-with(@class,"videoplayer")]/@data-file}]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'doc("'$url'")/(let $info:=//div[@class="fn-jw-player fn-videoplayer"] return if ($info/@data-has-streams) then {"name":"Omroep Flevoland: Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($info/@data-file)} else {"name":concat("Omroep Flevoland: ",if ($info/normalize-space(@data-title)) then $info/@data-title else normalize-space(//h2)),"date":if (//meta[@itemprop="datePublished"]) then format-date(date(//meta[@itemprop="datePublished"]/@content),"[D01]-[M01]-[Y]") else extract(//span[starts-with(@class,"t--red")],"[\d-]+"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","resolution":"960x540","url":$info/@data-file}]})'
+{
+  "name": "Omroep Flevoland: Massale zoekactie naar verdachte van misdrijf",
+  "date": "14-09-2020",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "960x540",
+      "url": "https://d5ms27yy6exnf.cloudfront.net/video/middel/200915_Zoekactie_Lelystad2.mp4"
+    }
+  ]
+}
 
 ------------------------------------------------------------------------------------------------
 
--e '
-  let $a:=//div[ends-with(@class,"videoplayer")] return
-  if ($a/@data-page-type="home") then {
-    "name":"Omroep Flevoland: Livestream",
-    "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-    "formats":xivid:m3u8-to-json($a/@data-file)
-  } else {
-    "name":"Omroep Flevoland: "||normalize-space(//h2),
-    "date":if ($a/@data-page-type="missed") then
-      substring(
-        normalize-space(//span[starts-with(@class,"t--red")]),
-        4
-      )
-    else
-      xivid:txt-to-date(//span[@class="d--block--sm"]),
-    "formats":[
-      {
-        "id":"pg-1",
-        "format":"mp4[h264+aac]",
-        "url"://div[ends-with(@class,"videoplayer")]/@data-file
-      }
-    ]
-  }
-'
+declare function xivid:ofl($url as string) as object()? {
+  doc($url)/(
+    let $info:=//div[@class="fn-jw-player fn-videoplayer"] return
+    if ($info/@data-has-streams) then {
+      "name":"Omroep Flevoland: Livestream",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json($info/@data-file)
+    } else {
+      "name":concat(
+        "Omroep Flevoland: ",
+        if ($info/normalize-space(@data-title)) then
+          $info/@data-title
+        else
+          normalize-space(//h2)
+      ),
+      "date":if (//meta[@itemprop="datePublished"]) then
+        format-date(
+          date(//meta[@itemprop="datePublished"]/@content),
+          "[D01]-[M01]-[Y]"
+        )
+      else
+        extract(//span[starts-with(@class,"t--red")],"[\d-]+"),
+      "formats":[
+        {
+          "id":"pg-1",
+          "format":"mp4[h264+aac]",
+          "resolution":"960x540",
+          "url":$info/@data-file
+        }
+      ]
+    }
+  )
+};
 
 ================================================================================================
 
