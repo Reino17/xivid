@@ -2223,6 +2223,51 @@ $ xidel -s --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-tex
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js   # Omrop Fryslân
+
+$ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/clipData/(assets)()'
+{
+  "mediatype": "MP4_MAIN",
+  "id": "1590440881090348",
+  "status": "active",
+  "src": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8",
+  "length": "",
+  "exactlength": "",
+  "width": "1920",
+  "height": "1080",
+  "bandwidth": "1000"
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-text("'$url'"),"var opts = (.+);",1)),$publ:="Omrop Fryslân",$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/(if (sourcetype="live") then {"name":$publ||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((assets)()/src)} else {"name":concat($publ,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]})'
+{
+  "name": "Omrop Fryslân: Livestream",
+  "date": "15-09-2020",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "426x240@25fps",
+      "bitrate": "637kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/270p/prog_index.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720@25fps",
+      "bitrate": "2419kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/720p/prog_index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string,$publ as string) as object()? {
   let $json:=json(
         extract(unparsed-text($url),"var opts = (.+);",1)
@@ -2230,36 +2275,42 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
       $host:=$json/publicationData/defaultMediaAssetPath,
       $orig:=json($json/clipData/s3Info)/format
   return
-  $json/clipData/{
-    "name":concat($publ,": ",title),
-    "date":format-date(
-      dateTime(publisheddate) + implicit-timezone(),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":length * duration("PT1S") + time("00:00:00"),
-    "formats":[
-      for $x at $i in (assets)()
-      order by $x/bandwidth
-      count $i
-      return
-      $x/{
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":concat(width,"x",height),
-        "bitrate":bandwidth||"kbps",
-        "url":resolve-uri(src,$host)
-      },
-      {
-        "id":"pg-"||count((assets)()) + 1,
-        "format":"mp4[h264+aac]",
-        "resolution":concat(originalWidth,"x",originalHeight),
-        "bitrate":round(
-          tokenize($orig/bit_rate)[1] * 1024
-        )||"kbps",
-        "url":$orig/filename
-      }[url]
-    ]
-  }
+  $json/clipData/(
+    if (sourcetype="live") then {
+      "name":$publ||": Livestream",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json((assets)()/src)
+    } else {
+      "name":concat($publ,": ",title),
+      "date":format-date(
+        dateTime(publisheddate) + implicit-timezone(),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":length * duration("PT1S") + time("00:00:00"),
+      "formats":[
+        for $x at $i in (assets)()
+        order by $x/bandwidth
+        count $i
+        return
+        $x/{
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":concat(width,"x",height),
+          "bitrate":bandwidth||"kbps",
+          "url":resolve-uri(src,$host)
+        },
+        {
+          "id":"pg-"||count((assets)()) + 1,
+          "format":"mp4[h264+aac]",
+          "resolution":concat(originalWidth,"x",originalHeight),
+          "bitrate":round(
+            tokenize($orig/bit_rate)[1] * 1024
+          )||"kbps",
+          "url":$orig/filename
+        }[url]
+      ]
+    }
+  )
 };
 
 ================================================================================================
@@ -5674,15 +5725,52 @@ https://media.dumpert.nl/tablet/_9bfd3dc6_YTDL_1.mp4.mp4.mp4
 
 [omrop fryslân]
 
+$ url=https://www.omropfryslan.nl/live/omrop-fryslan-tv
+
+$ xidel -se 'doc("'$url'")//script[@async] ! (@src,static-base-uri(),resolve-uri(@src))'
+//omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
 https://www.omropfryslan.nl/live/omrop-fryslan-tv
+https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true   # Blue Billywig
 
-$ xidel -s "https://www.omropfryslan.nl/live/omrop-fryslan-tv" -e '//meta[@itemprop="embedURL"]/extract(@content,".+(http.+xml)",1)'
-https://omropfryslan.bbvms.com/mediaclip/2970835.xml
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --module=xivid.xqm "https://www.omropfryslan.nl/live/omrop-fryslan-tv" -e '{"name"://meta[@itemprop="name"]/@content||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(doc(//meta[@itemprop="embedURL"]/extract(@content,".+(http.+xml)",1))//asset/@src)}'
+https://www.w3.org/TR/xpath-functions-31/#func-resolve-uri:
+
+  fn:resolve-uri($relative as xs:string?, $base as xs:string) as xs:anyURI?
+  If the $base argument is not supplied, then:
+    If the static base URI in the static context is not absent, it is used as the effective value of $base.
+
+static-base-uri() hier boven staat gelijk aan $url, maar hier...
+
+'test.xqm':
+
+module namespace local = "127.0.0.1";
+
+declare function local:test($url) {
+  doc($url)//script[@async] ! (
+    @src,
+    static-base-uri(),
+    resolve-uri(@src),
+    resolve-uri(@src,base-uri()),
+    resolve-uri(@src,$url)
+  )
+};
+
+$ xidel -s --module=test.xqm -e 'local:test("'$url'")'
+//omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
+test.xqm
+file://D:\\omropfryslan.bbvms.com\p\omrop_frysl_n_live_stream_4\c\3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
+https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
+https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
+
+...staat ie gelijk aan "test.xqm". In 'xivid.xqm' is dus base-uri() of $url nodig voor $base in resolve-uri().
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s --module=xivid.xqm -e 'xivid:bbvms(doc("'$url'")//script[@async]/resolve-uri(@src),"Omrop Fryslân")'
 {
-  "name": "Omrop Fryslân TV: Livestream",
-  "date": "02-08-2019",
+  "name": "Omrop Fryslân: Livestream",
+  "date": "15-09-2020",
   "formats": [
     {
       "id": "hls-0",
@@ -5693,102 +5781,66 @@ $ xidel -s --module=xivid.xqm "https://www.omropfryslan.nl/live/omrop-fryslan-tv
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
       "resolution": "426x240@25fps",
-      "bitrate": "528kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/400/prog_index.m3u8"
+      "bitrate": "637kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/270p/prog_index.m3u8"
     },
     [...]
     {
       "id": "hls-3",
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720@25fps",
-      "bitrate": "2128kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/2000/prog_index.m3u8"
+      "bitrate": "2419kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/720p/prog_index.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700
+$ url=https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-14-septimber-2020-1700
 
-$ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700" -e '//meta[@itemprop="embedURL"]/extract(@content,"defaultMediaAssetPath=(.+?)&.+clipXmlUrl=(.+?)&",(1,2))'
-https://d3pvma9xb2775h.cloudfront.net
-https://omropfryslan.bbvms.com/mediaclip/3277401.xml
+$ xidel -se 'doc("'$url'")//div[starts-with(@class,"bluebillywig")]/iframe/(string(@data-src),resolve-uri(substring-before(@data-src,"html")||"js"))'
+//omropfryslan.bbvms.com/p/omropfryslan_video/c/3909754.html
+https://omropfryslan.bbvms.com/p/omropfryslan_video/c/3909754.js
 
-$ xidel -s "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700" --xquery '{"name":"Omrop Fryslân: "||normalize-space(//h1),"date":replace(//meta[@itemprop="dateModified"]/@content,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":duration("P"||//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[let $a:=//meta[@itemprop="embedURL"]/extract(@content,"defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",(1,2)) for $x at $i in doc($a[2])//asset order by $x/@bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/@width,"x",$x/@height),"bitrate":$x/@bandwidth||"kbps","url":resolve-uri($x/@src,$a[1])}]}'
+$ xidel -s --module=xivid.xqm -e 'xivid:bbvms(doc("'$url'")/(.//script[@async]/resolve-uri(@src),.//div[starts-with(@class,"bluebillywig")]/iframe/resolve-uri(substring-before(@data-src,"html")||"js")),"Omrop Fryslân")'
 {
-  "name": "Omrop Fryslân: Fryslân Hjoed fan 21 maart 2019 17:00",
-  "date": "21-03-2019",
-  "duration": "00:28:24",
+  "name": "Omrop Fryslân: FRYSLANHJOED_2020-09-14",
+  "date": "14-09-2020",
+  "duration": "00:10:26",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
       "resolution": "480x272",
       "bitrate": "525kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2019/03/21/Asset_iPOD_FRYSLANHJOED_2019-03-21.mp4"
+      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2020/09/14/Asset_iPOD_FRYSLANHJOED_2020-09-14.mp4"
     },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "720x400",
-      "bitrate": "1126kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2019/03/21/Asset_SD_FRYSLANHJOED_2019-03-21.mp4"
-    },
+    [...]
     {
       "id": "pg-3",
       "format": "mp4[h264+aac]",
       "resolution": "1920x1080",
-      "bitrate": "6142kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2019/03/21/Asset_HD_FRYSLANHJOED_2019-03-21.mp4"
+      "bitrate": "6150kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2020/09/14/Asset_HD_FRYSLANHJOED_2020-09-14.mp4"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-Eén query voor beide videostreams:
-
-$ xidel -s --module=xivid.xqm "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-21-maart-2019-1700" --xquery 'let $a:=//meta[@itemprop="embedURL"]/extract(@content,"defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",(1,2)),$b:=doc($a[2]) return if ($b//@sourcetype="live") then {"name"://meta[@itemprop="name"]/@content||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($b//asset/@src)} else {"name":"Omrop Fryslân: "||normalize-space(//h1),"date":replace(//meta[@itemprop="dateModified"]/@content,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":duration("P"||//meta[@itemprop="duration"]/@content) + time("00:00:00"),"formats":[for $x at $i in $b//asset order by $x/@bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/@width,"x",$x/@height),"bitrate":$x/@bandwidth||"kbps","url":resolve-uri($x/@src,$a[1])}]}'
-
-------------------------------------------------------------------------------------------------
-
---xquery '
-  let $a:=//meta[@itemprop="embedURL"]/extract(
-        @content,
-        "defaultMediaAssetPath=(.+?)&amp;.+clipXmlUrl=(.+?)&amp;",
-        (1,2)
-      ),
-      $b:=doc($a[2])
-  return
-  if ($b//@sourcetype="live") then {
-    "name"://meta[@itemprop="name"]/@content||": Livestream",
-    "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-    "formats":xivid:m3u8-to-json($b//asset/@src)
-  } else {
-    "name":"Omrop Fryslân: "||normalize-space(//h1),
-    "date":replace(
-      //meta[@itemprop="dateModified"]/@content,
-      "(\d+)-(\d+)-(\d+).+",
-      "$3-$2-$1"
+declare function xivid:ofr($url as string) as object()? {
+  xivid:bbvms(
+    doc($url)/(
+      .//script[@async]/resolve-uri(@src,$url),
+      .//div[starts-with(@class,"bluebillywig")]/iframe/resolve-uri(
+        substring-before(@data-src,"html")||"js",
+        $url
+      )
     ),
-    "duration":duration(
-      "P"||//meta[@itemprop="duration"]/@content
-    ) + time("00:00:00"),
-    "formats":[
-      for $x at $i in $b//asset
-      order by $x/@bandwidth
-      count $i
-      return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":concat($x/@width,"x",$x/@height),
-        "bitrate":$x/@bandwidth||"kbps",
-        "url":resolve-uri($x/@src,$a[1])
-      }
-    ]
-  }
-'
+    "Omrop Fryslân"
+  )
+};
 
 ================================================================================================
 

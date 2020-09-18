@@ -223,36 +223,42 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
       $host:=$json/publicationData/defaultMediaAssetPath,
       $orig:=json($json/clipData/s3Info)/format
   return
-  $json/clipData/{
-    "name":concat($publ,": ",title),
-    "date":format-date(
-      dateTime(publisheddate) + implicit-timezone(),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":length * duration("PT1S") + time("00:00:00"),
-    "formats":[
-      for $x at $i in (assets)()
-      order by $x/bandwidth
-      count $i
-      return
-      $x/{
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":concat(width,"x",height),
-        "bitrate":bandwidth||"kbps",
-        "url":resolve-uri(src,$host)
-      },
-      {
-        "id":"pg-"||count((assets)()) + 1,
-        "format":"mp4[h264+aac]",
-        "resolution":concat(originalWidth,"x",originalHeight),
-        "bitrate":round(
-          tokenize($orig/bit_rate)[1] * 1024
-        )||"kbps",
-        "url":$orig/filename
-      }[url]
-    ]
-  }
+  $json/clipData/(
+    if (sourcetype="live") then {
+      "name":$publ||": Livestream",
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json((assets)()/src)
+    } else {
+      "name":concat($publ,": ",title),
+      "date":format-date(
+        dateTime(publisheddate) + implicit-timezone(),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":length * duration("PT1S") + time("00:00:00"),
+      "formats":[
+        for $x at $i in (assets)()
+        order by $x/bandwidth
+        count $i
+        return
+        $x/{
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":concat(width,"x",height),
+          "bitrate":bandwidth||"kbps",
+          "url":resolve-uri(src,$host)
+        },
+        {
+          "id":"pg-"||count((assets)()) + 1,
+          "format":"mp4[h264+aac]",
+          "resolution":concat(originalWidth,"x",originalHeight),
+          "bitrate":round(
+            tokenize($orig/bit_rate)[1] * 1024
+          )||"kbps",
+          "url":$orig/filename
+        }[url]
+      ]
+    }
+  )
 };
 
 (:~
@@ -459,6 +465,19 @@ declare function xivid:tvblik($url as string) as object()? {
     xivid:rtl("https://www.rtlxl.nl/video/"||$host[2])
   else
     xivid:kijk("https://kijk.nl/video/"||$host[2])
+};
+
+declare function xivid:ofr($url as string) as object()? {
+  xivid:bbvms(
+    doc($url)/(
+      .//script[@async]/resolve-uri(@src,$url),
+      .//div[starts-with(@class,"bluebillywig")]/iframe/resolve-uri(
+        substring-before(@data-src,"html")||"js",
+        $url
+      )
+    ),
+    "Omrop Fryslân"
+  )
 };
 
 declare function xivid:dumpert($url as string) {
