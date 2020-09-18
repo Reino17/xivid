@@ -2107,6 +2107,163 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
 
 ================================================================================================
 
+[Blue Billywig]
+
+$ url=https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.js   # Leeuwarder Courant
+
+$ xidel -se 'unparsed-text("'$url'")'
+//serverPlayerPath = https://cdn.bluebillywig.com/apps/player/20200907.161353/ 
+
+
+		// Player Five
+		(function(){
+		 // metadata
+		 var opts = <hele-lange-json>;
+
+$ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/(clipData,json(clipData/s3Info),publicationData/defaultMediaAssetPath)'
+{
+  "id": "3892522",
+  [...]
+  "length": "102",
+  "sourceid": "",
+  "title": "Enorme belangstelling voor gratis perenbomen in Heerenveen",
+  [...]
+  "publisheddate": "2020-08-22T10:03:48Z",
+  [...]
+  "originalWidth": 1920,
+  "originalHeight": 1080,
+  [...]
+  "assets": [
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "1598093328914448",
+      "status": "active",
+      "src": "/ndc/media/2020/08/22/asset-3892522-1598093328914448.mp4",
+      "length": "102",
+      "exactlength": "102379",
+      "width": "1280",
+      "height": "720",
+      "bandwidth": "2000",
+      "jobdefid": "mp4_main-1280x720-2000",
+      "jobqid": "mp4_main-1280x720-2000"
+    },
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "1598093329066746",
+      "status": "active",
+      "src": "/ndc/media/2020/08/22/asset-3892522-1598093329066746.mp4",
+      "length": "102",
+      "exactlength": "102379",
+      "width": "768",
+      "height": "432",
+      "bandwidth": "1600",
+      "jobdefid": "mp4_main-768x432-1600",
+      "jobqid": "mp4_main-768x432-1600"
+    },
+    [...]
+  ],
+  [...]
+  "s3Info": "[...]{\"filename\": \"https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4\"[...]",
+  [...]
+}
+{
+  [...]
+  "format": {
+    "filename": "https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4",
+    "nb_streams": 2,
+    "nb_programs": 0,
+    "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+    "format_long_name": "QuickTime / MOV",
+    "start_time": "0:00:00.000000",
+    "duration": "0:01:42.293333",
+    "size": "122.606459 Mibyte",
+    "bit_rate": "10.054394 Mbit/s",
+    "probe_score": 100,
+    "tags": {
+      "major_brand": "mp42",
+      "minor_version": "0",
+      "compatible_brands": "mp42mp41",
+      "creation_time": "2020-08-22T10:29:23.000000Z"
+    }
+  },
+  [...]
+}
+https://d3jbi46382yahz.cloudfront.net
+
+$ xidel -s --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-text("'$url'"),"var opts = (.+);",1)),$publ:="LC",$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/{"name":concat($publ,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]}'
+{
+  "name": "LC: Enorme belangstelling voor gratis perenbomen in Heerenveen",
+  "date": "22-08-2020",
+  "duration": "00:01:42",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "400kbps",
+      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2020/08/22/asset-3892522-1598093329299560.mp4"
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3000kbps",
+      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2020/08/22/asset-3892522-1598093329696575.mp4"
+    },
+    {
+      "id": "pg-7",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "10296kbps",
+      "url": "https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:bbvms($url as string,$publ as string) as object()? {
+  let $json:=json(
+        extract(unparsed-text($url),"var opts = (.+);",1)
+      ),
+      $host:=$json/publicationData/defaultMediaAssetPath,
+      $orig:=json($json/clipData/s3Info)/format
+  return
+  $json/clipData/{
+    "name":concat($publ,": ",title),
+    "date":format-date(
+      dateTime(publisheddate) + implicit-timezone(),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":length * duration("PT1S") + time("00:00:00"),
+    "formats":[
+      for $x at $i in (assets)()
+      order by $x/bandwidth
+      count $i
+      return
+      $x/{
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":concat(width,"x",height),
+        "bitrate":bandwidth||"kbps",
+        "url":resolve-uri(src,$host)
+      },
+      {
+        "id":"pg-"||count((assets)()) + 1,
+        "format":"mp4[h264+aac]",
+        "resolution":concat(originalWidth,"x",originalHeight),
+        "bitrate":round(
+          tokenize($orig/bit_rate)[1] * 1024
+        )||"kbps",
+        "url":$orig/filename
+      }[url]
+    ]
+  }
+};
+
+================================================================================================
+
 [TTML naar SRT]
 
 https://en.wikipedia.org/wiki/Timed_Text_Markup_Language
@@ -7274,67 +7431,10 @@ $ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""funct
 $ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return json(//script/tokenize(.,",")[contains(.,$id)]))'
 https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.html?inheritDimensions=true
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return json(//script/tokenize(.,",")[contains(.,$id)]) ! replace(.,"html.+","js"))'
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return substring-before(json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"js")'
 https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.js   # Blue Billywig
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),$bbvms:=json(//script/tokenize(.,",")[contains(.,$id)]) ! replace(.,"html.+","js") return json(extract(unparsed-text($bbvms),"var opts = (.+);",1))/(clipData,s3Info,publicationData/defaultMediaAssetPath))'
-{
-  "id": "3892522",
-  [...]
-  "length": "102",
-  "sourceid": "",
-  "title": "Enorme belangstelling voor gratis perenbomen in Heerenveen",
-  [...]
-  "publisheddate": "2020-08-22T10:03:48Z",
-  [...]
-  "originalWidth": 1920,
-  "originalHeight": 1080,
-  [...]
-  "assets": [
-    {
-      "mediatype": "MP4_MAIN",
-      "id": "1598093328914448",
-      "status": "active",
-      "src": "/ndc/media/2020/08/22/asset-3892522-1598093328914448.mp4",
-      "length": "102",
-      "exactlength": "102379",
-      "width": "1280",
-      "height": "720",
-      "bandwidth": "2000",
-      "jobdefid": "mp4_main-1280x720-2000",
-      "jobqid": "mp4_main-1280x720-2000"
-    },
-    [...]
-  ],
-  [...]
-  "s3Info": "[...]{\"filename\": \"https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4\"[...]",
-  [...]
-}
-{
-  [...]
-  "format": {
-    "filename": "https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4",
-    "nb_streams": 2,
-    "nb_programs": 0,
-    "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
-    "format_long_name": "QuickTime / MOV",
-    "start_time": "0:00:00.000000",
-    "duration": "0:01:42.293333",
-    "size": "122.606459 Mibyte",
-    "bit_rate": "10.054394 Mbit/s",
-    "probe_score": 100,
-    "tags": {
-      "major_brand": "mp42",
-      "minor_version": "0",
-      "compatible_brands": "mp42mp41",
-      "creation_time": "2020-08-22T10:29:23.000000Z"
-    }
-  },
-  [...]
-}
-https://d3jbi46382yahz.cloudfront.net
-
-$ xidel -s --json-mode=deprecated --xquery 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),$bbvms:=json(//script/tokenize(.,",")[contains(.,$id)]) ! replace(.,"html.+","js"),$json:=json(extract(unparsed-text($bbvms),"var opts = (.+);",1)),$orig:=json($json/clipData/s3Info)/format,$host:=$json/publicationData/defaultMediaAssetPath return $json/clipData/{"name":"LC: "||title,"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}]})'
+$ xidel -s --module=xivid.xqm -e 'let $html:=x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc,$id:=$html//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return xivid:bbvms(substring-before(json($html//script/tokenize(.,",")[contains(.,$id)]),"html")||"js","LC")'
 {
   "name": "LC: Enorme belangstelling voor gratis perenbomen in Heerenveen",
   "date": "22-08-2020",
@@ -7368,49 +7468,18 @@ $ xidel -s --json-mode=deprecated --xquery 'x:request({"headers":"Cookie: ndc_co
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:lc($url as string) as object()? {
-  x:request({
-    "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
-    "url":$url
-  })/doc/(
-    let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),
-        $bbvms:=json(
-          //script/tokenize(.,",")[contains(.,$id)]
-        ) ! replace(.,"html.+","js"),
-        $json:=json(
-          extract(unparsed-text($bbvms),"var opts = (.+);",1)
-        ),
-        $orig:=json($json/clipData/s3Info)/format,
-        $host:=$json/publicationData/defaultMediaAssetPath
-    return
-    $json/clipData/{
-      "name":"LC: "||title,
-      "date":format-date(
-        dateTime(publisheddate) + implicit-timezone(),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":length * duration("PT1S") + time("00:00:00"),
-      "formats":[
-        for $x at $i in (assets)()
-        order by $x/bandwidth
-        count $i
-        return $x/{
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":concat(width,"x",height),
-          "bitrate":bandwidth||"kbps",
-          "url":resolve-uri(src,$host)
-        },
-        {
-          "id":"pg-"||count((assets)()) + 1,
-          "format":"mp4[h264+aac]",
-          "resolution":concat(originalWidth,"x",originalHeight),
-          "bitrate":round(
-            tokenize($orig/bit_rate)[1] * 1024
-          )||"kbps",
-          "url":$orig/filename
-        }
-      ]
-    }
+  let $html:=x:request({
+        "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
+        "url":$url
+      })/doc,
+      $id:=$html//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
+  return
+  xivid:bbvms(
+    substring-before(
+      json($html//script/tokenize(.,",")[contains(.,$id)]),
+      "html"
+    )||"js",
+    "LC"
   )
 };
 

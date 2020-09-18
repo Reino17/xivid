@@ -216,6 +216,45 @@ declare function xivid:info($json as object()) as string* {
   )
 };
 
+declare function xivid:bbvms($url as string,$publ as string) as object()? {
+  let $json:=json(
+        extract(unparsed-text($url),"var opts = (.+);",1)
+      ),
+      $host:=$json/publicationData/defaultMediaAssetPath,
+      $orig:=json($json/clipData/s3Info)/format
+  return
+  $json/clipData/{
+    "name":concat($publ,": ",title),
+    "date":format-date(
+      dateTime(publisheddate) + implicit-timezone(),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":length * duration("PT1S") + time("00:00:00"),
+    "formats":[
+      for $x at $i in (assets)()
+      order by $x/bandwidth
+      count $i
+      return
+      $x/{
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":concat(width,"x",height),
+        "bitrate":bandwidth||"kbps",
+        "url":resolve-uri(src,$host)
+      },
+      {
+        "id":"pg-"||count((assets)()) + 1,
+        "format":"mp4[h264+aac]",
+        "resolution":concat(originalWidth,"x",originalHeight),
+        "bitrate":round(
+          tokenize($orig/bit_rate)[1] * 1024
+        )||"kbps",
+        "url":$orig/filename
+      }[url]
+    ]
+  }
+};
+
 (:~
  : --------------------------------
  : Extractors
@@ -531,48 +570,17 @@ declare function xivid:ad($url as string) as object()? {
 };
 
 declare function xivid:lc($url as string) as object()? {
-  x:request({
-    "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
-    "url":$url
-  })/doc/(
-    let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),
-        $bbvms:=json(
-          //script/tokenize(.,",")[contains(.,$id)]
-        ) ! replace(.,"html.+","js"),
-        $json:=json(
-          extract(unparsed-text($bbvms),"var opts = (.+);",1)
-        ),
-        $orig:=json($json/clipData/s3Info)/format,
-        $host:=$json/publicationData/defaultMediaAssetPath
-    return
-    $json/clipData/{
-      "name":"LC: "||title,
-      "date":format-date(
-        dateTime(publisheddate) + implicit-timezone(),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":length * duration("PT1S") + time("00:00:00"),
-      "formats":[
-        for $x at $i in (assets)()
-        order by $x/bandwidth
-        count $i
-        return $x/{
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":concat(width,"x",height),
-          "bitrate":bandwidth||"kbps",
-          "url":resolve-uri(src,$host)
-        },
-        {
-          "id":"pg-"||count((assets)()) + 1,
-          "format":"mp4[h264+aac]",
-          "resolution":concat(originalWidth,"x",originalHeight),
-          "bitrate":round(
-            tokenize($orig/bit_rate)[1] * 1024
-          )||"kbps",
-          "url":$orig/filename
-        }
-      ]
-    }
+  let $html:=x:request({
+        "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
+        "url":$url
+      })/doc,
+      $id:=$html//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
+  return
+  xivid:bbvms(
+    substring-before(
+      json($html//script/tokenize(.,",")[contains(.,$id)]),
+      "html"
+    )||"js",
+    "LC"
   )
 };
