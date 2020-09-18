@@ -190,6 +190,53 @@ https://stackoverflow.com/q/33629416
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+Check of de hoeveelheid bits groter is dan 31:
+
+- Tel het aantal bits.
+
+  $ xidel -se 'x:integer-to-base(x:integer("0xffffff88"),2)'
+  11111111111111111111111110001000
+
+  $ xidel -se 'string-length(x:integer-to-base(x:integer("0xffffff88"),2))'
+  32
+
+- Converteer als unsigned 32bit Hex en trek daar 2^(aantal bits) van af.
+
+  $ xidel -se 'math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2)))'
+  4.294967296E9
+
+  $ xidel -se 'integer(math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2))))'
+  4294967296
+
+  $ xidel -se 'let $a:=x:integer("0xffffff88") return $a - integer(math:pow(2,string-length(x:integer-to-base($a,2))))'
+  -120
+
+- Dit geldt alleen voor 0x80000000 en hoger. Converteer 0x7fffffff en lager als unsigned 32bit Hex!
+
+  $ xidel -se 'x:integer-to-base(x:integer("0x80000000"),2)'
+  10000000000000000000000000000000
+
+  $ xidel -se 'x:integer-to-base(x:integer("0x7fffffff"),2)'
+  1111111111111111111111111111111
+
+  $ xidel -se 'let $a:=x:integer("0x80000000"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  -2147483648
+
+  $ xidel -se 'let $a:=x:integer("0x7fffffff"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  2147483647   # 2^31
+
+  $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
+  -120
+
+$ time xidel -se 'declare function local:shex-to-dec($shex as string) as integer {let $a:=x:integer($shex),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a}; ((1 to 100000) ! local:shex-to-dec("0xffffff88"))[1]'
+-120
+
+real    0m30.359s
+user    0m0.015s
+sys     0m0.015s
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 Check of de decimale waarde groter is dan 2^31:
 
 - Tel het aantal bits.
@@ -233,8 +280,12 @@ Check of de decimale waarde groter is dan 2^31:
   $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=integer(math:pow(2,(string-length("0xffffff88") - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a'
   -120
 
-$ xidel -se 'declare function local:shex-to-dec($shex as string) as integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a}; local:shex-to-dec("0xffffff88")'
+$ time xidel -se 'declare function local:shex-to-dec($shex as string) as integer {let $a:=x:integer($shex),$b:=integer(math:pow(2,(string-length($shex) - 2) * 4)) return if ($a gt $b div 2) then $a - $b else $a}; ((1 to 100000) ! local:shex-to-dec("0xffffff88"))[1]'
 -120
+
+real    0m4.813s   # Veel snellere methode!
+user    0m0.015s
+sys     0m0.015s
 
 declare function xivid:shex-to-dec($shex as string) as integer {
   let $a:=x:integer($shex),
@@ -242,59 +293,6 @@ declare function xivid:shex-to-dec($shex as string) as integer {
   return
   if ($a gt $b div 2) then
     $a - $b
-  else
-    $a
-};
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-Check of de hoeveelheid bits groter is dan 31:
-
-- Tel het aantal bits.
-
-  $ xidel -se 'x:integer-to-base(x:integer("0xffffff88"),2)'
-  11111111111111111111111110001000
-
-  $ xidel -se 'string-length(x:integer-to-base(x:integer("0xffffff88"),2))'
-  32
-
-- Converteer als unsigned 32bit Hex en trek daar 2^(aantal bits) van af.
-
-  $ xidel -se 'math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2)))'
-  4.294967296E9
-
-  $ xidel -se 'integer(math:pow(2,string-length(x:integer-to-base(x:integer("0xffffff88"),2))))'
-  4294967296
-
-  $ xidel -se 'let $a:=x:integer("0xffffff88") return $a - integer(math:pow(2,string-length(x:integer-to-base($a,2))))'
-  -120
-
-- Dit geldt alleen voor 0x80000000 en hoger. Converteer 0x7fffffff en lager als unsigned 32bit Hex!
-
-  $ xidel -se 'x:integer-to-base(x:integer("0x80000000"),2)'
-  10000000000000000000000000000000
-
-  $ xidel -se 'x:integer-to-base(x:integer("0x7fffffff"),2)'
-  1111111111111111111111111111111
-
-  $ xidel -se 'let $a:=x:integer("0x80000000"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
-  -2147483648
-
-  $ xidel -se 'let $a:=x:integer("0x7fffffff"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
-  2147483647   # 2^31
-
-  $ xidel -se 'let $a:=x:integer("0xffffff88"),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a'
-  -120
-
-$ xidel -se 'declare function local:shex-to-dec($shex as string) as integer {let $a:=x:integer($shex),$b:=x:integer-to-base($a,2) return if (string-length($b) gt 31) then $a - integer(math:pow(2,string-length($b))) else $a}; local:shex-to-dec("0xffffff88")'
--120
-
-declare function xivid:shex-to-dec($shex as string) as integer {
-  let $a:=x:integer($shex),
-      $b:=x:integer-to-base($a,2)
-  return
-  if (string-length($b) gt 31) then
-    $a - integer(math:pow(2,string-length($b)))
   else
     $a
 };
