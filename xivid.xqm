@@ -244,7 +244,7 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
     {
       "formats":[
         xivid:m3u8-to-json(
-          (assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)
+          (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         ),
         for $x at $i in (assets)()[ends-with(src,"mp4")]
         order by $x/bandwidth

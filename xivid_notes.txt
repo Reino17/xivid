@@ -2475,6 +2475,62 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://omroepwest.bbvms.com/p/regiogrid/c/2054317.json   # Omroep West
+
+$ xidel -se 'json("'$url'")/clipData/(assets)()'
+{
+  "mediatype": "MP4_MAIN",
+  "id": "1347006347173657",
+  "status": "active",
+  "src": "//d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8",
+  "length": "",
+  "exactlength": "",
+  "width": "1920",
+  "height": "1080",
+  "bandwidth": "4128"
+}
+{
+  "mediatype": "MP4_IPOD",
+  "id": "1347007455980753",
+  "status": "active",
+  "src": "//d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_mobile/playlist.m3u8",
+  "length": "",
+  "exactlength": "",
+  "width": "480",
+  "height": "270",
+  "bandwidth": "400"
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info) return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00")},{"formats":[xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]]}|}}; xivid:bbvms("'$url'","Omroep West: Livestream")'
+{
+  "name": "Omroep West: Livestream",
+  "date": "28-09-2020",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "712x400",
+      "bitrate": "571kbps",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b531072.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "4227kbps",
+      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b4227072.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   let $json:=json($url),
       $host:=$json/publicationData/defaultMediaAssetPath,
@@ -2503,7 +2559,7 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
     {
       "formats":[
         xivid:m3u8-to-json(
-          (assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)
+          (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         ),
         for $x at $i in (assets)()[ends-with(src,"mp4")]
         order by $x/bandwidth
