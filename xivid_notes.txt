@@ -2373,6 +2373,62 @@ gevonden",
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://www.rtvnoord.nl/media/bluebillywigplayeroptions/static/Tv.json   # RTV Noord
+
+$ xidel -se 'json("'$url'")/clipData'
+{
+  [...]
+  "sourcetype": "on_demand",          # Zou natuurlijk "live" moeten zijn. Laks!
+  "originalfilename": "index.m3u8",
+  "length": null,
+  [...]
+  "assets": [
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "Tv",
+      "status": "active",
+      "src": "/live/rtvnoord/tv/index.m3u8",   # De livestreams (van de regionale zenders) hebben wel (bijna) altijd "/live/" in de url.
+      "length": null,
+      "exactlength": null,
+      "width": "720",
+      "height": "400",
+      "bandwidth": "1200",
+      "jobdefid": null
+    }
+  ],
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info) return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/")) then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00")},{"formats":[xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]]}|}}; xivid:bbvms("'$url'","RTV Noord: Livestream")'
+{
+  "name": "RTV Noord: Livestream",
+  "date": "28-09-2020",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/index.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "627kbps",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/6a46cbb2-57ee-4192-b55a-de7b4575b19b/index.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-4",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "6096kbps",
+      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/3e8fe3c1-0868-49b0-b2f3-7dd6eb30651f/index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   let $json:=json($url),
       $host:=$json/publicationData/defaultMediaAssetPath,
@@ -2385,7 +2441,10 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
       else
         concat($json/publicationData/label,": ",title)
     },
-    if (sourcetype="live") then {
+    if (
+      sourcetype="live" or
+      contains((assets)()[ends-with(src,"m3u8")]/src,"/live/")
+    ) then {
       "date":format-date(current-date(),"[D01]-[M01]-[Y]")
     } else {
       "date":format-date(

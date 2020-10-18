@@ -228,7 +228,10 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
       else
         concat($json/publicationData/label,": ",title)
     },
-    if (sourcetype="live") then {
+    if (
+      sourcetype="live" or
+      contains((assets)()[ends-with(src,"m3u8")]/src,"/live/")
+    ) then {
       "date":format-date(current-date(),"[D01]-[M01]-[Y]")
     } else {
       "date":format-date(
