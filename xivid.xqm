@@ -239,7 +239,7 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
         dateTime(publisheddate) + implicit-timezone(),
         "[D01]-[M01]-[Y]"
       ),
-      "duration":length * duration("PT1S") + time("00:00:00")
+      "duration":.[length]/length * duration("PT1S") + time("00:00:00")
     },
     {
       "formats":[
