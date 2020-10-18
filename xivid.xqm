@@ -221,7 +221,11 @@ declare function xivid:info($json as object()) as string* {
   )
 };
 
-declare function xivid:bbvms($url as string?,$name as string?) as object()? {
+declare function xivid:bbvms(
+  $url as string?,
+  $publ as string?,
+  $title as string?
+) as object()? {
   let $json:=json($url),
       $host:=$json/publicationData/resolve-uri(
         defaultMediaAssetPath,
@@ -231,10 +235,13 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   return
   $json/clipData/{|
     {
-      "name":if ($name) then
-        $name
-      else
-        concat($json/publicationData/label,": ",title)
+      "name":join(
+        (
+          if ($publ) then $publ else $json/publicationData/label,
+          if ($title) then $title else .[title]/title
+        ),
+        ": "
+      )
     },
     if (
       sourcetype="live" or
