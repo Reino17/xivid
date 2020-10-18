@@ -2575,9 +2575,52 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://rijnmond.bbvms.com/p/regiogrid_16-9_responsive/q/sourceid_string:9097D24729832965C12585DD00421C42.json   # RTV Rijnmond
+
+$ xidel -se 'json("'$url'")'
+{
+  "previewMode": null,
+  "protocol": "https://",
+  [...]
+  "publicationData": {
+    [...]
+    "defaultMediaAssetPath": "//dcur8bjarl5c2.cloudfront.net",
+    [...]
+  }
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/resolve-uri(defaultMediaAssetPath,$json/protocol),$orig:=json($json/clipData/s3Info) return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":.[length]/length * duration("PT1S") + time("00:00:00")},{"formats":[xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]]}|}}; xivid:bbvms("'$url'",())'
+{
+  "name": "RTV Rijnmond: Welkom bij Rijnmond",
+  "date": "04-10-2020",
+  "duration": "00:10:21",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "600kbps",
+      "url": "https://dcur8bjarl5c2.cloudfront.net/2020/video/nwszo041020_vlq.mp4"
+    },
+    {
+      "id": "pg-2",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3602kbps",
+      "url": "https://dcur8bjarl5c2.cloudfront.net/rijnmond/media/2020/10/04/3931211.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   let $json:=json($url),
-      $host:=$json/publicationData/defaultMediaAssetPath,
+      $host:=$json/publicationData/resolve-uri(
+        defaultMediaAssetPath,
+        $json/protocol
+      ),
       $orig:=json($json/clipData/s3Info)
   return
   $json/clipData/{|

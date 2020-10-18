@@ -218,7 +218,10 @@ declare function xivid:info($json as object()) as string* {
 
 declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   let $json:=json($url),
-      $host:=$json/publicationData/defaultMediaAssetPath,
+      $host:=$json/publicationData/resolve-uri(
+        defaultMediaAssetPath,
+        $json/protocol
+      ),
       $orig:=json($json/clipData/s3Info)
   return
   $json/clipData/{|
