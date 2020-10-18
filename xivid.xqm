@@ -41,7 +41,12 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
         "#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",
         0,"ms*"
       )
-  return (
+  return
+  if ($m3u8 and not($streams[1])) then {
+    "id":"hls-1",
+    "format":"m3u8[h264+aac]",
+    "url":$m3u8Url
+  } else (
     extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
