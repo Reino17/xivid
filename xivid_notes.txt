@@ -2107,21 +2107,14 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
 
 [Blue Billywig]
 
-$ url=https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.js   # Leeuwarder Courant
+$ url=https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.json   # Leeuwarder Courant
 
-$ xidel -se 'unparsed-text("'$url'")'
-//serverPlayerPath = https://cdn.bluebillywig.com/apps/player/20200907.161353/ 
-
-
-		// Player Five
-		(function(){
-		 // metadata
-		 var opts = <hele-lange-json>;
-
-$ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/(clipData,json(clipData/s3Info),publicationData/defaultMediaAssetPath)'
+$ xidel -se 'json("'$url'")/(clipData,json(clipData/s3Info),publicationData)'
 {
   "id": "3892522",
   [...]
+  "sourcetype": "on_demand",
+  "originalfilename": "FBVERSIEBOMEN.mp4",
   "length": "102",
   "sourceid": "",
   "title": "Enorme belangstelling voor gratis perenbomen in Heerenveen",
@@ -2161,6 +2154,9 @@ $ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/(clipDa
     [...]
   ],
   [...]
+  "publication": "lc",
+  "source": "lc",
+  "isPrefetch": "true",
   "s3Info": "[...]{\"filename\": \"https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4\"[...]",
   [...]
 }
@@ -2186,11 +2182,21 @@ $ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/(clipDa
   },
   [...]
 }
-https://d3jbi46382yahz.cloudfront.net
-
-$ xidel -s --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-text("'$url'"),"var opts = (.+);",1)),$publ:="LC",$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/{"name":concat($publ,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]}'
 {
-  "name": "LC: Enorme belangstelling voor gratis perenbomen in Heerenveen",
+  [...]
+  "name": "ndc",
+  "label": "NDC",
+  [...]
+  "defaultMediaAssetPath": "https://d3jbi46382yahz.cloudfront.net",
+  [...]
+}
+
+In veel gevallen zijn de gegevens in de "Blue Billywig"-json veel te ontbetrouwbaar om de naam hier uit te halen, omdat ze lang niet altijd aanwezig zijn.
+Daarom de optionele 2e parameter voor een naam. Niet gespecificeerd, dan de naam uit de "Blue Billywig"-json.
+
+$ xidel -s --json-mode=deprecated --xquery 'declare function local:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/{"name":if ($name) then $name else concat($json/publicationData/label,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]}}; local:bbvms("'$url'",())'
+{
+  "name": "NDC: Enorme belangstelling voor gratis perenbomen in Heerenveen",
   "date": "22-08-2020",
   "duration": "00:01:42",
   "formats": [
@@ -2221,25 +2227,39 @@ $ xidel -s --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-tex
 
 ------------------------------------------------------------------------------------------------
 
-$ url=https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js   # Omrop Fryslân
+$ url=https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.json   # Omrop Fryslân
 
-$ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/clipData/(assets)()'
+$ xidel -se 'json("'$url'")/clipData'
 {
-  "mediatype": "MP4_MAIN",
-  "id": "1590440881090348",
-  "status": "active",
-  "src": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8",
-  "length": "",
-  "exactlength": "",
-  "width": "1920",
-  "height": "1080",
-  "bandwidth": "1000"
+  [...]
+  "sourcetype": "live",
+  "originalfilename": "",
+  "length": null,
+  "sourceid": "live_api_04b3d44d-40d1-424e-bf97-72a913daf431",
+  "title": "Omrop Fryslân Live TV",
+  [...]
+  "publisheddate": "2020-05-25T21:18:15Z",
+  [...]
+  "assets": [
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "1590440881090348",
+      "status": "active",
+      "src": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8",
+      "length": "",
+      "exactlength": "",
+      "width": "1920",
+      "height": "1080",
+      "bandwidth": "1000"
+    }
+  ],
+  [...]
 }
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-text("'$url'"),"var opts = (.+);",1)),$publ:="Omrop Fryslân",$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/(if (sourcetype="live") then {"name":$publ||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((assets)()/src)} else {"name":concat($publ,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]})'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xmlns:xivid="https://github.com/Reino17/xivid/" --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live") then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00")},{"formats":[xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/src),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]}|}}; xivid:bbvms("'$url'","Omrop Fryslân: Livestream")'
 {
   "name": "Omrop Fryslân: Livestream",
-  "date": "15-09-2020",
+  "date": "28-09-2020",
   "formats": [
     {
       "id": "hls-0",
@@ -2255,20 +2275,20 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(e
     },
     [...]
     {
-      "id": "hls-3",
+      "id": "hls-4",
       "format": "m3u8[h264+aac]",
-      "resolution": "1280x720@25fps",
-      "bitrate": "2419kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/720p/prog_index.m3u8"
+      "resolution": "1920x1080@25fps",
+      "bitrate": "5760kbps",
+      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/1080p/prog_index.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-$ url=https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3911399.js   # RTV Utrecht
+$ url=https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3911399.json   # RTV Utrecht
 
-$ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/clipData/(assets)()[mediatype="MP4_HLS"]'
+$ xidel -se 'json("'$url'")/(clipData/(assets)()[ends-with(src,"m3u8")],json(clipData/s3Info))'
 {
   "mediatype": "MP4_HLS",
   "id": "1600381184068100",
@@ -2284,8 +2304,22 @@ $ xidel -se 'json(extract(unparsed-text("'$url'"),"var opts = (.+);",1))/clipDat
   "language-name": "",
   "language-isocode": ""
 }
+{
+  [...]
+  "ContentType": "video/mpeg2",
+  [...]
+  "format": {
+    "filename": "https://s3.eu-west-1.amazonaws.com/mm.rtvutrecht.bbvms.com/upload/rtvutrecht/RTVU_2676436_1080p.mxf",
+    "nb_streams": 3,
+    "nb_programs": 0,
+    "format_name": "mxf",
+    "format_long_name": "MXF (Material eXchange Format)",
+    [...]
+  },
+  [...]
+}
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(extract(unparsed-text("'$url'"),"var opts = (.+);",1)),$publ:="RTV Utrecht",$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info)/format return $json/clipData/(if (sourcetype="live") then {"name":$publ||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json((assets)()/src)} else {"name":concat($publ,": ",title),"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00"),"formats":[xivid:m3u8-to-json((assets)()[mediatype="MP4_HLS"]/resolve-uri(src,$host)),for $x at $i in (assets)()[mediatype!="MP4_HLS"] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[mediatype!="MP4_HLS"]) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]]})'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=json($json/clipData/s3Info) return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live") then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":length * duration("PT1S") + time("00:00:00")},{"formats":[xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]]}|}}; xivid:bbvms("'$url'",())'
 {
   "name": "RTV Utrecht: Toch geen auto's over fietspad Wolvenstraat Utrecht, andere omleidingsroute
 gevonden",
@@ -2329,7 +2363,7 @@ gevonden",
     },
     {
       "id": "pg-7",
-      "format": "mp4[h264+aac]",
+      "format": "mxf[mpeg2+pcm]",
       "resolution": "1920x1080",
       "bitrate": "53855kbps",
       "url": "https://s3.eu-west-1.amazonaws.com/mm.rtvutrecht.bbvms.com/upload/rtvutrecht/RTVU_2676436_1080p.mxf"
@@ -2339,30 +2373,33 @@ gevonden",
 
 ------------------------------------------------------------------------------------------------
 
-declare function xivid:bbvms($url as string,$publ as string) as object()? {
-  let $json:=json(
-        extract(unparsed-text($url),"var opts = (.+);",1)
-      ),
+declare function xivid:bbvms($url as string?,$name as string?) as object()? {
+  let $json:=json($url),
       $host:=$json/publicationData/defaultMediaAssetPath,
-      $orig:=json($json/clipData/s3Info)/format
+      $orig:=json($json/clipData/s3Info)
   return
-  $json/clipData/(
+  $json/clipData/{|
+    {
+      "name":if ($name) then
+        $name
+      else
+        concat($json/publicationData/label,": ",title)
+    },
     if (sourcetype="live") then {
-      "name":$publ||": Livestream",
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-      "formats":xivid:m3u8-to-json((assets)()/src)
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]")
     } else {
-      "name":concat($publ,": ",title),
       "date":format-date(
         dateTime(publisheddate) + implicit-timezone(),
         "[D01]-[M01]-[Y]"
       ),
-      "duration":length * duration("PT1S") + time("00:00:00"),
+      "duration":length * duration("PT1S") + time("00:00:00")
+    },
+    {
       "formats":[
         xivid:m3u8-to-json(
-          (assets)()[mediatype="MP4_HLS"]/resolve-uri(src,$host)
+          (assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)
         ),
-        for $x at $i in (assets)()[mediatype!="MP4_HLS"]
+        for $x at $i in (assets)()[ends-with(src,"mp4")]
         order by $x/bandwidth
         count $i
         return
@@ -2374,17 +2411,20 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
           "url":resolve-uri(src,$host)
         },
         {
-          "id":"pg-"||count((assets)()[mediatype!="MP4_HLS"]) + 1,
-          "format":"mp4[h264+aac]",
+          "id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,
+          "format":concat(
+            extract($orig/format/filename,".+\.(.+)",1),
+            if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"
+          ),
           "resolution":concat(originalWidth,"x",originalHeight),
           "bitrate":round(
-            tokenize($orig/bit_rate)[1] * 1024
+            tokenize($orig/format/bit_rate)[1] * 1024
           )||"kbps",
-          "url":$orig/filename
+          "url":$orig/format/filename
         }[url]
       ]
     }
-  )
+  |}
 };
 
 ================================================================================================

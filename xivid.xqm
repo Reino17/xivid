@@ -216,30 +216,33 @@ declare function xivid:info($json as object()) as string* {
   )
 };
 
-declare function xivid:bbvms($url as string,$publ as string) as object()? {
-  let $json:=json(
-        extract(unparsed-text($url),"var opts = (.+);",1)
-      ),
+declare function xivid:bbvms($url as string?,$name as string?) as object()? {
+  let $json:=json($url),
       $host:=$json/publicationData/defaultMediaAssetPath,
-      $orig:=json($json/clipData/s3Info)/format
+      $orig:=json($json/clipData/s3Info)
   return
-  $json/clipData/(
+  $json/clipData/{|
+    {
+      "name":if ($name) then
+        $name
+      else
+        concat($json/publicationData/label,": ",title)
+    },
     if (sourcetype="live") then {
-      "name":$publ||": Livestream",
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-      "formats":xivid:m3u8-to-json((assets)()/src)
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]")
     } else {
-      "name":concat($publ,": ",title),
       "date":format-date(
         dateTime(publisheddate) + implicit-timezone(),
         "[D01]-[M01]-[Y]"
       ),
-      "duration":length * duration("PT1S") + time("00:00:00"),
+      "duration":length * duration("PT1S") + time("00:00:00")
+    },
+    {
       "formats":[
         xivid:m3u8-to-json(
-          (assets)()[mediatype="MP4_HLS"]/resolve-uri(src,$host)
+          (assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)
         ),
-        for $x at $i in (assets)()[mediatype!="MP4_HLS"]
+        for $x at $i in (assets)()[ends-with(src,"mp4")]
         order by $x/bandwidth
         count $i
         return
@@ -251,17 +254,20 @@ declare function xivid:bbvms($url as string,$publ as string) as object()? {
           "url":resolve-uri(src,$host)
         },
         {
-          "id":"pg-"||count((assets)()[mediatype!="MP4_HLS"]) + 1,
-          "format":"mp4[h264+aac]",
+          "id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,
+          "format":concat(
+            extract($orig/format/filename,".+\.(.+)",1),
+            if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"
+          ),
           "resolution":concat(originalWidth,"x",originalHeight),
           "bitrate":round(
-            tokenize($orig/bit_rate)[1] * 1024
+            tokenize($orig/format/bit_rate)[1] * 1024
           )||"kbps",
-          "url":$orig/filename
+          "url":$orig/format/filename
         }[url]
       ]
     }
-  )
+  |}
 };
 
 (:~
