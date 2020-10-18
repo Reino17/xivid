@@ -733,17 +733,18 @@ declare function xivid:ad($url as string) as object()? {
 };
 
 declare function xivid:lc($url as string) as object()? {
-  let $html:=x:request({
+  let $src:=x:request({
         "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
         "url":$url
       })/doc,
-      $id:=$html//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
+      $id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
   return
-  xivid:bbvms(
+  $src/xivid:bbvms(
     substring-before(
-      json($html//script/tokenize(.,",")[contains(.,$id)]),
+      json(//script/tokenize(.,",")[contains(.,$id)]),
       "html"
-    )||"js",
-    "LC"
+    )||"json",
+    //meta[@property="og:site_name"]/@content,
+    ()
   )
 };

@@ -8016,8 +8016,9 @@ declare function xivid:ad($url as string) as object()? {
 
 $ url=https://www.lc.nl/friesland/heerenveen/Alle-gratis-perenbomen-weggegeven-in-Friesland-25949273.html
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")'
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc ! (//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),//meta[@property="og:site_name"]/@content)'
 3892522
+Leeuwarder Courant
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -8041,12 +8042,12 @@ $ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""funct
 $ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return json(//script/tokenize(.,",")[contains(.,$id)]))'
 https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.html?inheritDimensions=true
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return substring-before(json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"js")'
-https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.js   # Blue Billywig
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return substring-before(json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json")'
+https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.json   # Blue Billywig
 
-$ xidel -s --module=xivid.xqm -e 'let $html:=x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc,$id:=$html//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return xivid:bbvms(substring-before(json($html//script/tokenize(.,",")[contains(.,$id)]),"html")||"js","LC")'
+$ xidel -s --module=xivid.xqm -e 'let $src:=x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc,$id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return $src/xivid:bbvms(substring-before(json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json",//meta[@property="og:site_name"]/@content,())'
 {
-  "name": "LC: Enorme belangstelling voor gratis perenbomen in Heerenveen",
+  "name": "Leeuwarder Courant: Enorme belangstelling voor gratis perenbomen in Heerenveen",
   "date": "22-08-2020",
   "duration": "00:01:42",
   "formats": [
@@ -8078,18 +8079,19 @@ $ xidel -s --module=xivid.xqm -e 'let $html:=x:request({"headers":"Cookie: ndc_c
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:lc($url as string) as object()? {
-  let $html:=x:request({
+  let $src:=x:request({
         "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
         "url":$url
       })/doc,
-      $id:=$html//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
+      $id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
   return
-  xivid:bbvms(
+  $src/xivid:bbvms(
     substring-before(
-      json($html//script/tokenize(.,",")[contains(.,$id)]),
+      json(//script/tokenize(.,",")[contains(.,$id)]),
       "html"
-    )||"js",
-    "LC"
+    )||"json",
+    //meta[@property="og:site_name"]/@content,
+    ()
   )
 };
 
