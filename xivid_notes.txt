@@ -2685,6 +2685,37 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://www.omroepzeeland.nl/media/bluebillywigplayeroptions/rtv/Tv/370236927.json   # Omroep Zeeland
+
+$ xidel -se 'json("'$url'")/clipData/(assets)()'
+{
+  [...]
+  "src": "/custom/getDownload?sourceid=370236927-Zeeland-Nu-04-10-2020-ZNB201002NG",
+  [...]
+}
+
+$ xidel -se 'json("'$url'")/resolve-uri(clipData/(assets)()[not(ends-with(src,"m3u8"))]/src,publicationData/defaultMediaAssetPath) ! (.,x:request({"method":"HEAD","url":.})/url)'
+https://omroepzeeland.bbvms.com/custom/getDownload?sourceid=370236927-Zeeland-Nu-04-10-2020-ZNB201002NG
+https://d3isaxd2t6q8zm.cloudfront.net/omroepzeeland/media/2020/10/04/Asset_HD_370236927-Zeeland-Nu-04-10-2020-ZNB201002NG.mp4
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/resolve-uri(defaultMediaAssetPath,$json/protocol),$orig:=json($json/clipData/s3Info) return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":.[length]/length * duration("PT1S") + time("00:00:00")},{"formats":[(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[not(ends-with(src,"m3u8"))] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host) ! (if (ends-with(.,"mp4")) then . else x:request({"method":"HEAD","url":.})/url)},{"id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]]}|}}; xivid:bbvms("'$url'",())'
+{
+  "name": "Omroep Zeeland: ",
+  "date": "04-10-2020",
+  "duration": null,
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "720x400",
+      "bitrate": "1200kbps",
+      "url": "https://d3isaxd2t6q8zm.cloudfront.net/omroepzeeland/media/2020/10/04/Asset_HD_370236927-Zeeland-Nu-04-10-2020-ZNB201002NG.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   let $json:=json($url),
       $host:=$json/publicationData/resolve-uri(
@@ -2730,7 +2761,7 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         ),
-        for $x at $i in (assets)()[ends-with(src,"mp4")]
+        for $x at $i in (assets)()[not(ends-with(src,"m3u8"))]
         order by $x/bandwidth
         count $i
         return
@@ -2739,10 +2770,15 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
           "format":"mp4[h264+aac]",
           "resolution":.[width]/concat(width,"x",height),
           "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
-          "url":resolve-uri(src,$host)
+          "url":resolve-uri(src,$host) ! (
+            if (ends-with(.,"mp4")) then
+              .
+            else
+              x:request({"method":"HEAD","url":.})/url
+          )
         },
         {
-          "id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,
+          "id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,
           "format":concat(
             extract($orig/format/filename,".+\.(.+)",1),
             if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"

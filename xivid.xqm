@@ -261,7 +261,7 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         ),
-        for $x at $i in (assets)()[ends-with(src,"mp4")]
+        for $x at $i in (assets)()[not(ends-with(src,"m3u8"))]
         order by $x/bandwidth
         count $i
         return
@@ -270,10 +270,15 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
           "format":"mp4[h264+aac]",
           "resolution":.[width]/concat(width,"x",height),
           "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
-          "url":resolve-uri(src,$host)
+          "url":resolve-uri(src,$host) ! (
+            if (ends-with(.,"mp4")) then
+              .
+            else
+              x:request({"method":"HEAD","url":.})/url
+          )
         },
         {
-          "id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,
+          "id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,
           "format":concat(
             extract($orig/format/filename,".+\.(.+)",1),
             if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"
