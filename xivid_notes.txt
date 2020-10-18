@@ -2615,6 +2615,76 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://omroepgelderland.bbvms.com/p/default/q/sourceid_string:SREGIOOG_43332.json   # Omroep Gelderland
+
+$ xidel -se 'json("'$url'")/(clipData,publicationData)'
+{
+  [...]
+  "length": null,
+  [...]
+  "assets": [
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "1601824877194122",
+      "status": "active",
+      "src": "/epg/prod/media/videos/8Y7vw33Qv4W.mp4",
+      "length": "",
+      "exactlength": "",
+      "width": "",
+      "height": "",
+      "bandwidth": "",
+      "jobdefid": "mp4_main-x-",
+      "jobqid": "mp4_main-x-"
+    }
+  ],
+  "hasJobs": false,
+  "subtitles": [
+    {
+      "languageid": "1541",
+      "languagename": "Nederlands",
+      "id": "63808",
+      "name": "",
+      "default": "true",
+      "isocode": "nl",
+      "status": "published"
+    }
+  ],
+  [...]
+}
+{
+  [...]
+  "baseurl": "https://omroepgelderland.bbvms.com",
+  [...]
+}
+
+$ xidel -se 'let $json:=json("'$url'") return $json/clipData/(subtitles)()/concat($json/publicationData/baseurl,"/subtitle/",id,".srt")'
+https://omroepgelderland.bbvms.com/subtitle/63808.srt
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$name as string?) as object()? {let $json:=json($url),$host:=$json/publicationData/resolve-uri(defaultMediaAssetPath,$json/protocol),$orig:=json($json/clipData/s3Info) return $json/clipData/{|{"name":if ($name) then $name else concat($json/publicationData/label,": ",title)},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":format-date(current-date(),"[D01]-[M01]-[Y]")} else {"date":format-date(dateTime(publisheddate) + implicit-timezone(),"[D01]-[M01]-[Y]"),"duration":.[length]/length * duration("PT1S") + time("00:00:00")},{"formats":[(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]]}|}}; xivid:bbvms("'$url'",())'
+{
+  "name": "Omroep Gelderland: GLD Nieuws",
+  "date": "04-10-2020",
+  "duration": null,
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "srt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://omroepgelderland.bbvms.com/subtitle/63808.srt"
+    },
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": null,
+      "bitrate": null,
+      "url": "https://d2od87akyl46nm.cloudfront.net/epg/prod/media/videos/8Y7vw33Qv4W.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms($url as string?,$name as string?) as object()? {
   let $json:=json($url),
       $host:=$json/publicationData/resolve-uri(
@@ -2645,6 +2715,18 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
     },
     {
       "formats":[
+        (subtitles)()/{
+          "id":"sub-1",
+          "format":"srt",
+          "language":isocode,
+          "label":languagename,
+          "url":concat(
+            $json/publicationData/baseurl,
+            "/subtitle/",
+            id,
+            ".srt"
+          )
+        },
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         ),
@@ -2655,8 +2737,8 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
         $x/{
           "id":"pg-"||$i,
           "format":"mp4[h264+aac]",
-          "resolution":concat(width,"x",height),
-          "bitrate":bandwidth||"kbps",
+          "resolution":.[width]/concat(width,"x",height),
+          "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
           "url":resolve-uri(src,$host)
         },
         {

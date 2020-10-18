@@ -246,6 +246,18 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
     },
     {
       "formats":[
+        (subtitles)()/{
+          "id":"sub-1",
+          "format":"srt",
+          "language":isocode,
+          "label":languagename,
+          "url":concat(
+            $json/publicationData/baseurl,
+            "/subtitle/",
+            id,
+            ".srt"
+          )
+        },
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         ),
@@ -256,8 +268,8 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
         $x/{
           "id":"pg-"||$i,
           "format":"mp4[h264+aac]",
-          "resolution":concat(width,"x",height),
-          "bitrate":bandwidth||"kbps",
+          "resolution":.[width]/concat(width,"x",height),
+          "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
           "url":resolve-uri(src,$host)
         },
         {
