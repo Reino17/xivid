@@ -230,7 +230,8 @@ declare function xivid:bbvms($url as string?,$name as string?) as object()? {
     },
     if (
       sourcetype="live" or
-      contains((assets)()[ends-with(src,"m3u8")]/src,"/live/")
+      contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or
+      ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")
     ) then {
       "date":format-date(current-date(),"[D01]-[M01]-[Y]")
     } else {
