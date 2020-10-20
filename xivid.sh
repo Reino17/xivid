@@ -90,80 +90,6 @@ nos() {
   ' --output-format=bash)"
 }
 
-regio() {
-  eval "$(xidel "$1" --xquery '
-    let $a:=doc(
-          parse-html(
-            //div[starts-with(@class,"inlinemedia")]/@data-accept
-          )//@src
-        ),
-        $b:=x:request({
-          "url":(
-            (.,$a)//@data-media-url,
-            //div[@class="bbwLive-player"]//@src,
-            resolve-uri(doc(//iframe/@src)//@src),
-            //div[@class="bbw bbwVideo"]/concat(
-              "https://l1.bbvms.com/p/video/c/",
-              @data-id,
-              ".json"
-            )
-          )
-        })/(
-          .[json]/json,
-          .[doc]/json(
-            extract(raw,"var opts = (.+);",1)
-          )
-        ),
-        $c:=$b/clipData/(assets)(1)[ends-with(src,"m3u8")]/(
-          if (starts-with(src,"//")) then
-            $b/protocol||substring-after(src,"//")
-          else
-            resolve-uri(src,$b/publicationData/defaultMediaAssetPath)
-        )
-    return
-    json:=if ($c) then {
-      "name":$b/publicationData/label||": Livestream",
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-      "formats":xivid:m3u8-to-json($c)
-    } else {
-      "name":concat(
-        $b/publicationData/label,
-        ": ",
-        normalize-space(
-          (
-            //div[@class="media-details"]/h3,
-            (.,$a)//div[@class="video-title"],
-            replace(//div[@class="overlay"]/h1,"(.+) -.+","$1")
-          )
-        )
-      ),
-      "date":format-date(
-        dateTime($b/clipData/publisheddate),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":$b/clipData/(
-        (assets)(1)/length,
-        length
-      )[.][1] * duration("PT1S") + time("00:00:00"),
-      "formats":[
-        for $x at $i in $b/clipData/(assets)()
-        order by $x/bandwidth
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":concat($x/width,"x",$x/height),
-          "bitrate":$x/bandwidth||"kbps",
-          "url":resolve-uri(
-            $x/src,
-            $b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//")
-          )
-        }
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 autojunk() {
   eval "$(xidel "$1" --xquery '
     let $a:=//div[@id="playerWrapper"]/script[1] return
@@ -765,16 +691,12 @@ elif [[ $url =~ rtlxl.nl|rtlnieuws.nl ]]; then
   eval "$(xidel -e 'json:=xivid:rtl("'$url'")' --output-format=bash)"
 elif [[ $url =~ kijk.nl ]]; then
   eval "$(xidel -e 'json:=xivid:kijk("'$url'")' --output-format=bash)"
-elif [[ $url =~ omropfryslan.nl ]]; then
-  eval "$(xidel -e 'json:=xivid:ofr("'$url'")' --output-format=bash)"
+elif [[ $url =~ (omropfryslan.nl|rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepwest.nl|rijnmond.nl|rtvutrecht.nl|omroepgelderland.nl|omroepzeeland.nl|omroepbrabant.nl|l1.nl) ]]; then
+  eval "$(xidel -e 'json:=xivid:regio("'$url'")' --output-format=bash)"
 elif [[ $url =~ (nhnieuws.nl|at5.nl) ]]; then
   eval "$(xidel -e 'json:=xivid:nhnieuws("'$url'")' --output-format=bash)"
 elif [[ $url =~ omroepflevoland.nl ]]; then
   eval "$(xidel -e 'json:=xivid:ofl("'$url'")' --output-format=bash)"
-elif [[ $url =~ rtvutrecht.nl ]]; then
-  eval "$(xidel -e 'json:=xivid:rtvu("'$url'")' --output-format=bash)"
-elif [[ $url =~ (rtvnoord.nl|rtvdrenthe.nl|rtvoost.nl|omroepgelderland.nl|omroepwest.nl|rijnmond.nl|omroepzeeland.nl|omroepbrabant.nl|l1.nl) ]]; then
-  regio "$url"
 elif [[ $url =~ dumpert.nl ]]; then
   eval "$(xidel -e 'json:=xivid:dumpert("'$url'")' --output-format=bash)"
 elif [[ $url =~ autojunk.nl ]]; then

@@ -512,17 +512,68 @@ declare function xivid:tvblik($url as string) as object()? {
     xivid:kijk("https://kijk.nl/video/"||$host[2])
 };
 
-declare function xivid:ofr($url as string) as object()? {
-  xivid:bbvms(
-    doc($url)/(
-      .//script[@async]/resolve-uri(@src,$url),
-      .//div[starts-with(@class,"bluebillywig")]/iframe/resolve-uri(
-        substring-before(@data-src,"html")||"js",
+declare function xivid:regio($url as string) as object()? {
+  let $src:=doc($url),
+      $script:=resolve-uri(
+        if ($url="https://www.omroepgelderland.nl/tv") then
+          extract(
+            unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),
+            "bbw_media_config_url = &apos;(.+)&apos;",1
+          )
+        else
+          $src/(
+            //@data-media-url,
+            //article/iframe/@src,
+            //div[
+              starts-with(@class,"bluebillywig") or
+              starts-with(@class,"customhtml") or
+              @class="bbwLive-player"
+            ]/script/@src,
+            //div[starts-with(@class,"inlinemedia")]/iframe/@src,
+            //div[starts-with(@class,"bluebillywig")]/iframe/@data-src,
+            json(
+              //script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]
+            )//file,
+            json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(
+              "https://omroepbrabant.bbvms.com/p/default/",
+              if (clip) then "c/"||clip else "q/sourceid_string:"||programId,
+              ".json"
+            ),
+            //div[@class="bbw bbwVideo"]/concat(
+              "https://limburg.bbvms.com/p/L1_video/c/",@data-id,".json"
+            )
+          ),
         $url
+      ),
+      $title:=$src/(
+        //div[@class="media-details"]/h3,
+        //div[@class="node-content-wrapper"]/header/normalize-space(h3),
+        //h1[@class="title-KX" and not(contains(text(),"live"))],
+        json(//script/substring-after(.,"var msTag = ")[.])/data/(content)()
       )
-    ),
-    "Omrop Fryslân"
-  )
+  return
+  if (ends-with($script,"mp4")) then
+    {
+      "name":$src/concat(
+        //meta[@name="publisher"]/@content,
+        ": ",
+        //form[@name="quick_menu2"]//option[@selected]
+      ),
+      "date":replace($script,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
+      "formats":[
+        {
+          "id":"pg-1",
+          "format":"mp4[h264+aac]",
+          "url":x:request({"method":"HEAD","url":$script})/url
+        }
+      ]
+    }
+  else
+    xivid:bbvms(
+      extract($script,".+\.")||"json",
+      $src//meta[@name="publisher" or @property="og:site_name"]/@content,
+      if ($title) then $title else "Livestream"
+    )
 };
 
 declare function xivid:nhnieuws($url as string) as object()? {
@@ -586,42 +637,6 @@ declare function xivid:ofl($url as string) as object()? {
       ]
     }
   )
-};
-
-declare function xivid:rtvu($url as string) as object()? {
-  let $html:=doc($url),
-      $vid:=x:request({
-        "url":json(
-          $html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]
-        )//file,
-        "method":"HEAD"
-      }[url])/url
-  return
-  if ($vid) then {
-    "name":"RTV Utrecht: "||substring-before(
-      normalize-space($html//h3[@class="article-title"]),
-      " -"
-    ),
-    "date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
-    "formats":[
-      {
-        "id":"pg-1",
-        "format":"mp4[h264+aac]",
-        "url":$vid
-      }
-    ]
-  }
-  else
-    xivid:bbvms(
-      $html/(
-        //iframe/concat(
-          substring-before(@src,"html"),
-          "js"
-        ),
-        //script[@async="true"]/@src[1]
-      ),
-      "RTV Utrecht"
-    )
 };
 
 declare function xivid:dumpert($url as string) {

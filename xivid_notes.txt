@@ -6241,16 +6241,41 @@ https://media.dumpert.nl/tablet/_9bfd3dc6_YTDL_1.mp4.mp4.mp4
 
 ================================================================================================
 
-[omrop fryslân]
+[Regionale zenders]
 
-$ url=https://www.omropfryslan.nl/live/omrop-fryslan-tv
+Blue Billywig livestreams:
 
-$ xidel -se 'doc("'$url'")//script[@async] ! (@src,static-base-uri(),resolve-uri(@src))'
+$ xidel -se '
+  doc("https://www.omropfryslan.nl/live/omrop-fryslan-tv")//div[starts-with(@class,"bluebillywig")]/script/@src,
+  doc("https://www.rtvnoord.nl/televisie")//@data-media-url,
+  doc("https://www.rtvdrenthe.nl/tv")//@data-media-url,
+  doc("https://www.rtvoost.nl/tv")//@data-media-url,
+  doc("https://www.omroepwest.nl/tv")//@data-media-url,
+  doc("https://www.rijnmond.nl/tv")//div[starts-with(@class,"customhtml")]/script/@src,
+  doc("https://www.rtvutrecht.nl/live/rtvutrecht")//article/iframe/@src,
+  doc("https://www.omroepzeeland.nl/livetv")//div[starts-with(@class,"inlinemedia")]/iframe/@src,
+  doc("https://www.omroepbrabant.nl/tv")/json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(
+    "https://omroepbrabant.bbvms.com/p/default/c/",clip,".json"
+  ),
+  doc("https://l1.nl/live-l1-tv")//div[@class="bbwLive-player"]/script/@src
+'
+//omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
+/media/bluebillywigplayeroptions/static/Tv.json
+/media/bluebillywigplayeroptions/static/Tv.json
+/media/bluebillywigplayeroptions/static/Tv.json
+//omroepwest.bbvms.com/p/regiogrid/c/2054317.js
+https://rijnmond.bbvms.com/p/rijnmond_live/c/1227908.js
+https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3742011.html?inheritDimensions=true
+https://omroepzeeland.bbvms.com/p/regiogridautoplay/l/1491828714434033.html
+https://omroepbrabant.bbvms.com/p/default/c/1080520.json
+//l1.bbvms.com/p/video_autoplay/c/3247576.js
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se 'doc("https://www.omropfryslan.nl/live/omrop-fryslan-tv")//div[starts-with(@class,"bluebillywig")]/script ! (@src,static-base-uri(),resolve-uri(@src))'
 //omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true
 https://www.omropfryslan.nl/live/omrop-fryslan-tv
 https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPlay=0&callback=bbwloaded&supportIABConsent=true   # Blue Billywig
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 https://www.w3.org/TR/xpath-functions-31/#func-resolve-uri:
 
@@ -6265,7 +6290,7 @@ static-base-uri() hier boven staat gelijk aan $url, maar hier...
 module namespace local = "127.0.0.1";
 
 declare function local:test($url) {
-  doc($url)//script[@async] ! (
+  doc($url)//div[starts-with(@class,"bluebillywig")]/script ! (
     @src,
     static-base-uri(),
     resolve-uri(@src),
@@ -6285,870 +6310,354 @@ https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.js?autoPl
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --module=xivid.xqm -e 'xivid:bbvms(doc("'$url'")//script[@async]/resolve-uri(@src),"Omrop Fryslân")'
-{
-  "name": "Omrop Fryslân: Livestream",
-  "date": "15-09-2020",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "426x240@25fps",
-      "bitrate": "637kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/270p/prog_index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720@25fps",
-      "bitrate": "2419kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/720p/prog_index.m3u8"
-    }
-  ]
-}
+https://www.omroepgelderland.nl/tv
 
-------------------------------------------------------------------------------------------------
+$ xidel -s --xquery 'extract(unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),"bbw_media_config_url = &apos;(.+)&apos;",1)'
+https://omroepgelderland.bbvms.com/p/default/c/3651657.json
 
-$ url=https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-14-septimber-2020-1700
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -se 'doc("'$url'")//div[starts-with(@class,"bluebillywig")]/iframe/(string(@data-src),resolve-uri(substring-before(@data-src,"html")||"js"))'
-//omropfryslan.bbvms.com/p/omropfryslan_video/c/3909754.html
-https://omropfryslan.bbvms.com/p/omropfryslan_video/c/3909754.js
-
-$ xidel -s --module=xivid.xqm -e 'xivid:bbvms(doc("'$url'")/(.//script[@async]/resolve-uri(@src),.//div[starts-with(@class,"bluebillywig")]/iframe/resolve-uri(substring-before(@data-src,"html")||"js")),"Omrop Fryslân")'
-{
-  "name": "Omrop Fryslân: FRYSLANHJOED_2020-09-14",
-  "date": "14-09-2020",
-  "duration": "00:10:26",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "480x272",
-      "bitrate": "525kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2020/09/14/Asset_iPOD_FRYSLANHJOED_2020-09-14.mp4"
-    },
-    [...]
-    {
-      "id": "pg-3",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "6150kbps",
-      "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2020/09/14/Asset_HD_FRYSLANHJOED_2020-09-14.mp4"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-declare function xivid:ofr($url as string) as object()? {
-  xivid:bbvms(
-    doc($url)/(
-      .//script[@async]/resolve-uri(@src,$url),
-      .//div[starts-with(@class,"bluebillywig")]/iframe/resolve-uri(
-        substring-before(@data-src,"html")||"js",
-        $url
-      )
-    ),
-    "Omrop Fryslân"
+$ xidel -s --xquery '
+  for $x in (
+    "https://www.omropfryslan.nl/live/omrop-fryslan-tv",
+    "https://www.rtvnoord.nl/televisie",
+    "https://www.rtvdrenthe.nl/tv",
+    "https://www.rtvoost.nl/tv",
+    "https://www.omroepwest.nl/tv",
+    "https://www.rijnmond.nl/tv",
+    "https://www.rtvutrecht.nl/live/rtvutrecht",
+    "https://www.omroepgelderland.nl/tv",
+    "https://www.omroepzeeland.nl/livetv",
+    "https://www.omroepbrabant.nl/tv",
+    "https://l1.nl/live-l1-tv"
+  ) return
+  doc($x)/concat(
+    resolve-uri(
+      if ($x="https://www.omroepgelderland.nl/tv") then
+        extract(
+          unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),
+          "bbw_media_config_url = &apos;(.+)&apos;",1
+        )
+      else (
+        //@data-media-url,                                                  (: RTV- Noord, Drenthe, Oost en Omroep West :)
+        //article/iframe/@src,                                              (: RTV Utrecht :)
+        //div[
+          starts-with(@class,"bluebillywig") or                             (: Omrop Fryslân :)
+          starts-with(@class,"customhtml") or                               (: Rijnmond :)
+          @class="bbwLive-player"                                           (: L1 :)
+        ]/script/@src,
+        //div[starts-with(@class,"inlinemedia")]/iframe/@src,               (: Omroep Zeeland :)
+        json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(   (: Omroep Brabant :)
+          "https://omroepbrabant.bbvms.com/p/default/c/",clip,".json"
+        )
+      ),
+      $x
+    ) ! extract(.,".+\.")||"json",
+    " - ",
+    //meta[@name="publisher" or @property="og:site_name"]/@content
   )
-};
-
-================================================================================================
-
-[rtv noord, drenthe, oost, omroep gelderland, omroep west, rtv rijnmond, omroep zeeland, omroep brabant en l1]
-
-https://www.rtvnoord.nl/televisie
-
-$ xidel -s "https://www.rtvnoord.nl/televisie" -e '//@data-media-url'
-/media/bluebillywigplayeroptions/static/Tv.json
-
-$ xidel -s "https://www.rtvnoord.nl/televisie" -e 'let $a:=json(resolve-uri(//@data-media-url)) return $a/(clipData/(assets)()/src,publicationData/defaultMediaAssetPath)'
-/live/rtvnoord/tv/index.m3u8
-https://media.rtvnoord.nl
-
-$ xidel -s --module=xivid.xqm "https://www.rtvnoord.nl/televisie" -e 'let $a:=json(resolve-uri(//@data-media-url)),$b:=$a/resolve-uri(clipData/(assets)()/src,publicationData/defaultMediaAssetPath) return {"name":$a/publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($b)}'
-{
-  "name": "RTV Noord: Livestream",
-  "date": "02-08-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "627kbps",
-      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/6a46cbb2-57ee-4192-b55a-de7b4575b19b/index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "6096kbps",
-      "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/3e8fe3c1-0868-49b0-b2f3-7dd6eb30651f/index.m3u8"
-    }
-  ]
-}
-
-https://www.rtvdrenthe.nl/tv
-
-$ xidel -s --module=xivid.xqm "https://www.rtvdrenthe.nl/tv" -e '[...]'
-{
-  "name": "RTV Drenthe: Livestream",
-  "date": "02-08-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "640x360@25fps",
-      "bitrate": "1192kbps",
-      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/360p/prog_index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080@25fps",
-      "bitrate": "5192kbps",
-      "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/1080p/prog_index.m3u8"
-    }
-  ]
-}
-
-https://www.rtvoost.nl/tv
-
-$ xidel -s "https://www.rtvoost.nl/tv" -e 'let $a:=json(resolve-uri(//@data-media-url)) return $a/resolve-uri(clipData/(assets)()/src,publicationData/defaultMediaAssetPath)'
-https://streams.rtvoost.nl/video/tv/hls.m3u8
-
-$ xidel -s --module=xivid.xqm "https://www.rtvoost.nl/tv" -e 'let $a:=json(resolve-uri(//@data-media-url)) return {"name":$a/publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/resolve-uri(clipData/(assets)()/src,publicationData/defaultMediaAssetPath))}'
-{
-  "name": "RTV Oost: Livestream",
-  "date": "14-04-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "416x234",
-      "bitrate": "613kbps",
-      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/e8a15a5f-a530-432e-a025-6dffc1426309/index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2566kbps",
-      "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/46ce631a-6155-4fcc-ac24-2b2e252f4f94/index.m3u8"
-    }
-  ]
-}
-
-https://www.omroepgelderland.nl/tvx # Via Google gevonden. Kopje "Live TV" verwijst vreemd genoeg https://www.omroepgelderland.nl/tv.
-
-$ xidel -s --module=xivid.xqm "https://www.omroepgelderland.nl/tvx" -e '[...]'
-{
-  "name": "Omroep Gelderland: Livestream",
-  "date": "28-04-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/304370bd56340c8246aab2abb5868726/sz/omroepgelderland/wowza4/live/livetv/playlist.m3u8?token=nw0E8DqmVNvMagzw-3fIQg&time=1556673255"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2633kbps",
-      "url": "https://ngx.cr6.streamzilla.xlcdn.com/session/304370bd56340c8246aab2abb5868726/sz/omroepgelderland/wowza4/live/livetv/chunklist.m3u8"
-    }
-  ]
-}
-
-https://www.omroepwest.nl/tv
-
-$ xidel -s "https://www.omroepwest.nl/tv" -e '//@data-media-url'
-//omroepwest.bbvms.com/p/regiogrid/c/2054317.js
-
-$ xidel -s "https://www.omroepwest.nl/tv" -e 'let $a:=//@data-media-url,$b:=json(if (ends-with($a,"json")) then resolve-uri($a) else extract(unparsed-text($a),"var opts = (.+);",1)) return $b/clipData/(assets)()'
-{
-  "mediatype": "MP4_MAIN",
-  "id": "1347006347173657",
-  "status": "active",
-  "src": "//d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8",
-  "length": "",
-  "exactlength": "",
-  "width": "671",
-  "height": "377",
-  "bandwidth": "800"
-}
-{
-  "mediatype": "MP4_IPOD",
-  "id": "1347007455980753",
-  "status": "active",
-  "src": "//d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_mobile/playlist.m3u8",
-  "length": "",
-  "exactlength": "",
-  "width": "480",
-  "height": "270",
-  "bandwidth": "400"
-}
-
-$ xidel -s "https://www.omroepwest.nl/tv" -e 'let $a:=//@data-media-url,$b:=json(if (ends-with($a,"json")) then resolve-uri($a) else extract(unparsed-text($a),"var opts = (.+);",1)) return $b/(protocol,clipData/(assets)(1)/src)'
-https://
-//d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8
-
-$ xidel -s "https://www.omroepwest.nl/tv" -e 'let $a:=x:request({"url"://@data-media-url})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return $a/clipData/(assets)(1)/(if (starts-with(src,"//")) then $a/protocol||substring-after(src,"//") else resolve-uri(src,$a/publicationData/defaultMediaAssetPath))'
-https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8
-
-$ xidel -s --module=xivid.xqm "https://www.omroepwest.nl/tv" -e 'let $a:=x:request({"url"://@data-media-url})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":$a/publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/clipData/(assets)(1)/(if (starts-with(src,"//")) then $a/protocol||substring-after(src,"//") else resolve-uri(src,$a/publicationData/defaultMediaAssetPath)))}'
-{
-  "name": "Omroep West: Livestream",
-  "date": "22-04-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/playlist.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "712x400",
-      "bitrate": "571kbps",
-      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b531072.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "4227kbps",
-      "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b4227072.m3u8"
-    }
-  ]
-}
-
-https://www.rijnmond.nl/tv
-
-$ xidel -s --module=xivid.xqm "https://www.rijnmond.nl/tv" -e '[...]'
-{
-  "name": "RTV Rijnmond: Livestream",
-  "date": "02-08-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "142kbps",
-      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/1563277487-au-index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3817kbps",
-      "url": "https://d3r4bk4fg0k2xi.cloudfront.net/rijnmondTv/1563277487-faster-1920-1080-3500000-index.m3u8"
-    }
-  ]
-}
-
-https://www.omroepzeeland.nl/livetv
-
-$ xidel -s "https://www.omroepzeeland.nl/livetv" -e 'outer-html(//iframe)'
-<iframe src="https://omroepzeeland.bbvms.com/p/regiogridautoplay/l/1491828714434033.html" style="width:100%;" frameborder="0" allowfullscreen="true"></iframe>
-
-$ xidel -s "https://www.omroepzeeland.nl/livetv" -f '//iframe/@src' -e '//@src'
-/p/regiogridautoplay/l/1491828714434033.js?dummy=
-
-$ xidel -s --module=xivid.xqm "https://www.omroepzeeland.nl/livetv" -e 'let $a:=x:request({"url":(//@data-media-url,resolve-uri(doc(//iframe/@src)//@src))})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":$a/publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/clipData/(assets)(1)/(if (starts-with(src,"//")) then $a/protocol||substring-after(src,"//") else resolve-uri(src,$a/publicationData/defaultMediaAssetPath)))}'
-{
-  "name": "Omroep Zeeland: Livestream",
-  "date": "04-05-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d3isaxd2t6q8zm.cloudfront.net/live/omroepzeeland/tv/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "142kbps",
-      "url": "https://d3isaxd2t6q8zm.cloudfront.net/live/omroepzeeland/tv/1550416322-au-index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "5917kbps",
-      "url": "https://d3isaxd2t6q8zm.cloudfront.net/live/omroepzeeland/tv/1550416322-fast-1920-1080-5500000-index.m3u8"
-    }
-  ]
-}
-
-https://www.omroepbrabant.nl/tv
-
-$ xidel -s --module=xivid.xqm "https://www.omroepbrabant.nl/tv" -e '[...]'
-{
-  "name": "Omroep Brabant: Livestream",
-  "date": "05-05-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d3slqp9xhts6qb.cloudfront.net/live/omroepbrabant/tv/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "142kbps",
-      "url": "https://d3slqp9xhts6qb.cloudfront.net/live/omroepbrabant/tv/1556267641-au-index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-5",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3030kbps",
-      "url": "https://d3slqp9xhts6qb.cloudfront.net/live/omroepbrabant/tv/1556267641-fast-1920-1080-2750000-index.m3u8"
-    }
-  ]
-}
-
-https://l1.nl/live-l1-tv
-
-$ xidel -s "https://l1.nl/live-l1-tv" -e '//div[@class="bbwLive-player"]//@src'
-//l1.bbvms.com/p/video_autoplay/c/3247576.js
-
-$ xidel -s --module=xivid.xqm "https://l1.nl/live-l1-tv" -e 'let $a:=x:request({"url":(//@data-media-url,//div[@class="bbwLive-player"]//@src,resolve-uri(doc(//iframe/@src)//@src))})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":$a/publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($a/clipData/(assets)(1)/(if (starts-with(src,"//")) then $a/protocol||substring-after(src,"//") else resolve-uri(src,$a/publicationData/defaultMediaAssetPath)))}'
-{
-  "name": "L1: Livestream",
-  "date": "05-05-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/live/l1/tv/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "142kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/live/l1/tv/1553845279-au-index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "3817kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/live/l1/tv/1553845279-fast-1280-720-3500000-index.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811
-
-$ xidel -s "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/22811" -e 'let $a:=x:request({"url"://@data-media-url})/json return {"name":concat($a/publicationData/label,": ",//div[@class="media-details"]/h3),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$a/resolve-uri(clipData/(assets)()/src,publicationData/defaultMediaAssetPath)}]}'
-{
-  "name": "RTV Noord: Noord Vandaag",
-  "date": "29-03-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://media.rtvnoord.nl/video/2019/190329/190329_NVREC_XHQ.mp4"
-    }
-  ]
-}
-
-https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/42540
-
-$ xidel -s "https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/42540" -e '[...]'
-{
-  "name": "RTV Drenthe: Drenthe Nu",
-  "date": "31-03-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://av.rtvdrenthe.nl/media/drnl20190331-hhuitz.mp4"
-    }
-  ]
-}
-
-https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk
-
-$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e 'outer-html(//div[@class="video-title"])'
-<div class="video-title">
-                                Eerlijke wol uit Vries
-                        </div>
-
-$ xidel -s "https://www.rtvdrenthe.nl/nieuws/145732/Ondernemen-in-Drenthe-Duurzaam-handwerken-bij-Wol-zo-eerlijk" -e 'let $a:=x:request({"url"://@data-media-url})/json return {"name":concat($a/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,//div[@class="video-title"]))),"date":format-date(dateTime($a/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$a/resolve-uri(clipData/(assets)()/src,publicationData/defaultMediaAssetPath)}]}'
-{
-  "name": "RTV Drenthe: Eerlijke wol uit Vries",
-  "date": "31-03-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://av.rtvdrenthe.nl/media/nws20190331-ondernemen_in_drenthe_website_0002.mp4"
-    }
-  ]
-}
-
-https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428
-
-$ xidel -s "https://www.rtvoost.nl/tv/programma/63/Overijssel-Vandaag/aflevering/503428" -e '[...]'
-{
-  "name": "RTV Oost: Overijssel Vandaag",
-  "date": "13-04-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://tvarchief.rtvoost.nl/hi/503428.mp4"
-    }
-  ]
-}
-
-https://www.omroepgelderland.nl/tv/programma/232488309/GLD-Nieuws/aflevering/39012
-
-$ xidel -s "https://www.omroepgelderland.nl/tv/programma/232488309/GLD-Nieuws/aflevering/39012" -e '[...]'
-{
-  "name": "Omroep Gelderland: GLD Nieuws",
-  "date": "28-04-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://d2od87akyl46nm.cloudfront.net/epg/prod/media/videos/JkevaDM7lXm.mp4"
-    }
-  ]
-}
-
-https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders
-
-$ xidel -s "https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders" -e '//div[starts-with(@class,"inlinemedia")]/@data-accept'
-<iframe src="/media/player/30018" style="width:100%;" frameborder="0" allowfullscreen="true"></iframe>
-
-$ xidel -s "https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders" -f 'parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src' -e 'outer-html(//div[@class="video-title"])'
-<div class="video-title">
-                                Feestvierders geschept Doetinchem
-                        </div>
-
-$ xidel -s "https://www.omroepgelderland.nl/nieuws/2407417/UPDATE-Dramatisch-einde-Koningsdagfeest-Doetinchem-auto-schept-feestvierders" -e 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":(.,$a)//@data-media-url})/json return {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"]))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$b/resolve-uri(clipData/(assets)()/src,publicationData/defaultMediaAssetPath)}]}'
-{
-  "name": "Omroep Gelderland: Feestvierders geschept Doetinchem",
-  "date": "28-04-2019",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://d2od87akyl46nm.cloudfront.net/items/video/2019/04/Feestgangers_geschept_WEB.mp4"
-    }
-  ]
-}
-
-https://www.omroepwest.nl/tv/programma/170000115/TV-West-Nieuws/aflevering/170285899
-
-$ xidel -s "https://www.omroepwest.nl/tv/programma/170000115/TV-West-Nieuws/aflevering/170285899" --xquery 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":(.,$a)//@data-media-url})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"]))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":$b/clipData/(assets)(1)/length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $b/clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,$b/publicationData/defaultMediaAssetPath)}]}'
-{
-  "name": "Omroep West: TV West Nieuws",
-  "date": "19-04-2019",
-  "duration": "00:16:55",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "512x288",
-      "bitrate": "300kbps",
-      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/19/170285899_300.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "1024x576",
-      "bitrate": "1000kbps",
-      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/19/170285899_1000.mp4"
-    },
-    {
-      "id": "pg-3",
-      "format": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2000kbps",
-      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/19/170285899_2000.mp4"
-    }
-  ]
-}
-
-https://www.omroepwest.nl/nieuws/3825225/Files-naar-Keukenhof-Het-is-het-allemaal-waard
-
-$ xidel -s "https://www.omroepwest.nl/nieuws/3825225/Files-naar-Keukenhof-Het-is-het-allemaal-waard" --xquery '[...]'
-{
-  "name": "Omroep West: Keukenhof: 'Kies een andere dag voor een bezoek aan het park'",
-  "date": "21-04-2019",
-  "duration": "00:01:44",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "512x288",
-      "bitrate": "300kbps",
-      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/21/3825182_300.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "1024x576",
-      "bitrate": "1000kbps",
-      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/21/3825182_1000.mp4"
-    },
-    {
-      "id": "pg-3",
-      "format": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2000kbps",
-      "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2019/04/21/3825182_2000.mp4"
-    }
-  ]
-}
-
-https://www.rijnmond.nl/tv/programma/27/Rijnmond-Nieuws/aflevering/16972
-
-$ xidel -s "https://www.rijnmond.nl/tv/programma/27/Rijnmond-Nieuws/aflevering/16972" --xquery 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":(.,$a)//@data-media-url})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"]))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":$b/clipData/(assets)(1)/length * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $b/clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,$b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//"))}]}'
-{
-  "name": "RTV Rijnmond: Rijnmond Nieuws",
-  "date": "26-04-2019",
-  "duration": "00:13:52",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "600kbps",
-      "url": "https://dcur8bjarl5c2.cloudfront.net/2019/video/nwsvr260419_vlq.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3603kbps",
-      "url": "https://dcur8bjarl5c2.cloudfront.net/rijnmond/media/2019/04/26/3300832.mp4"
-    }
-  ]
-}
-
-https://www.rijnmond.nl/nieuws/181081/Koningsdag-in-Maassluis-hoofd-schouder-knie-en-teen-als-opwarmer-van-de-aubade
-
-$ xidel -s "https://www.rijnmond.nl/nieuws/181081/Koningsdag-in-Maassluis-hoofd-schouder-knie-en-teen-als-opwarmer-van-de-aubade" --xquery '[...]'
-{
-  "name": "RTV Rijnmond: Koningsdag in Maassluis: tompoezen, de aubade en de vrijmarkt",
-  "date": "27-04-2019",
-  "duration": "00:03:25",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "600kbps",
-      "url": "https://dcur8bjarl5c2.cloudfront.net/2019/video/nmaassluis28_04_19_T_AA3E6C56FE0CFFA6C12583E90031D6DB_vlq.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3607kbps",
-      "url": "https://dcur8bjarl5c2.cloudfront.net/upload/rijnmond/nmaassluis28_04_19_T_AA3E6C56FE0CFFA6C12583E90031D6DB.mp4"
-    }
-  ]
-}
-
-https://www.omroepzeeland.nl/tv/programma/370059803/Zeeland-Nu/aflevering/370182368
-
-$ xidel -s "https://www.omroepzeeland.nl/tv/programma/370059803/Zeeland-Nu/aflevering/370182368" --xquery 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":(.,$a)//@data-media-url})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"]))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":$b/clipData/((assets)(1)/length,length)[.] * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $b/clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,$b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//"))}]}'
-{
-  "name": "Omroep Zeeland: Zeeland Nu",
-  "date": "02-05-2019",
-  "duration": "00:13:35",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "480x272",
-      "bitrate": "400kbps",
-      "url": "https://d2axgm87evfsmi.cloudfront.net/omroepzeeland/media/2019/05/02/Asset_iPOD_370182368-Zeeland-Nu-02-05-2019-ZNB190502CT.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "720x400",
-      "bitrate": "1000kbps",
-      "url": "https://d2axgm87evfsmi.cloudfront.net/omroepzeeland/media/2019/05/02/Asset_SD_370182368-Zeeland-Nu-02-05-2019-ZNB190502CT.mp4"
-    },
-    {
-      "id": "pg-3",
-      "format": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2000kbps",
-      "url": "https://d2axgm87evfsmi.cloudfront.net/omroepzeeland/media/2019/05/02/Asset_HD_370182368-Zeeland-Nu-02-05-2019-ZNB190502CT.mp4"
-    }
-  ]
-}
-
-https://www.omroepzeeland.nl/nieuws/112666/Ellende-met-buxusrupsen-Traantjes-drogen-en-opnieuw-beginnen
-
-$ xidel -s "https://www.omroepzeeland.nl/nieuws/112666/Ellende-met-buxusrupsen-Traantjes-drogen-en-opnieuw-beginnen" --xquery '[...]'
-{
-  "name": "Omroep Zeeland: De buxusrups is weer terug",
-  "date": "02-05-2019",
-  "duration": "00:00:29",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "480x272",
-      "bitrate": "400kbps",
-      "url": "https://d2axgm87evfsmi.cloudfront.net/omroepzeeland/media/2019/05/02/Asset_iPOD_Buxusrups-ZNO190502HO.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "720x400",
-      "bitrate": "1000kbps",
-      "url": "https://d2axgm87evfsmi.cloudfront.net/omroepzeeland/media/2019/05/02/Asset_SD_Buxusrups-ZNO190502HO.mp4"
-    },
-    {
-      "id": "pg-3",
-      "format": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "2000kbps",
-      "url": "https://d2axgm87evfsmi.cloudfront.net/omroepzeeland/media/2019/05/02/Asset_HD_Buxusrups-ZNO190502HO.mp4"
-    }
-  ]
-}
-
-https://www.omroepbrabant.nl/tv/programma/252/Brabant-Nieuws/aflevering/2932581
-
-$ xidel -s "https://www.omroepbrabant.nl/tv/programma/252/Brabant-Nieuws/aflevering/2932581" --xquery 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":(.,$a)//@data-media-url})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"]))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":$b/clipData/((assets)(1)/length,length)[.][1] * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $b/clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,$b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//"))}]}'
-{
-  "name": "Omroep Brabant: Brabant Nieuws",
-  "date": "04-05-2019",
-  "duration": "00:09:55",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "512x288",
-      "bitrate": "500kbps",
-      "url": "https://d1ctz4dshc0ubt.cloudfront.net/omroepbrabant/2019/video/2932581_ulq.mp4"
-    },
-    [...]
-    {
-      "id": "pg-6",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3500kbps",
-      "url": "https://d1ctz4dshc0ubt.cloudfront.net/omroepbrabant/2019/video/2932581_ehq.mp4"
-    }
-  ]
-}
-
-https://www.omroepbrabant.nl/nieuws/2992614/Wat-zeggen-peilingen-echt-over-de-kansen-van-Duncan-Laurence-op-het-Eurovisie-Songfestival-VIDEO
-
-$ xidel -s "https://www.omroepbrabant.nl/nieuws/2992614/Wat-zeggen-peilingen-echt-over-de-kansen-van-Duncan-Laurence-op-het-Eurovisie-Songfestival-VIDEO" --xquery '[...]'
-{
-  "name": "Omroep Brabant: Zo belangrijk zijn de peilingen van het Songfestival voor Duncan Laurence.",
-  "date": "03-05-2019",
-  "duration": "00:04:03",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "512x288",
-      "bitrate": "500kbps",
-      "url": "https://d1ctz4dshc0ubt.cloudfront.net/omroepbrabant/2019/video/2992318_ulq.mp4"
-    },
-    [...]
-    {
-      "id": "pg-6",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3500kbps",
-      "url": "https://d1ctz4dshc0ubt.cloudfront.net/omroepbrabant/2019/video/2992318_ehq.mp4"
-    }
-  ]
-}
-
-https://l1.nl/l1mburg-centraal-4-mei-2019-149530
-
-$ xidel -s "https://l1.nl/l1mburg-centraal-4-mei-2019-149530" -e 'outer-html(//div[@class="bbw bbwVideo"])'
-<div class="bbw bbwVideo" data-id="3305749" data-playout="video" style="background-image:url('/img-cache/remote/bbw/3305749-1557041501.49e9508d.jpg');"> <div class="bbwVideo__inner icon-pointer-right"></div> </div>
-
-$ xidel -s "https://l1.nl/l1mburg-centraal-4-mei-2019-149530" -e 'concat("https://l1.bbvms.com/p/video/c/",//div[@class="bbw bbwVideo"]/@data-id,".json")'
-https://l1.bbvms.com/p/video/c/3305749.json
-
-$ xidel -s "https://l1.nl/l1mburg-centraal-4-mei-2019-149530" --xquery 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":((.,$a)//@data-media-url,//div[@class="bbw bbwVideo"]/concat("https://l1.bbvms.com/p/video/c/",@data-id,".json"))})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))) return {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"],replace(//div[@class="overlay"]/h1,"(.+) -.+","$1")))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":$b/clipData/((assets)(1)/length,length)[.][1] * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $b/clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,$b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//"))}]}'
-{
-  "name": "L1: L1mburg Centraal",
-  "date": "05-05-2019",
-  "duration": "00:24:18",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "1000kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/video/20190504-192817-360p.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "3500kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/video/20190504-192817-720p.mp4"
-    }
-  ]
-}
-
-https://l1.nl/de-l1mbo-top-100-tip-van-rian-149539
-
-$ xidel -s "https://l1.nl/de-l1mbo-top-100-tip-van-rian-149539/" --xquery '[...]'
-{
-  "name": "L1: De L1mbo Top 100 stemtip van Rian",
-  "date": "05-05-2019",
-  "duration": "00:00:32",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "1000kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/video/20190505-115121-360p.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "3500kbps",
-      "url": "https://d34pj260kw1xmk.cloudfront.net/video/20190505-115121-720p.mp4"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-Eén query voor beide videostreams:
-
-$ xidel -s --module=xivid.xqm "https://l1.nl/de-l1mbo-top-100-tip-van-rian-149539" --xquery 'let $a:=doc(parse-html(//div[starts-with(@class,"inlinemedia")]/@data-accept)//@src),$b:=x:request({"url":((.,$a)//@data-media-url,//div[@class="bbwLive-player"]//@src,resolve-uri(doc(//iframe/@src)//@src),//div[@class="bbw bbwVideo"]/concat("https://l1.bbvms.com/p/video/c/",@data-id,".json"))})/(.[json]/json,.[doc]/json(extract(raw,"var opts = (.+);",1))),$c:=$b/clipData/(assets)(1)[ends-with(src,"m3u8")]/(if (starts-with(src,"//")) then $b/protocol||substring-after(src,"//") else resolve-uri(src,$b/publicationData/defaultMediaAssetPath)) return if ($c) then {"name":$b/publicationData/label||": Livestream","date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json($c)} else {"name":concat($b/publicationData/label,": ",normalize-space((//div[@class="media-details"]/h3,(.,$a)//div[@class="video-title"],replace(//div[@class="overlay"]/h1,"(.+) -.+","$1")))),"date":format-date(dateTime($b/clipData/publisheddate),"[D01]-[M01]-[Y]"),"duration":$b/clipData/((assets)(1)/length,length)[.][1] * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in $b/clipData/(assets)() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":resolve-uri($x/src,$b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//"))}]}'
-
-------------------------------------------------------------------------------------------------
-
---xquery '
-  let $a:=doc(
-        parse-html(
-          //div[starts-with(@class,"inlinemedia")]/@data-accept
-        )//@src
-      ),
-      $b:=x:request({
-        "url":(
-          (.,$a)//@data-media-url,
-          //div[@class="bbwLive-player"]//@src,
-          resolve-uri(doc(//iframe/@src)//@src),
-          //div[@class="bbw bbwVideo"]/concat(
-            "https://l1.bbvms.com/p/video/c/",
-            @data-id,
-            ".json"
+'
+https://omropfryslan.bbvms.com/p/omrop_frysl_n_live_stream_4/c/3748627.json - Omrop Fryslân
+https://www.rtvnoord.nl/media/bluebillywigplayeroptions/static/Tv.json - RTV Noord
+https://www.rtvdrenthe.nl/media/bluebillywigplayeroptions/static/Tv.json - RTV Drenthe
+https://www.rtvoost.nl/media/bluebillywigplayeroptions/static/Tv.json - RTV Oost
+https://omroepwest.bbvms.com/p/regiogrid/c/2054317.json - Omroep West
+https://rijnmond.bbvms.com/p/rijnmond_live/c/1227908.json - Rijnmond
+https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3742011.json - RTV Utrecht
+https://omroepgelderland.bbvms.com/p/default/c/3651657.json - Omroep Gelderland
+https://omroepzeeland.bbvms.com/p/regiogridautoplay/l/1491828714434033.json - Omroep Zeeland
+https://omroepbrabant.bbvms.com/p/default/c/1080520.json - Omroep Brabant
+https://l1.bbvms.com/p/video_autoplay/c/3247576.json - L1
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery '
+  for $x in (
+    "https://www.omropfryslan.nl/live/omrop-fryslan-tv",
+    "https://www.rtvnoord.nl/televisie",
+    "https://www.rtvdrenthe.nl/tv",
+    "https://www.rtvoost.nl/tv",
+    "https://www.omroepwest.nl/tv",
+    "https://www.rijnmond.nl/tv",
+    "https://www.rtvutrecht.nl/live/rtvutrecht",
+    "https://www.omroepgelderland.nl/tv",
+    "https://www.omroepzeeland.nl/livetv",
+    "https://www.omroepbrabant.nl/tv",
+    "https://l1.nl/live-l1-tv"
+  )
+  let $src:=doc($x),
+      $script:=resolve-uri(
+        if ($x="https://www.omroepgelderland.nl/tv") then
+          extract(
+            unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),
+            "bbw_media_config_url = &apos;(.+)&apos;",1
           )
-        )
-      })/(
-        .[json]/json,
-        .[doc]/json(
-          extract(raw,"var opts = (.+);",1)
-        )
-      ),
-      $c:=$b/clipData/(assets)(1)[ends-with(src,"m3u8")]/(
-        if (starts-with(src,"//")) then
-          $b/protocol||substring-after(src,"//")
         else
-          resolve-uri(src,$b/publicationData/defaultMediaAssetPath)
+          $src/(
+            //@data-media-url,
+            //article/iframe/@src,
+            //div[
+              starts-with(@class,"bluebillywig") or
+              starts-with(@class,"customhtml") or
+              @class="bbwLive-player"
+            ]/script/@src,
+            //div[starts-with(@class,"inlinemedia")]/iframe/@src,
+            json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(
+              "https://omroepbrabant.bbvms.com/p/default/c/",clip,".json"
+            )
+          ),
+        $x
       )
   return
-  if ($c) then {
-    "name":$b/publicationData/label||": Livestream",
-    "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-    "formats":xivid:m3u8-to-json($c)
-  } else {
-    "name":concat(
-      $b/publicationData/label,
-      ": ",
-      normalize-space(
-        (
-          //div[@class="media-details"]/h3,
-          (.,$a)//div[@class="video-title"],
-          replace(//div[@class="overlay"]/h1,"(.+) -.+","$1")
+  xivid:bbvms(
+    extract($script,".+\.")||"json",
+    concat(
+      $src//meta[@name="publisher" or @property="og:site_name"]/@content,
+      ": Livestream"
+    )
+  )
+' --printed-json-format=compact
+{"name": "Omrop Fryslân: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-4", "format": "m3u8[h264+aac]", "resolution": "1920x1080@25fps", "bitrate": "5760kbps", "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/1080p/prog_index.m3u8"}]}
+{"name": "RTV Noord: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-4", "format": "m3u8[h264+aac]", "resolution": "1920x1080", "bitrate": "6096kbps", "url": "https://media.rtvnoord.nl/live/rtvnoord/tv/3e8fe3c1-0868-49b0-b2f3-7dd6eb30651f/index.m3u8"}]}
+{"name": "RTV Drenthe: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-3", "format": "m3u8[h264+aac]", "resolution": "1920x1080@25fps", "bitrate": "5192kbps", "url": "https://cdn.rtvdrenthe.nl/live/rtvdrenthe/tv/1080p/prog_index.m3u8"}]}
+{"name": "RTV Oost: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-3", "format": "m3u8[h264+aac]", "resolution": "1280x720", "bitrate": "2566kbps", "url": "https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/46ce631a-6155-4fcc-ac24-2b2e252f4f94/index.m3u8"}]}
+{"name": "Omroep West: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-3", "format": "m3u8[h264+aac]", "resolution": "1920x1080", "bitrate": "4227kbps", "url": "https://d2dslh4sd7yvc1.cloudfront.net/live/omroepwest/ngrp:tv-feed_all/chunklist_b4227072.m3u8"}]}
+{"name": "Rijnmond: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-4", "format": "m3u8[h264+aac]", "resolution": "1920x1080", "bitrate": "3817kbps", "url": "https://dcur8bjarl5c2.cloudfront.net/live/rijnmond/tv/1600067212-faster-1920-1080-3500000-index.m3u8"}]}
+{"name": "RTV Utrecht: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-5", "format": "m3u8[h264+aac]", "resolution": "1920x1080", "bitrate": "3030kbps", "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1597825675-faster-1920-1080-2750000-index.m3u8"}]}
+{"name": "Omroep Gelderland: Livestream", "date": "04-10-2020", "formats": [{"id": "hls-1", "format": "m3u8[h264+aac]", "url": "https://d2od87akyl46nm.cloudfront.net/live/omroepgelderland/tvlive/index.m3u8"}]}
+{"name": "Omroep Zeeland: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-4", "format": "m3u8[h264+aac]", "resolution": "1920x1080", "bitrate": "5917kbps", "url":"https://d3isaxd2t6q8zm.cloudfront.net/live/omroepzeeland/tv/1594052133-fast-1920-1080-5500000-index.m3u8"}]}
+{"name": "Omroep Brabant: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-5", "format": "m3u8[h264+aac]", "resolution": "1920x1080", "bitrate": "3164kbps", "url": "https://d1ctz4dshc0ubt.cloudfront.net/live/omroepbrabant/tv/1599642273-fast-1920-1080-2750000-index.m3u8"}]}
+{"name": "L1: Livestream", "date": "04-10-2020", "formats": [[...], {"id": "hls-3", "format": "m3u8[h264+aac]", "resolution": "1280x720", "bitrate": "3817kbps", "url": "https://d34pj260kw1xmk.cloudfront.net/live/l1/tv/1596634197-fast-1280-720-3500000-index.m3u8"}]}
+
+------------------------------------------------------------------------------------------------
+
+Blue Billywig on-demand video-streams:
+
+$ xidel -se '
+  for $x in (
+    "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-3-oktober-2020-1800",
+    "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/35117",
+    "https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/57260",
+    "https://www.rtvoost.nl/tv/programma/1035/Thuis-in-Overijssel/aflevering/559728",
+    "https://www.omroepwest.nl/tv/programma/170000115/TV-West-Nieuws/aflevering/170345791",
+    "https://www.rijnmond.nl/tv/programma/27/Welkom-bij-Rijnmond/aflevering/27246",
+    "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20201002-1700",
+    "https://www.omroepgelderland.nl/tv/programma/31/GLD-Nieuws/aflevering/43332",
+    "https://www.omroepzeeland.nl/tv/programma/370059803/Zeeland-Nu/aflevering/370236927",
+    "https://www.omroepbrabant.nl/tv/programma/3116322/Brabant-Nieuws-2020/aflevering/3253165/Brabant-Nieuws",
+    "https://l1.nl/l1mburg-centraal-3-oktober-2020-159971"
+  ) return
+  doc($x)/concat(
+    resolve-uri(
+      if ($x="https://www.omroepgelderland.nl/tv") then
+        extract(
+          unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),
+          "bbw_media_config_url = &apos;(.+)&apos;",1
         )
-      )
-    ),
-    "date":format-date(
-      dateTime($b/clipData/publisheddate),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":$b/clipData/(
-      (assets)(1)/length,
-      length
-    )[.][1] * duration("PT1S") + time("00:00:00"),
-    "formats":[
-      for $x at $i in $b/clipData/(assets)()
-      order by $x/bandwidth
-      count $i
-      return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":concat($x/width,"x",$x/height),
-        "bitrate":$x/bandwidth||"kbps",
-        "url":resolve-uri(
-          $x/src,
-          $b/protocol||substring-after($b/publicationData/defaultMediaAssetPath,"//")
+      else (
+        //@data-media-url,                                                  (: RTV- Noord, Drenthe, Oost, Omroep- West en Gelderland :)
+        //article/iframe/@src,                                              (: RTV Utrecht :)
+        //div[
+          starts-with(@class,"bluebillywig") or                             (: Omrop Fryslân :)
+          starts-with(@class,"customhtml") or                               (: Rijnmond :)
+          @class="bbwLive-player"                                           (: L1 :)
+        ]/script/@src,
+        //div[starts-with(@class,"inlinemedia")]/iframe/@src,               (: Omroep Zeeland :)
+        //div[starts-with(@class,"bluebillywig")]/iframe/@data-src,         (: Omrop Fryslân :)
+        json(
+          //script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]      (: RTV Utrecht :)
+        )//file,
+        json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(   (: Omroep Brabant :)
+          "https://omroepbrabant.bbvms.com/p/default/",
+          if (clip) then "c/"||clip else "q/sourceid_string:"||programId,
+          ".json"
+        ),
+        //div[@class="bbw bbwVideo"]/concat(
+          "https://limburg.bbvms.com/p/L1_video/c/",@data-id,".json"        (: L1 :)
         )
-      }
-    ]
-  }
+      ),
+      $x
+    ) ! (
+      if (ends-with(.,"mp4")) then
+        x:request({"method":"HEAD","url":.})/url
+      else
+        extract(.,".+\.")||"json"
+    ),
+    " - ",
+    //meta[@name="publisher" or @property="og:site_name"]/@content,
+    ": ",
+    (
+      //div[@class="media-details"]/h3,                                      (: RTV- Noord, Drenthe, Oost, Omroep- West, Gelderland, Zeeland en Rijnmond :)
+      //div[@class="node-content-wrapper"]/header/normalize-space(h3),       (: Omrop Fryslân :)
+      //h1[@class="title-KX" and not(contains(text(),"live"))],              (: Omroep Brabant :)
+      //form[@name="quick_menu2"]//option[@selected],                        (: RTV Utrecht :)
+      json(//script/substring-after(.,"var msTag = ")[.])/data/(content)()   (: L1 :)
+    )
+  )
 '
+https://omropfryslan.bbvms.com/p/omropfryslan_video/c/3930670.json - Omrop Fryslân: Fryslân Hjoed
+https://www.rtvnoord.nl/media/bluebillywigplayeroptions/rtv/Tv/35117.json - RTV Noord: Noord Vandaag
+https://www.rtvdrenthe.nl/media/bluebillywigplayeroptions/rtv/Tv/57260.json - RTV Drenthe: Drenthe Nu
+https://www.rtvoost.nl/media/bluebillywigplayeroptions/rtv/Tv/559728.json - RTV Oost: Thuis in Overijssel
+https://omroepwest.bbvms.com/p/regiogrid/q/sourceId_string:170345791.json - Omroep West: TV West Nieuws
+https://rijnmond.bbvms.com/p/regiogrid_16-9_responsive/q/sourceid_string:9097D24729832965C12585DD00421C42.json - Rijnmond: Welkom bij Rijnmond
+https://content1b.omroep.nl/urishieldv2/[...]/2020/10/02/RTV2079851_MQ.mp4 - RTV Utrecht: UNieuws
+https://omroepgelderland.bbvms.com/p/default/q/sourceid_string:SREGIOOG_43332.json - Omroep Gelderland: GLD Nieuws
+https://www.omroepzeeland.nl/media/bluebillywigplayeroptions/rtv/Tv/370236927.json - Omroep Zeeland: Zeeland Nu
+https://omroepbrabant.bbvms.com/p/default/q/sourceid_string:3253165.json - Omroep Brabant: Brabant Nieuws
+https://limburg.bbvms.com/p/L1_video/c/3930664.json - L1: L1mburg Centraal
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery '
+  for $x in (
+    "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-3-oktober-2020-1800",
+    "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/35117",
+    "https://www.rtvdrenthe.nl/tv/programma/10/Drenthe-Nu/aflevering/57260",
+    "https://www.rtvoost.nl/tv/programma/1035/Thuis-in-Overijssel/aflevering/559728",
+    "https://www.omroepwest.nl/tv/programma/170000115/TV-West-Nieuws/aflevering/170345791",
+    "https://www.rijnmond.nl/tv/programma/27/Welkom-bij-Rijnmond/aflevering/27246",
+    "https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20201002-1700",
+    "https://www.omroepgelderland.nl/tv/programma/31/GLD-Nieuws/aflevering/43332",
+    "https://www.omroepzeeland.nl/tv/programma/370059803/Zeeland-Nu/aflevering/370236927",
+    "https://www.omroepbrabant.nl/tv/programma/3116322/Brabant-Nieuws-2020/aflevering/3253165/Brabant-Nieuws",
+    "https://l1.nl/l1mburg-centraal-3-oktober-2020-159971"
+  )
+  let $src:=doc($x),
+      $script:=resolve-uri(
+        if ($x="https://www.omroepgelderland.nl/tv") then
+          extract(
+            unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),
+            "bbw_media_config_url = &apos;(.+)&apos;",1
+          )
+        else
+          $src/(
+            //@data-media-url,                                                  (: RTV- Noord, Drenthe, Oost, Omroep- West en Gelderland :)
+            //article/iframe/@src,                                              (: RTV Utrecht :)
+            //div[
+              starts-with(@class,"bluebillywig") or                             (: Omrop Fryslân :)
+              starts-with(@class,"customhtml") or                               (: Rijnmond :)
+              @class="bbwLive-player"                                           (: L1 :)
+            ]/script/@src,
+            //div[starts-with(@class,"inlinemedia")]/iframe/@src,               (: Omroep Zeeland :)
+            //div[starts-with(@class,"bluebillywig")]/iframe/@data-src,         (: Omrop Fryslân :)
+            json(
+              //script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]      (: RTV Utrecht :)
+            )//file,
+            json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(   (: Omroep Brabant :)
+              "https://omroepbrabant.bbvms.com/p/default/",
+              if (clip) then "c/"||clip else "q/sourceid_string:"||programId,
+              ".json"
+            ),
+            //div[@class="bbw bbwVideo"]/concat(
+              "https://limburg.bbvms.com/p/L1_video/c/",@data-id,".json"        (: L1 :)
+            )
+          ),
+        $x
+      ),
+      $title:=$src/(
+        //div[@class="media-details"]/h3,                                      (: RTV- Noord, Drenthe, Oost, Omroep- West, Gelderland, Zeeland en Rijnmond :)
+        //div[@class="node-content-wrapper"]/header/normalize-space(h3),       (: Omrop Fryslân :)
+        //h1[@class="title-KX" and not(contains(text(),"live"))],              (: Omroep Brabant :)
+        json(//script/substring-after(.,"var msTag = ")[.])/data/(content)()   (: L1 :)
+      )
+  return
+  if (ends-with($script,"mp4")) then                                           (: RTV Utrecht :)
+    {
+      "name":$src/concat(
+        //meta[@name="publisher"]/@content,
+        ": ",
+        //form[@name="quick_menu2"]//option[@selected]
+      ),
+      "date":replace($script,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
+      "formats":[
+        {
+          "id":"pg-1",
+          "format":"mp4[h264+aac]",
+          "url":x:request({"method":"HEAD","url":$script})/url
+        }
+      ]
+    }
+  else
+    xivid:bbvms(
+      extract($script,".+\.")||"json",
+      $src//meta[@name="publisher" or @property="og:site_name"]/@content,
+      if ($title) then $title else "Livestream"
+    )
+' --printed-json-format=compact
+{"name": "Omrop Fryslân: Fryslân Hjoed", "date": "03-10-2020", "duration": "00:11:34", "formats": [[...], {"id": "pg-3", "format": "mp4[h264+aac]", "resolution": "1920x1080", "bitrate": "6134kbps", "url": "https://d3pvma9xb2775h.cloudfront.net/omropfryslan/video/2020/10/03/Asset_HD_FRYSLANHJOED_2020-10-03.mp4"}]}
+{"name": "RTV Noord: Noord Vandaag", "date": "02-10-2020", "duration": null, "formats": [{"id": "pg-1", "format": "mp4[h264+aac]", "resolution": "720x400", "bitrate": "1200kbps", "url": "https://media.rtvnoord.nl/video/2020/201002/201002_NVREC_XHQ.mp4"}]}
+{"name": "RTV Drenthe: Drenthe Nu", "date": "04-10-2020", "duration": null, "formats": [{"id": "pg-1", "format": "mp4[h264+aac]", "resolution": "720x400", "bitrate": "1200kbps", "url": "https://av.rtvdrenthe.nl/media/drnl20201004-hhuitz.mp4"}]}
+{"name": "RTV Oost: Thuis in Overijssel", "date": "04-10-2020", "duration": null, "formats": [{"id": "pg-1", "format": "mp4[h264+aac]", "resolution": "720x400", "bitrate": "1200kbps", "url": "https://tvarchief.rtvoost.nl/hi/559728.mp4"}]}
+{"name": "Omroep West: TV West Nieuws", "date": "02-10-2020", "duration": null, "formats": [[...], {"id": "pg-3", "format": "mp4[h264+aac]", "resolution": "1280x720", "bitrate": "2000kbps", "url": "https://d3r6frfb0ko02q.cloudfront.net/video/2020/10/02/170345791_2000.mp4"}]}
+{"name": "Rijnmond: Welkom bij Rijnmond", "date": "04-10-2020", "duration": "00:10:21", "formats": [[...], {"id": "pg-2", "format": "mp4[h264+aac]", "resolution": "1920x1080", "bitrate": "3602kbps", "url": "https://dcur8bjarl5c2.cloudfront.net/rijnmond/media/2020/10/04/3931211.mp4"}]}
+{"name": "RTV Utrecht: UNieuws", "date": "02-10-2020", "formats": [{"id": "pg-1", "format": "mp4[h264+aac]", "url": "https://content1b.omroep.nl/urishieldv2/[...]/2020/10/02/RTV2079851_MQ.mp4"}]}
+{"name": "Omroep Gelderland: GLD Nieuws", "date": "04-10-2020", "duration": null, "formats": [{"id": "sub-1", "format": "srt", "language": "nl", "label": "Nederlands", "url": "https://omroepgelderland.bbvms.com/subtitle/63808.srt"}, {"id": "pg-1", "format": "mp4[h264+aac]", "resolution": null, "bitrate": null, "url": "https://d2od87akyl46nm.cloudfront.net/epg/prod/media/videos/8Y7vw33Qv4W.mp4"}]}
+{"name": "Omroep Zeeland: Zeeland Nu", "date": "04-10-2020", "duration": null, "formats": [{"id": "pg-1", "format": "mp4[h264+aac]", "resolution": "720x400", "bitrate": "1200kbps", "url": "https://d3isaxd2t6q8zm.cloudfront.net/omroepzeeland/media/2020/10/04/Asset_HD_370236927-Zeeland-Nu-04-10-2020-ZNB201002NG.mp4"}]}
+{"name": "Omroep Brabant: Brabant Nieuws", "date": "02-10-2020", "duration": "00:13:48", "formats": [{"id": "sub-1", "format": "srt", "language": "nl", "label": "Nederlands", "url": "https://omroepbrabant.bbvms.com/subtitle/63441.srt"}, [...], {"id": "pg-6", "format": "mp4[h264+aac]", "resolution": "1920x1080", "bitrate": "3500kbps", "url": "https://d1ctz4dshc0ubt.cloudfront.net/omroepbrabant/2020/video/3253165_ehq.mp4"}, {"id": "pg-7", "format": "mxf[h264+aac]", "resolution": "1920x1080", "bitrate": "54049kbps", "url": "https://s3.eu-west-1.amazonaws.com/mm.omroepbrabant.bbvms.com/upload/omroepbrabant/3253165.mxf"}]}
+{"name": "L1: L1mburg Centraal", "date": "03-10-2020", "duration": "00:23:36", "formats": [[...], {"id": "pg-2", "format": "mp4[h264+aac]", "resolution": "1280x720", "bitrate": "3500kbps", "url": "https://d34pj260kw1xmk.cloudfront.net/video/201003-180111-589_720.mp4"}]}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:regio($url as string) as object()? {
+  let $src:=doc($url),
+      $script:=resolve-uri(
+        if ($url="https://www.omroepgelderland.nl/tv") then
+          extract(
+            unparsed-text("https://web.omroepgelderland.nl/epg/tv_vanavond/data/html/script.js"),
+            "bbw_media_config_url = &apos;(.+)&apos;",1
+          )
+        else
+          $src/(
+            //@data-media-url,
+            //article/iframe/@src,
+            //div[
+              starts-with(@class,"bluebillywig") or
+              starts-with(@class,"customhtml") or
+              @class="bbwLive-player"
+            ]/script/@src,
+            //div[starts-with(@class,"inlinemedia")]/iframe/@src,
+            //div[starts-with(@class,"bluebillywig")]/iframe/@data-src,
+            json(
+              //script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]
+            )//file,
+            json(//script[@id="__NEXT_DATA__"])/props/pageProps/props/concat(
+              "https://omroepbrabant.bbvms.com/p/default/",
+              if (clip) then "c/"||clip else "q/sourceid_string:"||programId,
+              ".json"
+            ),
+            //div[@class="bbw bbwVideo"]/concat(
+              "https://limburg.bbvms.com/p/L1_video/c/",@data-id,".json"
+            )
+          ),
+        $url
+      ),
+      $title:=$src/(
+        //div[@class="media-details"]/h3,
+        //div[@class="node-content-wrapper"]/header/normalize-space(h3),
+        //h1[@class="title-KX" and not(contains(text(),"live"))],
+        json(//script/substring-after(.,"var msTag = ")[.])/data/(content)()
+      )
+  return
+  if (ends-with($script,"mp4")) then
+    {
+      "name":$src/concat(
+        //meta[@name="publisher"]/@content,
+        ": ",
+        //form[@name="quick_menu2"]//option[@selected]
+      ),
+      "date":replace($script,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
+      "formats":[
+        {
+          "id":"pg-1",
+          "format":"mp4[h264+aac]",
+          "url":x:request({"method":"HEAD","url":$script})/url
+        }
+      ]
+    }
+  else
+    xivid:bbvms(
+      extract($script,".+\.")||"json",
+      $src//meta[@name="publisher" or @property="og:site_name"]/@content,
+      if ($title) then $title else "Livestream"
+    )
+};
 
 ================================================================================================
 
@@ -7417,166 +6926,6 @@ declare function xivid:ofl($url as string) as object()? {
       ]
     }
   )
-};
-
-================================================================================================
-
-[rtv utrecht]
-
-$ url=https://www.rtvutrecht.nl/live/rtvutrecht/
-
-$ xidel -se 'doc("'$url'")//iframe ! (@src,substring-before(@src,"html")||"js")'
-https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3742011.html?inheritDimensions=true
-https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3742011.js   # Blue Billywig
-
-$ xidel -s --module=xivid.xqm -e 'xivid:bbvms(doc("'$url'")//iframe/substring-before(@src,"html")||"js","RTV Utrecht")'
-{
-  "name": "RTV Utrecht: Livestream",
-  "date": "17-09-2020",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/index.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "142kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1597825675-au-index.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-5",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3030kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/live/rtvutrecht/rtvutrecht/1597825675-faster-1920-1080-2750000-index.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://www.rtvutrecht.nl/gemist/uitzending/rtvutrecht/unieuws/20200916-1700/
-
-$ xidel -se 'let $url:=doc("'$url'")/json(//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.])//file return ($url,x:request({"url":$url,"error-handling":"xxx=accept"})/raw,x:request({"url":$url,"method":"HEAD"})/url)'
-https://content.omroep.nl/rtvutrecht/uitzendinggemist/rtvutrecht/2020/09/16/RTV2076581_MQ.mp4
-<html><head>
-<meta http-equiv="refresh" content="0;URL=https://content10c2a.omroep.nl/[...]/2020/09/16/RTV2076581_MQ.mp4"></head><body></body></html>
-
-https://content10c2b.omroep.nl/[...]/2020/09/16/RTV2076581_MQ.mp4
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'let $html:=doc("'$url'"),$vid:=x:request({"url":json($html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.])//file,"method":"HEAD"}[url])/url return if ($vid) then {"name":"RTV Utrecht: "||substring-before(normalize-space($html//h3[@class="article-title"])," -"),"date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$vid}]} else xivid:bbvms($html//iframe/substring-before(@src,"html")||"js","RTV Utrecht")'
-{
-  "name": "RTV Utrecht: UNieuws",
-  "date": "16-09-2020",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "url": "https://content10c2a.omroep.nl/[...]/2020/09/16/RTV2076581_MQ.mp4"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://www.rtvutrecht.nl/nieuws/2097206/smalle-utrechtse-wolvenstraat-wordt-toch-geen-omleidingsroute-voor-autos.html
-
-$ xidel -s $url -e '//script[@async="true"]/@src[1]'
-https://rtvutrecht.bbvms.com/p/rtv_utrecht_videoplayer_web/c/3911399.js
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'let $html:=doc("'$url'"),$vid:=x:request({"url":json($html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.])//file,"method":"HEAD"}[url])/url return if ($vid) then {"name":"RTV Utrecht: "||substring-before(normalize-space($html//h3[@class="article-title"])," -"),"date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","url":$vid}]} else xivid:bbvms($html/(//iframe/concat(substring-before(@src,"html"),"js"),//script[@async="true"]/@src[1]),"RTV Utrecht")'
-
-{
-  "name": "RTV Utrecht: Toch geen auto's over fietspad Wolvenstraat Utrecht, andere omleidingsroute
-gevonden",
-  "date": "16-09-2020",
-  "duration": "00:01:18",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-160027203,1930323,2549578,2793708,3014217,3233646,3742861,.mp4.urlset/master.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "512x288@25fps",
-      "bitrate": "363kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-1600272031930323.mp4/index-v1-a1.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-6",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1080@25fps",
-      "bitrate": "2967kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/on-demand/rtvutrecht/media/2020/09/16/asset-3911399-1600272033742861.mp4/index-v1-a1.m3u8"
-    },
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "512x288",
-      "bitrate": "400kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/rtvutrecht/media/2020/09/16/asset-3911399-1600272031930323.mp4"
-    },
-    [...]
-    {
-      "id": "pg-6",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "3500kbps",
-      "url": "https://d18rwjdhpr8dcw.cloudfront.net/rtvutrecht/media/2020/09/16/asset-3911399-1600272033742861.mp4"
-    },
-    {
-      "id": "pg-7",
-      "format": "mp4[h264+aac]",
-      "resolution": "1920x1080",
-      "bitrate": "53855kbps",
-      "url": "https://s3.eu-west-1.amazonaws.com/mm.rtvutrecht.bbvms.com/upload/rtvutrecht/RTVU_2676436_1080p.mxf"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-declare function xivid:rtvu($url as string) as object()? {
-  let $html:=doc($url),
-      $vid:=x:request({
-        "url":json(
-          $html//script/extract(.,"playerInstance\.setup\((.+)\)",1,"s")[.]
-        )//file,
-        "method":"HEAD"
-      }[url])/url
-  return
-  if ($vid) then {
-    "name":"RTV Utrecht: "||substring-before(
-      normalize-space($html//h3[@class="article-title"]),
-      " -"
-    ),
-    "date":replace($vid,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
-    "formats":[
-      {
-        "id":"pg-1",
-        "format":"mp4[h264+aac]",
-        "url":$vid
-      }
-    ]
-  }
-  else
-    xivid:bbvms(
-      $html/(
-        //iframe/concat(
-          substring-before(@src,"html"),
-          "js"
-        ),
-        //script[@async="true"]/@src[1]
-      ),
-      "RTV Utrecht"
-    )
 };
 
 ================================================================================================

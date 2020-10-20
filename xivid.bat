@@ -88,80 +88,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:regio
-FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
-  let $a:^=doc^(
-        parse-html^(
-          //div[starts-with^(@class^,'inlinemedia'^)]/@data-accept
-        ^)//@src
-      ^)^,
-      $b:^=x:request^({
-        'url':^(
-          ^(.^,$a^)//@data-media-url^,
-          //div[@class^='bbwLive-player']//@src^,
-          resolve-uri^(doc^(//iframe/@src^)//@src^)^,
-          //div[@class^='bbw bbwVideo']/concat^(
-            'https://l1.bbvms.com/p/video/c/'^,
-            @data-id^,
-            '.json'
-          ^)
-        ^)
-      }^)/^(
-        .[json]/json^,
-        .[doc]/json^(
-          extract^(raw^,'var opts ^= ^(.+^)^;'^,1^)
-        ^)
-      ^)^,
-      $c:^=$b/clipData/^(assets^)^(1^)[ends-with^(src^,'m3u8'^)]/^(
-        if ^(starts-with^(src^,'//'^)^) then
-          $b/protocol^|^|substring-after^(src^,'//'^)
-        else
-          resolve-uri^(src^,$b/publicationData/defaultMediaAssetPath^)
-      ^)
-  return
-  json:^=if ^($c^) then {
-    'name':$b/publicationData/label^|^|': Livestream'^,
-    'date':format-date^(current-date^(^)^,'[D01]-[M01]-[Y]'^)^,
-    'formats':xivid:m3u8-to-json^($c^)
-  } else {
-    'name':concat^(
-      $b/publicationData/label^,
-      ': '^,
-      normalize-space^(
-        ^(
-          //div[@class^='media-details']/h3^,
-          ^(.^,$a^)//div[@class^='video-title']^,
-          replace^(//div[@class^='overlay']/h1^,'^(.+^) -.+'^,'$1'^)
-        ^)
-      ^)
-    ^)^,
-    'date':format-date^(
-      dateTime^($b/clipData/publisheddate^)^,
-      '[D01]-[M01]-[Y]'
-    ^)^,
-    'duration':$b/clipData/^(
-      ^(assets^)^(1^)/length^,
-      length
-    ^)[.][1] * duration^('PT1S'^) + time^('00:00:00'^)^,
-    'formats':[
-      for $x at $i in $b/clipData/^(assets^)^(^)
-      order by $x/bandwidth
-      count $i
-      return {
-        'id':'pg-'^|^|$i^,
-        'format':'mp4[h264+aac]'^,
-        'resolution':concat^($x/width^,'x'^,$x/height^)^,
-        'bitrate':$x/bandwidth^|^|'kbps'^,
-        'url':resolve-uri^(
-          $x/src^,
-          $b/protocol^|^|substring-after^($b/publicationData/defaultMediaAssetPath^,'//'^)
-        ^)
-      }
-    ]
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :autojunk
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   let $a:^=//div[@id^='playerWrapper']/script[1] return
@@ -773,33 +699,33 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:kijk.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:kijk('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:omropfryslan.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:ofr('%url%')" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:rtvnoord.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:rtvdrenthe.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:rtvoost.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:omroepwest.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:rijnmond.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:rtvutrecht.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:omroepgelderland.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:omroepzeeland.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:omroepbrabant.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:l1.nl=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:nhnieuws.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:nhnieuws('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:at5.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:nhnieuws('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:omroepflevoland.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:ofl('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtvutrecht.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtvu('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtvnoord.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:rtvdrenthe.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:rtvoost.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:omroepgelderland.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:omroepwest.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:rijnmond.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:omroepzeeland.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:omroepbrabant.nl=%"=="%url%" (
-  CALL :regio "%url%"
-) ELSE IF NOT "%url:l1.nl=%"=="%url%" (
-  CALL :regio "%url%"
 ) ELSE IF NOT "%url:dumpert.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:dumpert('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:autojunk.nl=%"=="%url%" (
