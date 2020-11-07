@@ -8604,10 +8604,8 @@ $ xidel -se 'tokenize(substring-after("'$url'","mixcloud.com/"),"/")[.]'
 EricVanKleef
 clubbin-12-wildfm-30-mei-2020
 
-$ xidel -s "$url" -e '$headers[contains(.,"csrftoken")]'
+$ xidel -se 'x:request({"method":"HEAD","url":"'$url'"})/(headers[contains(.,"csrftoken")],substring-before(substring-after(headers[contains(.,"csrftoken")],"="),";"))'
 set-cookie: csrftoken=DByTziojuvWczCcmPzUMJUx83hXB5s9OpRhhLmNZ6rpF3fedGCIA0ZmUX8CDdoug; Domain=.mixcloud.com; expires=Sun, 11-Jul-2021 09:37:49 GMT; Max-Age=31449600; Path=/; secure
-
-$ xidel -s "$url" -e 'substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";")'
 DByTziojuvWczCcmPzUMJUx83hXB5s9OpRhhLmNZ6rpF3fedGCIA0ZmUX8CDdoug
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -8662,7 +8660,7 @@ $ xidel -s \
 {"query": "{cloudcastLookup(lookup:{username:\"EricVanKleef\",slug:\"clubbin-12-wildfm-30-mei-2020\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}"}
 [...] # en nog 3x hetzelfde.
 
-$ csrf=$(xidel -s "$url" -e 'substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";")')
+$ csrf=$(xidel -s --method=HEAD "$url" -e 'substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";")')
 
 $ xidel -s -H "Content-Type: application/json" -H "Referer: $url" -H "X-CSRFToken: $csrf" -H "Cookie: csrftoken=$csrf" -d '{let $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}")}' https://www.mixcloud.com/graphql -e '$json//cloudcastLookup'
 {
@@ -8689,7 +8687,7 @@ $ xidel -s -H "Content-Type: application/json" -H "Referer: $url" -H "X-CSRFToke
 -d "{let \$us:=tokenize(substring-after('$url','mixcloud.com/'),'/') return serialize-json({'query':concat('{cloudcastLookup(lookup:{username:\"',\$us[1],'\",slug:\"',\$us[2],'\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}')})}"
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
+$ xidel -se 'let $csrf:=x:request({"method":"HEAD","url":"'$url'"})/substring-before(substring-after(headers[contains(.,"csrftoken")],"="),";") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":let $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
 {
   "name": "CLUBBIN #12 @WILDFM 30 MEI 2020.",
   "owner": {
@@ -8714,11 +8712,11 @@ $ xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[conta
 Windows:
 
 SET url=https://www.mixcloud.com/EricVanKleef/clubbin-12-wildfm-30-mei-2020
-FOR /F "delims=" %A IN ('xidel -s "%url%" -e "substring-before(substring-after($headers[contains(.,'csrftoken')],'='),';')"') DO SET csrf=%A
+FOR /F "delims=" %A IN ('xidel -s --method=HEAD "%url%" -e "substring-before(substring-after($headers[contains(.,'csrftoken')],'='),';')"') DO SET csrf=%A
 
 xidel -s -H "Content-Type: application/json" -H "Referer: %url%" -H "X-CSRFToken: %csrf%" -H "Cookie: csrftoken=%csrf%" -d "{let $us:=tokenize(substring-after('%url%','mixcloud.com/'),'/') return concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$us[1],'\\\",slug:\\\"',$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}')}" https://www.mixcloud.com/graphql -e "$json//cloudcastLookup"
 
-xidel -s "%url%" -e "let $csrf:=substring-before(substring-after($headers[contains(.,'csrftoken')],'='),';'),$us:=tokenize(substring-after('%url%','mixcloud.com/'),'/') return x:request({'headers':('Content-Type: application/json','Referer: %url%','X-CSRFToken: '||$csrf,'Cookie: csrftoken='||$csrf),'post':concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$us[1],'\\\",slug:\\\"',$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}'),'url':'https://www.mixcloud.com/graphql'})/json/data/cloudcastLookup"
+xidel -se "let $csrf:=x:request({'method':'HEAD','url':'%url%'})/substring-before(substring-after(headers[contains(.,'csrftoken')],'='),';') return x:request({'headers':('Content-Type: application/json','Referer: %url%','X-CSRFToken: '||$csrf,'Cookie: csrftoken='||$csrf),'post':let $us:=tokenize(substring-after('%url%','mixcloud.com/'),'/') return concat('{\"query\":\"{cloudcastLookup(lookup:{username:\\\"',$us[1],'\\\",slug:\\\"',$us[2],'\\\"}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}\"}'),'url':'https://www.mixcloud.com/graphql'})/json/data/cloudcastLookup"
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -8742,20 +8740,33 @@ x:integer(1101000,2) --> 104 en x:cps(104) --> "h"
 
 - Substrings
 
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")) return (string-length($url),string-length($decryption_key),ceiling(string-length($url) div string-length($decryption_key)))'
+$ xidel -se '
+  let $key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD",
+      $arg:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))
+  return (
+    string-length($arg),
+    $arg,
+    string-length($key),
+    $key,
+    string-length($arg) div string-length($key),
+    ceiling(string-length($arg) div string-length($key)),
+    string-join((1 to ceiling(string-length($arg) div string-length($key))) ! $key),
+    substring(
+      string-join((1 to ceiling(string-length($arg) div string-length($key))) ! $key),
+      1,string-length($arg)
+    )
+  )
+'
 95
+!2-?&mna5!,,.cfg>=+7#(00~"&)k<+,!6*x& <ntib`|b*wu*,6i}ujzxc /2ypvqgyqg1ddv$&7a%pj){/`=*+26b"r1~
 53
-2   # ceiling(95 div 53) --> ceiling(1.79245) = 2. $decryption_key moet dus minimaal 2x herhaald worden om de lengte van $url te evenaren.
-
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")) return ($url,string-join((1 to ceiling(string-length($url) div string-length($decryption_key))) ! $decryption_key))'
-!2-?&mna5!,,.cfg>=+7#(00~"&)k<+,!6*x& <ntib`|b*wu*,6i}ujzxc /2ypvqgyqg1ddv$&7a%pj){/`=*+26b"r1~
+IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD
+1.792452830188679245
+2
 IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUDIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD
-
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")) return ($url,substring(string-join((1 to ceiling(string-length($url) div string-length($decryption_key))) ! $decryption_key),1,string-length($url)))'
-!2-?&mna5!,,.cfg>=+7#(00~"&)k<+,!6*x& <ntib`|b*wu*,6i}ujzxc /2ypvqgyqg1ddv$&7a%pj){/`=*+26b"r1~
 IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUDIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADF
 
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$key:=substring(string-join((1 to ceiling(string-length($url) div string-length($decryption_key))) ! $decryption_key),1,string-length($url)) return for $x in 1 to string-length($url) return join((substring($url,$x,1),substring($key,$x,1)))'
+$ xidel -se 'let $key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD",$arg1:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$arg2:=substring(string-join((1 to ceiling(string-length($arg1) div string-length($key))) ! $key),1,string-length($arg1)) return for $x in 1 to string-length($arg1) return join((substring($arg1,$x,1),substring($arg2,$x,1)))'
 ! I
 2 F
 - Y
@@ -8763,7 +8774,7 @@ $ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONO
 & U
 [...]
 
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$key:=substring(string-join((1 to ceiling(string-length($url) div string-length($decryption_key))) ! $decryption_key),1,string-length($url)) return for $x in 1 to string-length($url) return join((x:cps(substring($url,$x,1)),x:cps(substring($key,$x,1))))'
+$ xidel -se 'let $key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD",$arg1:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$arg2:=substring(string-join((1 to ceiling(string-length($arg1) div string-length($key))) ! $key),1,string-length($arg1)) return for $x in 1 to string-length($arg1) return join((x:cps(substring($arg1,$x,1)),x:cps(substring($arg2,$x,1))))'
 33 73
 50 70
 45 89
@@ -8771,21 +8782,65 @@ $ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONO
 38 85
 [...]
 
-$ xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$key:=substring(string-join((1 to ceiling(string-length($url) div string-length($decryption_key))) ! $decryption_key),1,string-length($url)) return string-join(x:cps(for $x in 1 to string-length($url) return xivid:bin-xor(x:cps(substring($url,$x,1)),x:cps(substring($key,$x,1)))))'
+$ xidel -s --module=xivid.xqm -e 'let $key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD",$arg1:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$arg2:=substring(string-join((1 to ceiling(string-length($arg1) div string-length($key))) ! $key),1,string-length($arg1)) return join(x:cps(for $x in 1 to string-length($arg1) return xivid:bin-xor(x:cps(substring($arg1,$x,1)),x:cps(substring($arg2,$x,1)))))'
+h t t p s : / / a u d i o 1 2 . m i x c l o u d . c o m / s e c u r e / h l s / 0 / 0 / 1 / c / 6 f c c - 4 3 3 5 - 4 a a f - 8 3 0 5 - 8 4 e 7 0 9 c c c 1 d 9 . m 4 a / i n d e x . m 3 u 8
+
+$ time xidel -s --module=xivid.xqm -e '((1 to 1000) ! (let $key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD",$arg1:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$arg2:=substring(string-join((1 to ceiling(string-length($arg1) div string-length($key))) ! $key),1,string-length($arg1)) return string-join(x:cps(for $x in 1 to string-length($arg1) return xivid:bin-xor(x:cps(substring($arg1,$x,1)),x:cps(substring($arg2,$x,1)))))))[1]'
 https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
 
-$ time xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")),$key:=substring(string-join((1 to ceiling(string-length($url) div string-length($decryption_key))) ! $decryption_key),1,string-length($url)) return ((1 to 1000) ! string-join(x:cps(for $x in 1 to string-length($url) return xivid:bin-xor(x:cps(substring($url,$x,1)),x:cps(substring($key,$x,1))))))[1]'
+real    0m20.734s
+user    0m0.015s
+sys     0m0.000s
+
+----------------------------------------------------------------
+
+- Reeksen
+
+$ xidel -se '
+  let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),
+      $arg:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=")))
+  return (
+    count($arg),
+    string-join(x:cps($arg)),
+    count($key),
+    string-join(x:cps($key)),
+    count($arg) div count($key),
+    ceiling(count($arg) div count($key)),
+    string-join(x:cps(((1 to ceiling(count($arg) div count($key))) ! $key))),
+    string-join(x:cps(((1 to ceiling(count($arg) div count($key))) ! $key)[position() lt count($arg) + 1]))
+  )
+'
+95
+!2-?&mna5!,,.cfg>=+7#(00~"&)k<+,!6*x& <ntib`|b*wu*,6i}ujzxc /2ypvqgyqg1ddv$&7a%pj){/`=*+26b"r1~
+53
+IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD
+1.792452830188679245
+2
+IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUDIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD
+IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUDIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADF
+
+$ xidel -s --xquery 'let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),$arg1:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$arg2:=((1 to ceiling(count($arg1) div count($key))) ! $key)[position() lt count($arg1) + 1] for $x at $i in $arg1 return join(($x,$arg2[$i]))'
+33 73
+50 70
+45 89
+63 79
+38 85
+
+$ xidel -s --module=xivid.xqm --xquery 'let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),$arg1:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$arg2:=((1 to ceiling(count($arg1) div count($key))) ! $key)[position() lt count($arg1) + 1] return join(x:cps(for $x at $i in $arg1 return xivid:bin-xor($x,$arg2[$i])))'
+h t t p s : / / a u d i o 1 2 . m i x c l o u d . c o m / s e c u r e / h l s / 0 / 0 / 1 / c / 6 f c c - 4 3 3 5 - 4 a a f - 8 3 0 5 - 8 4 e 7 0 9 c c c 1 d 9 . m 4 a / i n d e x . m 3 u 8
+
+$ time xidel -s --module=xivid.xqm --xquery '((1 to 1000) ! (let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),$arg1:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$arg2:=((1 to ceiling(count($arg1) div count($key))) ! $key)[position() lt count($arg1) + 1] return string-join(x:cps(for $x at $i in $arg1 return xivid:bin-xor($x,$arg2[$i])))))[1]'
 https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
 
-real    0m25.250s
-user    0m0.031s
+real    0m19.656s
+user    0m0.015s
 sys     0m0.000s
 
 ----------------------------------------------------------------
 
 - Reeksen (de youtube-dl manier)
 
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps($decryption_key) return string-join(x:cps(for $x at $i in $url return $key[$i mod count($key)]))'
+$ xidel -s --xquery 'let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD") return string-join(x:cps(for $x at $i in x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))) return $key[$i mod count($key)]))'
 IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADF
                                                     ^ # "D" mist en lengte is 94 i.p.v. 95.
 
@@ -8802,55 +8857,23 @@ $ xidel -se '    $ xidel -se '
 0                53
 1                1
 
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps($decryption_key) return string-join(x:cps(for $x at $i in $url return $key[($i - 1) mod count($key) + 1]))'
+$ xidel -s --xquery 'let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD") return string-join(x:cps(for $x at $i in x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))) return $key[($i - 1) mod count($key) + 1]))'
 IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUDIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADF
                                                      ^ # Eindigt goed en herhaalt zichzelf tot de juiste lengte.
 
-$ xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps($decryption_key) return string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])))'
+$ xidel -s --module=xivid.xqm --xquery 'let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD") return join(x:cps(for $x at $i in x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))) return xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])))'
+h t t p s : / / a u d i o 1 2 . m i x c l o u d . c o m / s e c u r e / h l s / 0 / 0 / 1 / c / 6 f c c - 4 3 3 5 - 4 a a f - 8 3 0 5 - 8 4 e 7 0 9 c c c 1 d 9 . m 4 a / i n d e x . m 3 u 8
+
+$ time xidel -s --module=xivid.xqm --xquery '((1 to 1000) ! (let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD") return string-join(x:cps(for $x at $i in x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))) return xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])))))[1]'
 https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
 
-$ time xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps($decryption_key) return ((1 to 1000) ! string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1]))))[1]'
-https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a
-
-real    0m24.094s
+real    0m19.750s   # Net zo snel als de 2e methode, maar minder code.
 user    0m0.015s
-sys     0m0.016s
-
-----------------------------------------------------------------
-
-- Reeksen
-
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))) return (string-join(x:cps($url)),substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url)))'
-!2-?&mna5!,,.cfg>=+7#(00~"&)k<+,!6*x& <ntib`|b*wu*,6i}ujzxc /2ypvqgyqg1ddv$&7a%pj){/`=*+26b"r1~
-IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUDIFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADF
-
-$ xidel -se 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return for $x at $i in $url return join(($x,$key[$i]))'
-33 73
-50 70
-45 89
-63 79
-38 85
-[...]
-
-$ xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[$i])))'
-https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
-
-$ time xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; let $url:=x:cps(binary-to-string(base64Binary("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4="))),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return ((1 to 1000) ! string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[$i]))))[1]'
-https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
-
-real    0m23.531s   # Deze is dus toch het snelst.
-user    0m0.015s
-sys     0m0.015s
+sys     0m0.000s
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --module=xivid.xqm -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; declare function local:decrypt($a as base64Binary) as string {let $url:=x:cps(binary-to-string($a)),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[$i])))}; ("ITItPyZtbmE1ISwsLmNmZz49KzcjKDAwfiImKWs8KywhNip4JiA8bnRpYmB8Yip3dSosNml9dWp6eGMgLzJ5cHZxZ3lxZzFkZHYkJjdhJXBqKXsvYD0qKzI2YiJyMX4=","ITItPyZtbmEnIDogID9le305OiwsKyohNG8qKylgPSo3MT0yYS9gLHAnfXl5Ynl3c2N+eidmcD8sNnp1fWdhZXEgMzJka2djYWJ/cTFncXAnJyx/K21qImMvczwoI3sUBX90KjkhJgFlEiUcPBAvMxkfBTc/") ! local:decrypt(base64Binary(.))'
-https://audio12.mixcloud.com/secure/hls/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a/index.m3u8
-https://stream12.mixcloud.com/secure/c/m4a/64/0/0/1/c/6fcc-4335-4aaf-8305-84e709ccc1d9.m4a?sig=FJ29cabjN0VlZe_zdXQQcw
-
-xidel -s "$url" -e 'let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup'
-
-$ xidel -s --module=xivid.xqm --json-mode=deprecated "$url" -e 'declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"; declare function local:decrypt($a as base64Binary) as string {let $url:=x:cps(binary-to-string($a)),$key:=x:cps(substring(string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),1,count($url))) return string-join(x:cps(for $x at $i in $url return xivid:bin-xor($x,$key[$i])))}; let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),$us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup/{"name":concat(owner/displayName," - ",name),"date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),"duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"pg-1","format":"m4a[aac]","url":local:decrypt(base64Binary(streamInfo/url))},xivid:m3u8-to-json(local:decrypt(base64Binary(streamInfo/hlsUrl)))]}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),$decrypt:=function($arg as string) as string {string-join(x:cps(for $x at $i in x:cps(binary-to-string(base64Binary($arg))) return xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])))},$csrf:=x:request({"method":"HEAD","url":"'$url'"})/substring-before(substring-after(headers[contains(.,"csrftoken")],"="),";") return x:request({"headers":("Content-Type: application/json","Referer: '$url'","X-CSRFToken: "||$csrf,"Cookie: csrftoken="||$csrf),"post":let $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/") return concat("{""query"":""{cloudcastLookup(lookup:{username:\""",$us[1],"\"",slug:\""",$us[2],"\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"),"url":"https://www.mixcloud.com/graphql"})/json//cloudcastLookup/{"name":concat(owner/displayName," - ",name),"date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),"duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"pg-1","format":"m4a[aac]","url":$decrypt(streamInfo/url)},xivid:m3u8-to-json($decrypt(streamInfo/hlsUrl))]}'
 {
   "name": "Eric van Kleef - CLUBBIN #12 @WILDFM 30 MEI 2020.",
   "date": "31-05-2020",
@@ -8878,65 +8901,52 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated "$url" -e 'declare variable
 
 ------------------------------------------------------------------------------------------------
 
--e '
-  declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD";
-  declare function local:decrypt($a as base64Binary) as string {
-    let $url:=x:cps(binary-to-string($a)),
-        $key:=x:cps(
-          substring(
-            string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),
-            1,count($url)
+declare function xivid:mixcloud($url as string) as object()? {
+  let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),
+      $decrypt:=function($arg as string) as string {
+        string-join(
+          x:cps(
+            for $x at $i in x:cps(binary-to-string(base64Binary($arg))) return
+            xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])
           )
         )
-    return
-    string-join(
-      x:cps(
-        for $x at $i in $url return
-        xivid:bin-xor($x,$key[$i])
-      )
-    )
-  };
-  let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),
-      $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/")
+      },
+      $csrf:=x:request(
+        {"method":"HEAD","url":$url}
+      )/substring-before(substring-after(headers[contains(.,"csrftoken")],"="),";"),
+      $us:=tokenize(substring-after($url,"mixcloud.com/"),"/")
   return
-  x:request(
-    {
-      "headers":(
-        "Content-Type: application/json",
-        "Referer: '$url'",
-        "X-CSRFToken: "||$csrf,
-        "Cookie: csrftoken="||$csrf
-      ),
-      "post":concat(
-        "{""query"":""{cloudcastLookup(lookup:{username:\""",
-        $us[1],
-        "\"",slug:\""",
-        $us[2],
-        "\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"
-      ),
-      "url":"https://www.mixcloud.com/graphql"
-    }
-  )/json//cloudcastLookup/{
+  x:request({
+    "headers":(
+      "Content-Type: application/json",
+      "Referer: "||$url,
+      "X-CSRFToken: "||$csrf,
+      "Cookie: csrftoken="||$csrf
+    ),
+    "post":concat(
+      "{""query"":""{cloudcastLookup(lookup:{username:\""",
+      $us[1],
+      "\"",slug:\""",
+      $us[2],
+      "\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"
+    ),
+    "url":"https://www.mixcloud.com/graphql"
+  })/json//cloudcastLookup/{
     "name":concat(owner/displayName," - ",name),
     "date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),
-    "duration":format-time(
-      audioLength * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
+    "duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),
     "formats":[
       {
         "id":"pg-1",
         "format":"m4a[aac]",
-        "url":local:decrypt(base64Binary(streamInfo/url))
+        "url":$decrypt(streamInfo/url)
       },
       xivid:m3u8-to-json(
-        local:decrypt(
-          base64Binary(streamInfo/hlsUrl)
-        )
+        $decrypt(streamInfo/hlsUrl)
       )
     ]
   }
-'
+};
 
 ================================================================================================
 

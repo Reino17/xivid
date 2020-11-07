@@ -763,3 +763,50 @@ declare function xivid:lc($url as string) as object()? {
     ()
   )
 };
+
+declare function xivid:mixcloud($url as string) as object()? {
+  let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),
+      $decrypt:=function($arg as string) as string {
+        string-join(
+          x:cps(
+            for $x at $i in x:cps(binary-to-string(base64Binary($arg))) return
+            xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])
+          )
+        )
+      },
+      $csrf:=x:request(
+        {"method":"HEAD","url":$url}
+      )/substring-before(substring-after(headers[contains(.,"csrftoken")],"="),";"),
+      $us:=tokenize(substring-after($url,"mixcloud.com/"),"/")
+  return
+  x:request({
+    "headers":(
+      "Content-Type: application/json",
+      "Referer: "||$url,
+      "X-CSRFToken: "||$csrf,
+      "Cookie: csrftoken="||$csrf
+    ),
+    "post":concat(
+      "{""query"":""{cloudcastLookup(lookup:{username:\""",
+      $us[1],
+      "\"",slug:\""",
+      $us[2],
+      "\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"
+    ),
+    "url":"https://www.mixcloud.com/graphql"
+  })/json//cloudcastLookup/{
+    "name":concat(owner/displayName," - ",name),
+    "date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),
+    "duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),
+    "formats":[
+      {
+        "id":"pg-1",
+        "format":"m4a[aac]",
+        "url":$decrypt(streamInfo/url)
+      },
+      xivid:m3u8-to-json(
+        $decrypt(streamInfo/hlsUrl)
+      )
+    ]
+  }
+};

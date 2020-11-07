@@ -354,68 +354,6 @@ twitch() {
   ' --output-format=bash)"
 }
 
-mixcloud() {
-  eval "$(xidel "$1" -e '
-    declare variable $decryption_key:="IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD";
-    declare function local:decrypt($a as base64Binary) as string {
-      let $url:=x:cps(binary-to-string($a)),
-          $key:=x:cps(
-            substring(
-              string-join((1 to ceiling(count($url) div string-length($decryption_key))) ! $decryption_key),
-              1,count($url)
-            )
-          )
-      return
-      string-join(
-        x:cps(
-          for $x at $i in $url return
-          xivid:bin-xor($x,$key[$i])
-        )
-      )
-    };
-    let $csrf:=substring-before(substring-after($headers[contains(.,"csrftoken")],"="),";"),
-        $us:=tokenize(substring-after("'$url'","mixcloud.com/"),"/")
-    return
-    json:=x:request(
-      {
-        "headers":(
-          "Content-Type: application/json",
-          "Referer: '$1'",
-          "X-CSRFToken: "||$csrf,
-          "Cookie: csrftoken="||$csrf
-        ),
-        "post":concat(
-          "{""query"":""{cloudcastLookup(lookup:{username:\""",
-          $us[1],
-          "\"",slug:\""",
-          $us[2],
-          "\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"
-        ),
-        "url":"https://www.mixcloud.com/graphql"
-      }
-    )/json//cloudcastLookup/{
-      "name":concat(owner/displayName," - ",name),
-      "date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),
-      "duration":format-time(
-        audioLength * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":[
-        {
-          "id":"pg-1",
-          "format":"m4a[aac]",
-          "url":local:decrypt(base64Binary(streamInfo/url))
-        },
-        xivid:m3u8-to-json(
-          local:decrypt(
-            base64Binary(streamInfo/hlsUrl)
-          )
-        )
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 soundcloud() {
   eval "$(xidel "$1" --xquery '
     let $cid:=substring(
@@ -716,7 +654,7 @@ elif [[ $url =~ dailymotion.com ]]; then
 elif [[ $url =~ twitch.tv ]]; then
   twitch "$url"
 elif [[ $url =~ mixcloud.com ]]; then
-  mixcloud "$url"
+  eval "$(xidel -e 'json:=xivid:mixcloud("'$url'")' --output-format=bash | tr -d '\r')"
 elif [[ $url =~ soundcloud.com ]]; then
   soundcloud "$url"
 elif [[ $url =~ facebook.com ]]; then
