@@ -810,3 +810,45 @@ declare function xivid:mixcloud($url as string) as object()? {
     ]
   }
 };
+
+declare function xivid:soundcloud($url as string) as object()? {
+  let $src:=doc($url),
+      $cid:=substring(
+        substring-after(
+          unparsed-text($src//script[@crossorigin][last()]/@src),
+          "client_id:"
+        ),
+        2,32
+      ),
+      $json:=json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(data)(),
+      $fmts:=($json//transcodings)()
+  return
+  $json/{
+    "name":concat(user/(full_name,username)[.][1]," - ",title),
+    "date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),
+    "duration":format-time(
+      round(duration div 1000) * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      $fmts[format/protocol="progressive"]/(
+        let $url:=json(concat(url,"?client_id=",$cid))/url return {
+          "id":"pg-1",
+          "format":substring-before(preset,"_"),
+          "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
+          "url":$url
+        }
+      ),
+      for $x at $i in $fmts[format/protocol="hls"]
+      order by $x/preset descending
+      count $i
+      let $url:=json(concat($x/url,"?client_id=",$cid))/url
+      return {
+        "id":"hls-"||$i,
+        "format":concat("m3u8[",substring-before($x/preset,"_"),"]"),
+        "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
+        "url":$url
+      }
+    ]
+  }
+};
