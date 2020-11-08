@@ -42,7 +42,7 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
         0,"ms*"
       )
   return
-  if ($m3u8 and not($streams[1])) then {
+  if (exists($m3u8) and not(exists($streams))) then {
     "id":"hls-1",
     "format":"m3u8[h264+aac]",
     "url":$m3u8Url
@@ -155,7 +155,7 @@ declare function xivid:info($json as object()) as string* {
         "formats":"Formaten:"
       },
       $b:=max(
-        $a()[$json(.)] ! $a(.) ! string-length()
+        $a()[exists($json(.))] ! $a(.) ! string-length()
       ),
       $c:=[
         {
@@ -174,13 +174,13 @@ declare function xivid:info($json as object()) as string* {
       ),
       $e:=$d ! max($c()(.) ! string-length())
   return (
-    $a()[$json(.)] ! concat(
+    $a()[exists($json(.))] ! concat(
       substring(
         $a(.)||string-join((1 to $b) ! " "),
         1,$b + 1
       ),
       if (.=$a()[last()]) then
-        if ($c(2)) then
+        if (exists($c(2))) then
           join(
             $c() ! string-join(
               for $x at $i in $d return
@@ -332,9 +332,9 @@ declare function xivid:npo($url as string) as object()? {
           "/streams?profile=hls&amp;quality=npo&amp;tokenId=",
           $token2/token
         )
-      )/stream[not(protection)]/src
+      )/stream[not(exists(protection))]/src
   return {|
-    if ($info) then $info/{
+    if (exists($info)) then $info/{
       "name":concat(
         franchiseTitle,
         if (contains(franchiseTitle,title)) then () else ": "||title
@@ -382,7 +382,7 @@ declare function xivid:npo($url as string) as object()? {
     {
       "formats":[
         (
-          if (not($info/(subtitles)()) and $info/parentId) then
+          if (not(exists($info/(subtitles)())) and $info/parentId) then
             json(
               doc(
                 x:request({
@@ -467,7 +467,7 @@ declare function xivid:kijk($url as string) as object()? {
     "duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),
     "formats":[
       for $x at $i in (
-        if ($info[type="webvtt"]) then
+        if (exists($info[type="webvtt"])) then
           $info[type="webvtt"]/file
         else
           $info[ends-with(sourceUrl,"vtt")]/sourceUrl
@@ -644,7 +644,7 @@ declare function xivid:dumpert($url as string) {
     json(
       doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
     )
-  )/items/item/item[(media)()[mediatype="VIDEO"]]/{
+  )/items/item/item[exists((media)()[mediatype="VIDEO"])]/{
     "name":"Dumpert: "||title,
     "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
     "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
