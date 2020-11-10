@@ -610,9 +610,9 @@ elif [[ $url =~ dailymotion.com ]]; then
 elif [[ $url =~ twitch.tv ]]; then
   twitch "$url"
 elif [[ $url =~ mixcloud.com ]]; then
-  eval "$(xidel -e 'json:=xivid:mixcloud("'$url'")' --output-format=bash | tr -d '\r')"
+  eval "$(xidel -e 'json:=xivid:mixcloud("'$url'")' --output-format=bash)"
 elif [[ $url =~ soundcloud.com ]]; then
-  eval "$(xidel -e 'json:=xivid:soundcloud("'$url'")' --output-format=bash | tr -d '\r')"
+  eval "$(xidel -e 'json:=xivid:soundcloud("'$url'")' --output-format=bash)"
 elif [[ $url =~ facebook.com ]]; then
   facebook "$url"
 elif [[ $url =~ twitter.com ]]; then

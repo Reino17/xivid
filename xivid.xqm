@@ -486,7 +486,7 @@ declare function xivid:kijk($url as string) as object()? {
       },
       xivid:m3u8-to-json(
         (
-          $info[type="m3u8" and not(drm)]/extract(file,".+m3u8"),
+          $info[type="m3u8" and not(exists(drm))]/extract(file,".+m3u8"),
           $info[ends-with(sourceUrl,"m3u8")]/sourceUrl
         )[1]
       )
