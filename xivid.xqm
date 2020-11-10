@@ -764,6 +764,22 @@ declare function xivid:lc($url as string) as object()? {
   )
 };
 
+declare function xivid:dailymotion($url as string) as object()? {
+  json(replace($url,"video","player/metadata/video"))/{
+    "name":"Dailymotion: "||title,
+    "date":format-date(
+      created_time * duration("PT1S") +
+      implicit-timezone() + date("1970-01-01"),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(
+      duration * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":xivid:m3u8-to-json(qualities//url)
+  }
+};
+
 declare function xivid:mixcloud($url as string) as object()? {
   let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),
       $decrypt:=function($arg as string) as string {
