@@ -442,36 +442,25 @@ declare function xivid:rtl($url as string) as object()? {
 };
 
 declare function xivid:kijk($url as string) as object()? {
-  let $json:=json(doc($url)//script[@type="application/json"])/props,
-      $info:=for $x in $json/(apolloState)()[starts-with(.,"Program:"||$json/pageProps/video/id)] return $json/(apolloState)($x)
-  return {
-    "name":"Kijk: "||$info[__typename="Program"]/(
-      if (type="MOVIE") then
-        title
-      else
-        concat(
-          $json/pageProps/format/title,
-          " S",
-          seasonNumber ! (if (. lt 10) then "0"||. else .),
-          "E",
-          tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
-        )
+  let $json:=json(doc($url)//script[@type="application/json"])//pageProps return
+  $json/video/{
+    "name":concat(
+      "Kijk: ",
+      ($json/format,.)[1]/title,
+      .[exists(seasonNumber)]/concat(
+        " S",
+        seasonNumber ! (if (. lt 10) then "0"||. else .),
+        "E",
+        tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
+      )
     ),
     "date":format-date(
-      (
-        $info[__typename="Program"]//media_datepublished,
-        $info[__typename="Media"]/availableDate
-      )[1] div 1000 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),
+      epgDate div 1000 * duration("PT1S") + date("1970-01-01"),
       "[D01]-[M01]-[Y]"
     ),
-    "duration":round($info[__typename="Program"]/duration) * duration("PT1S") + time("00:00:00"),
+    "duration":round(duration) * duration("PT1S") + time("00:00:00"),
     "formats":[
-      for $x at $i in (
-        if (exists($info[type="webvtt"])) then
-          $info[type="webvtt"]/file
-        else
-          $info[ends-with(sourceUrl,"vtt")]/sourceUrl
-      )
+      for $x at $i in (.//sourceUrl)[ends-with(.,"vtt")]
       order by $x
       count $i
       return {
@@ -484,12 +473,7 @@ declare function xivid:kijk($url as string) as object()? {
           "Nederlands",
         "url":$x
       },
-      xivid:m3u8-to-json(
-        (
-          $info[type="m3u8" and not(exists(drm))]/extract(file,".+m3u8"),
-          $info[ends-with(sourceUrl,"m3u8")]/sourceUrl
-        )[1]
-      )
+      xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])
     ]
   }
 };
