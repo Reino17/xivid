@@ -642,6 +642,33 @@ declare function xivid:dumpert($url as string) {
   }
 };
 
+declare function xivid:autojunk($url as string) as object()? {
+  let $src:=doc($url),
+      $info:=$src//div[@id="playerWrapper"]/script
+  return {
+    "name":"Autojunk: "||extract($info,"clipData.title=&quot;(.+)&quot;",1),
+    "date":extract($src//span[@class="posted"],"([\d-]+)",1),
+    "duration":format-time(
+      extract($info,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),
+      "[H01]:[m01]:[s01]"
+    ),
+    "formats":[
+      for $x at $i in json(
+        replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+","")
+      )()[src]
+      order by $x/bandwidth
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":concat($x/width,"x",$x/height),
+        "bitrate":$x/bandwidth||"kbps",
+        "url":$x/src
+      }
+    ]
+  }
+};
+
 declare function xivid:telegraaf($url as string) as object()? {
   json(
     concat(

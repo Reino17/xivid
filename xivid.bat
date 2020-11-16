@@ -88,38 +88,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:autojunk
-FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
-  let $a:^=//div[@id^='playerWrapper']/script[1] return
-  json:^={
-    'name':'Autojunk: '^|^|extract^($a^,'clipData.title^=^&quot^;^(.+^)^&quot^;'^,1^)^,
-    'date':extract^(//span[@class^='posted']^,'^([\d-]+^)'^,1^)^,
-    'duration':format-time^(
-      extract^($a^,'clipData\[^&quot^;length^&quot^;\].+?^(\d+^)'^,1^) * duration^('PT1S'^)^,
-      '[H01]:[m01]:[s01]'
-    ^)^,
-    'formats':[
-      for $x at $i in json^(
-        replace^(
-          extract^($a^,'clipData.assets ^= ^(.+\]^)^;'^,1^,'s'^)^,
-          ' //.+'^,
-          ''
-        ^)
-      ^)^(^)[src]
-      order by $x/bandwidth
-      count $i
-      return {
-        'id':'pg-'^|^|$i^,
-        'format':'mp4[h264+aac]'^,
-        'resolution':concat^($x/width^,'x'^,$x/height^)^,
-        'bitrate':$x/bandwidth^|^|'kbps'^,
-        'url':$x/src
-      }
-    ]
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :youtube
 xidel "%~1" --xquery ^"^
   let $a:=if (//meta[@property='og:restrictions:age']) then^
@@ -605,7 +573,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:dumpert.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:dumpert('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:autojunk.nl=%"=="%url%" (
-  CALL :autojunk "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:autojunk('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:telegraaf.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:telegraaf('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:ad.nl=%"=="%url%" (

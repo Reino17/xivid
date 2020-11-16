@@ -90,38 +90,6 @@ nos() {
   ' --output-format=bash)"
 }
 
-autojunk() {
-  eval "$(xidel "$1" --xquery '
-    let $a:=//div[@id="playerWrapper"]/script[1] return
-    json:={
-      "name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),
-      "date":extract(//span[@class="posted"],"([\d-]+)",1),
-      "duration":format-time(
-        extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":[
-        for $x at $i in json(
-          replace(
-            extract($a,"clipData.assets = (.+\]);",1,"s"),
-            " //.+",
-            ""
-          )
-        )()[src]
-        order by $x/bandwidth
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":concat($x/width,"x",$x/height),
-          "bitrate":$x/bandwidth||"kbps",
-          "url":$x/src
-        }
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 youtube() {
   eval "$(xidel "$1" --xquery '
     let $a:=if (//meta[@property="og:restrictions:age"]) then
@@ -576,7 +544,7 @@ elif [[ $url =~ omroepflevoland.nl ]]; then
 elif [[ $url =~ dumpert.nl ]]; then
   eval "$(xidel -e 'json:=xivid:dumpert("'$url'")' --output-format=bash)"
 elif [[ $url =~ autojunk.nl ]]; then
-  autojunk "$url"
+  eval "$(xidel -e 'json:=xivid:autojunk("'$url'")' --output-format=bash)"
 elif [[ $url =~ telegraaf.nl ]]; then
   eval "$(xidel -e 'json:=xivid:telegraaf("'$url'")' --output-format=bash)"
 elif [[ $url =~ ad.nl ]]; then

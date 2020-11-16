@@ -8260,9 +8260,9 @@ $ xidel -s --module=xivid.xqm --xquery 'declare variable $id:=extract("https://w
 
 [autojunk]
 
-https://www.autojunk.nl/2018/10/ford-fiesta-st-interview
+$ url=https://www.autojunk.nl/2018/10/ford-fiesta-st-interview
 
-$ xidel -s "https://www.autojunk.nl/2018/10/ford-fiesta-st-interview" -e '//div[@id="playerWrapper"]/script[1]/extract(.,"clipData.assets = (.+\]);",1,"s")'
+$ xidel -se 'doc("'$url'")//div[@id="playerWrapper"]/script/extract(.,"clipData.assets = (.+\]);",1,"s")'
 [{
               id: 1, // unique asset ID
               mediatype: "MP4_HD", // HD if higher then 720p, MP4_MAIN otherwise.
@@ -8280,7 +8280,7 @@ $ xidel -s "https://www.autojunk.nl/2018/10/ford-fiesta-st-interview" -e '//div[
               bandwidth: "1200",
           }]
 
-$ xidel -s "https://www.autojunk.nl/2018/10/ford-fiesta-st-interview" -e '//div[@id="playerWrapper"]/script[1]/json(replace(extract(.,"clipData.assets = (.+\]);",1,"s")," //.+",""))'
+$ xidel -se 'doc("'$url'")//div[@id="playerWrapper"]/script/json(replace(extract(.,"clipData.assets = (.+\]);",1,"s")," //.+",""))'
 [
   {
     "id": 1,
@@ -8300,7 +8300,7 @@ $ xidel -s "https://www.autojunk.nl/2018/10/ford-fiesta-st-interview" -e '//div[
   }
 ]
 
-$ xidel -s aj_ford-fiesta-st-interview.htm --xquery 'let $a:=//div[@id="playerWrapper"]/script[1] return {"name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),"date":extract(//span[@class="posted"],"([\d-]+)",1),"duration":format-time(extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in json(replace(extract($a,"clipData.assets = (.+\]);",1,"s")," //.+",""))() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":$x/src}]}'
+$ xidel -s --json-mode=deprecated --xquery 'let $src:=doc("'$url'"),$info:=$src//div[@id="playerWrapper"]/script return {"name":"Autojunk: "||extract($info,"clipData.title=&quot;(.+)&quot;",1),"date":extract($src//span[@class="posted"],"([\d-]+)",1),"duration":format-time(extract($info,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in json(replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+",""))() order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":$x/src}]}'
 {
   "name": "Autojunk: Ford Fiesta ST interview",
   "date": "30-10-2018",
@@ -8325,16 +8325,16 @@ $ xidel -s aj_ford-fiesta-st-interview.htm --xquery 'let $a:=//div[@id="playerWr
 
 ------------------------------------------------------------------------------------------------
 
-http://www.autojunk.nl/2009/11/peugeot-206-rally-crash
+$ url=http://www.autojunk.nl/2009/11/peugeot-206-rally-crash
 
-$ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" -e '//div[@id="playerWrapper"]/script[1]/extract(.,"clipData.assets = (.+\]);",1,"s")'
+$ xidel -se 'doc("'$url'")//div[@id="playerWrapper"]/script/extract(.,"clipData.assets = (.+\]);",1,"s")'
 [{
               id: 1, // unique asset ID
               mediatype: "MP4_HD", // HD if higher then 720p, MP4_MAIN otherwise.
               src: "https://static.autojunk.nl/flv/2009/1115/135833.mp4", // asset URL
               width: "1280", // video width
-              height: "720", // video height, used to display the asset name in the quality selector (rounded)
-              bandwidth: "2000" // asset bitrate in kbps, used to sort the assets from high to low in the quality selector in the player and pick a suitable asset for the user's connection speed.
+              height: "720", // video height, [...]
+              bandwidth: "2000" // asset bitrate in kbps, [...]
           },
           {
               id: 2,
@@ -8345,7 +8345,7 @@ $ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" -e '//div[@i
               bandwidth: "1200",
           }]
 
-$ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" --xquery 'let $a:=//div[@id="playerWrapper"]/script[1] return {"name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),"date":extract(//span[@class="posted"],"([\d-]+)",1),"duration":format-time(extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in json(replace(extract($a,"clipData.assets = (.+\]);",1,"s")," //.+",""))()[src] order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":$x/src}]}'
+$ xidel -s --json-mode=deprecated --xquery 'let $src:=doc("'$url'"),$info:=$src//div[@id="playerWrapper"]/script return {"name":"Autojunk: "||extract($info,"clipData.title=&quot;(.+)&quot;",1),"date":extract($src//span[@class="posted"],"([\d-]+)",1),"duration":format-time(extract($info,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in json(replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+",""))()[src] order by $x/bandwidth count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat($x/width,"x",$x/height),"bitrate":$x/bandwidth||"kbps","url":$x/src}]}'
 {
   "name": "Autojunk: Peugeot 206 rally crash",
   "date": "15-11-2009",
@@ -8363,21 +8363,36 @@ $ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" --xquery 'le
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
-  let $a:=//div[@id="playerWrapper"]/script[1] return {
-    "name":"Autojunk: "||extract($a,"clipData.title=&quot;(.+)&quot;",1),
-    "date":extract(//span[@class="posted"],"([\d-]+)",1),
+$ url=https://www.autojunk.nl/2020/11/bmw-m440i-xdrive-rijtest-e100-000-coupe-gaat-dwars
+
+$ xidel -se 'doc("'$url'")//div[@id="playerWrapper"]/script/@src'
+//autoblog.bbvms.com/p/autojunk/y/MRTsP_YS4m0.js   # Blue Billywig
+
+$ xidel -se 'doc("'$url'")//div[@id="playerWrapper"]/script/json(resolve-uri(@src)||"on")/clipData'
+{
+  "id": "0",
+  "usetype": "editorial",
+  "mediatype": "video",
+  "sourceid": "0yt-https://www.youtube.com/watch?v=MRTsP_YS4m0"
+}
+
+Nog te doen: af laten handelen door xivid:youtube() als die klaar is.
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:autojunk($url as string) as object()? {
+  let $src:=doc($url),
+      $info:=$src//div[@id="playerWrapper"]/script
+  return {
+    "name":"Autojunk: "||extract($info,"clipData.title=&quot;(.+)&quot;",1),
+    "date":extract($src//span[@class="posted"],"([\d-]+)",1),
     "duration":format-time(
-      extract($a,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),
+      extract($info,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),
       "[H01]:[m01]:[s01]"
     ),
     "formats":[
       for $x at $i in json(
-        replace(
-          extract($a,"clipData.assets = (.+\]);",1,"s"),
-          " //.+",
-          ""
-        )
+        replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+","")
       )()[src]
       order by $x/bandwidth
       count $i
@@ -8390,7 +8405,7 @@ $ xidel -s "http://www.autojunk.nl/2009/11/peugeot-206-rally-crash" --xquery 'le
       }
     ]
   }
-'
+};
 
 ================================================================================================
 
