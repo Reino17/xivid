@@ -405,38 +405,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:pornhub
-FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
-  let $a:^=json^(//script/extract^(.^,'flashvars_\d+ ^= ^(.+^)^;'^,1^)[.]^) return
-  json:^={
-    'name':'Pornhub: '^|^|$a/video_title^,
-    'date':replace^(
-      $a/image_url^,
-      '.+?^(\d{4}^)^(\d{2}^)/^(\d{2}^).+'^,
-      '$3-$2-$1'
-    ^)^,
-    'duration':format-time^(
-      $a/video_duration * duration^('PT1S'^)^,
-      '[H01]:[m01]:[s01]'
-    ^)^,
-    'formats':[
-      for $x in //script/extract^(.^,'^(var ra.+?quality.+?^)flashvars'^,1^,'*'^) !
-      replace^(.^,'^&quot^; \+ ^&quot^;^|^&quot^;'^,''^)
-      group by $q:^=extract^($x^,'quality_^(\d+^)p^='^,1^)
-      count $i
-      return {
-        'id':'pg-'^|^|$i^,
-        'format':'mp4[h264+aac]'^,
-        'resolution':^('426x240'^,'854x480'^,'1280x720'^,'1920x1080'^)[$i]^,
-        'url':string-join^(
-          extract^($x^,'\*/^(\w+^)'^,1^,'*'^) ! substring-before^(substring-after^($x^,.^|^|'^='^)^,'^;'^)
-        ^)
-      }
-    ]
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :start
 @ECHO off
 SETLOCAL DISABLEDELAYEDEXPANSION
@@ -599,7 +567,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
   CALL :twitter "%url%"
 ) ELSE IF NOT "%url:pornhub.com=%"=="%url%" (
-  CALL :pornhub "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:pornhub('%url%')" --output-format^=cmd') DO %%A
 ) ELSE (
   ECHO xivid: url wordt niet ondersteund.
   EXIT /B 1

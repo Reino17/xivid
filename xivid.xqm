@@ -879,3 +879,36 @@ declare function xivid:soundcloud($url as string) as object()? {
     ]
   }
 };
+
+declare function xivid:pornhub($url as string) as object()? {
+  let $src:=doc($url),
+      $info:=json($src//script[@type="application/ld+json"]),
+      $fmts:=for $x in $src//div[@id="player"]/tokenize(
+        replace(script,"&quot; \+ &quot;|&quot;",""),
+        "flashvars.+?;"
+      )[contains(.,"var media_")]
+      order by extract($x,"media_(\d+)",1) descending
+      return
+      string-join(
+        extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
+      )
+  return {
+    "name":"Pornhub: "||$info/name,
+    "date":format-date(
+      dateTime($info/uploadDate) + implicit-timezone(),
+      "[D01]-[M01]-[Y]"
+    ),
+    "duration":format-time(duration($info/duration),"[H01]:[m01]:[s01]"),
+    "formats":[
+      for $x at $i in $fmts[not(contains(.,"m3u8"))]
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
+        "url":$x
+      },
+      xivid:m3u8-to-json($fmts[1])
+    ]
+  }
+};

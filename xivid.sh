@@ -402,38 +402,6 @@ twitter() {
   ' --output-format=bash)"
 }
 
-pornhub() {
-  eval "$(xidel "$1" --xquery '
-    let $a:=json(//script/extract(.,"flashvars_\d+ = (.+);",1)[.]) return
-    json:={
-      "name":"Pornhub: "||$a/video_title,
-      "date":replace(
-        $a/image_url,
-        ".+?(\d{4})(\d{2})/(\d{2}).+",
-        "$3-$2-$1"
-      ),
-      "duration":format-time(
-        $a/video_duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":[
-        for $x in //script/extract(.,"(var ra.+?quality.+?)flashvars",1,"*") !
-        replace(.,"&quot; \+ &quot;|&quot;","")
-        group by $q:=extract($x,"quality_(\d+)p=",1)
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
-          "url":string-join(
-            extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
-          )
-        }
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 if command -v xidel >/dev/null; then
   ver=$(xidel --version | xidel - -se 'substring-before(substring-after($raw,"("),".")')
   if [[ $ver -ge 20200726 ]]; then
@@ -568,7 +536,7 @@ elif [[ $url =~ facebook.com ]]; then
 elif [[ $url =~ twitter.com ]]; then
   twitter "$url"
 elif [[ $url =~ pornhub.com ]]; then
-  pornhub "$url"
+  eval "$(xidel -e 'json:=xivid:pornhub("'$url'")' --output-format=bash)"
 else
   echo "xivid: url wordt niet ondersteund." 1>&2
   exit 1
