@@ -57,15 +57,15 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
       )
     },
     for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
-    let $br:=extract($x[1],"BANDWIDTH=(\d+)",1)
-    group by $br
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
     count $i
     return {
       "id":"pg-"||$i,
       "format":"mp4[h264+aac]",
-      "resolution":extract($x[1],"RESOLUTION=([\dx]+)",1),
+      "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
       "bitrate":round($br div 1000)||"kbps",
-      "url":extract($x[1],"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)
+      "url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)
     },
     {
       "id":"hls-0",
@@ -73,33 +73,33 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
       "url":$m3u8Url
     }[url],
     for $x at $i in $streams
-    let $br:=extract($x[1],"BANDWIDTH=(\d+)",1)
-    group by $br
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x[1],"avc1")) then
+      "format":if (contains($x,"avc1")) then
         "m3u8[h264+aac]"
       else
         "m3u8[aac]",
       "resolution":concat(
-        extract($x[1],"RESOLUTION=([\dx]+)",1)[.],
-        extract($x[1],"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] !
+        extract($x,"RESOLUTION=([\dx]+)",1)[.],
+        extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] !
           concat("@",round-half-to-even(.,3),"fps")
       )[.],
-      "bitrate":let $a:=extract($x[1],"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
+      "bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
       concat(
-        if ($a[1]) then
-          join((round($a[2][.] div 1000),round($a[1] div 1000)),"|")
+        if ($br2[1]) then
+          join((round($br2[2][.] div 1000),round($br2[1] div 1000)),"|")
         else
           (
             round($br[.] div 1000),
-            extract($x[1],"GROUP-ID=.+?-(\d+)",1)[.]
+            extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
           ),
         "kbps"
       ),
       "url":resolve-uri(
-        extract($x[1],"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),
+        extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),
         $m3u8Url
       )
     }
@@ -623,7 +623,7 @@ declare function xivid:ofl($url as string) as object()? {
   )
 };
 
-declare function xivid:dumpert($url as string) {
+declare function xivid:dumpert($url as string) as object()? {
   json(
     json(
       doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
