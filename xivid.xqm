@@ -473,7 +473,7 @@ declare function xivid:kijk($url as string) as object()? {
           "Nederlands",
         "url":$x
       },
-      xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])
+      xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")][last()])
     ]
   }
 };

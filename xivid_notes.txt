@@ -4286,6 +4286,88 @@ In Kijk's JSON is geen aanwijzing meer te vinden dat een video met DRM beveiligd
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://kijk.nl/films/video/13-going-on-30/BuHhR4Edq6M
+
+$ xidel -se 'json(doc("'$url'")//script[@type="application/json"])//pageProps/video/(media)()'
+{
+  "availableDate": "1606426901000",
+  "mediaContent": [
+    {
+      "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/BuHhR4Edq6M/f5dab26b-de88-8409-054a-6e4baa1f9a97/BuHhR4Edq6M_1578040540267.ism/Manifest",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/BuHhR4Edq6M/f5dab26b-de88-8409-054a-6e4baa1f9a97/BuHhR4Edq6M_1578040540267.ism/master.m3u8",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/BuHhR4Edq6M/f5dab26b-de88-8409-054a-6e4baa1f9a97/BuHhR4Edq6M_1578040540267.ism/index.mpd",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/BuHhR4Edq6M/f5dab26b-de88-8409-054a-6e4baa1f9a97/BuHhR4Edq6M_1578040540267.ism/index.mpd",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/760062E1.vtt",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-mp-prod.talpatvcdn.nl/0e4a89b76f9e42519be88b6c1a91eb47/5fb4f1bcca634f7ebbeaa9eda36f2702/118d72f49ada4963a86a677fc4a7024a/index.m3u8",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-mp-prod.talpatvcdn.nl/0e4a89b76f9e42519be88b6c1a91eb47/2cdfa1514ece4b428e9aeccee697d7ee/f35833b7b818457581c444ccf1a10fb7/index.mpd",
+      "__typename": "MediaFile"
+    },
+    {
+      "sourceUrl": "https://vod-kijk2-mp-prod.talpatvcdn.nl/0e4a89b76f9e42519be88b6c1a91eb47/d4f12e9f8d4d4f839f2db87a426a9260/91da1977fd6840e3ab30a620d3021eeb/index.ism/Manifest",
+      "__typename": "MediaFile"
+    }
+  ],
+  "__typename": "Media"
+}
+
+De host met "mp" in de url heeft de voorkeur, omdat deze betrouwbaarder en een stuk sneller is.
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $json:=json(doc("'$url'")//script[@type="application/json"])//pageProps return $json/video/{"name":concat("Kijk: ",($json/format,.)[1]/title,.[exists(seasonNumber)]/concat(" S",seasonNumber ! (if (. lt 10) then "0"||. else .),"E",tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .))),"date":format-date(epgDate div 1000 * duration("PT1S") + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":round(duration) * duration("PT1S") + time("00:00:00"),"formats":[for $x at $i in (.//sourceUrl)[ends-with(.,"vtt")] order by $x count $i return {"id":"sub-"||$i,"format":"vtt","language":"nl","label":if (contains($x,"OPE")) then "Doven en Slechthorenden" else "Nederlands","url":$x},xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")][last()])]}'
+{
+  "name": "Kijk: 13 Going on 30",
+  "date": "26-11-2020",
+  "duration": "01:28:32",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/760062E1.vtt"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://vod-kijk2-mp-prod.talpatvcdn.nl/[...]/index.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "448x252@25fps",
+      "bitrate": "507kbps",
+      "url": "https://vod-kijk2-mp-prod.talpatvcdn.nl/[...]/b32dc0ea44a541f5a2f95f64fafca090/9b83a77875d2492c869b1584e4999b77/index_6.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "6776kbps",
+      "url": "https://vod-kijk2-mp-prod.talpatvcdn.nl/[...]/b32dc0ea44a541f5a2f95f64fafca090/9b83a77875d2492c869b1584e4999b77/index_1.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:kijk($url as string) as object()? {
   let $json:=json(doc($url)//script[@type="application/json"])//pageProps return
   $json/video/{
@@ -4318,7 +4400,7 @@ declare function xivid:kijk($url as string) as object()? {
           "Nederlands",
         "url":$x
       },
-      xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")])
+      xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")][last()])
     ]
   }
 };
