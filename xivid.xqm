@@ -775,6 +775,64 @@ declare function xivid:lc($url as string) as object()? {
   )
 };
 
+declare function xivid:youtube($url as string) as object()? {
+  let $json:={|
+    for $x in tokenize(
+      unparsed-text("https://www.youtube.com/get_video_info?video_id="||extract($url,"\w+$")),
+      "&amp;"
+    )
+    let $kv:=tokenize($x,"=") return {$kv[1]:uri-decode($kv[2])}
+  |}/json(player_response) return
+  $json//playerMicroformatRenderer/{|
+    if (liveBroadcastDetails/isLiveNow) then {
+      "name":title/simpleText,
+      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "formats":xivid:m3u8-to-json($json/streamingData/hlsManifestUrl)
+    } else {
+      "name":title/simpleText,
+      "date":format-date(date(uploadDate),"[D01]-[M01]-[Y]"),
+      "duration":format-time(lengthSeconds * duration("PT1S"),"[H01]:[m01]:[s01]"),
+      "formats":[
+        ($json//captionTracks)()[languageCode=("nl","en")]/{
+          "id":"sub-"||position(),
+          "format":"ttml",
+          "language":languageCode,
+          "label":name/simpleText,
+          "url":baseUrl
+        },
+        for $x at $i in $json/streamingData/(formats)()[url]
+        order by $x/width
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":let $mt:=tokenize($x/mimeType,";"),
+              $c:=tokenize(
+                extract($mt[2],"&quot;(.+)&quot;",1),
+                ", "
+              ) ! tokenize(.,"\.")[1]
+          return
+          concat(
+            substring-after($mt[1],"/"),
+            "[",
+            if ($c[1]="avc1") then "h264" else $c[1],
+            "+",
+            if ($c[2]="mp4a") then "aac" else $c[2],
+            "]"
+          ),
+          "resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),
+          "bitrate":concat(round($x/bitrate div 1000),"kbps"),
+          "url":$x/url
+        },
+        {
+          "id":"dash-0",
+          "format":"mpd[manifest]",
+          "url":$json/streamingData/dashManifestUrl
+        }[url]
+      ]
+    }
+  |}
+};
+
 declare function xivid:dailymotion($url as string) as object()? {
   json(replace($url,"video","player/metadata/video"))/{
     "name":"Dailymotion: "||title,

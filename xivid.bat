@@ -88,132 +88,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:youtube
-xidel "%~1" --xquery ^"^
-  let $a:=if (//meta[@property='og:restrictions:age']) then^
-        {^|^
-          for $x in tokenize(^
-            unparsed-text(^
-              concat(^
-                'https://www.youtube.com/get_video_info?video_id=',^
-                //meta[@itemprop='videoId']/@content,^
-                '^&amp;eurl=',^
-                uri-encode('https://youtube.googleapis.com/v/'^|^|//meta[@itemprop='videoId']/@content),^
-                '^&amp;sts=',^
-                json(^
-                  doc(^
-                    'https://www.youtube.com/embed/'^|^|//meta[@itemprop='videoId']/@content^
-                  )//script/extract(.,'setConfig\((.+?)\)',1,'*')[3]^
-                )//sts^
-              )^
-            ),^
-            '^&amp;'^
-          )^
-          let $a:=tokenize($x,'=') return {$a[1]:uri-decode($a[2])}^
-        ^|}^
-      else^
-        json(^
-          //script/extract(.,'ytplayer.config = (.+?\});',1)[.]^
-        )/args,^
-      $b:=$a/json(player_response),^
-      $c:=for $x at $i in tokenize($a/url_encoded_fmt_stream_map,',') return {^|^
-        let $a:=extract(^
-          tokenize($a/fmt_list,',')[$i],^
-          '/(\d+)x(\d+)',^
-          (1,2)^
-        ) return ({'width':$a[1]},{'height':$a[2]}),^
-        for $y in tokenize($x,'^&amp;')^
-        let $a:=tokenize($y,'=')^
-        return^
-        {if ($a[1]='type') then 'mimeType' else $a[1]:uri-decode($a[2])}^
-      ^|},^
-      $d:=tokenize($a/adaptive_fmts,',') ! {^|^
-        for $x in tokenize(.,'^&amp;')^
-        let $a:=tokenize($x,'=')^
-        return^
-        if ($a[1]='size') then^
-          let $a:=tokenize($a[2],'x') return ({'width':$a[1]},{'height':$a[2]})^
-        else {^
-          if ($a[1]='type') then^
-            'mimeType'^
-          else if ($a[1]='audio_sample_rate') then^
-            'audioSampleRate'^
-          else^
-            $a[1]:uri-decode($a[2])^
-        }^
-      ^|}^
-  return^
-  if ($b/videoDetails/isLive) then {^
-    'name'://meta[@property='og:title']/@content,^
-    'date':format-date(current-date(),'[D01]-[M01]-[Y]'),^
-    'formats':xivid:m3u8-to-json($b/streamingData/hlsManifestUrl)^
-  } else {^
-    'name'://meta[@property='og:title']/@content,^
-    'date':format-date(^
-      date(//meta[@itemprop='datePublished']/@content),^
-      '[D01]-[M01]-[Y]'^
-    ),^
-    'duration':duration(//meta[@itemprop='duration']/@content) + time('00:00:00'),^
-    'formats':[^
-      ($b//captionTracks)()[languageCode='nl']/{^
-        'id':'sub-1',^
-        'format':'ttml',^
-        'language':'nl',^
-        'label':name/simpleText,^
-        'url':baseUrl^
-      },^
-      for $x at $i in if ($b/streamingData/formats) then $b/streamingData/(formats)()[url] else reverse($c[not(s)])^
-      order by $x/width^
-      count $i^
-      return {^
-        'id':'pg-'^|^|$i,^
-        'format':let $a:=extract(^
-          $x/mimeType,^
-          '/(.+);.+^&quot;(\w+)\..+ (\w+)(?:\.^|^&quot;)',^
-          (1 to 3)^
-        ) return^
-        concat(^
-          if ($a[1]='3gpp') then '3gp' else $a[1],^
-          '[',^
-          if ($a[2]='avc1') then 'h264' else $a[2],^
-          '+',^
-          if ($a[3]='mp4a') then 'aac' else $a[3],^
-          ']'^
-        ),^
-        'resolution':concat($x/width,'x',$x/height),^
-        'bitrate':$x[itag ne 43]/bitrate ! concat(round(. div 1000),'kbps'),^
-        'url':$x/url^
-      },^
-      for $x at $i in if ($b/streamingData/adaptiveFormats) then $b/streamingData/(adaptiveFormats)()[url] else $d[not(s)]^
-      order by $x/boolean(width),$x/bitrate^
-      count $i^
-      return {^
-        'id':'dash-'^|^|$i,^
-        'format':let $a:=extract(^
-          $x/mimeType,^
-          '/(.+);.+^&quot;(\w+)',^
-          (1,2)^
-        ) return^
-        concat(^
-          $a[1],^
-          '[',^
-          if ($a[2]='avc1') then 'h264' else if ($a[2]='mp4a') then 'aac' else $a[2],^
-          ']'^
-        ),^
-        'resolution':$x/width ! concat(.,'x',$x/height,'@',$x/fps,'fps'),^
-        'samplerate':$x/audioSampleRate ! concat(. div 1000,'kHz'),^
-        'bitrate':round($x/bitrate div 1000)^|^|'kbps',^
-        'url':$x/url^
-      }^
-    ]^
-  }^
-" > xivid.json
-REM CMD's commandline buffer is 8KB (8192 bytes) groot. De gegenereerde JSON
-REM hier heeft makkelijk meer dan 20000 tekens en gaat daar dus ver overheen.
-REM De enige manier om zo'n JSON toch te verwerken is door gebruik te maken
-REM van een tijdelijk bestand.
-EXIT /B
-
 :vimeo
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   json:^=json^(
@@ -549,9 +423,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:lc.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:lc('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:youtube.com=%"=="%url%" (
-  CALL :youtube "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:youtube('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:youtu.be=%"=="%url%" (
-  CALL :youtube "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:youtube('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:vimeo.com=%"=="%url%" (
   CALL :vimeo "%url%"
 ) ELSE IF NOT "%url:dailymotion.com=%"=="%url%" (
@@ -573,9 +447,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
   EXIT /B 1
 )
 
-IF EXIST xivid.json (
-  FOR /F "delims=" %%A IN ('xidel xivid.json -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd') DO %%A
-) ELSE IF DEFINED json (
+IF DEFINED json (
   FOR /F "delims=" %%A IN ('ECHO %json% ^| xidel - -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd') DO %%A
 ) ELSE (
   ECHO xivid: geen video^(-informatie^) beschikbaar.
@@ -600,50 +472,25 @@ IF DEFINED f (
         )
       )
     )
-    IF EXIST xivid.json (
-      xidel xivid.json -e ^"^
-        for $x in tokenize^('%f%'^,'\+'^) return^
-        if ^(ends-with^($x^,'#'^)^) then^
-          $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
-        else^
-          $json/^(formats^)^(^)[id^=$x]/url^
-      "
-    ) ELSE (
-      ECHO !json! | xidel - -e ^"^
-        for $x in tokenize^('%f%'^,'\+'^) return^
-        if ^(ends-with^($x^,'#'^)^) then^
-          $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
-        else^
-          $json/^(formats^)^(^)[id^=$x]/url^
-      "
-    )
+    ECHO !json! | xidel - -e ^"^
+      for $x in tokenize^('%f%'^,'\+'^) return^
+      if ^(ends-with^($x^,'#'^)^) then^
+        $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
+      else^
+        $json/^(formats^)^(^)[id^=$x]/url^
+    "
   ) ELSE (
     ECHO xivid: geen video beschikbaar.
-    IF EXIST xivid.json DEL xivid.json
     EXIT /B 1
   )
 ) ELSE IF DEFINED i (
-  IF EXIST xivid.json (
-    xidel xivid.json -e "xivid:info($json)"
-  ) ELSE (
-    ECHO %json% | xidel - -e "xivid:info($json)"
-  )
+  ECHO %json% | xidel - -e "xivid:info($json)"
 ) ELSE IF DEFINED j (
-  IF EXIST xivid.json (
-    xidel xivid.json -e "$json"
-  ) ELSE (
-    ECHO %json% | xidel - -e "$json"
-  )
+  ECHO %json% | xidel - -e "$json"
 ) ELSE IF DEFINED fmts (
-  IF EXIST xivid.json (
-    xidel xivid.json -e "$json/(formats)()[last()]/url"
-  ) ELSE (
-    ECHO %json% | xidel - -e "$json/(formats)()[last()]/url"
-  )
+  ECHO %json% | xidel - -e "$json/(formats)()[last()]/url"
 ) ELSE (
   ECHO xivid: geen video beschikbaar.
-  IF EXIST xivid.json DEL xivid.json
   EXIT /B 1
 )
-IF EXIST xivid.json DEL xivid.json
 EXIT /B 0
