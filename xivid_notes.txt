@@ -2005,6 +2005,48 @@ $ xidel -s dm_x5aa1uc.m3u8 --json-mode=deprecated --xquery 'let $url:="https://w
 
 ------------------------------------------------------------------------------------------------
 
+'vimeo_238924796.m3u8':
+
+#EXTM3U
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-medium",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/853938837/playlist.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-high",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/853938829/playlist.m3u8"
+
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=657686,AVERAGE-BANDWIDTH=485000,RESOLUTION=640x360,FRAME-RATE=25.000,CODECS="avc1.64001E,mp4a.40.2",AUDIO="audio-medium"
+../853938837/playlist.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=996877,AVERAGE-BANDWIDTH=624000,RESOLUTION=704x396,FRAME-RATE=25.000,CODECS="avc1.64001F,mp4a.40.2",AUDIO="audio-medium"
+../853938829/playlist.m3u8
+
+$ xidel -s vimeo_238924796.m3u8 --xquery 'let $streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return let $a:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return if ($a[1]) then concat(round($a[2][.] div 1000),"|",round($a[1] div 1000),"kbps") else if ($br) then concat((round($br[.] div 1000),extract($x[1],"GROUP-ID=.+?-(\d+)",1)[.]),"kbps") else ()'
+658kbps
+997kbps
+
+$ xidel -s vimeo_238924796.m3u8 --json-mode=deprecated --xquery 'let $url:="https://197vod-adaptive.akamaized.net/exp=1606676297~acl=%2F238924796%2F%2A~hmac=02b379efe1250180b199bb4d6270271972a767a81e976b9442d92c76d178aa06/238924796/sep/video/853938837,853938829/master.m3u8",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return [extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return if ($br2[1]) then concat(round($br2[2][.] div 1000),"|",round($br2[1] div 1000),"kbps") else if ($br) then concat((round($br[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps") else (),"url":resolve-uri(extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),$url)}]'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://197vod-adaptive.akamaized.net/[...]/853938837,853938829/master.m3u8"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[aac]",
+    "resolution": null,
+    "bitrate": null,
+    "url": "https://197vod-adaptive.akamaized.net/[...]/853938837/playlist.m3u8"
+  },
+  [...]
+  {
+    "id": "hls-4",
+    "format": "m3u8[h264+aac]",
+    "resolution": "704x396@25fps",
+    "bitrate": "997kbps",
+    "url": "https://197vod-adaptive.akamaized.net/[...]/853938829/playlist.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
 'ogl_live.m3u8':
 
 #EXTM3U
@@ -2051,7 +2093,7 @@ https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2V
 
 - Creëer een m3u8-to-json functie van deze query.
 
-$ xidel -s --json-mode=deprecated --xquery 'declare function local:m3u8-to-json($url as string?) as object()* {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/doc,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then {"id":"hls-1","format":"m3u8[h264+aac]","url":$url} else (extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return concat(if ($br2[1]) then join((round($br2[2][.] div 1000),round($br2[1] div 1000)),"|") else (round($br[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps"),"url":resolve-uri(extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),$m3u8Url)})}; local:m3u8-to-json(<url>)'
+$ xidel -s --json-mode=deprecated --xquery 'declare function local:m3u8-to-json($url as string?) as object()* {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/doc,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then {"id":"hls-1","format":"m3u8[h264+aac]","url":$url} else (extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return if ($br2[1]) then concat(round($br2[2][.] div 1000),"|",round($br2[1] div 1000),"kbps") else if ($br) then concat((round($br[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps") else (),"url":resolve-uri(extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),$m3u8Url)})}; local:m3u8-to-json(<url>)'
 
 string    # Een string.
 string+   # Eén of meerdere strings.
@@ -2117,16 +2159,23 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
           concat("@",round-half-to-even(.,3),"fps")
       )[.],
       "bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
-      concat(
-        if ($br2[1]) then
-          join((round($br2[2][.] div 1000),round($br2[1] div 1000)),"|")
-        else
+      if ($br2[1]) then
+        concat(
+          round($br2[2][.] div 1000),
+          "|",
+          round($br2[1] div 1000),
+          "kbps"
+        )
+      else if ($br) then
+        concat(
           (
             round($br[.] div 1000),
             extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
           ),
-        "kbps"
-      ),
+          "kbps"
+        )
+      else
+        (),
       "url":resolve-uri(
         extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),
         $m3u8Url

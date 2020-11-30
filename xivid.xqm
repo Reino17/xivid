@@ -88,16 +88,23 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
           concat("@",round-half-to-even(.,3),"fps")
       )[.],
       "bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
-      concat(
-        if ($br2[1]) then
-          join((round($br2[2][.] div 1000),round($br2[1] div 1000)),"|")
-        else
+      if ($br2[1]) then
+        concat(
+          round($br2[2][.] div 1000),
+          "|",
+          round($br2[1] div 1000),
+          "kbps"
+        )
+      else if ($br) then
+        concat(
           (
             round($br[.] div 1000),
             extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
           ),
-        "kbps"
-      ),
+          "kbps"
+        )
+      else
+        (),
       "url":resolve-uri(
         extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),
         $m3u8Url
