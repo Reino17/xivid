@@ -2047,6 +2047,43 @@ $ xidel -s vimeo_238924796.m3u8 --json-mode=deprecated --xquery 'let $url:="http
 
 ------------------------------------------------------------------------------------------------
 
+'nhnieuws_live.m3u8':
+
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=1153433,RESOLUTION=640x360
+https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/chunklist_b1048576.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2306867,RESOLUTION=1280x720
+https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/chunklist_b2097152.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=3487334,RESOLUTION=1920x1080
+https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/chunklist_b3170304.m3u8
+
+$ xidel -s nhnieuws_live.m3u8 --json-mode=deprecated --xquery 'let $url:="https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/playlist.m3u8?token=UgzahPavoxmi-u_WRJaG9g&amp;time=1606692116",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return [extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return if ($br2[1]) then concat(round($br2[2][.] div 1000),"|",round($br2[1] div 1000),"kbps") else if ($br) then concat((round($br[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps") else (),"url":resolve-uri(extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),$url)}]'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://ngx.cr2.streamzilla.xlcdn.com/[...]/playlist.m3u8?token=UgzahPavoxmi-u_WRJaG9g&time=1606692116"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[h264+aac]",
+    "resolution": "640x360",
+    "bitrate": "1153kbps",
+    "url": "https://ngx.cr2.streamzilla.xlcdn.com/[...]/chunklist_b1048576.m3u8"
+  },
+  [...]
+  {
+    "id": "hls-3",
+    "format": "m3u8[h264+aac]",
+    "resolution": "1920x1080",
+    "bitrate": "3487kbps",
+    "url": "https://ngx.cr2.streamzilla.xlcdn.com/[...]/chunklist_b3170304.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
 'ogl_live.m3u8':
 
 #EXTM3U
@@ -2093,7 +2130,7 @@ https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2V
 
 - Creëer een m3u8-to-json functie van deze query.
 
-$ xidel -s --json-mode=deprecated --xquery 'declare function local:m3u8-to-json($url as string?) as object()* {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/doc,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then {"id":"hls-1","format":"m3u8[h264+aac]","url":$url} else (extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return if ($br2[1]) then concat(round($br2[2][.] div 1000),"|",round($br2[1] div 1000),"kbps") else if ($br) then concat((round($br[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps") else (),"url":resolve-uri(extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),$m3u8Url)})}; local:m3u8-to-json(<url>)'
+$ xidel -s --json-mode=deprecated --xquery 'declare function local:m3u8-to-json($url as string?) as object()* {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/doc,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then {"id":"hls-1","format":"m3u8[h264+aac]","url":$url} else (extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution":concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return if ($br2[1]) then concat(round($br2[2][.] div 1000),"|",round($br2[1] div 1000),"kbps") else if ($br) then concat((round($br[.] div 1000),extract($x,"GROUP-ID=.+?-(\d+)",1)[.]),"kbps") else (),"url":resolve-uri(extract($x,"(?:.+URI=&quot;)?(.+m3u8(?:\?.+?$)?)",1,"m"),$m3u8Url)})}; local:m3u8-to-json(<url>)'
 
 string    # Een string.
 string+   # Eén of meerdere strings.
@@ -2149,7 +2186,7 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1")) then
+      "format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then
         "m3u8[h264+aac]"
       else
         "m3u8[aac]",
@@ -3790,7 +3827,7 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'let $prid:=extract("'$u
     },
     {
       "id": "hls-3",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "480x270",
       "bitrate": "209|64kbps",
       "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03373320_v4-audio=64000-video=209000.m3u8"
@@ -6272,7 +6309,7 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/{"name":substring-after(//title,
     },
     {
       "id": "hls-1",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "640x360",
       "bitrate": "1153kbps",
       "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/b698f6a49ad321c97d82cbdcc113c215/sz/nhnieuws/wowza4/live/live.smil/chunklist_b1048576.m3u8"
@@ -6280,7 +6317,7 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/{"name":substring-after(//title,
     [...]
     {
       "id": "hls-3",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "3487kbps",
       "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/b698f6a49ad321c97d82cbdcc113c215/sz/nhnieuws/wowza4/live/live.smil/chunklist_b3170304.m3u8"
@@ -6302,21 +6339,21 @@ $ xidel -s --module=xivid.xqm -e '[...]'
     },
     {
       "id": "hls-1",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "640x512",
       "bitrate": "1153kbps",
       "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/chunklist_b1048576.m3u8"
     },
     {
       "id": "hls-2",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "768x608",
       "bitrate": "2307kbps",
       "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/chunklist_b2097152.m3u8"
     },
     {
       "id": "hls-3",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "1920x1536",
       "bitrate": "3460kbps",
       "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/chunklist_b3145728.m3u8"
@@ -6340,7 +6377,7 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then json(//scri
     },
     {
       "id": "hls-1",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "568x320",
       "bitrate": "649kbps",
       "url": "https://wos.cr2.streamzilla.xlcdn.com/session/8ec1ff7f8b2ca8e2c4126e3de4a5bdcf/vod/_definst_/sz/nhnieuws/2020/09/15/5f61304eb80485f61304eb8083.smil/chunklist_b589824.m3u8"
@@ -6348,7 +6385,7 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then json(//scri
     [...]
     {
       "id": "hls-4",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "4794kbps",
       "url": "https://wos.cr2.streamzilla.xlcdn.com/session/8ec1ff7f8b2ca8e2c4126e3de4a5bdcf/vod/_definst_/sz/nhnieuws/2020/09/15/5f61304eb80485f61304eb8083.smil/chunklist_b4358144.m3u8"
@@ -6370,7 +6407,7 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then json(//scri
     },
     {
       "id": "hls-1",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "568x320",
       "bitrate": "649kbps",
       "url": "https://wos.cr2.streamzilla.xlcdn.com/session/84999fac2f88ccc249d84f3d1ba508b7/vod/_definst_/sz/atvijf/2020/04/01/5e847e53d70f55e847e53d712f.smil/chunklist_b589926.m3u8"
@@ -6378,7 +6415,7 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then json(//scri
     [...]
     {
       "id": "hls-4",
-      "format": "m3u8[aac]",
+      "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "5924kbps",
       "url": "https://wos.cr2.streamzilla.xlcdn.com/session/84999fac2f88ccc249d84f3d1ba508b7/vod/_definst_/sz/atvijf/2020/04/01/5e847e53d70f55e847e53d712f.smil/chunklist_b5385216.m3u8"
