@@ -5233,17 +5233,17 @@ declare function xivid:youtube($url as string) as object()? {
 
 [vimeo]
 
-https://vimeo.com/195782736
+$ url=https://vimeo.com/224661084
 
-$ xidel -s "https://vimeo.com/195782736" -e 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])'
+$ xidel -se 'json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])'
 {
   "clip": {
-    "id": 195782736,
-    "title": "Sony Cyber-shot RX100 V sample movie: Daylight handheld / 4k / 24p",
-    "description": "<p class=\"first\">Sample movie filmed with a Sony Cyber-shot RX100 V in 4k / 24p using the Standard Creative Style and with Picture Profiles Off. This video is part of my RX100 V review at Camera Labs. You can find my review at:</p>\n<p><a href=\"http://www.cameralabs.com/reviews/Sony_Cyber-shot_RX100_V/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">cameralabs.com/reviews/Sony_Cyber-shot_RX100_V/</a></p>\n<p>Feel free to download the original file for evaluation on your own computer, but please don&#039;t upload it to another website without permission from <a href=\"http://www.cameralabs.com/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">cameralabs.com/</a>  Thanks!</p>",
-    "uploaded_on": "2016-12-15 07:10:44",
-    "uploaded_on_relative": "2 years ago",
-    "uploaded_on_full": "Thursday, December 15, 2016 at 7:10 AM EST",
+    "id": 224661084,
+    "title": "The Uncertainty has Settled-Now on demand",
+    "description": "<p class=\"first\">The full length documentary [...] Are we doing the right thing?</p>",
+    "uploaded_on": "2017-07-07 11:14:30",
+    "uploaded_on_relative": "3 years ago",
+    "uploaded_on_full": "Friday, July 7, 2017 at 11:14 AM EST",
     "is_spatial": false,
     "is_hdr": false,
     "privacy": {
@@ -5252,150 +5252,260 @@ $ xidel -s "https://vimeo.com/195782736" -e 'json(//script/extract(.,"clip_page_
       "description": "Public"
     },
     "duration": {
-      "raw": 19,
-      "formatted": "00:19"
+      "raw": 117,
+      "formatted": "01:57"
     },
     "is_liked": false,
     "is_unavailable": false,
-    "likes_url": "/195782736/likes",
+    "likes_url": "/224661084/likes",
     "is_live": false,
     "unlisted_hash": null
   },
+  "owner": {
+    "id": 11716486,
+    "display_name": "Marijn Poels",
+    [...]
+  },
   [...]
   "player": {
-    "config_url": "https://player.vimeo.com/video/195782736/config?autopause=1&byline=0&collections=1&context=Vimeo%5CController%5CClipController.main&default_to_hd=1&outro=nothing&portrait=0&share=1&title=0&watch_trailer=0&s=367ed06735a602d6e3e5c20f0713f42c4a46ecbf_1564856655",
+    "config_url": "https://player.vimeo.com/video/224661084/config?[...]",
     "player_url": "player.vimeo.com",
     "dimensions": {
       "height": 540,
-      "width": 960
+      "width": 1290
     },
     "poster": {
-      "url": "https://i.vimeocdn.com/video/608090569.jpg?mw=2000&mh=1080&q=70"
+      "url": "https://i.vimeocdn.com/video/660399389.jpg?mw=2000&mh=1080&q=70"
     }
   },
   [...]
 }
 
-$ xidel -s "https://vimeo.com/195782736" -e 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])/player/json(config_url)'
+$ xidel -se 'json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/player/json(config_url)'
 {
   "cdn_url": "https://f.vimeocdn.com",
   "vimeo_api_url": "api.vimeo.com",
   "request": {
     "files": {
       "dash": {
-        "separate_av": true,
-        "streams": [
-          {
-            "profile": 119,
-            "quality": "1080p",
-            "id": 656588355,
-            "fps": 23
-          },
-          [...]
-          {
-            "profile": 174,
-            "quality": "720p",
-            "id": 656588395,
-            "fps": 23
-          }
-        ],
-        "cdns": {
-          "akfire_interconnect_quic": {
-            "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1564760602~acl=%2F195782736%2F%2A~hmac=ab204b26e281653916a435156a98ceafe3e40d05b144e42867e57e38fab34177/195782736/sep/video/656588398,656588401,656588395,656588393,656588355,656588334/master.json?base64_init=1",
-            "origin": "gcs"
-          },
-          "fastly_skyfire": {
-            "url": "https://skyfire.vimeocdn.com/1564760602-0x27d00b2e48ee30536284cb9f76fd59643e77f5ae/195782736/sep/video/656588398,656588401,656588395,656588393,656588355,656588334/master.json?base64_init=1",
-            "origin": "gcs"
-          }
-        },
-        "default_cdn": "fastly_skyfire"
+        [...]
       },
       "hls": {
-        "separate_av": false,
-        "default_cdn": "fastly_skyfire",
+        "separate_av": true,
+        "default_cdn": "akfire_interconnect_quic",
         "cdns": {
           "akfire_interconnect_quic": {
-            "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1564760602~acl=%2F195782736%2F%2A~hmac=ab204b26e281653916a435156a98ceafe3e40d05b144e42867e57e38fab34177/195782736/video/656588398,656588401,656588395,656588393,656588355,656588334/master.m3u8",
-            "origin": "gcs"
+            "url": "https://85vod-adaptive.akamaized.net/[...]/787433688,787433686,787433685,787433684/master.m3u8",
+            "origin": "gcs",
+            "avc_url": [...]
           },
           "fastly_skyfire": {
-            "url": "https://skyfire.vimeocdn.com/1564760602-0x27d00b2e48ee30536284cb9f76fd59643e77f5ae/195782736/video/656588398,656588401,656588395,656588393,656588355,656588334/master.m3u8",
-            "origin": "gcs"
+            "url": "https://skyfire.vimeocdn.com/[...]/787433688,787433686,787433685,787433684/master.m3u8",
+            "origin": "gcs",
+            "avc_url": [...]
           }
         }
       },
       "progressive": [
         {
-          "profile": 170,
-          "width": 2560,
+          "profile": 174,
+          "width": 1366,
           "mime": "video/mp4",
-          "fps": 23,
-          "url": "https://gcs-vimeo.akamaized.net/exp=1564760602~acl=%2A%2F656588401.mp4%2A~hmac=1fe49184540fbb4774b99e21a01af79049471011467213644a895d5eb19b293c/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588401.mp4",
+          "fps": 25,
+          "url": "https://vod-progressive.akamaized.net/[...]/787433688.mp4",
           "cdn": "akamai_interconnect",
-          "quality": "1440p",
-          "id": 656588401,
+          "quality": "720p",
+          "id": 787433688,
           "origin": "gcs",
-          "height": 1440
+          "height": 572
         },
         [...]
         {
           "profile": 165,
           "width": 960,
           "mime": "video/mp4",
-          "fps": 23,
-          "url": "https://gcs-vimeo.akamaized.net/exp=1564760602~acl=%2A%2F656588334.mp4%2A~hmac=f0e4bf3f128a2bed654e37027b30fb29a0066e36918d49f207f9719f2215174c/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588334.mp4",
+          "fps": 25,
+          "url": "https://vod-progressive.akamaized.net/[...]/787433684.mp4",
           "cdn": "akamai_interconnect",
           "quality": "540p",
-          "id": 656588334,
+          "id": 787433684,
           "origin": "gcs",
-          "height": 540
+          "height": 402
         }
       ]
     },
     [...]
-    }
   },
   [...]
 }
 
-$ xidel -s --module=xivid.xqm "https://vimeo.com/195782736" -e 'json(//script/extract(.,"clip_page_config = (.+);",1)[.])/{"name":clip/title,"date":replace(clip/uploaded_on,"(\d+)-(\d+)-(\d+).+","$3-$2-$1"),"duration":clip/duration/raw * duration("PT1S") + time("00:00:00"),"formats":player/json(config_url)//files/(for $x at $i in (progressive)() order by $x/width count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height,"@",fps,"fps"),"url":url},xivid:m3u8-to-json((hls//url)[1]))}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/{"name":concat(owner/display_name,": ",clip/title),"date":format-date(date(substring(clip/uploaded_on,1,10)),"[D01]-[M01]-[Y]"),"duration":clip/duration/raw * duration("PT1S") + time("00:00:00"),"formats":player/json(config_url)//files/[for $x at $i in (progressive)() order by $x/width count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height,"@",fps,"fps"),"url":url},xivid:m3u8-to-json((hls//url)[1])]}'
 {
-  "name": "Sony Cyber-shot RX100 V sample movie: Daylight handheld / 4k / 24p",
-  "date": "15-12-2016",
-  "duration": "00:00:19",
+  "name": "Marijn Poels: The Uncertainty has Settled-Now on demand",
+  "date": "07-07-2017",
+  "duration": "00:01:57",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "resolution": "640x360@23fps",
-      "url": "https://gcs-vimeo.akamaized.net/exp=1564760854~acl=%2A%2F656588398.mp4%2A~hmac=1caf16b81674ac295cd421a91b8729374b7b9cf283bf15cc15bf8f85763076e1/vimeo-prod-skyfire-std-us/01/4156/7/195782736/656588398.mp4"
+      "resolution": "640x268@25fps",
+      "url": "https://vod-progressive.akamaized.net/[...]/787433686.mp4"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x804@25fps",
+      "url": "https://vod-progressive.akamaized.net/[...]/787433685.mp4"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://85vod-adaptive.akamaized.net/[...]/787433688,787433686,787433685,787433684/master.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": null,
+      "url": "https://85vod-adaptive.akamaized.net/[...]/787433686/playlist.m3u8"
     },
     [...]
     {
       "id": "hls-6",
       "format": "m3u8[h264+aac]",
-      "resolution": "3840x2160@23.976fps",
-      "bitrate": "22273kbps",
-      "url": "https://137skyfiregce-vimeo.akamaized.net/exp=1564760854~acl=%2F195782736%2F%2A~hmac=19a32934b6a2f5474b50c73ba1e33ef8d00bede1296e6d4256972bf4af35247b/195782736/video/656588393/playlist.m3u8"
+      "resolution": "1920x804@25fps",
+      "bitrate": "6370kbps",
+      "url": "https://85vod-adaptive.akamaized.net/[...]/787433685/playlist.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
+$ url=https://player.vimeo.com/video/238924796
+
+$ xidel -se 'json(doc("'$url'")//script/extract(.,"config = (.+?);",1)[.])'
+{
+  "cdn_url": "https://f.vimeocdn.com",
+  "vimeo_api_url": "api.vimeo.com",
+  "request": {
+    "files": {
+      "dash": {
+        [...]
+      },
+      "hls": {
+        "separate_av": true,
+        "default_cdn": "akfire_interconnect_quic",
+        "cdns": {
+          "akfire_interconnect_quic": {
+            "url": "https://197vod-adaptive.akamaized.net/[...]/853938837,853938829/master.m3u8",
+            "origin": "gcs",
+            "avc_url": [...]
+          },
+          "fastly_skyfire": {
+            "url": "https://skyfire.vimeocdn.com/[...]/853938837,853938829/master.m3u8",
+            "origin": "gcs",
+            "avc_url": [...]
+          }
+        }
+      },
+      "progressive": [
+        {
+          "profile": 164,
+          "width": 640,
+          "mime": "video/mp4",
+          "fps": 25,
+          "url": "https://vod-progressive.akamaized.net/[...]/853938837.mp4",
+          "cdn": "akamai_interconnect",
+          "quality": "360p",
+          "id": 853938837,
+          "origin": "gcs",
+          "height": 360
+        }
+      ]
+    },
+    [...]
+  },
+  "player_url": "player.vimeo.com",
+  "video": {
+    [...]
+    "duration": 85,
+    [...]
+    "owner": {
+      "account_type": "pro",
+      "name": "NTR internet & innovatie",
+      "img": "https://i.vimeocdn.com/portrait/defaults-blue_60x60.png",
+      "url": "https://vimeo.com/user60209025",
+      "img_2x": "https://i.vimeocdn.com/portrait/defaults-blue_120x120.png",
+      "id": 60209025
+    },
+    "id": 238924796,
+    "embed_code": "<iframe title=\"vimeo-player\" src=\"https://player.vimeo.com/video/238924796\" width=\"640\" height=\"360\" frameborder=\"0\" allowfullscreen></iframe>",
+    "title": "Waarom is zeewater zout?",
+    "share_url": "https://vimeo.com/238924796",
+    "width": 704,
+    "embed_permission": "public",
+    "fps": 25,
+    [...]
+  },
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","\d+$") return json(doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.])/{"name":video/concat(owner/name,": ",title),"date":if (contains("'$url'","player.vimeo.com")) then () else json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/format-date(date(substring(clip/uploaded_on,1,10)),"[D01]-[M01]-[Y]"),"duration":video/duration * duration("PT1S") + time("00:00:00"),"formats":request/files/[for $x at $i in (progressive)() order by $x/width count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height,"@",fps,"fps"),"url":url},xivid:m3u8-to-json((hls//url)[1])]}'
+{
+  "name": "NTR internet & innovatie - Waarom is zeewater zout?",
+  "date": null,
+  "duration": "00:01:25",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360@25fps",
+      "url": "https://vod-progressive.akamaized.net/[...]/853938837.mp4"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://197vod-adaptive.akamaized.net/[...]/853938837,853938829/master.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "resolution": null,
+      "bitrate": null,
+      "url": "https://197vod-adaptive.akamaized.net/[...]/853938837/playlist.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "704x396@25fps",
+      "bitrate": "997kbps",
+      "url": "https://197vod-adaptive.akamaized.net/[...]/853938829/playlist.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:vimeo($url as string) as object()? {
+  let $id:=extract($url,"\d+$") return
   json(
-    //script/extract(.,"clip_page_config = (.+);",1)[.]
+    doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.]
   )/{
-    "name":clip/title,
-    "date":replace(
-      clip/uploaded_on,
-      "(\d+)-(\d+)-(\d+).+",
-      "$3-$2-$1"
-    ),
-    "duration":clip/duration/raw * duration("PT1S") + time("00:00:00"),
-    "formats":player/json(config_url)//files/(
+    "name":video/concat(owner/name,": ",title),
+    "date":if (contains($url,"player.vimeo.com")) then
+      ()
+    else
+      json(
+        doc($url)//script/extract(.,"clip_page_config = (.+);",1)[.]
+      )/format-date(
+        date(substring(clip/uploaded_on,1,10)),
+        "[D01]-[M01]-[Y]"
+      ),
+    "duration":video/duration * duration("PT1S") + time("00:00:00"),
+    "formats":request/files/[
       for $x at $i in (progressive)()
       order by $x/width
       count $i
@@ -5407,9 +5517,9 @@ $ xidel -s --module=xivid.xqm "https://vimeo.com/195782736" -e 'json(//script/ex
         "url":url
       },
       xivid:m3u8-to-json((hls//url)[1])
-    )
+    ]
   }
-'
+};
 
 ================================================================================================
 

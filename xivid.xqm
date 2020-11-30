@@ -840,6 +840,38 @@ declare function xivid:youtube($url as string) as object()? {
   |}
 };
 
+declare function xivid:vimeo($url as string) as object()? {
+  let $id:=extract($url,"\d+$") return
+  json(
+    doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.]
+  )/{
+    "name":video/concat(owner/name,": ",title),
+    "date":if (contains($url,"player.vimeo.com")) then
+      ()
+    else
+      json(
+        doc($url)//script/extract(.,"clip_page_config = (.+);",1)[.]
+      )/format-date(
+        date(substring(clip/uploaded_on,1,10)),
+        "[D01]-[M01]-[Y]"
+      ),
+    "duration":video/duration * duration("PT1S") + time("00:00:00"),
+    "formats":request/files/[
+      for $x at $i in (progressive)()
+      order by $x/width
+      count $i
+      return
+      $x/{
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":concat(width,"x",height,"@",fps,"fps"),
+        "url":url
+      },
+      xivid:m3u8-to-json((hls//url)[1])
+    ]
+  }
+};
+
 declare function xivid:dailymotion($url as string) as object()? {
   json(replace($url,"video","player/metadata/video"))/{
     "name":"Dailymotion: "||title,

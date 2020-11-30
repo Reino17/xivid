@@ -88,35 +88,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:vimeo
-FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
-  json:^=json^(
-    //script/extract^(.^,'clip_page_config ^= ^(.+^)^;'^,1^)[.]
-  ^)/{
-    'name':clip/title^,
-    'date':replace^(
-      clip/uploaded_on^,
-      '^(\d+^)-^(\d+^)-^(\d+^).+'^,
-      '$3-$2-$1'
-    ^)^,
-    'duration':clip/duration/raw * duration^('PT1S'^) + time^('00:00:00'^)^,
-    'formats':player/json^(config_url^)//files/^(
-      for $x at $i in ^(progressive^)^(^)
-      order by $x/width
-      count $i
-      return
-      $x/{
-        'id':'pg-'^|^|$i^,
-        'format':'mp4[h264+aac]'^,
-        'resolution':concat^(width^,'x'^,height^,'@'^,fps^,'fps'^)^,
-        'url':url
-      }^,
-      xivid:m3u8-to-json^(^(hls//url^)[1]^)
-    ^)
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :twitch
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   declare variable $id:^=extract^($url^,'.+/^(.+^)'^,1^)^;
@@ -427,7 +398,7 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:youtu.be=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:youtube('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:vimeo.com=%"=="%url%" (
-  CALL :vimeo "%url%"
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:vimeo('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:dailymotion.com=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:dailymotion('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:twitch.tv=%"=="%url%" (

@@ -90,35 +90,6 @@ nos() {
   ' --output-format=bash)"
 }
 
-vimeo() {
-  eval "$(xidel "$1" --xquery '
-    json:=json(
-      //script/extract(.,"clip_page_config = (.+);",1)[.]
-    )/{
-      "name":clip/title,
-      "date":replace(
-        clip/uploaded_on,
-        "(\d+)-(\d+)-(\d+).+",
-        "$3-$2-$1"
-      ),
-      "duration":clip/duration/raw * duration("PT1S") + time("00:00:00"),
-      "formats":player/json(config_url)//files/(
-        for $x at $i in (progressive)()
-        order by $x/width
-        count $i
-        return
-        $x/{
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":concat(width,"x",height,"@",fps,"fps"),
-          "url":url
-        },
-        xivid:m3u8-to-json((hls//url)[1])
-      )
-    }
-  ' --output-format=bash)"
-}
-
 twitch() {
   eval "$(xidel "$1" --xquery '
     declare variable $id:=extract($url,".+/(.+)",1);
@@ -400,7 +371,7 @@ elif [[ $url =~ lc.nl ]]; then
 elif [[ $url =~ (youtube.com|youtu.be) ]]; then
   eval "$(xidel -e 'json:=xivid:youtube("'$url'")' --output-format=bash)"
 elif [[ $url =~ vimeo.com ]]; then
-  vimeo "$url"
+  eval "$(xidel -e 'json:=xivid:vimeo("'$url'")' --output-format=bash)"
 elif [[ $url =~ dailymotion.com ]]; then
   eval "$(xidel -e 'json:=xivid:dailymotion("'$url'")' --output-format=bash)"
 elif [[ $url =~ twitch.tv ]]; then
