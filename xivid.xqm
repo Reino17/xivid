@@ -992,10 +992,13 @@ declare function xivid:pornhub($url as string) as object()? {
   return {
     "name":"Pornhub: "||$info/name,
     "date":format-date(
-      dateTime($info/uploadDate) + implicit-timezone(),
+      adjust-dateTime-to-timezone(dateTime($info/uploadDate)),
       "[D01]-[M01]-[Y]"
     ),
-    "duration":format-time(duration($info/duration),"[H01]:[m01]:[s01]"),
+    "duration":format-time(
+      duration($info/duration),
+      "[H01]:[m01]:[s01]"
+    ),
     "formats":[
       for $x at $i in $fmts[not(contains(.,"m3u8"))]
       count $i
