@@ -113,6 +113,35 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
   )
 };
 
+declare function xivid:mpd-to-json($mpd) as object()* {
+  {
+    "id":"dash-0",
+    "format":"mpd[manifest]",
+    "url":$mpd[. instance of string]
+  }[url],
+  for $x at $i in (
+    if ($mpd instance of node()) then $mpd else doc($mpd)
+  )//Representation
+  order by boolean($x/@width),$x/@bandwidth
+  count $i
+  return {
+    "id":"dash-"||$i,
+    "format":concat(
+      substring-after($x/(.,..)/@mimeType,"/"),
+      "[",
+      tokenize($x/@codecs,"\.")[1] ! (
+        if (.="mp4a") then "aac" else
+        if (.="avc1") then "h264" else .
+      ),
+      "]"
+    ),
+    "resolution":$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),
+    "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
+    "bitrate":round($x/@bandwidth div 1000)||"kbps",
+    "url":$x/BaseUrl
+  }
+};
+
 declare function xivid:txt-to-date($txt as string) as string {
   let $a:={
         "januari":"01","februari":"02","maart":"03",
