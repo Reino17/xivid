@@ -1006,6 +1006,48 @@ declare function xivid:soundcloud($url as string) as object()? {
   }
 };
 
+declare function xivid:facebook($url as string) as object()? {
+  doc($url)/{|
+    json(//script[@type="application/ld+json"])/{
+      "name":join(
+        reverse(tokenize(name," \| ")),
+        ": "
+      ),
+      "date":format-date(
+        adjust-dateTime-to-timezone(dateTime(uploadDate)),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        duration("P"||duration),
+        "[H01]:[m01]:[s01]"
+      )
+    },
+    {
+      "formats":json(
+        replace(
+          //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
+          "\\x","\\u00"
+        )
+      )/(.//videoData)()/[
+        {
+          "id":"sub-1",
+          "format":"srt",
+          "url":subtitles_src
+        }[url],
+        (
+          (sd_src_no_ratelimit,sd_src)[.][1],
+          (hd_src_no_ratelimit,hd_src)[.][1]
+        ) ! {
+          "id":"pg-"||position(),
+          "format":"mp4[h264+aac]",
+          "url":.
+        },
+        xivid:mpd-to-json(parse-xml(dash_manifest))
+      ]
+    }
+  |}
+};
+
 declare function xivid:pornhub($url as string) as object()? {
   let $src:=doc($url),
       $info:=json($src//script[@type="application/ld+json"]),

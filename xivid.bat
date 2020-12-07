@@ -43,13 +43,13 @@ ECHO   uitzendinggemist.net    at5.nl                omroepzeeland.nl
 ECHO   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
 ECHO   kijk.nl                 rtvoost.nl            l1.nl
 ECHO.
-ECHO   dumpert.nl              vimeo.com             pornhub.com
-ECHO   autojunk.nl             dailymotion.com
+ECHO   dumpert.nl              vimeo.com             twitter.com
+ECHO   autojunk.nl             dailymotion.com       pornhub.com
 ECHO   telegraaf.nl            twitch.tv
 ECHO   ad.nl                   mixcloud.com
 ECHO   lc.nl                   soundcloud.com
 ECHO   youtube.com             facebook.com
-ECHO   youtu.be                twitter.com
+ECHO   youtu.be                fb.watch
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -151,60 +151,6 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
 ^" --output-format^=cmd') DO %%A
 EXIT /B
 
-:facebook
-FOR /F "delims=" %%A IN ('xidel --user-agent="%XIDEL_UA%" "%~1" --xquery ^"
-  let $a:^=^(//script/substring-before^(substring-after^(.^,'onPageletArrive^('^)^,'^)^;}^)^)^;'^)[.]^)[2] ! json^(
-    replace^(.^,'\\x'^,'\\u00'^)
-  ^)/^(.//videoData^)^(^) return
-  json:^={
-    'name':replace^(//title^,'^(.+^) \^| ^(.+^)'^,'$2: $1'^)^,
-    'date':format-date^(
-      //code/comment^(^) ! parse-html^(.^)//@data-utime * duration^('PT1S'^) +
-      implicit-timezone^(^) + date^('1970-01-01'^)^,
-      '[D01]-[M01]-[Y]'
-    ^)^,
-    'duration':format-time^(
-      duration^($a/parse-xml^(dash_manifest^)//@mediaPresentationDuration^) + duration^('PT0.5S'^)^,
-      '[H01]:[m01]:[s01]'
-    ^)^,
-    'formats':[
-      {
-        'id':'sub-1'^,
-        'format':'srt'^,
-        'language':'en'^,
-        'url':$a/subtitles_src
-      }[url]^,
-      $a/^(
-        ^(sd_src_no_ratelimit^,sd_src^)[.][1]^,
-        ^(hd_src_no_ratelimit^,hd_src^)[.][1]
-      ^) ! {
-        'id':'pg-'^|^|position^(^)^,
-        'format':'mp4[h264+aac]'^,
-        'url':uri-decode^(.^)
-      }^,
-      for $x at $i in $a/parse-xml^(dash_manifest^)//Representation
-      order by $x/boolean^(@width^)^,$x/@bandwidth
-      count $i
-      return {
-        'id':'dash-'^|^|$i^,
-        'format':concat^(
-          substring-after^($x/@mimeType^,'/'^)^,
-          '['^,
-          extract^($x/@codecs^,'^(^^[\w]+^)'^,1^) ! ^(
-            if ^(.^='avc1'^) then 'h264' else if ^(.^='mp4a'^) then 'aac' else .
-          ^)^,
-          ']'
-        ^)^,
-        'resolution':$x/@width ! concat^(.^,'x'^,$x/@height^)^,
-        'samplerate':$x/@audioSamplingRate ! concat^(. div 1000^,'kHz'^)^,
-        'bitrate':round^($x/@bandwidth div 1000^)^|^|'kbps'^,
-        'url':$x/uri-decode^(BaseUrl^)
-      }
-    ]
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :twitter
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   declare variable $head:^='Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%%2F40K4moUkGsoc%%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw'^;
@@ -258,7 +204,6 @@ FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   FOR /F "delims=(." %%B IN ('xidel --version ^| FIND "("') DO (
     IF %%B GEQ 20200726 (
       SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm --json-mode=deprecated"
-      SET "XIDEL_UA=Mozilla/5.0 Firefox/70.0"
     ) ELSE (
       ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
       ECHO Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
@@ -408,7 +353,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:soundcloud.com=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:soundcloud('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
-  CALL :facebook "%url%"
+  FOR /F "delims=" %%A IN ('xidel --user-agent^="Mozilla/5.0 Firefox/83.0" -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
+) ELSE IF NOT "%url:fb.watch=%"=="%url%" (
+  FOR /F "delims=" %%A IN ('xidel --user-agent^="Mozilla/5.0 Firefox/83.0" -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
   CALL :twitter "%url%"
 ) ELSE IF NOT "%url:pornhub.com=%"=="%url%" (

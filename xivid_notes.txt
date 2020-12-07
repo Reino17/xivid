@@ -757,6 +757,18 @@ $ xidel -se '1561935600 * duration("PT1S") + implicit-timezone() + adjust-dateTi
 
 ----------------------------------------------------------------
 
+$ xidel -se 'adjust-dateTime-to-timezone(dateTime("2019-06-30T23:00:00-05:00"))'
+2019-07-01T05:00:00+01:00
+
+2019-06-30T23:00:00-05:00 UTC−5 (New York) is dus 2019-07-01T05:00:00+01:00 UTC+1 (Nederland).
+
+$ date -d 2019-06-30T23:00:00-05:00 +%FT%T%:z
+2019-07-01T06:00:00+02:00
+
+Op die datum zelf is het natuurlijk zomertijd in Nederland (UTC+2). Date "weet" dit. Met Xidel is dit niet mogelijk.
+
+----------------------------------------------------------------
+
 $ xidel -se 'format-date(1561935600 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]")'
 01-07-2019
 
@@ -7251,31 +7263,57 @@ declare function xivid:lc($url as string) as object()? {
 
 [facebook]
 
-$ url=https://www.facebook.com/LEGONetherlands/videos/374747990176575/   # https://nl.hardware.info/nieuws/72584/
+$ url=https://www.facebook.com/watch/?v=374747990176575   # https://nl.hardware.info/nieuws/72584/
 
-$ xidel -s "$url" -e '(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2]'   # Alleen de tweede JSON is van belang.
-{sr_revision:1002368233,bootloadable:{"XUIAmbientNUX.react":[...]dash_manifest:null,[...]
+$ xidel -se 'doc("'$url'")/json(//script[@type="application/ld+json"])'
+{
+  "@type": "VideoObject",
+  "name": "LEGO NES | Facebook",
+  "description": "Het LEGO Nintendo Entertainment System, de perfecte combinatie van videogames en LEGO. \n\nhttps://lego.build/NESReveal",
+  "thumbnailUrl": "https://scontent.fams1-1.fna.fbcdn.net/v/t15.5256-10/108554373_374751573509550_5904191927523521476_n.jpg?[...]",
+  "duration": "T1M8S",
+  "uploadDate": "2020-07-14T01:06:20-07:00",
+  "contentUrl": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
+  "interactionCount": 33659,
+  "publication": [
+    {
+      "@type": "BroadcastEvent",
+      "isLiveBroadcast": false
+    }
+  ],
+  "@id": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
+  "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
+  "datePublished": "2020-07-14T01:06:20-07:00",
+  [...]
+  "headline": "LEGO NES | Facebook",
+  "isFamilyFriendly": true,
+  [...]
+}
 
-Deze video heeft ook een DASH manifest, maar zonder een user-agent wordt deze niet gegenereerd.
+$ xidel -se 'doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
+{displayResources:["gthHO","t9MZQ","Y4UD9",[...],dash_manifest:null,[...]
 
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2]'
-{sr_revision:1002368233,bootloadable:{"XUIAmbientNUX.react":[...]dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
+$ xidel -s --user-agent="Mozilla/5.0 Firefox/83.0" -e 'doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
+{displayResources:["gthHO","t9MZQ","Y4UD9",[...],dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
 
-$ xidel -s "$url" -e 'json((//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2])'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+$ xidel -se 'x:request({"user-agent":"Mozilla/5.0 Firefox/83.0","url":"'$url'"})/doc//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
+Dit werkt (nog) niet. Zie https://github.com/benibela/xidel/issues/58.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'json(doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")])'
 Error:
-jerr:JNDY0021: Failed to parse JSON: Invalid character at line 1, pos 23354: 'x' at  (tkColon) in [...]
+jerr:JNDY0021: Failed to parse JSON: Invalid character at line 0, pos 9360: 'x' at  (tkColon) in [...]
 
 [...]dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
-                    ^positie 23354
+                    ^positie 9360
 
 $ xidel -se 'join(("3C_16",x:integer("3C",16)||"_10",x:cps(x:integer("3C",16)))," = ")'
 3C_16 = 60_10 = <
 
-Alle tekens met codepoint 1 t/m 255 (Extended ASCII) dienen als "\x<hexadecimaal>" gecodeerd worden. Dus \x01 t/m \xFF.
-Alle tekens met codepoint 1 t/m 65535 (Unicode) dienen als "\u<hexadecimaal>" gecodeerd worden. Dus \u0001 t/m \uFFFF.
-In JSON is alleen Unicode codering toegestaan. Alle "\x" moeten dus vervangen worden door "\u00".
+\x3C is de Javascript notatie voor <. In JSON is alleen de Unicode codering, \u003C ,toegestaan.
 
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)()'   # Alleen de "videoData"-array is van belang.
+$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'json(replace(doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"))/(.//videoData)()'   # Alleen de "videoData"-array is van belang voor de video formaten.
 {
   "is_hls": false,
   "video_id": "374747990176575",
@@ -7294,16 +7332,16 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substrin
   "captions_autogenerated_indicator_config": null,
   "sd_src_no_ratelimit": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
   "aspect_ratio": 0.8,
-  "hd_src": "https://video.fams1-2.fna.fbcdn.net/v/t39.24130-2/107979746_304302857604709_5707354064042508309_n.mp4?[...]",
+  "hd_src": "https://scontent.fams1-2.fna.fbcdn.net/v/t66.36240-6/49915952_378325833593524_1098325198102408920_n.mp4?[...]",
   "sd_src": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
   "hd_tag": "oep_hd",
   "sd_tag": "sve_sd",
   "stream_type": "dash",
   "live_routing_token": "",
   "projection": "flat",
-  "subtitles_src": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]",
-  "dash_manifest": "<?xml version=\"1.0\"?>\n<MPD [...]",
-  "dash_prefetched_representation_ids": ["389951148633569v", "405461810413399a"],
+  "subtitles_src": "https://scontent.fams1-1.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]",
+  "dash_manifest": "<?xml version=\"1.0\"?>\n<MPD [...]\x3C/AdaptationSet>\x3C/Period>\x3C/MPD>\n",
+  "dash_prefetched_representation_ids": ["1243446782689657v", "405461810413399a"],
   "player_version_overwrite": "pleasantville",
   "spherical_config": {},
   "is_spherical": false,
@@ -7315,16 +7353,16 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" "$url" -e '(//script/substrin
   "prefetch_cache": null
 }
 
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url" --xquery 'let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(replace(.,"\\\x","\\\u00"))/(.//videoData)() return {"name":replace(//title,"(.+) \| (.+)","$2: $1"),"date":format-date(//code/comment() ! parse-html(.)//@data-utime * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]"),"duration":format-time(duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),"[H01]:[m01]:[s01]"),"formats":[{"id":"sub-1","format":"srt","url":$a/subtitles_src}[url],$a/((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":uri-decode(.)},for $x at $i in $a/parse-xml(dash_manifest)//Representation order by $x/boolean(@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/@mimeType,"/"),"[",extract($x/@codecs,"(^[\w]+)",1) ! (if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/uri-decode(BaseUrl)}]}'
+$ xidel -s --module=xivid.xqm --user-agent='Mozilla/5.0 Firefox/83.0' --json-mode=deprecated -e 'doc("'$url'")/{|json(//script[@type="application/ld+json"])/{"name":join(reverse(tokenize(name," \| ")),": "),"date":format-date(adjust-dateTime-to-timezone(dateTime(uploadDate)),"[D01]-[M01]-[Y]"),"duration":format-time(duration("P"||duration),"[H01]:[m01]:[s01]")},json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"))/(.//videoData)()/{"formats":[{"id":"sub-1","format":"srt","url":subtitles_src}[url],((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":.},xivid:mpd-to-json(parse-xml(dash_manifest))]}|}'
 {
-  "name": "Facebook: LEGO - LEGO NES",
+  "name": "Facebook: LEGO NES",
   "date": "14-07-2020",
-  "duration": "00:01:07",
+  "duration": "00:01:08",
   "formats": [
     {
       "id": "sub-1",
       "format": "srt",
-      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]"
+      "url": "https://scontent.fams1-1.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]"
     },
     {
       "id": "pg-1",
@@ -7334,7 +7372,7 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url"
     {
       "id": "pg-2",
       "format": "mp4[h264+aac]",
-      "url": "https://video.fams1-2.fna.fbcdn.net/v/t39.24130-2/107979746_304302857604709_5707354064042508309_n.mp4?[...]"
+      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t66.36240-6/49915952_378325833593524_1098325198102408920_n.mp4?[...]"
     },
     {
       "id": "dash-1",
@@ -7342,71 +7380,64 @@ $ xidel -s --user-agent="Mozilla/5.0 Firefox/70.0" --json-mode=deprecated "$url"
       "resolution": null,
       "samplerate": "48kHz",
       "bitrate": "65kbps",
-      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.1790-2/109281327_405461813746732_178858496964516997_n.mp4?[...]"
+      "url": "https://video.fams1-1.fna.fbcdn.net/v/t42.1790-2/109281327_405461813746732_178858496964516997_n.mp4?[...]"
+
     },
     [...]
     {
       "id": "dash-5",
       "format": "mp4[h264]",
-      "resolution": "720x900",
+      "resolution": "720x900@25fps",
       "samplerate": null,
-      "bitrate": "414kbps",
-      "url": "https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/109304628_605794363632964_2667690113915675475_n.mp4?[...]"
+      "bitrate": "378kbps",
+      "url": "https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/121418431_154480879657509_7493886390368626002_n.mp4?[...]"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
---xquery '
-  let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(
-    replace(.,"\\\x","\\\u00")
-  )/(.//videoData)() return {
-    "name":replace(//title,"(.+) \| (.+)","$2: $1"),
-    "date":format-date(
-      //code/comment() ! parse-html(.)//@data-utime * duration("PT1S") +
-      implicit-timezone() + date("1970-01-01"),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":format-time(
-      duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "formats":[
-      {
-        "id":"sub-1",
-        "format":"srt",
-        "url":$a/subtitles_src
-      }[url],
-      $a/(
-        (sd_src_no_ratelimit,sd_src)[.][1],
-        (hd_src_no_ratelimit,hd_src)[.][1]
-      ) ! {
-        "id":"pg-"||position(),
-        "format":"mp4[h264+aac]",
-        "url":uri-decode(.)
-      },
-      for $x at $i in $a/parse-xml(dash_manifest)//Representation
-      order by $x/boolean(@width),$x/@bandwidth
-      count $i
-      return {
-        "id":"dash-"||$i,
-        "format":concat(
-          substring-after($x/@mimeType,"/"),
-          "[",
-          extract($x/@codecs,"(^[\w]+)",1) ! (
-            if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .
-          ),
-          "]"
-        ),
-        "resolution":$x/@width ! concat(.,"x",$x/@height),
-        "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
-        "bitrate":round($x/@bandwidth div 1000)||"kbps",
-        "url":$x/uri-decode(BaseUrl)
-      }
-    ]
-  }
-'
+declare function xivid:facebook($url as string) as object()? {
+  doc($url)/{|
+    json(//script[@type="application/ld+json"])/{
+      "name":join(
+        reverse(tokenize(name," \| ")),
+        ": "
+      ),
+      "date":format-date(
+        adjust-dateTime-to-timezone(dateTime(uploadDate)),
+        "[D01]-[M01]-[Y]"
+      ),
+      "duration":format-time(
+        duration("P"||duration),
+        "[H01]:[m01]:[s01]"
+      )
+    },
+    {
+      "formats":json(
+        replace(
+          //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
+          "\\x","\\u00"
+        )
+      )/(.//videoData)()/[
+        {
+          "id":"sub-1",
+          "format":"srt",
+          "url":subtitles_src
+        }[url],
+        (
+          (sd_src_no_ratelimit,sd_src)[.][1],
+          (hd_src_no_ratelimit,hd_src)[.][1]
+        ) ! {
+          "id":"pg-"||position(),
+          "format":"mp4[h264+aac]",
+          "url":.
+        },
+        xivid:mpd-to-json(parse-xml(dash_manifest))
+      ]
+    }
+  |}
+};
 
 ================================================================================================
 

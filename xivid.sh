@@ -44,13 +44,13 @@ Ondersteunde websites:
   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
-  dumpert.nl              vimeo.com             pornhub.com
-  autojunk.nl             dailymotion.com
+  dumpert.nl              vimeo.com             twitter.com
+  autojunk.nl             dailymotion.com       pornhub.com
   telegraaf.nl            twitch.tv
   ad.nl                   mixcloud.com
   lc.nl                   soundcloud.com
   youtube.com             facebook.com
-  youtu.be                twitter.com
+  youtu.be                fb.watch
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -153,59 +153,6 @@ twitch() {
   ' --output-format=bash)"
 }
 
-facebook() {
-  eval "$(xidel --user-agent="$XIDEL_UA" "$1" --xquery '
-    let $a:=(//script/substring-before(substring-after(.,"onPageletArrive("),");}));")[.])[2] ! json(
-      replace(.,"\\\x","\\\u00")
-    )/(.//videoData)() return
-    json:={
-      "name":replace(//title,"(.+) \| (.+)","$2: $1"),
-      "date":format-date(
-        //code/comment() ! parse-html(.)//@data-utime * duration("PT1S") +
-        implicit-timezone() + date("1970-01-01"),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        duration($a/parse-xml(dash_manifest)//@mediaPresentationDuration) + duration("PT0.5S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":[
-        {
-          "id":"sub-1",
-          "format":"srt",
-          "url":$a/subtitles_src
-        }[url],
-        $a/(
-          (sd_src_no_ratelimit,sd_src)[.][1],
-          (hd_src_no_ratelimit,hd_src)[.][1]
-        ) ! {
-          "id":"pg-"||position(),
-          "format":"mp4[h264+aac]",
-          "url":uri-decode(.)
-        },
-        for $x at $i in $a/parse-xml(dash_manifest)//Representation
-        order by $x/boolean(@width),$x/@bandwidth
-        count $i
-        return {
-          "id":"dash-"||$i,
-          "format":concat(
-            substring-after($x/@mimeType,"/"),
-            "[",
-            extract($x/@codecs,"(^[\w]+)",1) ! (
-              if (.="avc1") then "h264" else if (.="mp4a") then "aac" else .
-            ),
-            "]"
-          ),
-          "resolution":$x/@width ! concat(.,"x",$x/@height),
-          "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
-          "bitrate":round($x/@bandwidth div 1000)||"kbps",
-          "url":$x/uri-decode(BaseUrl)
-        }
-      ]
-    }
-  ' --output-format=bash)"
-}
-
 twitter() {
   eval "$(xidel "$1" -e '
     declare variable $head:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw";
@@ -252,10 +199,8 @@ twitter() {
 }
 
 if command -v xidel >/dev/null; then
-  ver=$(xidel --version | xidel - -se 'substring-before(substring-after($raw,"("),".")')
-  if [[ $ver -ge 20200726 ]]; then
+  if [[ $(xidel --version | xidel - -se 'substring-before(substring-after($raw,"("),".")') -ge 20200726 ]]; then
     export XIDEL_OPTIONS="--silent --module=${0%%/*}/xivid.xqm --json-mode=deprecated"
-    XIDEL_UA="Mozilla/5.0 Firefox/70.0"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
@@ -380,8 +325,8 @@ elif [[ $url =~ mixcloud.com ]]; then
   eval "$(xidel -e 'json:=xivid:mixcloud("'$url'")' --output-format=bash)"
 elif [[ $url =~ soundcloud.com ]]; then
   eval "$(xidel -e 'json:=xivid:soundcloud("'$url'")' --output-format=bash)"
-elif [[ $url =~ facebook.com ]]; then
-  facebook "$url"
+elif [[ $url =~ facebook.com|fb.watch ]]; then
+  eval "$(xidel --user-agent='Mozilla/5.0 Firefox/83.0' -e 'json:=xivid:facebook("'$url'")' --output-format=bash)"
 elif [[ $url =~ twitter.com ]]; then
   twitter "$url"
 elif [[ $url =~ pornhub.com ]]; then
