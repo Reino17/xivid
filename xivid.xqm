@@ -73,7 +73,8 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
       "url":$m3u8Url
     }[url],
     for $x at $i in $streams
-    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))
     order by $br
     count $i
     return {
@@ -87,22 +88,19 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
         extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] !
           concat("@",round-half-to-even(.,3),"fps")
       )[.],
-      "bitrate":let $br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2)) return
-      if ($br2[1]) then
-        concat(
-          round($br2[2][.] div 1000),
-          "|",
-          round($br2[1] div 1000),
-          "kbps"
-        )
-      else if ($br) then
-        concat(
+      "bitrate":if ($br2[1]) then
+        join(
           (
-            round($br[.] div 1000),
-            extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
+            round($br2[2][.] div 1000),
+            round($br2[1] div 1000)
           ),
-          "kbps"
-        )
+          "|"
+        )||"kbps"
+      else if ($br) then
+        (
+          round($br[.] div 1000),
+          extract($x,"GROUP-ID=.+?-(\d+)",1)[.]
+        )||"kbps"
       else
         (),
       "url":resolve-uri(
