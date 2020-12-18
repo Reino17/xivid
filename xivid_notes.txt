@@ -6950,7 +6950,7 @@ $ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return json(concat("https://
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else (),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else (),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("640x360","1280x720")[$i],"url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
   "name": "AD: Snel Nieuws - Loekasjenko voorziet val Poetin bij zijn vertrek",
   "date": "08-09-2020",
@@ -6958,14 +6958,14 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract(
   "formats": [
     {
       "id": "pg-1",
-      "resolution": "640x360",
       "format": "mp4[h264+aac]",
+      "resolution": "640x360",
       "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~s2i9P90ObQr0eChTZxDs?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
     },
     {
       "id": "pg-2",
-      "resolution": "1280x720",
       "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
       "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10189472~~s2i9P90Fbwq6eGBWZVaiE7k?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
     },
     {
@@ -7001,7 +7001,7 @@ $ xidel -se 'x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fc
 $ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//div[@data-mychannels-type="video"]/@data-mychannels-id,"?options=FUTFU_default")'
 https://embed.mychannels.video/sdk/production/138236?options=FUTFU_default
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//div[@data-mychannels-type="video"]/@data-mychannels-id,"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc//div[@data-mychannels-type="video"]/@data-mychannels-id,"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("640x360","1280x720")[$i],"url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
   "name": "AD: Keuken Heks - Pasta droog en klef bij het opwarmen? Niet met deze truc",
   "date": "30-07-2020",
@@ -7009,14 +7009,14 @@ $ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract(
   "formats": [
     {
       "id": "pg-1",
-      "resolution": "640x360",
       "format": "mp4[h264+aac]",
+      "resolution": "640x360",
       "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10131662~~s2i9P90ObQr0eChTZxDs?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
     },
     {
       "id": "pg-2",
-      "resolution": "1280x720",
       "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
       "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10131662~~s2i9P90Fbwq6eGBWZVaiE7k?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
     },
     {
@@ -7052,7 +7052,7 @@ $ xidel -se 'x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fc
 $ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//iframe[@class="mc-embed"]) then //iframe[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")'
 https://embed.mychannels.video/sdk/production/66560?options=FUTFU_default
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//iframe[@class="mc-embed"]) then //iframe[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//iframe[@class="mc-embed"]) then //iframe[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("640x360","1280x720")[$i],"url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
   "name": "AD: Auto - Teslatest",
   "date": "04-03-2019",
@@ -7091,7 +7091,7 @@ $ xidel -se 'x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fc
 $ xidel -se 'let $id:=extract("'$url'","~p(\d+)",1) return concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//*[@class="mc-embed"]) then //*[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")'
 https://embed.mychannels.video/sdk/production/53235?options=FUTFU_default
 
-$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//*[@class="mc-embed"]) then //*[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"resolution":("640x360","1280x720")[$i],"format":"mp4[h264+aac]","url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated --xquery 'let $id:=extract("'$url'","~p(\d+)",1),$json:=json(concat("https://embed.mychannels.video/sdk/production/",if ($id) then $id else x:request({"headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5","url":"'$url'"})/doc/(if (//*[@class="mc-embed"]) then //*[@class="mc-embed"]/extract(@src,"\d+") else //div[@data-mychannels-type="video"]/@data-mychannels-id),"?options=FUTFU_default")) return $json/{|{"name":concat("AD: ",(shows)()/title," - ",(productions)()/title)},(productions)()/{"date":format-date(date(tokenize(publicationDate)[1]),"[D01]-[M01]-[Y]"),"duration":format-time(duration * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":[for $x at $i in reverse((sources)()[type="video/mp4"]) return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("640x360","1280x720")[$i],"url":$x/src},xivid:m3u8-to-json((sources)(1)/src)]}|}'
 {
   "name": "AD: Snel Nieuws - De nummers op benzinepompen zijn veranderd",
   "date": "03-02-2019",
@@ -7164,8 +7164,8 @@ declare function xivid:ad($url as string) as object()? {
       "formats":[
         for $x at $i in reverse((sources)()[type="video/mp4"]) return {
           "id":"pg-"||$i,
-          "resolution":("640x360","1280x720")[$i],
           "format":"mp4[h264+aac]",
+          "resolution":("640x360","1280x720")[$i],
           "url":$x/src
         },
         xivid:m3u8-to-json((sources)(1)/src)

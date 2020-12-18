@@ -784,8 +784,8 @@ declare function xivid:ad($url as string) as object()? {
       "formats":[
         for $x at $i in reverse((sources)()[type="video/mp4"]) return {
           "id":"pg-"||$i,
-          "resolution":("640x360","1280x720")[$i],
           "format":"mp4[h264+aac]",
+          "resolution":("640x360","1280x720")[$i],
           "url":$x/src
         },
         xivid:m3u8-to-json((sources)(1)/src)
