@@ -133,7 +133,9 @@ declare function xivid:mpd-to-json($mpd) as object()* {
       ),
       "]"
     ),
-    "resolution":$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),
+    "resolution":$x/@width ! concat(
+      .,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"
+    ),
     "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
     "bitrate":round($x/@bandwidth div 1000)||"kbps",
     "url":$x/BaseUrl

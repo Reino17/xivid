@@ -2372,6 +2372,48 @@ $ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' --json-mode=deprecated --xque
 
 ------------------------------------------------------------------------------------------------
 
+'https://www.facebook.com/AFV/videos/3868462086560598'   # Framerate als breuk.
+
+$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'json(replace(doc("https://www.facebook.com/AFV/videos/3868462086560598")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"))/serialize(parse-xml(.//dash_manifest),{"indent":true()})' --output-declaration='<?xml version="1.0"?>'
+<?xml version="1.0"?>
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500S" type="static" mediaPresentationDuration="PT0H3M3.253S" maxSegmentDuration="PT0H0M5.005S" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011,http://dashif.org/guidelines/dash264" FBTagsetUsed="v4_5secgop">
+  <Period duration="PT0H3M3.253S">
+    <AdaptationSet segmentAlignment="true" maxWidth="1080" maxHeight="1080" maxFrameRate="11988/400" par="1:1" lang="eng" subsegmentAlignment="true" subsegmentStartsWithSAP="1">
+      <Representation id="686583002042085v" mimeType="video/mp4" codecs="avc1.4D401E" width="426" height="426" frameRate="11988/400" sar="1:1" startWithSAP="1" bandwidth="495243" [...]>
+        <BaseURL>https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/10000000_211002737316506_3401323434707970907_n.mp4?[...]</BaseURL>
+        <SegmentBase indexRangeExact="true" indexRange="970-1445" FBFirstSegmentRange="1446-363121">
+          <Initialization range="0-969"/>
+        </SegmentBase>
+      </Representation>
+      [...]
+    </AdaptationSet>
+    [...]
+  </Period>
+</MPD>
+
+$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' --json-mode=deprecated --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as object()* {{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/(.,..)/@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/BaseUrl}}; json(replace(doc("https://www.facebook.com/AFV/videos/3868462086560598")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"))/[xivid:mpd-to-json(parse-xml(.//dash_manifest))]'
+[
+  {
+    "id": "dash-1",
+    "format": "mp4[aac]",
+    "resolution": null,
+    "samplerate": "48kHz",
+    "bitrate": "65kbps",
+    "url": "https://video.fams1-1.fna.fbcdn.net/v/t42.1790-2/101540421_3072634259510939_7405909952142770176_n.mp4?[...]"
+  },
+  [...]
+  {
+    "id": "dash-5",
+    "format": "mp4[h264]",
+    "resolution": "1080x1080@29.97fps",
+    "samplerate": null,
+    "bitrate": "3269kbps",
+    "url": "https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/10000000_373951763866207_2053968370854114061_n.mp4?[...]"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:mpd-to-json($mpd) as object()* {
   {
     "id":"dash-0",
@@ -2394,7 +2436,9 @@ declare function xivid:mpd-to-json($mpd) as object()* {
       ),
       "]"
     ),
-    "resolution":$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),
+    "resolution":$x/@width ! concat(
+      .,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"
+    ),
     "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
     "bitrate":round($x/@bandwidth div 1000)||"kbps",
     "url":$x/BaseUrl
