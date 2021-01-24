@@ -7587,15 +7587,15 @@ $ xidel -se 'doc("'$url'")/parse-json(//script[@type="application/ld+json"])'
 $ xidel -se 'doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
 {displayResources:["gthHO","t9MZQ","Y4UD9",[...],dash_manifest:null,[...]
 
-$ xidel -s --user-agent="Mozilla/5.0 Firefox/83.0" -e 'doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
+$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
 {displayResources:["gthHO","t9MZQ","Y4UD9",[...],dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-$ xidel -se 'x:request({"user-agent":"Mozilla/5.0 Firefox/83.0","url":"'$url'"})/doc//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
+$ xidel -se 'x:request({"user-agent":"Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
 Dit werkt (nog) niet. Zie https://github.com/benibela/xidel/issues/58.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'doc("'$url'")/parse-json(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")])'
+$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc/parse-json(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],{"liberal":true()})'
 Error:
 jerr:JNDY0021: Failed to parse JSON: Invalid character at line 0, pos 9360: 'x' at  (tkColon) in [...]
 
@@ -7607,7 +7607,7 @@ $ xidel -se 'join(("3C_16",x:integer("3C",16)||"_10",x:cps(x:integer("3C",16))),
 
 \x3C is de Javascript notatie voor <. In JSON is alleen de Unicode codering, \u003C ,toegestaan.
 
-$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'doc("'$url'")/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"))/(.//videoData)()'   # Alleen de "videoData"-array is van belang voor de video formaten.
+$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/(.//videoData)()'   # Alleen de "videoData"-array is van belang voor de video formaten.
 {
   "is_hls": false,
   "video_id": "374747990176575",
@@ -7647,7 +7647,7 @@ $ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'doc("'$url'")/parse-json(
   "prefetch_cache": null
 }
 
-$ xidel -s --module=xivid.xqm --user-agent='Mozilla/5.0 Firefox/83.0' --json-mode=deprecated -e 'doc("'$url'")/map:merge((parse-json(//script[@type="application/ld+json"])/{"name":join(reverse(tokenize(name," \| ")),": "),"date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),"duration":duration("P"||duration)},parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"))/(.//videoData)()/{"formats":[{"id":"sub-1","format":"srt","url":subtitles_src}[url],((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":.},xivid:mpd-to-json(parse-xml(dash_manifest))]}))'
+$ xidel -s --module=xivid.xqm --json-mode=deprecated -e 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc/map:merge((parse-json(//script[@type="application/ld+json"])/{"name":join(reverse(tokenize(name," \| ")),": "),"date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),"duration":duration("P"||duration)},parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/(.//videoData)()/{"formats":[{"id":"sub-1","format":"srt","url":subtitles_src}[url],((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":.},xivid:mpd-to-json(parse-xml(dash_manifest))]}))'
 {
   "name": "Facebook: LEGO NES",
   "date": "2020-07-14T08:06:20Z",
@@ -7692,7 +7692,10 @@ $ xidel -s --module=xivid.xqm --user-agent='Mozilla/5.0 Firefox/83.0' --json-mod
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:facebook($url as string) as object()? {
-  doc($url)/map:merge((
+  x:request({
+    "headers":"User-Agent: Mozilla/5.0 Firefox/84.0",
+    "url":$url
+  })/doc/map:merge((
     parse-json(//script[@type="application/ld+json"])/{
       "name":join(
         reverse(tokenize(name," \| ")),
@@ -7704,14 +7707,14 @@ declare function xivid:facebook($url as string) as object()? {
       ),
       "duration":duration("P"||duration)
     },
-    {
-      "formats":parse-json(
-        replace(
-          //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
-          "\\x","\\u00"
-        ),
-        {"liberal":true()}
-      )/(.//videoData)()/[
+    parse-json(
+      replace(
+        //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
+        "\\x","\\u00"
+      ),
+      {"liberal":true()}
+    )/(.//videoData)()/{
+      "formats":[
         {
           "id":"sub-1",
           "format":"srt",

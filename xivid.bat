@@ -353,9 +353,9 @@ IF NOT "%url:npostart.nl=%"=="%url%" (
 ) ELSE IF NOT "%url:soundcloud.com=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:soundcloud('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel --user-agent^="Mozilla/5.0 Firefox/83.0" -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:fb.watch=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel --user-agent^="Mozilla/5.0 Firefox/83.0" -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
+  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
   CALL :twitter "%url%"
 ) ELSE IF NOT "%url:pornhub.com=%"=="%url%" (

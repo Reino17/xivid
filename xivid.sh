@@ -326,7 +326,7 @@ elif [[ $url =~ mixcloud.com ]]; then
 elif [[ $url =~ soundcloud.com ]]; then
   eval "$(xidel -e 'json:=xivid:soundcloud("'$url'")' --output-format=bash)"
 elif [[ $url =~ facebook.com|fb.watch ]]; then
-  eval "$(xidel --user-agent='Mozilla/5.0 Firefox/83.0' -e 'json:=xivid:facebook("'$url'")' --output-format=bash)"
+  eval "$(xidel -e 'json:=xivid:facebook("'$url'")' --output-format=bash)"
 elif [[ $url =~ twitter.com ]]; then
   twitter "$url"
 elif [[ $url =~ pornhub.com ]]; then

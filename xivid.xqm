@@ -1035,7 +1035,10 @@ declare function xivid:soundcloud($url as string) as object()? {
 };
 
 declare function xivid:facebook($url as string) as object()? {
-  doc($url)/map:merge((
+  x:request({
+    "headers":"User-Agent: Mozilla/5.0 Firefox/84.0",
+    "url":$url
+  })/doc/map:merge((
     parse-json(//script[@type="application/ld+json"])/{
       "name":join(
         reverse(tokenize(name," \| ")),
@@ -1047,14 +1050,14 @@ declare function xivid:facebook($url as string) as object()? {
       ),
       "duration":duration("P"||duration)
     },
-    {
-      "formats":parse-json(
-        replace(
-          //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
-          "\\x","\\u00"
-        ),
-        {"liberal":true()}
-      )/(.//videoData)()/[
+    parse-json(
+      replace(
+        //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
+        "\\x","\\u00"
+      ),
+      {"liberal":true()}
+    )/(.//videoData)()/{
+      "formats":[
         {
           "id":"sub-1",
           "format":"srt",
