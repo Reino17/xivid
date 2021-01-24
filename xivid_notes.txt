@@ -6143,7 +6143,7 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
 
 Dumpert formaten van lage naar hoge resolutie: "mobile","tablet","720p","original", ook al zie je die laatste niet vaak.
 
-$ xidel -s --xquery 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $vid:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$vid}[url]}'
+$ xidel -s --xquery 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x]/uri}[url]}'
 {
   "name": "Dumpert: Telefoon checken tijdens het fietsen",
   "date": "2020-08-22T08:22:56Z",
@@ -6223,7 +6223,7 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
   [...]
 }
 
-$ xidel -s --xquery 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $vid:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$vid}[url]}'
+$ xidel -s --xquery 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x]/uri}[url]}'
 {
   "name": "Dumpert: Deze mensen kunnen echt helemaal niks! #FAIL (6) | Dumpert Tags",
   "date": "2020-08-03T15:00:39Z",
@@ -6260,7 +6260,7 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
 
 Nog te doen: af laten handelen door xivid:youtube() en xivid:twitter() als die klaar zijn.
 
-$ xidel -s --xquery 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]/(if ((.//variants)()/version="embed") then (.//variants)()/(if (starts-with(uri,"youtube")) then xivid:youtube(replace(uri,"youtube:","https://youtu.be/")) else xivid:twitter(replace(uri,"twitter:","https://twitter.com/i/status/"))) else {"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":for $x at $i in ("mobile","tablet","720p","original") let $vid:=(.//variants)()[version=$x]/uri return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$vid}[url]})'
+$ xidel -s --xquery 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]/(if ((.//variants)()/version="embed") then (.//variants)()/(if (starts-with(uri,"youtube")) then xivid:youtube(replace(uri,"youtube:","https://youtu.be/")) else xivid:twitter(replace(uri,"twitter:","https://twitter.com/i/status/"))) else {"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x]/uri}[url]})'
 
 ------------------------------------------------------------------------------------------------
 
@@ -6273,12 +6273,10 @@ declare function xivid:dumpert($url as string) as object()? {
     "name":"Dumpert: "||title,
     "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
     "duration":(media)()/duration * duration("PT1S"),
-    "formats":for $x at $i in ("mobile","tablet","720p","original")
-    let $vid:=(.//variants)()[version=$x]/uri
-    return {
+    "formats":for $x at $i in ("mobile","tablet","720p","original") return {
       "id":"pg-"||$i,
       "format":"mp4[h264+aac]",
-      "url":$vid
+      "url":(.//variants)()[version=$x]/uri
     }[url]
   }
 };

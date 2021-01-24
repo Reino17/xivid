@@ -709,12 +709,10 @@ declare function xivid:dumpert($url as string) as object()? {
     "name":"Dumpert: "||title,
     "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
     "duration":(media)()/duration * duration("PT1S"),
-    "formats":for $x at $i in ("mobile","tablet","720p","original")
-    let $vid:=(.//variants)()[version=$x]/uri
-    return {
+    "formats":for $x at $i in ("mobile","tablet","720p","original") return {
       "id":"pg-"||$i,
       "format":"mp4[h264+aac]",
-      "url":$vid
+      "url":(.//variants)()[version=$x]/uri
     }[url]
   }
 };
