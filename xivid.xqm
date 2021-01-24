@@ -970,13 +970,16 @@ declare function xivid:mixcloud($url as string) as object()? {
       "X-CSRFToken: "||$csrf,
       "Cookie: csrftoken="||$csrf
     ),
-    "post":concat(
-      "{""query"":""{cloudcastLookup(lookup:{username:\""",
-      $us[1],
-      "\"",slug:\""",
-      $us[2],
-      "\""}){name,owner{displayName,url,username},publishDate,audioLength,streamInfo{hlsUrl,url}}}""}"
-    ),
+    "post":serialize-json({
+      "query":concat(
+        "{cloudcastLookup(lookup:{username:&quot;",
+        $us[1],
+        "&quot;,slug:&quot;",
+        $us[2],
+        "&quot;}){name,owner{displayName,url,username},",
+        "publishDate,audioLength,streamInfo{hlsUrl,url}}}"
+      )
+    }),
     "url":"https://www.mixcloud.com/graphql"
   })/json//cloudcastLookup/{
     "name":concat(owner/displayName," - ",name),
