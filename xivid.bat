@@ -201,7 +201,7 @@ EXIT /B
 SETLOCAL DISABLEDELAYEDEXPANSION
 SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
-  FOR /F "delims=(." %%B IN ('xidel --version ^| FIND "("') DO (
+  FOR /F "delims=" %%B IN ('xidel --version ^| xidel - -se "extract($raw,'\d{8}')"') DO (
     IF %%B GEQ 20200726 (
       SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm --json-mode=deprecated"
     ) ELSE (
