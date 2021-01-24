@@ -269,7 +269,7 @@ declare function xivid:bbvms(
       ),
       $orig:=parse-json($json/clipData/s3Info)
   return
-  $json/clipData/{|
+  $json/clipData/map:merge((
     {
       "name":join(
         (
@@ -339,7 +339,7 @@ declare function xivid:bbvms(
         }[url]
       ]
     }
-  |}
+  ))
 };
 
 (:~
@@ -369,7 +369,8 @@ declare function xivid:npo($url as string) as object()? {
           $token2/token
         )
       )/stream[not(exists(protection))]/src
-  return {|
+  return
+  map:merge((
     if (exists($info)) then $info/{
       "name":concat(
         franchiseTitle,
@@ -439,7 +440,7 @@ declare function xivid:npo($url as string) as object()? {
         xivid:m3u8-to-json($stream)
       ]
     }
-  |}
+  ))
 };
 
 declare function xivid:rtl($url as string) as object()? {
@@ -768,7 +769,7 @@ declare function xivid:ad($url as string) as object()? {
         )
       )
   return
-  $json/{|
+  $json/map:merge((
     {
       "name":concat(
         "AD: ",
@@ -796,7 +797,7 @@ declare function xivid:ad($url as string) as object()? {
         xivid:m3u8-to-json((sources)(1)/src)
       ]
     }
-  |}
+  ))
 };
 
 declare function xivid:lc($url as string) as object()? {
@@ -817,14 +818,14 @@ declare function xivid:lc($url as string) as object()? {
 };
 
 declare function xivid:youtube($url as string) as object()? {
-  let $json:={|
+  let $json:=map:merge((
     for $x in tokenize(
       unparsed-text("https://www.youtube.com/get_video_info?video_id="||extract($url,"\w+$")),
       "&amp;"
     )
     let $kv:=tokenize($x,"=") return {$kv[1]:uri-decode($kv[2])}
-  |}/parse-json(player_response) return
-  $json//playerMicroformatRenderer/{|
+  ))/parse-json(player_response) return
+  $json//playerMicroformatRenderer/map:merge((
     if (liveBroadcastDetails/isLiveNow) then {
       "name":title/simpleText,
       "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
@@ -871,7 +872,7 @@ declare function xivid:youtube($url as string) as object()? {
         }[url]
       ]
     }
-  |}
+  ))
 };
 
 declare function xivid:vimeo($url as string) as object()? {
@@ -1012,7 +1013,7 @@ declare function xivid:soundcloud($url as string) as object()? {
 };
 
 declare function xivid:facebook($url as string) as object()? {
-  doc($url)/{|
+  doc($url)/map:merge((
     parse-json(//script[@type="application/ld+json"])/{
       "name":join(
         reverse(tokenize(name," \| ")),
@@ -1051,7 +1052,7 @@ declare function xivid:facebook($url as string) as object()? {
         xivid:mpd-to-json(parse-xml(dash_manifest))
       ]
     }
-  |}
+  ))
 };
 
 declare function xivid:pornhub($url as string) as object()? {
