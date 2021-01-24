@@ -471,32 +471,20 @@ declare function xivid:npo($url as string) as object()? {
 };
 
 declare function xivid:rtl($url as string) as object()? {
-  json-doc(
-    concat(
-      "http://www.rtl.nl/system/s4m/vfd/version=2/uuid=",
+  parse-json(
+    doc(
       if (contains($url,"rtlnieuws.nl")) then
-        doc($url)//@data-uuid
+        doc($url)//div[@class="rtl-player__fallback-overlay"]/a/@href
       else
-        extract($url,".+/(.+)",1),
-      "/fmt=adaptive/"
+        $url
+    )//script[@type="application/json"]
+  )//video/{
+    "name":concat("RTL: ",series/title," - ",title),
+    "date":broadcastDateTime,
+    "duration":duration * duration("PT1S"),
+    "formats":xivid:m3u8-to-json(
+      (assets)()[type="Video"]/json-doc(url||"?device=web&amp;format=hls")/manifest
     )
-  )[meta/nr_of_videos_total gt 0]/{
-    "name":concat(
-      .//station,": ",
-      abstracts/name," - ",
-      if (.//classname="uitzending") then episodes/name else .//title
-    ),
-    "date":(material)()/original_date *
-      duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-    "duration":time(
-      format-time(
-        time((material)()/duration) + duration("PT0.5S"),
-        "[H01]:[m01]:[s01]"
-      )
-    ) - time("00:00:00"),
-    "expdate":(.//ddr_timeframes)()[model="AVOD"]/stop *
-      duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-    "formats":xivid:m3u8-to-json(resolve-uri(.//videopath,.//videohost))
   }
 };
 
