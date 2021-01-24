@@ -142,22 +142,38 @@ declare function xivid:mpd-to-json($mpd) as object()* {
   }
 };
 
-declare function xivid:txt-to-date($txt as string) as string {
-  let $a:={
-        "januari":"01","februari":"02","maart":"03",
-        "april":"04","mei":"05","juni":"06",
-        "juli":"07","augustus":"08","september":"09",
-        "oktober":"10","november":"11","december":"12"
+declare function xivid:string-to-utc-dateTime($arg as string) as dateTime {
+  let $month:={
+        "jan":"01","feb":"02","mrt":"03","maart":"03","apr":"04",
+        "mei":"05","jun":"06","jul":"07","aug":"08",
+        "sep":"09","okt":"10","nov":"11","dec":"12"
       },
-      $b:=extract($txt,"(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))
+      $dt:=if ($arg castable as dateTime) then
+        $arg
+      else
+        let $i:=tokenize($arg,"[\s-]") return
+        concat(
+          join(
+            (
+              $i[3],
+              if ($i[2] castable as integer) then
+                $i[2]
+              else
+                ($month($i[2]),$month(substring($i[2],1,3))),
+              format-integer($i[1],"00")
+            ),
+            "-"
+          ),
+          "T",
+          substring(
+            join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",
+            1,8
+          )
+        )
   return
-  join(
-    (
-      if ($b[1] lt 10) then "0"||$b[1] else $b[1],
-      $a($b[2]),
-      $b[3]
-    ),
-    "-"
+  adjust-dateTime-to-timezone(
+    xivid:adjust-dateTime-to-dst($dt),
+    duration("PT0S")
   )
 };
 

@@ -987,58 +987,103 @@ I.t.t. date zijn printf en echo geen programma's, maar functies van Bash, waardo
 
 ------------------------------------------------------------------------------------------------
 
-Tekst naar datum:
+Datum-string naar (UTC) dateTime:
 
-$ xidel -se 'x:parse-date("17 february 2019  7:45","dd mmmm yyyy")'
-2019-02-17
+$ xidel -se 'parse-ietf-date("Tue Oct 29 01:10:02 +0000 2019")'
+2019-10-29T01:10:02Z
 
-$ xidel -se 'x:parse-dateTime("17 february 2019  7:45","dd mmmm yyyy  h:nn")'
-2019-02-17T07:45:00
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se '
+  x:parse-date("1 january 2020 7:00","d mmmm yyyy"),
+  x:parse-dateTime("1 january 2020 7:00","d mmmm yyyy h:nn")
+'
+2020-01-01
+2020-01-01T07:00:00
 
 Het Pascal format (https://www.freepascal.org/docs-html/rtl/sysutils/formatchars.html) komt heel precies,
 MAAR Xidel ondersteunt (op dit moment) alleen Engels en Duits:
 
-$ xidel -se 'x:parse-date("17 februari 2019  7:45","dd mmmm yyyy")'
+$ xidel -se 'x:parse-date("1 januari 2020 7:00","d mmmm yyyy")'
 Error:
-err:FORG0001: Invalid conversion from 17 februari 2019  7:45 to date format dd mmmm yyyy
+err:FORG0001: Invalid conversion from 1 januari 2020 7:00 to date format d mmmm yyyy
 
-Het kan ook handmatig:
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -se 'tokenize("17 februari 2019  7:45","\s+")'
-17
-februari
-2019
-7:45
+$ xidel -se 'tokenize("01-07-2020 07:00","[\s-]")'      $ xidel -se 'tokenize("1 juli 2020 7:00")'
+01                                                      1
+07                                                      juli
+2020                                                    2020
+07:00                                                   7:00
 
-$ xidel -se 'extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))'
-17
-februari
-2019
+$ xidel -se 'let $i:=tokenize("01-07-2020 07:00","[\s-]") return (format-integer($i[1],"00"),$i[2],$i[3],join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00")'
+$ xidel -se 'let $i:=tokenize("01-07-2020 07:00:00","[\s-]") return (format-integer($i[1],"00"),$i[2],$i[3],substring(join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",1,8))'
+$ xidel -se 'let $month:={"jan":"01","feb":"02","mrt":"03","apr":"04","mei":"05","jun":"06","jul":"07","aug":"08","sep":"09","okt":"10","nov":"11","dec":"12"},$i:=tokenize("1 juli 2020 7:00","[\s-]") return (format-integer($i[1],"00"),if ($i[2] castable as integer) then $i[2] else $month(substring($i[2],1,3)),$i[3],substring(join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",1,8))'
+01
+07
+2020
+07:00:00
 
-$ xidel -se 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return (if ($b[1] lt 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3])'
-17
-02
-2019
+$ xidel -se '("01-07-2020 07:00","1 juli 2020 7:00") ! (let $month:={"jan":"01","feb":"02","mrt":"03","apr":"04","mei":"05","jun":"06","jul":"07","aug":"08","sep":"09","okt":"10","nov":"11","dec":"12"},$i:=tokenize(.,"[\s-]") return concat(join(($i[3],if ($i[2] castable as integer) then $i[2] else $month(substring($i[2],1,3)),format-integer($i[1],"00")),"-"),"T",substring(join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",1,8)))'
+2020-07-01T07:00:00
+2020-07-01T07:00:00
 
-$ xidel -se 'let $a:={"januari":"01","februari":"02","maart":"03","april":"04","mei":"05","juni":"06","juli":"07","augustus":"08","september":"09","oktober":"10","november":"11","december":"12"},$b:=extract("17 februari 2019  7:45","(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3)) return join((if ($b[1] lt 10) then "0"||$b[1] else $b[1],$a($b[2]),$b[3]),"-")'
-17-02-2019
+----------------------------------------------------------------
 
-declare function xivid:txt-to-date($txt as string) as string {
-  let $a:={
-        "januari":"01","februari":"02","maart":"03",
-        "april":"04","mei":"05","juni":"06",
-        "juli":"07","augustus":"08","september":"09",
-        "oktober":"10","november":"11","december":"12"
+$ xidel -s --module=xivid.xqm -e '
+  implicit-timezone(),
+  adjust-dateTime-to-timezone(adjust-dateTime-to-timezone(dateTime("2020-07-01T07:00:00")),duration("PT0S")),
+  adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst("2020-07-01T07:00:00"),duration("PT0S"))
+'
+PT1H
+2020-07-01T06:00:00Z   # De huidige tijdzone is +01:00. Eén uur eerder voor UTC tijd in juli klopt dus niet.
+2020-07-01T05:00:00Z   # De tijdzone op dat moment is +02:00. Twee uur eerder voor UTC tijd in juli is dus de enige juiste uitkomst.
+
+----------------------------------------------------------------
+
+$ xidel -s --module=xivid.xqm -e 'declare function local:string-to-utc-dateTime($arg as string) as dateTime {let $month:={"jan":"01","feb":"02","mrt":"03","apr":"04","mei":"05","jun":"06","jul":"07","aug":"08","sep":"09","okt":"10","nov":"11","dec":"12"},$dt:=let $i:=tokenize($arg,"[\s-]") return concat(join(($i[3],if ($i[2] castable as integer) then $i[2] else $month(substring($i[2],1,3)),format-integer($i[1],"00")),"-"),"T",substring(join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",1,8)) return adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst($dt),duration("PT0S"))}; local:string-to-utc-dateTime("1 juli 2020 7:00")'
+2020-07-01T05:00:00Z
+
+$ xidel -s --module=xivid.xqm -e 'declare function local:string-to-utc-dateTime($arg as string) as dateTime {let $month:={"jan":"01","feb":"02","mrt":"03","maart":"03","apr":"04","mei":"05","jun":"06","jul":"07","aug":"08","sep":"09","okt":"10","nov":"11","dec":"12"},$dt:=let $i:=tokenize($arg,"[\s-]") return concat(join(($i[3],if ($i[2] castable as integer) then $i[2] else ($month($i[2]),$month(substring($i[2],1,3))),format-integer($i[1],"00")),"-"),"T",substring(join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",1,8)) return adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst($dt),duration("PT0S"))}; local:string-to-utc-dateTime("1 maart 2020 7:00")'
+2020-03-01T06:00:00Z
+
+$ xidel -s --module=xivid.xqm -e 'declare function local:string-to-utc-dateTime($arg as string) as dateTime {let $month:={"jan":"01","feb":"02","mrt":"03","maart":"03","apr":"04","mei":"05","jun":"06","jul":"07","aug":"08","sep":"09","okt":"10","nov":"11","dec":"12"},$dt:=if ($arg castable as dateTime) then $arg else let $i:=tokenize($arg,"[\s-]") return concat(join(($i[3],if ($i[2] castable as integer) then $i[2] else ($month($i[2]),$month(substring($i[2],1,3))),format-integer($i[1],"00")),"-"),"T",substring(join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",1,8)) return adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst($dt),duration("PT0S"))}; local:string-to-utc-dateTime("2020-07-01T07:00:00")'
+2020-07-01T05:00:00Z
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+declare function xivid:string-to-utc-dateTime($arg as string) as dateTime {
+  let $month:={
+        "jan":"01","feb":"02","mrt":"03","maart":"03","apr":"04",
+        "mei":"05","jun":"06","jul":"07","aug":"08",
+        "sep":"09","okt":"10","nov":"11","dec":"12"
       },
-      $b:=extract($txt,"(\d+)\s+([a-z]+)\s+(\d{4})",(1 to 3))
+      $dt:=if ($arg castable as dateTime) then
+        $arg
+      else
+        let $i:=tokenize($arg,"[\s-]") return
+        concat(
+          join(
+            (
+              $i[3],
+              if ($i[2] castable as integer) then
+                $i[2]
+              else
+                ($month($i[2]),$month(substring($i[2],1,3))),
+              format-integer($i[1],"00")
+            ),
+            "-"
+          ),
+          "T",
+          substring(
+            join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",
+            1,8
+          )
+        )
   return
-  join(
-    (
-      if ($b[1] lt 10) then "0"||$b[1] else $b[1],
-      $a($b[2]),
-      $b[3]
-    ),
-    "-"
+  adjust-dateTime-to-timezone(
+    xivid:adjust-dateTime-to-dst($dt),
+    duration("PT0S")
   )
 };
 
