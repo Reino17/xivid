@@ -7487,18 +7487,21 @@ Minimale wat voor mij (en hopelijk iedereen) werkt:
 
 Cookie: ndc_consent={"permissions":{"functional":true}}
 
+$ xidel -s --xquery '"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}}))'
+Cookie: ndc_consent=%7B%22permissions%22%3A%20%7B%22functional%22%3A%20true%7D%7D
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return //script/tokenize(.,",")[contains(.,$id)])'
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return //script/tokenize(.,",")[contains(.,$id)])'
 "https:\u002F\u002Fndc.bbvms.com\u002Fp\u002Flc_videoplayer_v2\u002Fc\u002F3892522.html?inheritDimensions=true"
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return parse-json(//script/tokenize(.,",")[contains(.,$id)]))'
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return parse-json(//script/tokenize(.,",")[contains(.,$id)]))'
 https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.html?inheritDimensions=true
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return substring-before(parse-json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json")'
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return substring-before(parse-json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json")'
 https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.json   # Blue Billywig
 
-$ xidel -s --module=xivid.xqm -e 'let $src:=x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc,$id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return $src/xivid:bbvms(substring-before(parse-json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json",//meta[@property="og:site_name"]/@content,())'
+$ xidel -s --module=xivid.xqm -e 'let $src:=x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc,$id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return $src/xivid:bbvms(substring-before(parse-json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json",//meta[@property="og:site_name"]/@content,())'
 {
   "name": "Leeuwarder Courant: Enorme belangstelling voor gratis perenbomen in Heerenveen",
   "date": "2020-08-22T10:03:48Z",
@@ -7533,7 +7536,9 @@ $ xidel -s --module=xivid.xqm -e 'let $src:=x:request({"headers":"Cookie: ndc_co
 
 declare function xivid:lc($url as string) as object()? {
   let $src:=x:request({
-        "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
+        "headers":"Cookie: ndc_consent="||uri-encode(
+          serialize-json({"permissions":{"functional":true}})
+        ),
         "url":$url
       })/doc,
       $id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")

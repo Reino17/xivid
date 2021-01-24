@@ -828,7 +828,9 @@ declare function xivid:ad($url as string) as object()? {
 
 declare function xivid:lc($url as string) as object()? {
   let $src:=x:request({
-        "headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}",
+        "headers":"Cookie: ndc_consent="||uri-encode(
+          serialize-json({"permissions":{"functional":true}})
+        ),
         "url":$url
       })/doc,
       $id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
