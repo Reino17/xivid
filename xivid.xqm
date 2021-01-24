@@ -323,13 +323,22 @@ declare function xivid:bbvms(
       contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or
       ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")
     ) then {
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]")
+      "date":substring(
+        adjust-dateTime-to-timezone(
+          current-dateTime() + duration("PT0.5S"),
+          duration("PT0S")
+        ),
+        1,19
+      )||"Z"
     } else {
-      "date":format-date(
-        dateTime(publisheddate) + implicit-timezone(),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":.[length]/length * duration("PT1S") + time("00:00:00")
+      "date":if (ends-with(publisheddate,"Z")) then
+        publisheddate
+      else
+        adjust-dateTime-to-timezone(
+          xivid:adjust-dateTime-to-dst(publisheddate),
+          duration("PT0S")
+        ),
+      "duration":length * duration("PT1S")
     },
     {
       "formats":[
@@ -415,28 +424,10 @@ declare function xivid:npo($url as string) as object()? {
         franchiseTitle,
         if (contains(franchiseTitle,title)) then () else ": "||title
       ),
-      "date":format-date(
-        dateTime(broadcastDate) + implicit-timezone(),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "start":if (startAt) then
-        format-time(
-          startAt * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        (),
-      "end":if (startAt) then
-        format-time(
-          (startAt + duration) * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        )
-      else
-        ()
+      "date":broadcastDate,
+      "duration":duration * duration("PT1S"),
+      "start":startAt,
+      "end":startAt + duration
     } else
       doc("https://www.npostart.nl/"||$prid)/(
         let $info:=parse-json(//script[@type="application/ld+json"]) return {
@@ -445,14 +436,11 @@ declare function xivid:npo($url as string) as object()? {
             ": ",
             @share-title
           ),
-          "date":format-date(
+          "date":adjust-dateTime-to-timezone(
             dateTime($info/uploadDate),
-            "[D01]-[M01]-[Y]"
+            duration("PT0S")
           ),
-          "duration":format-time(
-            duration($info/duration),
-            "[H01]:[m01]:[s01]"
-          )
+          "duration":$info/duration
         }
       ),
     {
@@ -495,25 +483,20 @@ declare function xivid:rtl($url as string) as object()? {
   )[meta/nr_of_videos_total gt 0]/{
     "name":concat(
       .//station,": ",
-      abstracts/name,
-      " - ",
+      abstracts/name," - ",
       if (.//classname="uitzending") then episodes/name else .//title
     ),
-    "date":format-date(
-      (material)()/original_date * duration("PT1S") +
-      implicit-timezone() + date("1970-01-01"),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":format-time(
-      time((material)()/duration) + duration("PT0.5S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "expdate":format-dateTime(
-      (.//ddr_timeframes)()[model="AVOD"]/stop * duration("PT1S") +
-      implicit-timezone() + dateTime("1970-01-01T00:00:00"),
-      "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
-    ),
-    "formats":xivid:m3u8-to-json(.//videohost||.//videopath)
+    "date":(material)()/original_date *
+      duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":time(
+      format-time(
+        time((material)()/duration) + duration("PT0.5S"),
+        "[H01]:[m01]:[s01]"
+      )
+    ) - time("00:00:00"),
+    "expdate":(.//ddr_timeframes)()[model="AVOD"]/stop *
+      duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "formats":xivid:m3u8-to-json(resolve-uri(.//videopath,.//videohost))
   }
 };
 
@@ -530,11 +513,9 @@ declare function xivid:kijk($url as string) as object()? {
         tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
       )
     ),
-    "date":format-date(
-      epgDate div 1000 * duration("PT1S") + date("1970-01-01"),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":round(duration) * duration("PT1S") + time("00:00:00"),
+    "date":.//availableDate div 1000 *
+      duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":round(duration) * duration("PT1S"),
     "formats":[
       for $x at $i in (.//sourceUrl)[ends-with(.,"vtt")]
       order by $x
@@ -623,7 +604,10 @@ declare function xivid:regio($url as string) as object()? {
         ": ",
         //form[@name="quick_menu2"]//option[@selected]
       ),
-      "date":replace($script,".+?(\d+)/(\d+)/(\d+).+","$3-$2-$1"),
+      "date":dateTime(
+        date(replace($script,".+?(\d+)/(\d+)/(\d+).+","$1-$2-$3")),
+        time("00:00:00Z")
+      ),
       "formats":[
         {
           "id":"pg-1",
@@ -651,15 +635,18 @@ declare function xivid:nhnieuws($url as string) as object()? {
           $info/concat(author,": ",caption)
         else
           concat(media//author,": ",title),
-        "date":format-date(
-          updated * duration("PT1S") + implicit-timezone() + date("1970-01-01"),
-          "[D01]-[M01]-[Y]"
-        ),
+        "date":updated * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
         "formats":xivid:m3u8-to-json(.//stream/url)
       }
     else {
       "name":substring-after(//title,"Media - ")||": Livestream",
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "date":substring(
+        adjust-dateTime-to-timezone(
+          current-dateTime() + duration("PT0.5S"),
+          duration("PT0S")
+        ),
+        1,19
+      )||"Z",
       "formats":xivid:m3u8-to-json(
         parse-json(
           //script/substring-after(.,"INIT_DATA__ = ")[.]
@@ -674,7 +661,13 @@ declare function xivid:ofl($url as string) as object()? {
     let $info:=//div[@class="fn-jw-player fn-videoplayer"] return
     if ($info/@data-has-streams) then {
       "name":"Omroep Flevoland: Livestream",
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "date":substring(
+        adjust-dateTime-to-timezone(
+          current-dateTime() + duration("PT0.5S"),
+          duration("PT0S")
+        ),
+        1,19
+      )||"Z",
       "formats":xivid:m3u8-to-json($info/@data-file)
     } else {
       "name":concat(
@@ -684,13 +677,17 @@ declare function xivid:ofl($url as string) as object()? {
         else
           normalize-space(//h2)
       ),
-      "date":if (//meta[@itemprop="datePublished"]) then
-        format-date(
-          date(//meta[@itemprop="datePublished"]/@content),
-          "[D01]-[M01]-[Y]"
-        )
-      else
-        extract(//span[starts-with(@class,"t--red")],"[\d-]+"),
+      "date":xivid:string-to-utc-dateTime(
+        //div[@class="card__info t--xsm"]/join(
+          if (.//span[@class="d--block--sm"]) then
+            extract(
+              .//span[@class="d--block--sm"],
+              "(\d+ \w+ \d+) \| ([\d:]+)",(1,2)
+            )
+          else
+            span/extract(.,"[\d:-]+",0,"*")
+          )
+      ),
       "formats":[
         {
           "id":"pg-1",
@@ -710,8 +707,8 @@ declare function xivid:dumpert($url as string) as object()? {
     )
   )/items/item/item[exists((media)()[mediatype="VIDEO"])]/{
     "name":"Dumpert: "||title,
-    "date":format-date(dateTime(date),"[D01]-[M01]-[Y]"),
-    "duration":(media)()/duration * duration("PT1S") + time("00:00:00"),
+    "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
+    "duration":(media)()/duration * duration("PT1S"),
     "formats":for $x at $i in ("mobile","tablet","720p","original")
     let $vid:=(.//variants)()[version=$x]/uri
     return {
@@ -727,11 +724,12 @@ declare function xivid:autojunk($url as string) as object()? {
       $info:=$src//div[@id="playerWrapper"]/script
   return {
     "name":"Autojunk: "||extract($info,"clipData.title=&quot;(.+)&quot;",1),
-    "date":extract($src//span[@class="posted"],"([\d-]+)",1),
-    "duration":format-time(
-      extract($info,"clipData\[&quot;length&quot;\].+?(\d+)",1) * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
+    "date":xivid:string-to-utc-dateTime(
+      join(extract($src//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
     ),
+    "duration":extract(
+      $info,"clipData\[&quot;length&quot;\].+?(\d+)",1
+    ) * duration("PT1S"),
     "formats":[
       for $x at $i in parse-json(
         replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+",""),
@@ -761,17 +759,12 @@ declare function xivid:telegraaf($url as string) as object()? {
     )
   )/(items)()/{
     "name":"Telegraaf: "||title,
-    "date":format-date(
-      date(tokenize(publishedstart)[1]),
-      "[D01]-[M01]-[Y]"
+    "date":xivid:string-to-utc-dateTime(
+      replace(publishedstart,"\s","T")
     ),
-    "duration":format-time(
-      duration * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
-    "expdate":publishedend ! format-dateTime(
-      dateTime(replace(.,"\s","T")),
-      "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+    "duration":duration * duration("PT1S"),
+    "expdate":publishedend ! xivid:string-to-utc-dateTime(
+      replace(.,"\s","T")
     ),
     "formats":[
       locations/reverse((progressive)())/{
@@ -818,14 +811,10 @@ declare function xivid:ad($url as string) as object()? {
       )
     },
     (productions)()/{
-      "date":format-date(
-        date(tokenize(publicationDate)[1]),
-        "[D01]-[M01]-[Y]"
+      "date":xivid:string-to-utc-dateTime(
+        replace(publicationDate,"\s","T")
       ),
-      "duration":format-time(
-        duration * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
+      "duration":duration * duration("PT1S"),
       "formats":[
         for $x at $i in reverse((sources)()[type="video/mp4"]) return {
           "id":"pg-"||$i,
@@ -864,15 +853,21 @@ declare function xivid:youtube($url as string) as object()? {
     )
     let $kv:=tokenize($x,"=") return {$kv[1]:uri-decode($kv[2])}
   ))/parse-json(player_response) return
-  $json//playerMicroformatRenderer/map:merge((
+  $json//playerMicroformatRenderer/(
     if (liveBroadcastDetails/isLiveNow) then {
       "name":title/simpleText,
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
+      "date":substring(
+        adjust-dateTime-to-timezone(
+          current-dateTime() + duration("PT0.5S"),
+          duration("PT0S")
+        ),
+        1,19
+      )||"Z",
       "formats":xivid:m3u8-to-json($json/streamingData/hlsManifestUrl)
     } else {
       "name":title/simpleText,
-      "date":format-date(date(uploadDate),"[D01]-[M01]-[Y]"),
-      "duration":format-time(lengthSeconds * duration("PT1S"),"[H01]:[m01]:[s01]"),
+      "date":dateTime(date(uploadDate),time("00:00:00"))||"Z",
+      "duration":lengthSeconds * duration("PT1S"),
       "formats":[
         ($json//captionTracks)()[languageCode=("nl","en")]/{
           "id":"sub-"||position(),
@@ -911,7 +906,7 @@ declare function xivid:youtube($url as string) as object()? {
         }[url]
       ]
     }
-  ))
+  )
 };
 
 declare function xivid:vimeo($url as string) as object()? {
@@ -925,11 +920,11 @@ declare function xivid:vimeo($url as string) as object()? {
     else
       parse-json(
         doc($url)//script/extract(.,"clip_page_config = (.+);",1)[.]
-      )/format-date(
-        date(substring(clip/uploaded_on,1,10)),
-        "[D01]-[M01]-[Y]"
+      )/adjust-dateTime-to-timezone(
+        dateTime(replace(clip/uploaded_on,"\s","T")||"-05:00"),
+        duration("PT0S")
       ),
-    "duration":video/duration * duration("PT1S") + time("00:00:00"),
+    "duration":video/duration * duration("PT1S"),
     "formats":request/files/[
       for $x at $i in (progressive)()
       order by $x/width
@@ -949,15 +944,8 @@ declare function xivid:vimeo($url as string) as object()? {
 declare function xivid:dailymotion($url as string) as object()? {
   json-doc(replace($url,"video","player/metadata/video"))/{
     "name":"Dailymotion: "||title,
-    "date":format-date(
-      created_time * duration("PT1S") +
-      implicit-timezone() + date("1970-01-01"),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":format-time(
-      duration * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
+    "date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":duration * duration("PT1S"),
     "formats":xivid:m3u8-to-json(qualities//url)
   }
 };
@@ -994,8 +982,8 @@ declare function xivid:mixcloud($url as string) as object()? {
     "url":"https://www.mixcloud.com/graphql"
   })/json//cloudcastLookup/{
     "name":concat(owner/displayName," - ",name),
-    "date":format-date(dateTime(publishDate),"[D01]-[M01]-[Y]"),
-    "duration":format-time(audioLength * duration("PT1S"),"[H01]:[m01]:[s01]"),
+    "date":dateTime(publishDate),
+    "duration":audioLength * duration("PT1S"),
     "formats":[
       {
         "id":"pg-1",
@@ -1023,11 +1011,8 @@ declare function xivid:soundcloud($url as string) as object()? {
   return
   $json/{
     "name":concat(user/(full_name,username)[.][1]," - ",title),
-    "date":format-date(dateTime(created_at),"[D01]-[M01]-[Y]"),
-    "duration":format-time(
-      round(duration div 1000) * duration("PT1S"),
-      "[H01]:[m01]:[s01]"
-    ),
+    "date":created_at,
+    "duration":round(duration div 1000) * duration("PT1S"),
     "formats":[
       $fmts[format/protocol="progressive"]/(
         let $url:=json-doc(concat(url,"?client_id=",$cid))/url return {
@@ -1058,14 +1043,11 @@ declare function xivid:facebook($url as string) as object()? {
         reverse(tokenize(name," \| ")),
         ": "
       ),
-      "date":format-date(
-        adjust-dateTime-to-timezone(dateTime(uploadDate)),
-        "[D01]-[M01]-[Y]"
+      "date":adjust-dateTime-to-timezone(
+        dateTime(uploadDate),
+        duration("PT0S")
       ),
-      "duration":format-time(
-        duration("P"||duration),
-        "[H01]:[m01]:[s01]"
-      )
+      "duration":duration("P"||duration)
     },
     {
       "formats":parse-json(
@@ -1108,14 +1090,8 @@ declare function xivid:pornhub($url as string) as object()? {
       )
   return {
     "name":"Pornhub: "||$info/name,
-    "date":format-date(
-      adjust-dateTime-to-timezone(dateTime($info/uploadDate)),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":format-time(
-      duration($info/duration),
-      "[H01]:[m01]:[s01]"
-    ),
+    "date":dateTime($info/uploadDate),
+    "duration":duration($info/duration),
     "formats":[
       for $x at $i in $fmts[not(contains(.,"m3u8"))]
       count $i
