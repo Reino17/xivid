@@ -489,36 +489,47 @@ declare function xivid:rtl($url as string) as object()? {
 };
 
 declare function xivid:kijk($url as string) as object()? {
-  let $json:=parse-json(doc($url)//script[@type="application/json"])//pageProps return
-  $json/video/{
+  x:request({
+    "headers":"Accept: application/json",
+    "url":request-combine(
+      "https://graph.kijk.nl/graphql",
+      {
+        "query":concat(
+          "query{programs(guid:&quot;",
+          extract($url,"\w+$"),
+          "&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,",
+          "seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,",
+          "type},availableDate,expirationDate,availabilityState},series{guid,title}}}}"
+        )
+      }
+    )/url
+  })/(json//items)()/{
     "name":concat(
       "Kijk: ",
-      ($json/format,.)[1]/title,
-      .[exists(seasonNumber)]/concat(
+      (.[series]/series/title,title),
+      .[seasonNumber]/concat(
         " S",
-        seasonNumber ! (if (. lt 10) then "0"||. else .),
+        format-integer(seasonNumber,"00"),
         "E",
-        tvSeasonEpisodeNumber ! (if (. lt 10) then "0"||. else .)
+        format-integer(tvSeasonEpisodeNumber,"00")
       )
     ),
     "date":.//availableDate div 1000 *
       duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "duration":round(duration) * duration("PT1S"),
+    "expdate":.//expirationDate div 1000 *
+      duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "formats":[
-      for $x at $i in (.//sourceUrl)[ends-with(.,"vtt")]
-      order by $x
-      count $i
-      return {
-        "id":"sub-"||$i,
+      (.//mediaContent)()[type="webvtt"]/{
+        "id":"sub-"||position(),
         "format":"vtt",
         "language":"nl",
-        "label":if (contains($x,"OPE")) then
-          "Doven en Slechthorenden"
-        else
-          "Nederlands",
-        "url":$x
+        "label":substring((assetTypes)(),17),
+        "url":sourceUrl
       },
-      xivid:m3u8-to-json((.//sourceUrl)[ends-with(.,"m3u8")][last()])
+      xivid:m3u8-to-json(
+        (.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl
+      )
     ]
   }
 };
