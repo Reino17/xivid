@@ -716,74 +716,252 @@ ALT+<cp> voor weergave (Windows).   # ALT 128 of ALT 253.
 
 ================================================================================================
 
-[Epoch/tijd/tijdzone conversies]
-
-"The Unix epoch (or Unix time or POSIX time or Unix timestamp) is the number of seconds that have elapsed since January 1, 1970." (https://www.epochconverter.com/)
-
-$ date -d 2019-07-01T01:00:00 +%s
-1561935600
-
-$ date -d @1561935600 +%FT%T
-$ printf '%(%FT%T)T\n' 1561935600
-2019-07-01T01:00:00
-
-$ date -d @1561935600 +%d-%m-%Y
-$ printf '%(%d-%m-%Y)T\n' 1561935600
-01-07-2019
-
-$ xidel -se '1561935600 * duration("PT1S") + dateTime("1970-01-01T00:00:00")'
-2019-06-30T23:00:00   # UTC tijd.
-
-I.t.t date/printf geeft Xidel bij het converteren van epoch naar datetime de UTC tijd weer.
-Je zult dus zelf de lokale tijdzone er in moeten verwerken.
+[Epoch/datum/tijd/tijdzone conversies]
 
 $ date +%:z
-+02:00   # UTC+2 (GMT+2), zomertijd in Nederland.
++01:00   # UTC+1 (Nederland, wintertijd).
 
-$ xidel -se 'time("00:00:00") - time("00:00:00'$(date +%:z)'")'   # Was nodig vóórdat implicit-timezone() werkte.
-$ xidel -se 'implicit-timezone()'   # xidel-0.9.9.7433-8b7ba70 en nieuwer.
-PT2H   # Tijdzone als dayTimeDuration().
-
-$ xidel -se '1561935600 * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00")'
-2019-07-01T01:00:00   # UTC+2 zonder tijdzone.
-
-----------------------------------------------------------------
-
-$ xidel -se 'adjust-dateTime-to-timezone(dateTime("1970-01-01T00:00:00"),implicit-timezone())'
-1970-01-01T00:00:00+02:00
-
-$ xidel -se '1561935600 * duration("PT1S") + implicit-timezone() + adjust-dateTime-to-timezone(dateTime("1970-01-01T00:00:00"),implicit-timezone())'
-2019-07-01T01:00:00+02:00   # UTC+2 met tijdzone.
-
-----------------------------------------------------------------
-
-$ xidel -se 'adjust-dateTime-to-timezone(dateTime("2019-06-30T23:00:00-05:00"))'
-2019-07-01T05:00:00+01:00
-
-2019-06-30T23:00:00-05:00 UTC−5 (New York) is dus 2019-07-01T05:00:00+01:00 UTC+1 (Nederland).
-
-$ date -d 2019-06-30T23:00:00-05:00 +%FT%T%:z
-2019-07-01T06:00:00+02:00
-
-Op die datum zelf is het natuurlijk zomertijd in Nederland (UTC+2). Date "weet" dit. Met Xidel is dit niet mogelijk.
-
-----------------------------------------------------------------
-
-$ xidel -se 'format-date(1561935600 * duration("PT1S") + implicit-timezone() + date("1970-01-01"),"[D01]-[M01]-[Y]")'
-01-07-2019
-
-$ xidel -se '(dateTime("2019-07-01T01:00:00") - dateTime("1970-01-01T00:00:00") - implicit-timezone()) div dayTimeDuration("PT1S")'
-1561935600
-
-Voor een deling is expliciet dayTimeDuration() nodig. Zie https://sourceforge.net/p/videlibri/mailman/videlibri-xidel/thread/7e952f3d-18d5-ede8-17df-8480b2594b7c%40benibela.de/#msg36722060.
+$ xidel -se 'implicit-timezone()'
+$ xidel -se 'time("00:00:00") - time("00:00:00'$(date +%:z)'")'   # Vóór xidel-0.9.9.7433-8b7ba70.
+PT1H   # Tijdzone als dayTimeDuration().
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-Bij het weergeven van de actuele tijd is Xidel wel bewust van de tijdzone.
+"Unix time (also known as Epoch time, POSIX time, seconds since the Epoch, or UNIX Epoch time) is a system for describing a point in time. It is the number of seconds that have elapsed since the Unix epoch, minus leap seconds; the Unix epoch is 00:00:00 UTC on 1 January 1970" (https://en.wikipedia.org/wiki/Unix_time)
 
-$ xidel -se '"'$(date +%FT%T)'",current-dateTime()'
-2020-07-31T19:15:50
-2020-07-31T19:15:50.687+02:00
+$ date -d @946683000 -u '+%FT%T%:z'
+1999-12-31T23:30:00+00:00   # UTC tijd.
+
+$ xidel -se 'duration("PT"||946683000||"S") + dateTime("1970-01-01T00:00:00Z")'
+$ xidel -se '946683000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")'
+1999-12-31T23:30:00Z   # UTC tijd.
+
+$ date -d @946683000 '+%FT%T%:z'
+$ xidel -se 'adjust-dateTime-to-timezone(946683000 * duration("PT1S") + implicit-timezone() + dateTime("1970-01-01T00:00:00"))'
+$ xidel -se 'adjust-dateTime-to-timezone(946683000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"))'
+2000-01-01T00:30:00+01:00   # UTC+1 tijd.
+
+$ date -d 2000-01-01T00:30:00+01:00 '+%s'
+$ xidel -se '(dateTime("2000-01-01T00:30:00+01:00") - dateTime("1970-01-01T00:00:00") - implicit-timezone()) div dayTimeDuration("PT1S")'
+$ xidel -se '(dateTime("2000-01-01T00:30:00+01:00") - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S")'
+946683000
+
+Voor een deling is expliciet dayTimeDuration() nodig. Zie https://sourceforge.net/p/videlibri/mailman/videlibri-xidel/thread/7e952f3d-18d5-ede8-17df-8480b2594b7c%40benibela.de/#msg36722060.
+
+$ date -d @946683000 '+%d-%m-%Y'
+$ xidel -se 'format-date(adjust-dateTime-to-timezone(946683000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),"[D01]-[M01]-[Y]")'
+01-01-2000
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se '
+  adjust-dateTime-to-timezone(dateTime("1999-12-31T23:30:00")),
+  adjust-dateTime-to-timezone(dateTime("1999-12-31T23:30:00Z")),
+  adjust-dateTime-to-timezone(dateTime("1999-12-31T23:30:00-05:00")),
+  adjust-dateTime-to-timezone(dateTime("1999-12-31T23:30:00-05:00"),duration("PT0S")),
+  adjust-dateTime-to-timezone(dateTime("1999-12-31T23:30:00-05:00"),duration("PT9H"))
+'
+1999-12-31T23:30:00+01:00   # Datetime zonder tijdzone wordt beschouwd als lokaal en krijgt alleen de lokale tijdzone er achter.
+2000-01-01T00:30:00+01:00   # Datetime met tijdzone wordt geconverteerd naar lokale datetime; UTC+1 (Nederland, wintertijd).
+2000-01-01T05:30:00+01:00   # Van UTC−5 (New York) naar UTC+1 (Nederland, wintertijd).
+2000-01-01T04:30:00Z        # Van UTC−5 (New York) naar UTC.
+2000-01-01T13:30:00+09:00   # Van UTC−5 (New York) naar UTC+9 (Japan).
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se '
+  "'$(date +%FT%T%:z)'",
+  "'$(date -u +%FT%T%:z)'",
+  current-dateTime(),
+  adjust-dateTime-to-timezone(current-dateTime(),duration("PT0S")),
+  format-dateTime(current-dateTime(),"[Y]-[M01]-[D01]T[H01]:[m01]:[s01][Z]"),
+  format-dateTime(current-dateTime() + duration("PT0.5S"),"[Y]-[M01]-[D01]T[H01]:[m01]:[s01][Z]"),
+  format-dateTime(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),"[Y]-[M01]-[D01]T[H01]:[m01]:[s01][Z]")
+'
+2020-12-18T13:53:33+01:00       # Huidige lokale tijd.
+2020-12-18T12:53:33+00:00       # Huidige UTC tijd.
+2020-12-18T13:53:33.718+01:00   # Huidige lokale tijd.
+2020-12-18T12:53:33.718Z        # Huidige UTC tijd.
+2020-12-18T13:53:33+01:00       # Huidige lokale tijd, zonder milliseconden.
+2020-12-18T13:53:34+01:00       # Huidige lokale tijd, met afgeronde seconden.
+2020-12-18T12:53:34+00:00       # Huidige UTC tijd, met afgeronde seconden.
+
+$ xidel -se '
+  "'$(date +%s)'",
+  (current-dateTime() - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S"),
+  round((current-dateTime() - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S"))
+'
+1608296013
+1608296013.718
+1608296014
+
+------------------------------------------------------------------------------------------------
+
+Afronden:
+
+$ xidel -se '
+  format-time(time("00:19:06.040"),"[H01]:[m01]:[s01]"),
+  format-time(time("00:19:06.540"),"[H01]:[m01]:[s01]"),
+  format-time(time("00:19:06.540") + duration("PT0.5S"),"[H01]:[m01]:[s01]")
+'
+00:19:06
+00:19:06
+00:19:07
+
+------------------------------------------------------------------------------------------------
+
+Zomer-/Wintertijd gecorrigeerde dateTime:
+
+$ xidel -s --module=functx-1.0.1-doc.xq -e 'functx:day-of-week("2020-12-25")'   # http://www.xqueryfunctions.com/xq/functx_day-of-week.html
+$ xidel -se 'days-from-duration(date("2020-12-25") - date("1901-01-06")) mod 7'
+5   # 0 = zondag, 6 = zaterdag.
+
+$ xidel -se '("zo","ma","di","wo","do","vr","za")[days-from-duration(date("2020-12-25") - date("1901-01-06")) mod 7 + 1]'
+$ xidel -se '("zo","ma","di","wo","do","vr","za")[days-from-duration(date("2020-12-25") - date("0000-01-01")) mod 7 + 1]'
+vr   # Eerste Kerstdag 2020 was dus op een vrijdag.
+
+functx:day-of-week() gebruikt 1901-01-06, een zondag, als referentiepunt, maar teruggerekend was 1 januari in het jaar 0 ook een zondag.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se '(25 to 31)[days-from-duration(date("2020-03-"||.) - date("0000-01-01")) mod 7 eq 0],(25 to 31)[days-from-duration(date("2020-10-"||.) - date("0000-01-01")) mod 7 eq 0]'
+$ xidel -se 'for $x in ("-03-","-10-") return (25 to 31)[days-from-duration(date("2020"||$x||.) - date("0000-01-01")) mod 7 eq 0]'
+$ xidel -se 'for $x in (3,10) return (25 to 31)[days-from-duration(date(join(("2020",format-integer($x,"00"),.),"-")) - date("0000-01-01")) mod 7 eq 0]'
+29   # 29 maart 2020, de laatste zondag van de maand, begin zomertijd.
+25   # 25 oktober 2020, de laatste zondag van de maand, einde zomertijd.
+
+$ xidel -s --xquery 'let $year:=year-from-dateTime(current-dateTime()) for $x in ("-03-","-10-") return dateTime(concat($year,$x,(25 to 31)[days-from-duration(date(concat($year,$x,.)) - date("0000-01-01")) mod 7 eq 0],"T01:00:00Z"))'
+2020-03-29T01:00:00Z   # Begin zomertijd.
+2020-10-25T01:00:00Z   # Einde zomertijd.
+
+Vóór 1996 golden er andere regels, maar aangezien de kans vrij groot is dat de data die Xivid ontleedt allemaal
+van ná die tijd is ga ik die hier niet in betrekken. Zie https://nl.wikipedia.org/wiki/Zomertijd#Nederland.
+
+$ xidel -s --xquery 'declare function local:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {let $year:=year-from-dateTime(dateTime($arg)),$dst:=for $x in ("-03-","-10-") return dateTime(concat($year,$x,(25 to 31)[days-from-duration(date(concat($year,$x,.)) - date("0000-01-01")) mod 7 eq 0],"T01:00:00Z")) return adjust-dateTime-to-timezone(dateTime($arg),if ($dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]) then implicit-timezone() + duration("PT1H") else implicit-timezone())}; local:adjust-dateTime-to-dst("2020-03-29T01:00:00Z")'
+2020-03-29T03:00:00+02:00
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {
+  let $year:=year-from-dateTime(dateTime($arg)),
+      $dst:=for $x in ("-03-","-10-") return
+      dateTime(
+        concat(
+          $year,$x,
+          (25 to 31)[
+            days-from-duration(
+              date(concat($year,$x,.)) - date("0000-01-01")
+            ) mod 7 eq 0
+          ],
+          "T01:00:00Z"
+        )
+      )
+  return
+  adjust-dateTime-to-timezone(
+    dateTime($arg),
+    if ($dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2])
+    then implicit-timezone() + duration("PT1H")
+    else implicit-timezone()
+  )
+};
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Begin zomertijd 2020:
+
+$ date -d 2020-03-29T02:00:00+01:00 +%s
+$ date -d 2020-03-29T03:00:00+02:00 +%s
+$ xidel -se '(dateTime("2020-03-29T02:00:00+01:00") - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S")'
+$ xidel -se '(dateTime("2020-03-29T03:00:00+02:00") - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S")'
+1585443600
+
+$ date -d 2020-03-29T01:59:59+01:00 -u +%FT%T%:z  /  $ date -d @1585443599 -u +%FT%T%:z
+$ date -d 2020-03-29T02:00:00+01:00 -u +%FT%T%:z  /  $ date -d @1585443600 -u +%FT%T%:z
+$ date -d 2020-03-29T01:59:59+01:00 +%FT%T%:z     /  $ date -d @1585443599 +%FT%T%:z
+$ date -d 2020-03-29T02:00:00+01:00 +%FT%T%:z     /  $ date -d @1585443600 +%FT%T%:z
+2020-03-29T00:59:59+00:00
+2020-03-29T01:00:00+00:00
+2020-03-29T01:59:59+01:00   # 1 seconde vóór begin zomertijd.
+2020-03-29T03:00:00+02:00   # begin zomertijd.
+
+$ xidel -s --module=xivid.xqm -e '
+  adjust-dateTime-to-timezone(dateTime("2020-03-29T01:59:59+01:00"),duration("PT0S")),
+  adjust-dateTime-to-timezone(dateTime("2020-03-29T02:00:00+01:00"),duration("PT0S")),
+  adjust-dateTime-to-timezone(dateTime("2020-03-29T01:59:59+01:00")),
+  adjust-dateTime-to-timezone(dateTime("2020-03-29T02:00:00+01:00")),
+  xivid:adjust-dateTime-to-dst("2020-03-29T01:59:59+01:00"),
+  xivid:adjust-dateTime-to-dst("2020-03-29T02:00:00+01:00")
+'
+2020-03-29T00:59:59Z
+2020-03-29T01:00:00Z
+2020-03-29T01:59:59+01:00
+2020-03-29T02:00:00+01:00   # Xidel heeft geen zomertijd/wintertijd database en past de dateTime aan met de implicit-timezone() van dit moment (december; PT1H).
+2020-03-29T01:59:59+01:00
+2020-03-29T03:00:00+02:00
+
+$ xidel -s --module=xivid.xqm -e '
+  1585443599 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+  1585443600 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+  adjust-dateTime-to-timezone(1585443599 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),
+  adjust-dateTime-to-timezone(1585443600 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),
+  xivid:adjust-dateTime-to-dst(1585443599 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),
+  xivid:adjust-dateTime-to-dst(1585443600 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"))
+'
+2020-03-29T00:59:59Z
+2020-03-29T01:00:00Z
+2020-03-29T01:59:59+01:00
+2020-03-29T02:00:00+01:00
+2020-03-29T01:59:59+01:00
+2020-03-29T03:00:00+02:00
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Begin wintertijd 2020:
+
+$ date -d 2020-10-25T03:00:00+02:00 +%s
+$ date -d 2020-10-25T02:00:00+01:00 +%s
+$ xidel -se '(dateTime("2020-10-25T03:00:00+02:00") - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S")'
+$ xidel -se '(dateTime("2020-10-25T02:00:00+01:00") - dateTime("1970-01-01T00:00:00Z")) div dayTimeDuration("PT1S")'
+1603587600
+
+$ date -d 2020-10-25T02:59:59+02:00 -u +%FT%T%:z  /  $ date -d @1603587599 -u +%FT%T%:z
+$ date -d 2020-10-25T03:00:00+02:00 -u +%FT%T%:z  /  $ date -d @1603587600 -u +%FT%T%:z
+$ date -d 2020-10-25T02:59:59+02:00 +%FT%T%:z     /  $ date -d @1603587599 +%FT%T%:z
+$ date -d 2020-10-25T03:00:00+02:00 +%FT%T%:z     /  $ date -d @1603587600 +%FT%T%:z
+2020-10-25T00:59:59+00:00
+2020-10-25T01:00:00+00:00
+2020-10-25T02:59:59+02:00   # 1 seconde vóór begin wintertijd.
+2020-10-25T02:00:00+01:00   # begin wintertijd.
+
+$ xidel -s --module=xivid.xqm -e '
+  adjust-dateTime-to-timezone(dateTime("2020-10-25T02:59:59+02:00"),duration("PT0S")),
+  adjust-dateTime-to-timezone(dateTime("2020-10-25T03:00:00+02:00"),duration("PT0S")),
+  adjust-dateTime-to-timezone(dateTime("2020-10-25T02:59:59+02:00")),
+  adjust-dateTime-to-timezone(dateTime("2020-10-25T03:00:00+02:00")),
+  xivid:adjust-dateTime-to-dst("2020-10-25T02:59:59+02:00"),
+  xivid:adjust-dateTime-to-dst("2020-10-25T03:00:00+02:00")
+'
+2020-10-25T00:59:59Z
+2020-10-25T01:00:00Z
+2020-10-25T01:59:59+01:00   # Xidel heeft geen zomertijd/wintertijd database en past de dateTime aan met de implicit-timezone() van dit moment (december; PT1H).
+2020-10-25T02:00:00+01:00
+2020-10-25T02:59:59+02:00
+2020-10-25T02:00:00+01:00
+
+$ xidel -s --module=xivid.xqm -e '
+  1603587599 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+  1603587600 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+  adjust-dateTime-to-timezone(1603587599 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),
+  adjust-dateTime-to-timezone(1603587600 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),
+  xivid:adjust-dateTime-to-dst(1603587599 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z")),
+  xivid:adjust-dateTime-to-dst(1603587600 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"))
+'
+2020-10-25T00:59:59Z
+2020-10-25T01:00:00Z
+2020-10-25T01:59:59+01:00
+2020-10-25T02:00:00+01:00
+2020-10-25T02:59:59+02:00
+2020-10-25T02:00:00+01:00
 
 ------------------------------------------------------------------------------------------------
 
@@ -863,19 +1041,6 @@ declare function xivid:txt-to-date($txt as string) as string {
     "-"
   )
 };
-
-------------------------------------------------------------------------------------------------
-
-Afronden:
-
-$ xidel -se 'format-time(time("00:19:06.040"),"[H01]:[m01]:[s01]")'
-00:19:06
-
-$ xidel -se 'format-time(time("00:19:06.540"),"[H01]:[m01]:[s01]")'
-00:19:06
-
-$ xidel -se 'format-time(time("00:19:06.540") + duration("PT0.5S"),"[H01]:[m01]:[s01]")'
-00:19:07
 
 ================================================================================================
 

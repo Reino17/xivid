@@ -161,6 +161,29 @@ declare function xivid:txt-to-date($txt as string) as string {
   )
 };
 
+declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {
+  let $year:=year-from-dateTime(dateTime($arg)),
+      $dst:=for $x in ("-03-","-10-") return
+      dateTime(
+        concat(
+          $year,$x,
+          (25 to 31)[
+            days-from-duration(
+              date(concat($year,$x,.)) - date("0000-01-01")
+            ) mod 7 eq 0
+          ],
+          "T01:00:00Z"
+        )
+      )
+  return
+  adjust-dateTime-to-timezone(
+    dateTime($arg),
+    if ($dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2])
+    then implicit-timezone() + duration("PT1H")
+    else implicit-timezone()
+  )
+};
+
 declare function xivid:bin-xor($a as integer,$b as integer) as integer {
   let $bin:=($a,$b) ! x:integer-to-base(.,2),
       $len:=max($bin ! string-length()),
