@@ -846,13 +846,11 @@ declare function xivid:lc($url as string) as object()? {
 };
 
 declare function xivid:youtube($url as string) as object()? {
-  let $json:=map:merge((
-    for $x in tokenize(
-      unparsed-text("https://www.youtube.com/get_video_info?video_id="||extract($url,"\w+$")),
-      "&amp;"
+  let $json:=request-decode(
+    "?"||unparsed-text(
+      "https://www.youtube.com/get_video_info?video_id="||extract($url,"\w+$")
     )
-    let $kv:=tokenize($x,"=") return {$kv[1]:uri-decode($kv[2])}
-  ))/parse-json(player_response) return
+  )/params/parse-json(player_response) return
   $json//playerMicroformatRenderer/(
     if (liveBroadcastDetails/isLiveNow) then {
       "name":title/simpleText,
