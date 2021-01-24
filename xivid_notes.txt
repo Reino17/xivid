@@ -7927,6 +7927,93 @@ $ xidel -s --module=xivid.xqm "https://twitter.com/ViviEducation/status/11365348
 
 ================================================================================================
 
+[instagram]
+
+$ url=https://www.instagram.com/p/CIx3NBpJ3BU
+
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"_sharedData = (.+);",1)[.])'
+{
+  [...]
+  "entry_data": {
+    "PostPage": [
+      {
+        "graphql": {
+          "shortcode_media": {
+            "__typename": "GraphVideo",
+            "id": "2463993258823872596",
+            "shortcode": "CIx3NBpJ3BU",
+            "dimensions": {
+              "height": 750,
+              "width": 750
+            },
+            [...]
+            "dash_info": {
+              "is_dash_eligible": false,
+              "video_dash_manifest": null,
+              "number_of_qualities": 0
+            },
+            "has_audio": true,
+            "video_url": "https://instagram.fams1-1.fna.fbcdn.net/v/t50.2886-16/130702470_426047925446010_2470762876495489406_n.mp4?_nc_ht=instagram.fams1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=8NPj7zy3XdYAX9ExPgT&oe=5FE1233A&oh=944168c9dc2da5cf2e7642c6bdbec6c3",
+            [...]
+            "edge_media_to_caption": {
+              "edges": [
+                {
+                  "node": {
+                    "text": "Merry Christmas, you filthy animals 🙀🎄 #HomeAlone #OwlKitty @culkamania\n-\n-\n#adoptdontshop #blackcat #catsofinstagram #catlife #putowlkittyonellen"
+                  }
+                }
+              ]
+            },
+            [...]
+            "taken_at_timestamp": 1607950917,
+            [...]
+            "title": "",
+            "video_duration": 42.839,
+            [...]
+          }
+        }
+      }
+    ]
+  },
+  [...]
+}
+
+$ xidel -s --json-mode=deprecated -e 'parse-json(doc("'$url'")//script/extract(.,"_sharedData = (.+);",1)[.])//shortcode_media/{"name":"Instagram: "||edge_media_to_caption//text,"date":taken_at_timestamp * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(video_duration) * duration("PT1S"),"formats":[{"id":"pg-1","format":"mp4[h264+aac]","resolution":dimensions/concat(height,"x",width),"url":video_url}]}'
+{
+  "name": "Instagram: Merry Christmas, you filthy animals 🙀🎄 #HomeAlone #OwlKitty @culkamania\n-\n-\n#adoptdontshop #blackcat #catsofinstagram #catlife #putowlkittyonellen",
+  "date": "2020-12-14T13:01:57Z",
+  "duration": "PT43S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "750x750",
+      "url": "https://instagram.fams1-1.fna.fbcdn.net/v/t50.2886-16/130702470_426047925446010_2470762876495489406_n.mp4?_nc_ht=instagram.fams1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=8NPj7zy3XdYAX9ExPgT&oe=5FE1233A&oh=944168c9dc2da5cf2e7642c6bdbec6c3"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:instagram($url as string) as object()? {
+  parse-json(
+    doc($url)//script/extract(.,"_sharedData = (.+);",1)[.]
+  )//shortcode_media/{
+    "name":"Instagram: "||edge_media_to_caption//text,
+    "date":taken_at_timestamp * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":round(video_duration) * duration("PT1S"),
+    "formats":[
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "url":video_url
+      }
+    ]
+  }
+};
+
+================================================================================================
+
 [pornhub]
 
 $ url=https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9

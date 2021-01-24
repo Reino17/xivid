@@ -1079,6 +1079,23 @@ declare function xivid:facebook($url as string) as object()? {
   ))
 };
 
+declare function xivid:instagram($url as string) as object()? {
+  parse-json(
+    doc($url)//script/extract(.,"_sharedData = (.+);",1)[.]
+  )//shortcode_media/{
+    "name":"Instagram: "||edge_media_to_caption//text,
+    "date":taken_at_timestamp * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":round(video_duration) * duration("PT1S"),
+    "formats":[
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "url":video_url
+      }
+    ]
+  }
+};
+
 declare function xivid:pornhub($url as string) as object()? {
   let $src:=doc($url),
       $info:=parse-json($src//script[@type="application/ld+json"]),
