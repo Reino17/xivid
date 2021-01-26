@@ -506,7 +506,7 @@ declare function xivid:kijk($url as string) as object()? {
   })/(json//items)()/{
     "name":concat(
       "Kijk: ",
-      (.[exists(series)]/series/title,title),
+      (.[exists(series)]/series/title,title)[.],
       .[exists(seasonNumber)]/concat(
         " S",
         format-integer(seasonNumber,"00"),
