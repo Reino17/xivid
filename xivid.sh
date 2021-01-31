@@ -200,7 +200,7 @@ twitter() {
 
 if command -v xidel >/dev/null; then
   if [[ $(xidel --version | xidel - -se 'extract($raw,"\d{8}")') -ge 20200726 ]]; then
-    export XIDEL_OPTIONS="--silent --module=${0%%/*}/xivid.xqm --json-mode=deprecated"
+    export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm --json-mode=deprecated"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
