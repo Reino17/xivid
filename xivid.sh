@@ -182,25 +182,27 @@ twitter() {
         round(($b//durationMs,$b//end_ms - $b//start_ms) div 1000) * duration("PT1S"),
         "[H01]:[m01]:[s01]"
       ),
-      "formats":if ($b/broadcasts) then
-        [{
-          "id":"hls-1",
-          "format":"m3u8[h264+aac]",
-          "resolution":concat($b//width,"x",$b//height),
-          "url":x:request({
-            "headers":($head,"x-guest-token: "||$a),
-            "url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key
-          })//location
-        }]
-      else
-        xivid:m3u8-to-json($b//playbackUrl)
+      "formats":array{
+        if ($b/broadcasts) then
+          {
+            "id":"hls-1",
+            "format":"m3u8[h264+aac]",
+            "resolution":concat($b//width,"x",$b//height),
+            "url":x:request({
+              "headers":($head,"x-guest-token: "||$a),
+              "url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key
+            })//location
+          }
+        else
+          xivid:m3u8-to-json($b//playbackUrl)
+      }
     }
   ' --output-format=bash)"
 }
 
 if command -v xidel >/dev/null; then
   if [[ $(xidel --version | xidel - -se 'extract($raw,"\d{8}")') -ge 20200726 ]]; then
-    export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm --json-mode=deprecated"
+    export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.

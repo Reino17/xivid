@@ -180,18 +180,20 @@ FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
       round^(^($b//durationMs^,$b//end_ms - $b//start_ms^) div 1000^) * duration^('PT1S'^)^,
       '[H01]:[m01]:[s01]'
     ^)^,
-    'formats':if ^($b/broadcasts^) then
-      [{
-        'id':'hls-1'^,
-        'format':'m3u8[h264+aac]'^,
-        'resolution':concat^($b//width^,'x'^,$b//height^)^,
-        'url':x:request^({
-          'headers':^($head^,'x-guest-token: '^|^|$a^)^,
-          'url':'https://api.twitter.com/1.1/live_video_stream/status/'^|^|$b//media_key
-        }^)//location
-      }]
-    else
-      xivid:m3u8-to-json^($b//playbackUrl^)
+    'formats':array{
+      if ^($b/broadcasts^) then
+        {
+          'id':'hls-1'^,
+          'format':'m3u8[h264+aac]'^,
+          'resolution':concat^($b//width^,'x'^,$b//height^)^,
+          'url':x:request^({
+            'headers':^($head^,'x-guest-token: '^|^|$a^)^,
+            'url':'https://api.twitter.com/1.1/live_video_stream/status/'^|^|$b//media_key
+          }^)//location
+        }
+      else
+        xivid:m3u8-to-json^($b//playbackUrl^)
+    }
   }
 ^" --output-format^=cmd') DO %%A
 EXIT /B
@@ -203,7 +205,7 @@ SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   FOR /F "delims=" %%B IN ('xidel --version ^| xidel - -se "extract($raw,'\d{8}')"') DO (
     IF %%B GEQ 20200726 (
-      SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm --json-mode=deprecated"
+      SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm"
     ) ELSE (
       ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
       ECHO Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.

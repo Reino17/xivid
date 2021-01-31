@@ -22,7 +22,7 @@
  : @see    https://github.com/Reino17/xivid
  :)
 
-xquery version "3.0-xidel";
+xquery version "3.1-xidel";
 module namespace xivid = "https://github.com/Reino17/xivid/";
 
 (:~
@@ -232,7 +232,7 @@ declare function xivid:info($json as object()) as string* {
       $b:=max(
         $a()[exists($json(.))] ! $a(.) ! string-length()
       ),
-      $c:=[
+      $c:=array{
         {
           "id":"id",
           "format":"formaat",
@@ -242,7 +242,7 @@ declare function xivid:info($json as object()) as string* {
           "bitrate":"bitrate"
         },
         $json/(formats)()
-      ],
+      },
       $d:=$c(1)() ! distinct-values(
         for $x in $c()[position() gt 1] return
         .[$x(.)]
@@ -341,7 +341,7 @@ declare function xivid:bbvms(
       "duration":length * duration("PT1S")
     },
     {
-      "formats":[
+      "formats":array{
         (subtitles)()/{
           "id":"sub-1",
           "format":"srt",
@@ -385,7 +385,7 @@ declare function xivid:bbvms(
           )||"kbps",
           "url":$orig/format/filename
         }[url]
-      ]
+      }
     }
   ))
 };
@@ -444,7 +444,7 @@ declare function xivid:npo($url as string) as object()? {
         }
       ),
     {
-      "formats":[
+      "formats":array{
         (
           if (not(exists($info/(subtitles)())) and $info/parentId) then
             parse-json(
@@ -465,7 +465,7 @@ declare function xivid:npo($url as string) as object()? {
           "url":src
         },
         xivid:m3u8-to-json($stream)
-      ]
+      }
     }
   ))
 };
@@ -519,7 +519,7 @@ declare function xivid:kijk($url as string) as object()? {
     "duration":round(duration) * duration("PT1S"),
     "expdate":.//expirationDate div 1000 *
       duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-    "formats":[
+    "formats":array{
       (.//mediaContent)()[type="webvtt"]/{
         "id":"sub-"||position(),
         "format":"vtt",
@@ -530,7 +530,7 @@ declare function xivid:kijk($url as string) as object()? {
       xivid:m3u8-to-json(
         (.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl
       )
-    ]
+    }
   }
 };
 
@@ -607,13 +607,13 @@ declare function xivid:regio($url as string) as object()? {
         date(replace($script,".+?(\d+)/(\d+)/(\d+).+","$1-$2-$3")),
         time("00:00:00Z")
       ),
-      "formats":[
+      "formats":array{
         {
           "id":"pg-1",
           "format":"mp4[h264+aac]",
           "url":x:request({"method":"HEAD","url":$script})/url
         }
-      ]
+      }
     }
   else
     xivid:bbvms(
@@ -687,14 +687,14 @@ declare function xivid:ofl($url as string) as object()? {
             span/extract(.,"[\d:-]+",0,"*")
           )
       ),
-      "formats":[
+      "formats":array{
         {
           "id":"pg-1",
           "format":"mp4[h264+aac]",
           "resolution":"960x540",
           "url":$info/@data-file
         }
-      ]
+      }
     }
   )
 };
@@ -727,7 +727,7 @@ declare function xivid:autojunk($url as string) as object()? {
     "duration":extract(
       $info,"clipData\[&quot;length&quot;\].+?(\d+)",1
     ) * duration("PT1S"),
-    "formats":[
+    "formats":array{
       for $x at $i in parse-json(
         replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+",""),
         {"liberal":true()}
@@ -741,7 +741,7 @@ declare function xivid:autojunk($url as string) as object()? {
         "bitrate":$x/bandwidth||"kbps",
         "url":$x/src
       }
-    ]
+    }
   }
 };
 
@@ -763,7 +763,7 @@ declare function xivid:telegraaf($url as string) as object()? {
     "expdate":publishedend ! xivid:string-to-utc-dateTime(
       replace(.,"\s","T")
     ),
-    "formats":[
+    "formats":array{
       locations/reverse((progressive)())/{
         "id":"pg-"||position(),
         "format":"mp4[h264+aac]",
@@ -773,7 +773,7 @@ declare function xivid:telegraaf($url as string) as object()? {
       xivid:m3u8-to-json(
         locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8")
       )
-    ]
+    }
   }
 };
 
@@ -812,7 +812,7 @@ declare function xivid:ad($url as string) as object()? {
         replace(publicationDate,"\s","T")
       ),
       "duration":duration * duration("PT1S"),
-      "formats":[
+      "formats":array{
         for $x at $i in reverse((sources)()[type="video/mp4"]) return {
           "id":"pg-"||$i,
           "format":"mp4[h264+aac]",
@@ -820,7 +820,7 @@ declare function xivid:ad($url as string) as object()? {
           "url":$x/src
         },
         xivid:m3u8-to-json((sources)(1)/src)
-      ]
+      }
     }
   ))
 };
@@ -865,7 +865,7 @@ declare function xivid:youtube($url as string) as object()? {
       "name":title/simpleText,
       "date":dateTime(date(uploadDate),time("00:00:00"))||"Z",
       "duration":lengthSeconds * duration("PT1S"),
-      "formats":[
+      "formats":array{
         ($json//captionTracks)()[languageCode=("nl","en")]/{
           "id":"sub-"||position(),
           "format":"ttml",
@@ -901,7 +901,7 @@ declare function xivid:youtube($url as string) as object()? {
           "format":"mpd[manifest]",
           "url":$json/streamingData/dashManifestUrl
         }[url]
-      ]
+      }
     }
   )
 };
@@ -922,7 +922,7 @@ declare function xivid:vimeo($url as string) as object()? {
         duration("PT0S")
       ),
     "duration":video/duration * duration("PT1S"),
-    "formats":request/files/[
+    "formats":request/files/array{
       for $x at $i in (progressive)()
       order by $x/width
       count $i
@@ -934,7 +934,7 @@ declare function xivid:vimeo($url as string) as object()? {
         "url":url
       },
       xivid:m3u8-to-json((hls//url)[1])
-    ]
+    }
   }
 };
 
@@ -984,7 +984,7 @@ declare function xivid:mixcloud($url as string) as object()? {
     "name":concat(owner/displayName," - ",name),
     "date":dateTime(publishDate),
     "duration":audioLength * duration("PT1S"),
-    "formats":[
+    "formats":array{
       {
         "id":"pg-1",
         "format":"m4a[aac]",
@@ -993,7 +993,7 @@ declare function xivid:mixcloud($url as string) as object()? {
       xivid:m3u8-to-json(
         $decrypt(streamInfo/hlsUrl)
       )
-    ]
+    }
   }
 };
 
@@ -1013,7 +1013,7 @@ declare function xivid:soundcloud($url as string) as object()? {
     "name":concat(user/(full_name,username)[.][1]," - ",title),
     "date":created_at,
     "duration":round(duration div 1000) * duration("PT1S"),
-    "formats":[
+    "formats":array{
       $fmts[format/protocol="progressive"]/(
         let $url:=json-doc(concat(url,"?client_id=",$cid))/url return {
           "id":"pg-1",
@@ -1032,7 +1032,7 @@ declare function xivid:soundcloud($url as string) as object()? {
         "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
         "url":$url
       }
-    ]
+    }
   }
 };
 
@@ -1059,7 +1059,7 @@ declare function xivid:facebook($url as string) as object()? {
       ),
       {"liberal":true()}
     )/(.//videoData)()/{
-      "formats":[
+      "formats":array{
         {
           "id":"sub-1",
           "format":"srt",
@@ -1074,7 +1074,7 @@ declare function xivid:facebook($url as string) as object()? {
           "url":.
         },
         xivid:mpd-to-json(parse-xml(dash_manifest))
-      ]
+      }
     }
   ))
 };
@@ -1086,13 +1086,13 @@ declare function xivid:instagram($url as string) as object()? {
     "name":"Instagram: "||edge_media_to_caption//text,
     "date":taken_at_timestamp * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "duration":round(video_duration) * duration("PT1S"),
-    "formats":[
+    "formats":array{
       {
         "id":"pg-1",
         "format":"mp4[h264+aac]",
         "url":video_url
       }
-    ]
+    }
   }
 };
 
@@ -1112,7 +1112,7 @@ declare function xivid:pornhub($url as string) as object()? {
     "name":"Pornhub: "||$info/name,
     "date":dateTime($info/uploadDate),
     "duration":duration($info/duration),
-    "formats":[
+    "formats":array{
       for $x at $i in $fmts[not(contains(.,"m3u8"))]
       count $i
       return {
@@ -1122,6 +1122,6 @@ declare function xivid:pornhub($url as string) as object()? {
         "url":$x
       },
       xivid:m3u8-to-json($fmts[1])
-    ]
+    }
   }
 };
