@@ -541,8 +541,7 @@ declare function xivid:tvblik($url as string) as object()? {
       div[@class="video_thumb"]//@onclick,
       iframe[@class="sbsEmbed"]/@src
     ),
-    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
-    (1,2)
+    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",(1,2)
   ) return
   if ($host[1]="npo") then
     xivid:npo("https://www.npostart.nl/"||$host[2])

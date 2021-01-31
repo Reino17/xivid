@@ -141,22 +141,18 @@ $ xidel -se '
 ------------------------------------------------------------------------------------------------
 
 $ echo '{"a":null}' | xidel - -se '
-  (
-    $json/join((exists(a),a)),
-    jn:parse-json($raw)/join((exists(a),a)),
-    parse-json($raw)/join((exists(a),a))
-  )
+  $json/join((exists(a),a)),
+  jn:parse-json($raw)/join((exists(a),a)),
+  parse-json($raw)/join((exists(a),a))
 '
 false
 true null
 false
 
 $ echo '{"a":null}' | xidel --json-mode=deprecated - -se '
-  (
-    $json/join((exists(a),a)),
-    jn:parse-json($raw)/join((exists(a),a)),
-    parse-json($raw)/join((exists(a),a))
-  )
+  $json/join((exists(a),a)),
+  jn:parse-json($raw)/join((exists(a),a)),
+  parse-json($raw)/join((exists(a),a))
 '
 true null
 true null
@@ -580,7 +576,10 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 
 - 0 t/m 127 in 16 rijen van 8.
 
+  $ xidel -s --xquery '(0 to 15) ! join(for $x in 0 to 127 where $x mod 16 eq . return $x)'
   $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x])'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 7) ! (. * 16 + $x))'
+  $ xidel -se '(0 to 15) ! join(for $x in 0 to 7 return ($x * 16 + .))'
   0 16 32 48 64 80 96 112
   1 17 33 49 65 81 97 113
   2 18 34 50 66 82 98 114
@@ -601,6 +600,7 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 - Uitlijnen. I.p.v. if ((. eq 0) or (. eq 1) or ...) then... geeft een vergelijking met een reeks ook een boolean.
 
   $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x] ! (if (. = (0 to 9,96 to 99)) then " "||. else .))'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 7) ! (. * 16 + $x) ! (if (. = (0 to 9,96 to 99)) then " "||. else .))'
    0 16 32 48 64 80  96 112
    1 17 33 49 65 81  97 113
    2 18 34 50 66 82  98 114
@@ -621,6 +621,7 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 - Hexadecimale getallen erbij, met | als scheiding en een extra 0 voor 0 t/m 9.
 
   $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .))))'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 7) ! (. * 16 + $x) ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .))))'
    0|00 16|10 32|20 48|30 64|40 80|50  96|60 112|70
    1|01 17|11 33|21 49|31 65|41 81|51  97|61 113|71
    2|02 18|12 34|22 50|32 66|42 82|52  98|62 114|72
@@ -641,6 +642,7 @@ ASCII 7bit (2^7=128), 0 t/m 127:
 - Tekens erbij, maar vervang 0, 7, 8, 9, 10 en 13 met spaties, omdat dit beheertekens (control characters) betreft.
 
   $ xidel -se 'for $x in 0 to 15 return join((0 to 127)[. mod 16 eq $x] ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .)),if (. = (0,7,8,9,10,13)) then " " else x:cps(.)))'
+  $ xidel -se 'for $x in 0 to 15 return join((0 to 7) ! (. * 16 + $x) ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .)),if (. = (0,7,8,9,10,13)) then " " else x:cps(.)))'
    0|00   16|10 ► 32|20   48|30 0 64|40 @ 80|50 P  96|60 ` 112|70 p
    1|01 ☺ 17|11 ◄ 33|21 ! 49|31 1 65|41 A 81|51 Q  97|61 a 113|71 q
    2|02 ☻ 18|12 ↕ 34|22 " 50|32 2 66|42 B 82|52 R  98|62 b 114|72 r
@@ -749,6 +751,41 @@ ALT+0<cp> voor weergave (Windows).   # ALT 0163 of ALT 0255.
   CMD (en dus Cygwin Bash) is standaard afgesteld op CHCP 437 (oem). Hierdoor krijg je dit rare tafereel dat --output-encoding precies andersom werkt.
 
 ALT+<cp> voor weergave (Windows).   # ALT 128 of ALT 253.
+
+$ xidel -se 'for $x in 0 to 31 return join((0 to 7) ! (. * 32 + $x) ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (if (string-length(.) eq 1) then "0"||. else .)),if (. = (0,7,8,9,10,13)) then " " else x:cps(.)))' --output-encoding=latin1
+$ xidel -se 'for $x in 0 to 31 return join((0 to 7) ! (. * 32 + $x) ! (concat(if (. = (0 to 9,96 to 99)) then " "||. else .,"|",x:integer-to-base(.,16) ! (substring("0",string-length(.),1)||.)),if (. = (0,7,8,9,10,13)) then " " else x:integer-to-base(.,16) ! binary-to-string(hexBinary(substring("0",string-length(.),1)||.),"oem")))'
+ 0|00   32|20   64|40 @  96|60 ` 128|80 Ç 160|A0 á 192|C0 └ 224|E0 α
+ 1|01 ☺ 33|21 ! 65|41 A  97|61 a 129|81 ü 161|A1 í 193|C1 ┴ 225|E1 ß
+ 2|02 ☻ 34|22 " 66|42 B  98|62 b 130|82 é 162|A2 ó 194|C2 ┬ 226|E2 Γ
+ 3|03 ♥ 35|23 # 67|43 C  99|63 c 131|83 â 163|A3 ú 195|C3 ├ 227|E3 π
+ 4|04 ♦ 36|24 $ 68|44 D 100|64 d 132|84 ä 164|A4 ñ 196|C4 ─ 228|E4 Σ
+ 5|05 ♣ 37|25 % 69|45 E 101|65 e 133|85 à 165|A5 Ñ 197|C5 ┼ 229|E5 σ
+ 6|06 ♠ 38|26 & 70|46 F 102|66 f 134|86 å 166|A6 ª 198|C6 ╞ 230|E6 µ
+ 7|07   39|27 ' 71|47 G 103|67 g 135|87 ç 167|A7 º 199|C7 ╟ 231|E7 τ
+ 8|08   40|28 ( 72|48 H 104|68 h 136|88 ê 168|A8 ¿ 200|C8 ╚ 232|E8 Φ
+ 9|09   41|29 ) 73|49 I 105|69 i 137|89 ë 169|A9 ⌐ 201|C9 ╔ 233|E9 Θ
+10|0A   42|2A * 74|4A J 106|6A j 138|8A è 170|AA ¬ 202|CA ╩ 234|EA Ω
+11|0B ♂ 43|2B + 75|4B K 107|6B k 139|8B ï 171|AB ½ 203|CB ╦ 235|EB δ
+12|0C ♀ 44|2C , 76|4C L 108|6C l 140|8C î 172|AC ¼ 204|CC ╠ 236|EC ∞
+13|0D   45|2D - 77|4D M 109|6D m 141|8D ì 173|AD ¡ 205|CD ═ 237|ED φ
+14|0E ♫ 46|2E . 78|4E N 110|6E n 142|8E Ä 174|AE « 206|CE ╬ 238|EE ε
+15|0F ☼ 47|2F / 79|4F O 111|6F o 143|8F Å 175|AF » 207|CF ╧ 239|EF ∩
+16|10 ► 48|30 0 80|50 P 112|70 p 144|90 É 176|B0 ░ 208|D0 ╨ 240|F0 ≡
+17|11 ◄ 49|31 1 81|51 Q 113|71 q 145|91 æ 177|B1 ▒ 209|D1 ╤ 241|F1 ±
+18|12 ↕ 50|32 2 82|52 R 114|72 r 146|92 Æ 178|B2 ▓ 210|D2 ╥ 242|F2 ≥
+19|13 ‼ 51|33 3 83|53 S 115|73 s 147|93 ô 179|B3 │ 211|D3 ╙ 243|F3 ≤
+20|14 ¶ 52|34 4 84|54 T 116|74 t 148|94 ö 180|B4 ┤ 212|D4 ╘ 244|F4 ⌠
+21|15 § 53|35 5 85|55 U 117|75 u 149|95 ò 181|B5 ╡ 213|D5 ╒ 245|F5 ⌡
+22|16 ▬ 54|36 6 86|56 V 118|76 v 150|96 û 182|B6 ╢ 214|D6 ╓ 246|F6 ÷
+23|17 ↨ 55|37 7 87|57 W 119|77 w 151|97 ù 183|B7 ╖ 215|D7 ╫ 247|F7 ≈
+24|18 ↑ 56|38 8 88|58 X 120|78 x 152|98 ÿ 184|B8 ╕ 216|D8 ╪ 248|F8 °
+25|19 ↓ 57|39 9 89|59 Y 121|79 y 153|99 Ö 185|B9 ╣ 217|D9 ┘ 249|F9 ∙
+26|1A → 58|3A : 90|5A Z 122|7A z 154|9A Ü 186|BA ║ 218|DA ┌ 250|FA ·
+27|1B ← 59|3B ; 91|5B [ 123|7B { 155|9B ¢ 187|BB ╗ 219|DB █ 251|FB √
+28|1C ∟ 60|3C < 92|5C \ 124|7C | 156|9C £ 188|BC ╝ 220|DC ▄ 252|FC ⁿ
+29|1D ↔ 61|3D = 93|5D ] 125|7D } 157|9D ¥ 189|BD ╜ 221|DD ▌ 253|FD ²
+30|1E ▲ 62|3E > 94|5E ^ 126|7E ~ 158|9E ₧ 190|BE ╛ 222|DE ▐ 254|FE ■
+31|1F ▼ 63|3F ? 95|5F _ 127|7F ⌂ 159|9F ƒ 191|BF ┐ 223|DF ▀ 255|FF  
 
 ================================================================================================
 
@@ -2477,7 +2514,7 @@ XML prettification:
 
 $ xidel -s --xquery '[...]/("<?xml version=""1.0"" encoding=""UTF-8""?>",serialize(unparsed-text(dashManifestUrl),{"indent":true()}))'
 $ xidel -s --xquery '[...]/serialize(unparsed-text(dashManifestUrl),{"indent":true()})' --output-declaration='<?xml version="1.0" encoding="UTF-8"?>'
-$ xidel -s --xquery '[...]/serialize(unparsed-text(dashManifestUrl),{"indent":true(),"omit-xml-declaration":false()})'   # Deze optie geeft (nog) geen new-line na de declaratie.
+$ xidel -s --xquery '[...]/serialize(unparsed-text(dashManifestUrl),{"indent":true(),"omit-xml-declaration":false()})'
 <?xml version="1.0" encoding="UTF-8"?>
 <MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:DASH:schema:MPD:2011" xmlns:yt="http://youtube.com/yt/2012/10/10" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd" minBufferTime="PT1.500S" profiles="urn:mpeg:dash:profile:isoff-main:2011" type="static" mediaPresentationDuration="PT1092.684S">
   <Period>
@@ -2540,7 +2577,7 @@ $ xidel -s --xquery 'declare function local:mpd-to-json($mpd) as object()* {{"id
 
 'https://www.facebook.com/watch/?v=374747990176575'   # DASH manifest als document-node.
 
-$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'parse-json(replace(doc("https://www.facebook.com/watch/?v=374747990176575")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})//dash_manifest'
+$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"https://www.facebook.com/watch/?v=374747990176575"})/doc/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})//dash_manifest'
 <?xml version="1.0"?>
 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500S" type="static" mediaPresentationDuration="PT0H1M7.008S" maxSegmentDuration="PT0H0M5.000S" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011,http://dashif.org/guidelines/dash264" FBTagsetUsed="v4_5secgop"><Period duration="PT0H1M7.008S"><AdaptationSet segmentAlignment="true" maxWidth="720" maxHeight="900" maxFrameRate="25" par="512:640" lang="eng" subsegmentAlignment="true" subsegmentStartsWithSAP="1"><Representation id="388357695712707v" mimeType="video/mp4" codecs="avc1.4D401F" width="512" height="640" frameRate="25" sar="1:1" startWithSAP="1" bandwidth="226389" [...]><BaseURL>https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/121592073_338211253915421_5657026045253466176_n.mp4?[...]</BaseURL><SegmentBase indexRangeExact="true" indexRange="971-1170" FBFirstSegmentRange="1171-111278"><Initialization range="0-970"/></SegmentBase></Representation>[...]</AdaptationSet><AdaptationSet segmentAlignment="true" lang="eng" subsegmentAlignment="true" subsegmentStartsWithSAP="1"><Representation id="405461810413399a" mimeType="audio/mp4" codecs="mp4a.40.5" audioSamplingRate="48000" startWithSAP="1" bandwidth="65445" [...]><AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/><BaseURL>https://video.fams1-1.fna.fbcdn.net/v/t42.1790-2/109281327_405461813746732_178858496964516997_n.mp4?[...]</BaseURL><SegmentBase indexRangeExact="true" indexRange="930-1369" FBFirstSegmentRange="1370-17883"><Initialization range="0-929"/></SegmentBase></Representation></AdaptationSet></Period></MPD>
 
@@ -2576,7 +2613,7 @@ $ xidel -s --xquery '[...]/serialize(parse-xml(.//dash_manifest),{"indent":true(
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as object()* {{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/(.,..)/@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/BaseUrl}}; parse-json(replace(doc("https://www.facebook.com/watch/?v=374747990176575")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/xivid:mpd-to-json(parse-xml(.//dash_manifest))'
+$ xidel -s --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as object()* {{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/(.,..)/@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/BaseUrl}}; x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"https://www.facebook.com/watch/?v=374747990176575"})/doc/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/xivid:mpd-to-json(parse-xml(.//dash_manifest))'
 {
   "id": "dash-1",
   "format": "mp4[aac]",
@@ -2599,7 +2636,7 @@ $ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' --xquery 'declare namespace x
 
 'https://www.facebook.com/AFV/videos/3868462086560598'   # Framerate als breuk.
 
-$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'parse-json(replace(doc("https://www.facebook.com/AFV/videos/3868462086560598")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/serialize(parse-xml(.//dash_manifest),{"indent":true()})' --output-declaration='<?xml version="1.0"?>'
+$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"https://www.facebook.com/AFV/videos/3868462086560598"})/doc/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/serialize(parse-xml(.//dash_manifest),{"indent":true()})' --output-declaration='<?xml version="1.0"?>'
 <?xml version="1.0"?>
 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500S" type="static" mediaPresentationDuration="PT0H3M3.253S" maxSegmentDuration="PT0H0M5.005S" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011,http://dashif.org/guidelines/dash264" FBTagsetUsed="v4_5secgop">
   <Period duration="PT0H3M3.253S">
@@ -2616,7 +2653,7 @@ $ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' -e 'parse-json(replace(doc("h
   </Period>
 </MPD>
 
-$ xidel -s --user-agent='Mozilla/5.0 Firefox/83.0' --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as object()* {{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/(.,..)/@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/BaseUrl}}; parse-json(replace(doc("https://www.facebook.com/AFV/videos/3868462086560598")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/xivid:mpd-to-json(parse-xml(.//dash_manifest))'
+$ xidel -s --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as object()* {{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":concat(substring-after($x/(.,..)/@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),"resolution":$x/@width ! concat(.,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"),"samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),"bitrate":round($x/@bandwidth div 1000)||"kbps","url":$x/BaseUrl}}; x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"https://www.facebook.com/AFV/videos/3868462086560598"})/doc/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/xivid:mpd-to-json(parse-xml(.//dash_manifest))'
 {
   "id": "dash-1",
   "format": "mp4[aac]",
@@ -4899,8 +4936,7 @@ $ xidel -se '
         div[@class="video_thumb"]//@onclick,
         iframe[@class="sbsEmbed"]/@src
       ),
-      "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
-      (1,2)
+      "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",(1,2)
     )
   )
 '
@@ -4926,8 +4962,7 @@ $ xidel -s --xquery '
       div[@class="video_thumb"]//@onclick,
       iframe[@class="sbsEmbed"]/@src
     ),
-    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",
-    (1,2)
+    "(npo|rtl|kijk).+(?:/|video=)([\w-]+)",(1,2)
   )
   return
   if ($host[1]="npo") then
@@ -7429,10 +7464,6 @@ declare function xivid:ad($url as string) as object()? {
 
 $ url=https://www.lc.nl/friesland/heerenveen/Alle-gratis-perenbomen-weggegeven-in-Friesland-25949273.html
 
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent={""permissions"":{""functional"":true}}","url":"'$url'"})/doc ! (//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),//meta[@property="og:site_name"]/@content)'
-3892522
-Leeuwarder Courant
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 De door internet browser gegenereerde cookie:
@@ -7451,6 +7482,10 @@ $ xidel -s --xquery '"Cookie: ndc_consent="||uri-encode(serialize-json({"permiss
 Cookie: ndc_consent=%7B%22permissions%22%3A%20%7B%22functional%22%3A%20true%7D%7D
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc ! (//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),//meta[@property="og:site_name"]/@content)'
+3892522
+Leeuwarder Courant
 
 $ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return //script/tokenize(.,",")[contains(.,$id)])'
 "https:\u002F\u002Fndc.bbvms.com\u002Fp\u002Flc_videoplayer_v2\u002Fc\u002F3892522.html?inheritDimensions=true"

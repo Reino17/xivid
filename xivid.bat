@@ -43,9 +43,9 @@ ECHO   uitzendinggemist.net    at5.nl                omroepzeeland.nl
 ECHO   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
 ECHO   kijk.nl                 rtvoost.nl            l1.nl
 ECHO.
-ECHO   dumpert.nl              vimeo.com             twitter.com
-ECHO   autojunk.nl             dailymotion.com       pornhub.com
-ECHO   telegraaf.nl            twitch.tv
+ECHO   dumpert.nl              vimeo.com             instagram.com
+ECHO   autojunk.nl             dailymotion.com       twitter.com
+ECHO   telegraaf.nl            twitch.tv             pornhub.com
 ECHO   ad.nl                   mixcloud.com
 ECHO   lc.nl                   soundcloud.com
 ECHO   youtube.com             facebook.com

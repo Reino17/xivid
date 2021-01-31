@@ -39,9 +39,9 @@ Deze websites worden op dit moment ondersteund:
   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
-  dumpert.nl              vimeo.com             twitter.com
-  autojunk.nl             dailymotion.com       pornhub.com
-  telegraaf.nl            twitch.tv
+  dumpert.nl              vimeo.com             instagram.com
+  autojunk.nl             dailymotion.com       twitter.com
+  telegraaf.nl            twitch.tv             pornhub.com
   ad.nl                   mixcloud.com
   lc.nl                   soundcloud.com
   youtube.com             facebook.com
