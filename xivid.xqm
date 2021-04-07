@@ -506,7 +506,7 @@ declare function xivid:kijk($url as string) as object()? {
   })/(json//items)()/{
     "name":concat(
       "Kijk: ",
-      (.[exists(series)]/series/title,title)[.],
+      join((series/title,title)," - "),
       .[exists(seasonNumber)]/concat(
         " S",
         format-integer(seasonNumber,"00"),
@@ -520,8 +520,12 @@ declare function xivid:kijk($url as string) as object()? {
     "expdate":.//expirationDate div 1000 *
       duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "formats":array{
-      (.//mediaContent)()[type="webvtt"]/{
-        "id":"sub-"||position(),
+      for $x at $i in (.//mediaContent)()[type="webvtt"]
+      order by $x/sourceUrl
+      count $i
+      return
+      $x/{
+        "id":"sub-"||$i,
         "format":"vtt",
         "language":"nl",
         "label":substring((assetTypes)(),17),

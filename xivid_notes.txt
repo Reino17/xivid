@@ -4649,7 +4649,7 @@ $ xidel -s --xquery 'x:request({"headers":"Accept: application/json","url":reque
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$")"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",series/title," S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00")),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{(.//mediaContent)()[type="webvtt"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8"]/sourceUrl)}}'
+$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",series/title," S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00")),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{(.//mediaContent)()[type="webvtt"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8"]/sourceUrl)}}'
 {
   "name": "Kijk: Wegmisbruikers S25E10",
   "date": "2020-03-22T19:30:00Z",
@@ -4739,7 +4739,7 @@ $ xidel -s --xquery 'x:request({"headers":"Accept: application/json","url":reque
   "series": null
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",(.[exists(series)]/series/title,title)[.],.[exists(seasonNumber)]/concat(" S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00"))),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{(.//mediaContent)()[type="webvtt"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8"]/sourceUrl)}}'
+$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",(series/title,title),.[exists(seasonNumber)]/concat(" S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00"))),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{(.//mediaContent)()[type="webvtt"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8"]/sourceUrl)}}'
 {
   "name": "Kijk: Bridge of Spies",
   "date": "2021-01-15T22:18:42Z",
@@ -4827,7 +4827,7 @@ $ xidel -s --xquery 'x:request({"headers":"Accept: application/json","url":reque
   "series": null
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",(.[exists(series)]/series/title,title)[.],.[exists(seasonNumber)]/concat(" S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00"))),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{(.//mediaContent)()[type="webvtt"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl)}}'
+$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",(series/title,title),.[exists(seasonNumber)]/concat(" S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00"))),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{(.//mediaContent)()[type="webvtt"]/{"id":"sub-"||position(),"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl)}}'
 {
   "name": "Kijk: Gone Baby Gone",
   "date": "2021-01-19T19:31:32Z",
@@ -4844,6 +4844,103 @@ $ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: applicatio
   ]
 }
 
+------------------------------------------------------------------------------------------------
+
+$ url=https://kijk.nl/programmas/mr-frank-visser-doet-uitspraak/ZMeF6bC3vW1/seizoen/188344360278/afleveringen/video/bezem-door-de-straat/7CFHn2lEXDW
+
+$ xidel -s --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()'
+{
+  "__typename": "Program",
+  "type": "EPISODE",
+  "guid": "7CFHn2lEXDW",
+  "title": "Bezem door de straat",
+  "duration": 2517.32,
+  "tvSeasonEpisodeNumber": 3,
+  "seriesEpisodeNumber": 106,
+  "seasonNumber": 6,
+  "media": [
+    {
+      "mediaContent": [
+        {
+          "assetTypes": ["Packager Output: MPEG DASH Manifest public"],
+          "sourceUrl": "https://vod-nl.prd.talpatvcdn.nl/962fcfa7b0484656bf334e98d6624110/2cdfa1514ece4b428e9aeccee697d7ee/f35833b7b818457581c444ccf1a10fb7/index.mpd",
+          "type": "dash"
+        },
+        {
+          "assetTypes": ["Packager Output: HLS Manifest public"],
+          "sourceUrl": "https://vod-nl.prd.talpatvcdn.nl/962fcfa7b0484656bf334e98d6624110/5fb4f1bcca634f7ebbeaa9eda36f2702/118d72f49ada4963a86a677fc4a7024a/index.m3u8",
+          "type": "m3u8"
+        },
+        {
+          "assetTypes": ["Packager Output: Smooth Manifest public"],
+          "sourceUrl": "https://vod-nl.prd.talpatvcdn.nl/962fcfa7b0484656bf334e98d6624110/d4f12e9f8d4d4f839f2db87a426a9260/91da1977fd6840e3ab30a620d3021eeb/index.ism/Manifest",
+          "type": "ism"
+        },
+        {
+          "assetTypes": ["Closed Caption: Doven en Slechthorenden"],
+          "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/806141E1OPE.vtt",
+          "type": "webvtt"
+        },
+        {
+          "assetTypes": ["Closed Caption: Nederlands"],
+          "sourceUrl": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/806141E1.vtt",
+          "type": "webvtt"
+        }
+      ],
+      "availableDate": "1616708064000",
+      "expirationDate": "1774474464000",
+      "availabilityState": true
+    }
+  ],
+  "series": {
+    "guid": "ZMeF6bC3vW1",
+    "title": "Mr. Frank Visser doet uitspraak"
+  }
+}
+
+$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Accept: application/json","url":request-combine("https://graph.kijk.nl/graphql",{"query":concat("query{programs(guid:&quot;",extract("'$url'","\w+$"),"&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,type},availableDate,expirationDate,availabilityState},series{guid,title}}}}")})/url})/(json//items)()/{"name":concat("Kijk: ",join((series/title,title)," - "),.[exists(seasonNumber)]/concat(" S",format-integer(seasonNumber,"00"),"E",format-integer(tvSeasonEpisodeNumber,"00"))),"date":.//availableDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round(duration) * duration("PT1S"),"expdate":.//expirationDate div 1000 * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":array{for $x at $i in (.//mediaContent)()[type="webvtt"] order by $x/sourceUrl count $i return $x/{"id":"sub-"||$i,"format":"vtt","language":"nl","label":substring((assetTypes)(),17),"url":sourceUrl},xivid:m3u8-to-json((.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl)}}'
+{
+  "name": "Kijk: Mr. Frank Visser doet uitspraak - Bezem door de straat S06E03",
+  "date": "2021-03-25T21:34:24Z",
+  "duration": "PT41M57S",
+  "expdate": "2026-03-25T21:34:24Z",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Nederlands",
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/806141E1.vtt"
+    },
+    {
+      "id": "sub-2",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Doven en Slechthorenden",
+      "url": "https://vod-kijk2-prod.talpatvcdn.nl/webvtt/806141E1OPE.vtt"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://vod-nl.prd.talpatvcdn.nl/[...]/index.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "448x252@25fps",
+      "bitrate": "507kbps",
+      "url": "https://vod-nl.prd.talpatvcdn.nl/[...]/index_6.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "6776kbps",
+      "url": "https://vod-nl.prd.talpatvcdn.nl/[...]/index_1.m3u8"
+    }
+  ]
+}
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:kijk($url as string) as object()? {
@@ -4864,7 +4961,7 @@ declare function xivid:kijk($url as string) as object()? {
   })/(json//items)()/{
     "name":concat(
       "Kijk: ",
-      (.[exists(series)]/series/title,title)[.],
+      join((series/title,title)," - "),
       .[exists(seasonNumber)]/concat(
         " S",
         format-integer(seasonNumber,"00"),
@@ -4878,8 +4975,12 @@ declare function xivid:kijk($url as string) as object()? {
     "expdate":.//expirationDate div 1000 *
       duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "formats":array{
-      (.//mediaContent)()[type="webvtt"]/{
-        "id":"sub-"||position(),
+      for $x at $i in (.//mediaContent)()[type="webvtt"]
+      order by $x/sourceUrl
+      count $i
+      return
+      $x/{
+        "id":"sub-"||$i,
         "format":"vtt",
         "language":"nl",
         "label":substring((assetTypes)(),17),
