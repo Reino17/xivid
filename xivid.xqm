@@ -790,6 +790,12 @@ declare function xivid:abhd($url as string) as object()? {
   }
 };
 
+declare function xivid:autoblog($url as string) as object()? {
+  doc($url)//iframe[starts-with(@data-lazy-src,"//autoblog.bbvms.com")]/xivid:bbvms(
+    resolve-uri(replace(@data-lazy-src,"html.+","json"),$url),(),()
+  )
+};
+
 declare function xivid:telegraaf($url as string) as object()? {
   json-doc(
     concat(

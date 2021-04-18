@@ -43,13 +43,13 @@ ECHO   uitzendinggemist.net    at5.nl                omroepzeeland.nl
 ECHO   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
 ECHO   kijk.nl                 rtvoost.nl            l1.nl
 ECHO.
-ECHO   dumpert.nl              youtu.be              fb.watch
-ECHO   autojunk.nl             vimeo.com             instagram.com
-ECHO   abhd.nl                 dailymotion.com       twitter.com
+ECHO   dumpert.nl              youtube.com           facebook.com
+ECHO   autojunk.nl             youtu.be              fb.watch
+ECHO   abhd.nl                 vimeo.com             instagram.com
+ECHO   autoblog.nl             dailymotion.com       twitter.com
 ECHO   telegraaf.nl            twitch.tv             pornhub.com
 ECHO   ad.nl                   mixcloud.com
 ECHO   lc.nl                   soundcloud.com
-ECHO   youtube.com             facebook.com
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -310,6 +310,7 @@ FOR /F "delims=" %%A IN ('xidel --xquery ^"
         'dumpert':array{'dumpert.nl'}^,
         'autojunk':array{'autojunk.nl'}^,
         'abhd':array{'abhd.nl'}^,
+        'autoblog':array{'autoblog.nl'}^,
         'telegraaf':array{'telegraaf.nl'}^,
         'ad':array{'ad.nl'}^,
         'lc':array{'lc.nl'}^,

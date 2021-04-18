@@ -9217,6 +9217,63 @@ declare function xivid:abhd($url as string) as object()? {
 
 ================================================================================================
 
+[autoblog]
+
+$ url=https://www.autoblog.nl/nieuws/brute-richmond-jeep-wrangler-rijtest-en-video-143735   # Eerste bbvms-video (16-03-2020) in het rijtesten-archief.
+
+$ xidel -se 'doc("'$url'")//iframe[@data-lazy-src]/resolve-uri(replace(@data-lazy-src,"html.+","json"))'
+https://autoblog.bbvms.com/p/autoblog_yt/c/3679822.json
+
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")//iframe[@data-lazy-src]/xivid:bbvms(resolve-uri(replace(@data-lazy-src,"html.+","json")),(),())'
+{
+  "name": "Autoblog: Brute Richmond (Jeep Wrangler) rijtest",
+  "date": "2020-03-15T09:51:01Z",
+  "duration": "PT15M45S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "400kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2020/03/15/asset-3679822-1584265633439393.mp4"
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3000kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2020/03/15/asset-3679822-1584265634228029.mp4"
+    },
+    {
+      "id": "pg-7",
+      "format": "mkv[h264+opus]",
+      "resolution": "1920x1080",
+      "bitrate": null,
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2020/03/15/3679822.mkv"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.autoblog.nl/nieuws/volvo-s60-t8-polestar-engineered-rijtest-en-video-142196
+
+$ xidel -se 'doc("'$url'")//iframe[@data-lazy-src]/@data-lazy-src'
+https://www.youtube.com/embed/IR8AlNUP5xo?feature=oembed
+
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")//iframe[starts-with(@data-lazy-src,"//autoblog.bbvms.com")]/xivid:bbvms(resolve-uri(replace(@data-lazy-src,"html.+","json")),(),())'
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:autoblog($url as string) as object()? {
+  doc($url)//iframe[starts-with(@data-lazy-src,"//autoblog.bbvms.com")]/xivid:bbvms(
+    resolve-uri(replace(@data-lazy-src,"html.+","json")),(),()
+  )
+};
+
+================================================================================================
+
 [dailymotion]
 
 $ url=https://www.dailymotion.com/video/x5aa1uc

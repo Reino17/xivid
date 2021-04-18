@@ -44,13 +44,13 @@ Ondersteunde websites:
   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
   kijk.nl                 rtvoost.nl            l1.nl
 
-  dumpert.nl              youtu.be              fb.watch
-  autojunk.nl             vimeo.com             instagram.com
-  abhd.nl                 dailymotion.com       twitter.com
+  dumpert.nl              youtube.com           facebook.com
+  autojunk.nl             youtu.be              fb.watch
+  abhd.nl                 vimeo.com             instagram.com
+  autoblog.nl             dailymotion.com       twitter.com
   telegraaf.nl            twitch.tv             pornhub.com
   ad.nl                   mixcloud.com
   lc.nl                   soundcloud.com
-  youtube.com             facebook.com
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -311,6 +311,7 @@ eval "$(xidel --xquery '
         "dumpert":array{"dumpert.nl"},
         "autojunk":array{"autojunk.nl"},
         "abhd":array{"abhd.nl"},
+        "autoblog":array{"autoblog.nl"},
         "telegraaf":array{"telegraaf.nl"},
         "ad":array{"ad.nl"},
         "lc":array{"lc.nl"},
