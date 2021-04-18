@@ -34,10 +34,10 @@ module namespace xivid = "https://github.com/Reino17/xivid/";
 declare function xivid:m3u8-to-json($url as string?) as array() {
   let $m3u8:=x:request(
         {"url":$url,"error-handling":"4xx=accept"}[url]
-      )[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
+      )[raw[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
       $m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,
       $streams:=extract(
-        $m3u8/doc,
+        $m3u8/raw,
         "#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",
         0,"ms*"
       )
@@ -49,7 +49,7 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
       "url":$m3u8Url
     }
   } else array{
-    extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    extract($m3u8/raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
@@ -75,9 +75,15 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
       "url":$m3u8Url
     }[url],
     for $x at $i in $streams
-    let $br:=extract($x,"BANDWIDTH=(\d+)",1),
-        $br2:=extract($x,"GROUP-ID=.+?-(\d+)",1),
-        $br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))
+    group by $path:=x:lines($x)[last()] ! (
+      if (contains(.,"URI=")) then
+        extract($x,"URI=&quot;(.+)&quot;",1)
+      else
+        replace(.,"#.+","")
+    )
+    let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],
+        $br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.]
     order by $br
     count $i
     return {
@@ -88,27 +94,16 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
         "m3u8[aac]",
       "resolution":concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
-        extract($x,"(?:FRAME-RATE=|GROUP-ID.+p)([\d\.]+)",1)[.] !
+        extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] !
           concat("@",round-half-to-even(.,3),"fps")
       )[.],
-      "bitrate":if ($br3[1]) then
-        join(
-          (round($br3[2][.] div 1000),round($br3[1] div 1000)),
-          "|"
-        )||"kbps"
-      else if ($br) then
-        (round($br[.] div 1000),$br2[.])||"kbps"
-      else
-        (),
-      "url":resolve-uri(
-        x:lines($x)[last()] ! (
-          if (contains(.,"URI=")) then
-            extract($x,"URI=&quot;(.+)&quot;",1)
-          else
-            replace(.,"#.+","")
-        ),
-        $m3u8Url
-      )
+      "bitrate":(
+        if ($br3[1]) then
+          join((round($br3[2] div 1000),round($br3[1] div 1000)),"|")
+        else 
+          ($br2,round($br[.] div 1000))[1]
+      ) ! concat(.,"kbps"),
+      "url":resolve-uri($path,$m3u8Url)
     }
   }
 };
