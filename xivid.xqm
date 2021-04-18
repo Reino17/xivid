@@ -31,7 +31,7 @@ module namespace xivid = "https://github.com/Reino17/xivid/";
  : --------------------------------
  :)
 
-declare function xivid:m3u8-to-json($url as string?) as object()* {
+declare function xivid:m3u8-to-json($url as string?) as array() {
   let $m3u8:=x:request(
         {"url":$url,"error-handling":"4xx=accept"}[url]
       )[doc[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
@@ -42,11 +42,13 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
         0,"ms*"
       )
   return
-  if (exists($m3u8) and not(exists($streams))) then {
-    "id":"hls-1",
-    "format":"m3u8[h264+aac]",
-    "url":$m3u8Url
-  } else (
+  if (exists($m3u8) and not(exists($streams))) then array{
+    {
+      "id":"hls-1",
+      "format":"m3u8[h264+aac]",
+      "url":$m3u8Url
+    }
+  } else array{
     extract($m3u8/doc,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
@@ -108,37 +110,39 @@ declare function xivid:m3u8-to-json($url as string?) as object()* {
         $m3u8Url
       )
     }
-  )
+  }
 };
 
 declare function xivid:mpd-to-json($mpd) as object()* {
-  {
-    "id":"dash-0",
-    "format":"mpd[manifest]",
-    "url":$mpd[. instance of string]
-  }[url],
-  for $x at $i in (
-    if ($mpd instance of node()) then $mpd else doc($mpd)
-  )//Representation
-  order by boolean($x/@width),$x/@bandwidth
-  count $i
-  return {
-    "id":"dash-"||$i,
-    "format":concat(
-      substring-after($x/(.,..)/@mimeType,"/"),
-      "[",
-      tokenize($x/@codecs,"\.")[1] ! (
-        if (.="mp4a") then "aac" else
-        if (.="avc1") then "h264" else .
+  array{
+    {
+      "id":"dash-0",
+      "format":"mpd[manifest]",
+      "url":$mpd[. instance of string]
+    }[url],
+    for $x at $i in (
+      if ($mpd instance of node()) then $mpd else doc($mpd)
+    )//Representation
+    order by boolean($x/@width),$x/@bandwidth
+    count $i
+    return {
+      "id":"dash-"||$i,
+      "format":concat(
+        substring-after($x/(.,..)/@mimeType,"/"),
+        "[",
+        tokenize($x/@codecs,"\.")[1] ! (
+          if (.="mp4a") then "aac" else
+          if (.="avc1") then "h264" else .
+        ),
+        "]"
       ),
-      "]"
-    ),
-    "resolution":$x/@width ! concat(
-      .,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"
-    ),
-    "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
-    "bitrate":round($x/@bandwidth div 1000)||"kbps",
-    "url":$x/BaseUrl
+      "resolution":$x/@width ! concat(
+        .,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"
+      ),
+      "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
+      "bitrate":round($x/@bandwidth div 1000)||"kbps",
+      "url":$x/BaseUrl
+    }
   }
 };
 
@@ -356,7 +360,7 @@ declare function xivid:bbvms(
         },
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
-        ),
+        )(),
         for $x at $i in (assets)()[not(ends-with(src,"m3u8"))]
         order by $x/bandwidth
         count $i
@@ -464,8 +468,8 @@ declare function xivid:npo($url as string) as object()? {
           "label":label,
           "url":src
         },
-        xivid:m3u8-to-json($stream)
-      }
+        xivid:m3u8-to-json($stream)()
+      }[exists(.())]
     }
   ))
 };
@@ -533,7 +537,7 @@ declare function xivid:kijk($url as string) as object()? {
       },
       xivid:m3u8-to-json(
         (.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl
-      )
+      )()
     }
   }
 };
@@ -711,11 +715,13 @@ declare function xivid:dumpert($url as string) as object()? {
     "name":"Dumpert: "||title,
     "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
     "duration":(media)()/duration * duration("PT1S"),
-    "formats":for $x at $i in ("mobile","tablet","720p","original") return {
-      "id":"pg-"||$i,
-      "format":"mp4[h264+aac]",
-      "url":(.//variants)()[version=$x]/uri
-    }[url]
+    "formats":array{
+      for $x at $i in ("mobile","tablet","720p","original") return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "url":(.//variants)()[version=$x]/uri
+      }[url]
+    }[exists(.())]
   }
 };
 
@@ -775,7 +781,7 @@ declare function xivid:telegraaf($url as string) as object()? {
       },
       xivid:m3u8-to-json(
         locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8")
-      )
+      )()
     }
   }
 };
@@ -822,7 +828,7 @@ declare function xivid:ad($url as string) as object()? {
           "resolution":("640x360","1280x720")[$i],
           "url":$x/src
         },
-        xivid:m3u8-to-json((sources)(1)/src)
+        xivid:m3u8-to-json((sources)(1)/src)()
       }
     }
   ))
@@ -936,7 +942,7 @@ declare function xivid:vimeo($url as string) as object()? {
         "resolution":concat(width,"x",height,"@",fps,"fps"),
         "url":url
       },
-      xivid:m3u8-to-json((hls//url)[1])
+      xivid:m3u8-to-json((hls//url)[1])()
     }
   }
 };
@@ -995,7 +1001,7 @@ declare function xivid:mixcloud($url as string) as object()? {
       },
       xivid:m3u8-to-json(
         $decrypt(streamInfo/hlsUrl)
-      )
+      )()
     }
   }
 };
@@ -1076,7 +1082,7 @@ declare function xivid:facebook($url as string) as object()? {
           "format":"mp4[h264+aac]",
           "url":.
         },
-        xivid:mpd-to-json(parse-xml(dash_manifest))
+        xivid:mpd-to-json(parse-xml(dash_manifest))()
       }
     }
   ))
@@ -1124,7 +1130,7 @@ declare function xivid:pornhub($url as string) as object()? {
         "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
         "url":$x
       },
-      xivid:m3u8-to-json($fmts[1])
+      xivid:m3u8-to-json($fmts[1])()
     }
   }
 };

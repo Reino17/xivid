@@ -182,20 +182,19 @@ twitter() {
         round(($b//durationMs,$b//end_ms - $b//start_ms) div 1000) * duration("PT1S"),
         "[H01]:[m01]:[s01]"
       ),
-      "formats":array{
-        if ($b/broadcasts) then
-          {
-            "id":"hls-1",
-            "format":"m3u8[h264+aac]",
-            "resolution":concat($b//width,"x",$b//height),
-            "url":x:request({
-              "headers":($head,"x-guest-token: "||$a),
-              "url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key
-            })//location
-          }
-        else
-          xivid:m3u8-to-json($b//playbackUrl)
+      "formats":if ($b/broadcasts) then array{
+        {
+          "id":"hls-1",
+          "format":"m3u8[h264+aac]",
+          "resolution":concat($b//width,"x",$b//height),
+          "url":x:request({
+            "headers":($head,"x-guest-token: "||$a),
+            "url":"https://api.twitter.com/1.1/live_video_stream/status/"||$b//media_key
+          })//location
+        }
       }
+      else
+        xivid:m3u8-to-json($b//playbackUrl)
     }
   ' --output-format=bash)"
 }
