@@ -283,97 +283,66 @@ IF NOT "%~1"=="" (
   EXIT /B 1
 )
 
-IF NOT "%url:npostart.nl=%"=="%url%" (
-  IF NOT "%url:npostart.nl/live=%"=="%url%" (
-    ECHO xivid: url wordt niet ondersteund.
-    EXIT /B 1
-  )
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:npo('%url%')" --output-format^=cmd') DO %%A
+IF NOT "%url:npostart.nl/live=%"=="%url%" (
+  ECHO xivid: url wordt niet ondersteund.
+  EXIT /B 1
 ) ELSE IF NOT "%url:nos.nl=%"=="%url%" (
   CALL :nos "%url%"
-) ELSE IF NOT "%url:tvblik.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:tvblik('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:uitzendinggemist.net=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:tvblik('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtlxl.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtl('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtlnieuws.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:rtl('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:kijk.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:kijk('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:omropfryslan.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtvnoord.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtvdrenthe.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtvoost.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:omroepwest.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rijnmond.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:rtvutrecht.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:omroepgelderland.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:omroepzeeland.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:omroepbrabant.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:l1.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:regio('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:nhnieuws.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:nhnieuws('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:at5.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:nhnieuws('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:omroepflevoland.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:ofl('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:dumpert.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:dumpert('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:autojunk.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:autojunk('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:telegraaf.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:telegraaf('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:ad.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:ad('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:lc.nl=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:lc('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:youtube.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:youtube('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:youtu.be=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:youtube('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:vimeo.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:vimeo('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:dailymotion.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:dailymotion('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:twitch.tv=%"=="%url%" (
   CALL :twitch "%url%"
-) ELSE IF NOT "%url:mixcloud.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:mixcloud('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:soundcloud.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:soundcloud('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:facebook.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:fb.watch=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:facebook('%url%')" --output-format^=cmd') DO %%A
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
   CALL :twitter "%url%"
-) ELSE IF NOT "%url:instagram.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:instagram('%url%')" --output-format^=cmd') DO %%A
-) ELSE IF NOT "%url:pornhub.com=%"=="%url%" (
-  FOR /F "delims=" %%A IN ('xidel -e "json:=xivid:pornhub('%url%')" --output-format^=cmd') DO %%A
-) ELSE (
+)
+
+FOR /F "delims=" %%A IN ('xidel --xquery ^"
+  let $extractors:^={
+        'npo':array{'npostart.nl'^,'gemi.st'}^,
+        'tvblik':array{'tvblik.nl'^,'uitzendinggemist.net'}^,
+        'rtl':array{'rtlxl.nl'^,'rtlnieuws.nl'}^,
+        'kijk':array{'kijk.nl'}^,
+        'regio':array{
+          'omropfryslan.nl'^,'rtvnoord.nl'^,'rtvdrenthe.nl'^,'rtvoost.nl'^,
+          'omroepwest.nl'^,'rijnmond.nl'^,'rtvutrecht.nl'^,'omroepgelderland.nl'^,
+          'omroepzeeland.nl'^,'omroepbrabant.nl'^,'l1.nl'
+        }^,
+        'nhnieuws':array{'nhnieuws.nl'^,'at5.nl'}^,
+        'ofl':array{'omroepflevoland.nl'}^,
+        'dumpert':array{'dumpert.nl'}^,
+        'autojunk':array{'autojunk.nl'}^,
+        'telegraaf':array{'telegraaf.nl'}^,
+        'ad':array{'ad.nl'}^,
+        'lc':array{'lc.nl'}^,
+        'youtube':array{'youtube.com'^,'youtu.be'}^,
+        'vimeo':array{'vimeo.com'}^,
+        'dailymotion':array{'dailymotion.com'}^,
+        'mixcloud':array{'mixcloud.com'}^,
+        'soundcloud':array{'soundcloud.com'}^,
+        'facebook':array{'facebook.com'^,'fb.watch'}^,
+        'instagram':array{'instagram.com'}^,
+        'pornhub':array{'pornhub.com'}
+      }^,
+      $temp:^=tokenize^(request-decode^('%url%'^)/host^,'\.'^)^,
+      $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
+  for $x in $extractors^(^)
+  return
+  if ^($extractors^($x^) ^= $host^) then ^(
+    json:^=eval^(x'xivid:{$x}^(''%url%''^)'^)^,
+    extractor:^=$x^,
+    fmts:^=join^($json/^(formats^)^(^)/id^)
+  ^)
+  else
+    ^(^)
+^" --output-format^=cmd') DO %%A
+
+IF NOT DEFINED extractor (
   ECHO xivid: url wordt niet ondersteund.
   EXIT /B 1
 )
-
-IF DEFINED json (
-  FOR /F "delims=" %%A IN ('ECHO %json% ^| xidel - -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd') DO %%A
-) ELSE (
+IF NOT DEFINED json (
   ECHO xivid: geen video^(-informatie^) beschikbaar.
   EXIT /B 1
 )
+
 IF DEFINED f (
   IF DEFINED fmts (
     SETLOCAL ENABLEDELAYEDEXPANSION
