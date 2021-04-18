@@ -758,6 +758,38 @@ declare function xivid:autojunk($url as string) as object()? {
   }
 };
 
+declare function xivid:abhd($url as string) as object()? {
+  let $src:=doc($url)//div[@id="playerObject"],
+      $info:=$src/script/parse-json(
+        replace(
+          extract(.,"clipData.assets = (.+\]);",1,"s"),
+          " //.+",""
+        ),
+        {"liberal":true()}
+      )
+  return {
+    "name":"ABHD: "||$src/h1/a,
+    "date":dateTime(
+      join(
+        extract($info(1)/src,"(\d{4})/?(\d{2})(\d{2})",1 to 3),
+        "-"
+      )||"T00:00:00Z"
+    ),
+    "formats":array{
+      for $x at $i in $info()/src return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":if (ends-with($x,"hq.mp4")) then "852x480" else "1280x720",
+        "bitrate":if (ends-with($x,"hq.mp4")) then "1200kbps" else "2000kbps",
+        "url":if (matches($x,"\d{14}")) then
+          replace($x,"(.+?\d{4})(\d{4})(.+)","$1/$2/$3")
+        else
+          $x
+      }
+    }
+  }
+};
+
 declare function xivid:telegraaf($url as string) as object()? {
   json-doc(
     concat(
