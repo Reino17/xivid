@@ -910,31 +910,50 @@ $ xidel -s --xquery 'let $year:=year-from-dateTime(current-dateTime()) for $x in
 Vóór 1996 golden er andere regels, maar aangezien de kans vrij groot is dat de data die Xivid ontleedt allemaal
 van ná die tijd is ga ik die hier niet in betrekken. Zie https://nl.wikipedia.org/wiki/Zomertijd#Nederland.
 
-$ xidel -s --xquery 'declare function local:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {let $year:=year-from-dateTime(dateTime($arg)),$dst:=for $x in ("-03-","-10-") return dateTime(concat($year,$x,(25 to 31)[days-from-duration(date(concat($year,$x,.)) - date("0000-01-01")) mod 7 eq 0],"T01:00:00Z")) return adjust-dateTime-to-timezone(dateTime($arg),if ($dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]) then implicit-timezone() + duration("PT1H") else implicit-timezone())}; local:adjust-dateTime-to-dst("2020-03-29T01:00:00Z")'
+----------------------------------------------------------------
+
+$ xidel -s --xquery 'declare function local:is-summertime($arg as dateTime) as boolean {let $year:=year-from-dateTime($arg),$dst:=for $x in ("-03-","-10-") return dateTime(concat($year,$x,(25 to 31)[days-from-duration(date(concat($year,$x,.)) - date("0000-01-01")) mod 7 eq 0],"T01:00:00Z")) return $dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]}; local:is-summertime(dateTime("2020-03-29T01:00:00Z"))'
+true
+
+----------------------------------------------------------------
+
+$ xidel -s --xquery 'declare function local:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {let $is-summertime:=function($arg as dateTime) as boolean {let $year:=year-from-dateTime($arg),$dst:=for $x in ("-03-","-10-") return dateTime(concat($year,$x,(25 to 31)[days-from-duration(date(concat($year,$x,.)) - date("0000-01-01")) mod 7 eq 0],"T01:00:00Z")) return $dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]} return adjust-dateTime-to-timezone(dateTime($arg),if ($is-summertime(current-dateTime())) then if ($is-summertime(dateTime($arg))) then implicit-timezone() else implicit-timezone() - duration("PT1H") else if ($is-summertime(dateTime($arg))) then implicit-timezone() + duration("PT1H") else implicit-timezone())}; local:adjust-dateTime-to-dst("2020-03-29T01:00:00Z")'
 2020-03-29T03:00:00+02:00
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {
-  let $year:=year-from-dateTime(dateTime($arg)),
-      $dst:=for $x in ("-03-","-10-") return
-      dateTime(
-        concat(
-          $year,$x,
-          (25 to 31)[
-            days-from-duration(
-              date(concat($year,$x,.)) - date("0000-01-01")
-            ) mod 7 eq 0
-          ],
-          "T01:00:00Z"
-        )
-      )
+  let $is-summertime:=function($arg as dateTime) as boolean {
+        let $year:=year-from-dateTime($arg),
+            $dst:=for $x in ("-03-","-10-") return
+            dateTime(
+              concat(
+                $year,
+                $x,
+                (25 to 31)[
+                  days-from-duration(
+                    date(concat($year,$x,.)) - date("0000-01-01")
+                  ) mod 7 eq 0
+                ],
+                "T01:00:00Z"
+              )
+            )
+        return
+        $dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]
+      }
   return
   adjust-dateTime-to-timezone(
     dateTime($arg),
-    if ($dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2])
-    then implicit-timezone() + duration("PT1H")
-    else implicit-timezone()
+    if ($is-summertime(current-dateTime())) then
+      if ($is-summertime(dateTime($arg))) then
+        implicit-timezone()
+      else
+        implicit-timezone() - duration("PT1H")
+    else
+      if ($is-summertime(dateTime($arg))) then
+        implicit-timezone() + duration("PT1H")
+      else
+        implicit-timezone()
   )
 };
 

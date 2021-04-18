@@ -141,6 +141,41 @@ declare function xivid:mpd-to-json($mpd) as object()* {
   }
 };
 
+declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {
+  let $is-summertime:=function($arg as dateTime) as boolean {
+        let $year:=year-from-dateTime($arg),
+            $dst:=for $x in ("-03-","-10-") return
+            dateTime(
+              concat(
+                $year,
+                $x,
+                (25 to 31)[
+                  days-from-duration(
+                    date(concat($year,$x,.)) - date("0000-01-01")
+                  ) mod 7 eq 0
+                ],
+                "T01:00:00Z"
+              )
+            )
+        return
+        $dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]
+      }
+  return
+  adjust-dateTime-to-timezone(
+    dateTime($arg),
+    if ($is-summertime(current-dateTime())) then
+      if ($is-summertime(dateTime($arg))) then
+        implicit-timezone()
+      else
+        implicit-timezone() - duration("PT1H")
+    else
+      if ($is-summertime(dateTime($arg))) then
+        implicit-timezone() + duration("PT1H")
+      else
+        implicit-timezone()
+  )
+};
+
 declare function xivid:string-to-utc-dateTime($arg as string) as dateTime {
   let $month:={
         "jan":"01","feb":"02","mrt":"03","maart":"03","apr":"04",
@@ -173,29 +208,6 @@ declare function xivid:string-to-utc-dateTime($arg as string) as dateTime {
   adjust-dateTime-to-timezone(
     xivid:adjust-dateTime-to-dst($dt),
     duration("PT0S")
-  )
-};
-
-declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {
-  let $year:=year-from-dateTime(dateTime($arg)),
-      $dst:=for $x in ("-03-","-10-") return
-      dateTime(
-        concat(
-          $year,$x,
-          (25 to 31)[
-            days-from-duration(
-              date(concat($year,$x,.)) - date("0000-01-01")
-            ) mod 7 eq 0
-          ],
-          "T01:00:00Z"
-        )
-      )
-  return
-  adjust-dateTime-to-timezone(
-    dateTime($arg),
-    if ($dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2])
-    then implicit-timezone() + duration("PT1H")
-    else implicit-timezone()
   )
 };
 
