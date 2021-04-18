@@ -729,31 +729,32 @@ declare function xivid:dumpert($url as string) as object()? {
 };
 
 declare function xivid:autojunk($url as string) as object()? {
-  let $src:=doc($url),
-      $info:=$src//div[@id="playerWrapper"]/script
-  return {
-    "name":"Autojunk: "||extract($info,"clipData.title=&quot;(.+)&quot;",1),
+  doc($url)/{
+    "name":"Autojunk: "||//meta[@property="og:title"]/@content,
     "date":xivid:string-to-utc-dateTime(
-      join(extract($src//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
+      join(extract(//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
     ),
-    "duration":extract(
-      $info,"clipData\[&quot;length&quot;\].+?(\d+)",1
-    ) * duration("PT1S"),
-    "formats":array{
-      for $x at $i in parse-json(
-        replace(extract($info,"clipData.assets = (.+\]);",1,"s")," //.+",""),
-        {"liberal":true()}
-      )()[src]
-      order by $x/bandwidth
-      count $i
-      return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":concat($x/width,"x",$x/height),
-        "bitrate":$x/bandwidth||"kbps",
-        "url":$x/src
+    "formats":if (//div[@id="playerWrapper"]/script) then
+      array{
+        let $id:=extract(//meta[@property="og:image"]/@content,"\d{4}/\d{4}/\d+")
+        for $x at $i in (".mp4","_hq.mp4","_720p.mp4") ! concat(
+          "https://static.autojunk.nl/flv/",$id,.
+        )
+        where x:request({
+          "method":"HEAD",
+          "error-handling":"xxx=accept",
+          "url":$x
+        })/headers[1] = "HTTP/1.1 200 OK"
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("640x360","852x480","1280x720")[$i],
+          "bitrate":(600,1200,2000)[$i]||"kbps",
+          "url":$x
+        }
       }
-    }
+    else
+      ()
   }
 };
 
