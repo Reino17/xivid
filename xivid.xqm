@@ -301,9 +301,9 @@ declare function xivid:bbvms(
   $title as string?
 ) as object()? {
   let $json:=json-doc($url),
-      $host:=$json/publicationData/resolve-uri(
-        defaultMediaAssetPath,
-        $json/protocol
+      $host:=$json/resolve-uri(
+        publicationData/defaultMediaAssetPath,
+        protocol
       ),
       $orig:=parse-json($json/clipData/s3Info)
   return
@@ -346,18 +346,13 @@ declare function xivid:bbvms(
           "format":"srt",
           "language":isocode,
           "label":languagename,
-          "url":concat(
-            $json/publicationData/baseurl,
-            "/subtitle/",
-            id,
-            ".srt"
-          )
+          "url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")
         },
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
         )(),
         for $x at $i in (assets)()[not(ends-with(src,"m3u8"))]
-        order by $x/bandwidth
+        order by exists($x/isSource),$x/bandwidth
         count $i
         return
         $x/{
@@ -366,25 +361,26 @@ declare function xivid:bbvms(
           "resolution":.[width]/concat(width,"x",height),
           "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
           "url":resolve-uri(src,$host) ! (
-            if (ends-with(.,"mp4")) then
-              .
-            else
-              x:request({"method":"HEAD","url":.})/url
+            if (ends-with(.,"mp4")) then .
+            else x:request({"method":"HEAD","url":.})/url
           )
         },
         {
           "id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,
-          "format":concat(
-            extract($orig/format/filename,".+\.(.+)",1),
-            if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"
+          "format":extract(src,".+\.(.+)",1) ! concat(
+            .,
+            if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]"
+            else if (.="mkv") then "[h264+opus]"
+            else "[h264+aac]"
           ),
           "resolution":concat(originalWidth,"x",originalHeight),
-          "bitrate":round(
-            tokenize($orig/format/bit_rate)[1] * 1024
-          )||"kbps",
-          "url":$orig/format/filename
+          "bitrate":$orig/format/concat(round(tokenize(bit_rate)[1] * 1024),"kbps"),
+          "url":if (exists($orig)) then
+            $orig/format/filename
+          else
+            resolve-uri(.[not((assets)()/src = src) and src != ""]/src,$host)
         }[url]
-      }
+      }[exists(.())]
     }
   ))
 };

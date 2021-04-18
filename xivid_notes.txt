@@ -2917,7 +2917,7 @@ $ xidel -se 'json-doc("'$url'")/(clipData,parse-json(clipData/s3Info),publicatio
 In veel gevallen zijn de gegevens in de "Blue Billywig"-json veel te ontbetrouwbaar om de naam hier uit te halen, omdat ze lang niet altijd aanwezig zijn.
 Daarom de optionele 2e parameter voor een naam. Niet gespecificeerd, dan de naam uit de "Blue Billywig"-json.
 
-$ xidel -s --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info)/format return $json/clipData/{"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": "),"date":publisheddate,"duration":length * duration("PT1S"),"formats":array{for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]}}}; local:bbvms("'$url'","Leeuwarder Courant",())'
+$ xidel -s --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/{"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": "),"date":publisheddate,"duration":length * duration("PT1S"),"formats":array{for $x at $i in (assets)() order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}}; local:bbvms("'$url'","Leeuwarder Courant",())'
 {
   "name": "Leeuwarder Courant: Enorme belangstelling voor gratis perenbomen in Heerenveen",
   "date": "2020-08-22T10:03:48Z",
@@ -2979,7 +2979,7 @@ $ xidel -se 'json-doc("'$url'")/clipData'
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --xmlns:xivid="https://github.com/Reino17/xivid/" --xquery 'declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info)/format return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live") then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/src),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/bit_rate)[1] * 1024)||"kbps","url":$orig/filename}[url]}}))}; xivid:bbvms("'$url'","Omrop Fryslân","Livestream")'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live") then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/src)(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()) + 1,"format":"mp4[h264+aac]","resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'","Omrop Fryslân","Livestream")'
 {
   "name": "Omrop Fryslân: Livestream",
   "date": "2020-12-18T20:18:36Z",
@@ -3042,7 +3042,7 @@ $ xidel -se 'json-doc("'$url'")/(clipData/(assets)()[ends-with(src,"m3u8")],pars
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live") then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'",(),())'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live") then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'",(),())'
 {
   "name": "RTV Utrecht: Toch geen auto's over fietspad Wolvenstraat Utrecht, andere omleidingsroute gevonden",
   "date": "2020-09-16T16:03:02Z",
@@ -3121,7 +3121,7 @@ $ xidel -se 'json-doc("'$url'")/clipData'
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'","RTV Noord","Livestream")'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'","RTV Noord","Livestream")'
 {
   "name": "RTV Noord: Livestream",
   "date": "2020-12-18T20:22:42Z",
@@ -3167,7 +3167,7 @@ $ xidel -se 'json-doc("'$url'")/clipData/(assets)()[ends-with(src,"m3u8")]'
   "jobdefid": null
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'","RTV Oost","Livestream")'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'","RTV Oost","Livestream")'
 {
   "name": "RTV Oost: Livestream",
   "date": "2020-12-18T20:24:17Z",
@@ -3223,7 +3223,7 @@ $ xidel -se 'json-doc("'$url'")/clipData/(assets)()'
   "bandwidth": "400"
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'","Omroep West","Livestream")'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":publisheddate,"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'","Omroep West","Livestream")'
 {
   "name": "Omroep West: Livestream",
   "date": "2020-12-18T20:25:02Z",
@@ -3264,6 +3264,8 @@ $ xidel -se 'json-doc("'$url'")/clipData'
   [...]
   "publisheddate": "2020-10-02T18:00:00",
   [...]
+  "src": "/video/2020/201002/201002_NVREC_XHQ.mp4",
+  [...]
   "assets": [
     {
       "mediatype": "MP4_MAIN",
@@ -3284,7 +3286,7 @@ $ xidel -se 'json-doc("'$url'")/clipData'
 $ xidel -s --module=xivid.xqm -e 'json-doc("'$url'")/clipData/xivid:adjust-dateTime-to-dst(publisheddate)'
 2020-10-02T18:00:00+02:00
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'",(),())'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/defaultMediaAssetPath,$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'",(),())'
 {
   "name": "RTV Noord",
   "date": "2020-10-02T16:00:00Z",
@@ -3317,7 +3319,7 @@ $ xidel -se 'json-doc("'$url'")'
   [...]
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/resolve-uri(defaultMediaAssetPath,$json/protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'",(),())'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/resolve-uri(publicationData/defaultMediaAssetPath,protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"bitrate":bandwidth||"kbps","url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'",(),())'
 {
   "name": "RTV Rijnmond: Welkom bij Rijnmond",
   "date": "2020-10-04T15:55:06Z",
@@ -3387,7 +3389,7 @@ $ xidel -se 'json-doc("'$url'")/(clipData,publicationData)'
 $ xidel -se 'let $json:=json("'$url'") return $json/clipData/(subtitles)()/concat($json/publicationData/baseurl,"/subtitle/",id,".srt")'
 https://omroepgelderland.bbvms.com/subtitle/63808.srt
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/resolve-uri(defaultMediaAssetPath,$json/protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'",(),())'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/resolve-uri(publicationData/defaultMediaAssetPath,protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[ends-with(src,"mp4")] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host)},{"id":"pg-"||count((assets)()[ends-with(src,"mp4")]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'",(),())'
 {
   "name": "Omroep Gelderland: GLD Nieuws",
   "date": "2020-10-04T15:21:16Z",
@@ -3425,7 +3427,7 @@ $ xidel -se 'json-doc("'$url'")/resolve-uri(clipData/(assets)()[not(ends-with(sr
 https://omroepzeeland.bbvms.com/custom/getDownload?sourceid=370236927-Zeeland-Nu-04-10-2020-ZNB201002NG
 https://d3isaxd2t6q8zm.cloudfront.net/omroepzeeland/media/2020/10/04/Asset_HD_370236927-Zeeland-Nu-04-10-2020-ZNB201002NG.mp4
 
-$ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/publicationData/resolve-uri(defaultMediaAssetPath,$json/protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)),for $x at $i in (assets)()[not(ends-with(src,"m3u8"))] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host) ! (if (ends-with(.,"mp4")) then . else x:request({"method":"HEAD","url":.})/url)},{"id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,"format":concat(extract($orig/format/filename,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; xivid:bbvms("'$url'",(),())'
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/resolve-uri(publicationData/defaultMediaAssetPath,protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[not(ends-with(src,"m3u8"))] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host) ! (if (ends-with(.,"mp4")) then . else x:request({"method":"HEAD","url":.})/url)},{"id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,"format":concat(extract(src,".+\.(.+)",1),if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":round(tokenize($orig/format/bit_rate)[1] * 1024)||"kbps","url":$orig/format/filename}[url]}}))}; local:bbvms("'$url'",(),())'
 {
   "name": "Omroep Zeeland",
   "date": "2020-10-04T16:00:00Z",
@@ -3443,15 +3445,149 @@ $ xidel -s --module=xivid.xqm --xquery 'declare namespace xivid = "https://githu
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://autoblog.bbvms.com/p/autoblog_yt/c/3679822.json
+
+$ xidel -se 'json-doc("'$url'")/clipData'
+{
+  [...]
+  "src": "/autoblog/media/2020/03/15/3679822.mkv",
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/resolve-uri(publicationData/defaultMediaAssetPath,protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[not(ends-with(src,"m3u8"))] order by $x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host) ! (if (ends-with(.,"mp4")) then . else x:request({"method":"HEAD","url":.})/url)},{"id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,"format":extract(src,".+\.(.+)",1) ! concat(.,if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else if (.="mkv") then "[h264+opus]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":$orig/format/concat(round(tokenize(bit_rate)[1] * 1024),"kbps"),"url":if (exists($orig)) then $orig/format/filename else resolve-uri(.[not((assets)()/src = src)]/src,$host)}[url]}}))}; local:bbvms("'$url'",(),())'
+{
+  "name": "Autoblog: Brute Richmond (Jeep Wrangler) rijtest",
+  "date": "2020-03-15T09:51:01Z",
+  "duration": "PT15M45S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "512x288",
+      "bitrate": "400kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2020/03/15/asset-3679822-1584265633439393.mp4"
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "3000kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2020/03/15/asset-3679822-1584265634228029.mp4"
+    },
+    {
+      "id": "pg-7",
+      "format": "mkv[h264+opus]",
+      "resolution": "1920x1080",
+      "bitrate": null,
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2020/03/15/3679822.mkv"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://autoblog.bbvms.com/p/autoblog_yt/c/4141066.json
+
+$ xidel -se 'json-doc("'$url'")/clipData'
+{
+  [...]
+  "src": "/autoblog/media/2021/02/28/4141066.mp4",
+  [...]
+  "assets": [
+    [...]
+    {
+      "mediatype": "MP4_MAIN",
+      "id": "4141066",
+      "status": "active",
+      "src": "/autoblog/media/2021/02/28/4141066.mp4",
+      "length": "22",
+      "exactlength": "",
+      "width": "590",
+      "height": "432",
+      "bandwidth": "852",
+      "jobdefid": "mp4_main-590x432-852",
+      "isSource": true,
+      "jobqid": "mp4_main-590x432-852"
+    }
+  ],
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/resolve-uri(publicationData/defaultMediaAssetPath,protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[not(ends-with(src,"m3u8"))] order by exists($x/isSource),$x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host) ! (if (ends-with(.,"mp4")) then . else x:request({"method":"HEAD","url":.})/url)},{"id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,"format":extract(src,".+\.(.+)",1) ! concat(.,if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else if (.="mkv") then "[h264+opus]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":$orig/format/concat(round(tokenize(bit_rate)[1] * 1024),"kbps"),"url":if (exists($orig)) then $orig/format/filename else resolve-uri(.[not((assets)()/src = src)]/src,$host)}[url]}}))}; local:bbvms("'$url'",(),())'
+{
+  "name": "Autoblog: Door rood rijden met juten achter je",
+  "date": "2021-02-28T10:26:41Z",
+  "duration": "PT22S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "512x374",
+      "bitrate": "400kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2021/02/28/asset-4141066-1614508006643328.mp4"
+    },
+    {
+      "id": "pg-2",
+      "format": "mp4[h264+aac]",
+      "resolution": "768x562",
+      "bitrate": "600kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2021/02/28/asset-4141066-1614508006799572.mp4"
+    },
+    {
+      "id": "pg-3",
+      "format": "mp4[h264+aac]",
+      "resolution": "768x562",
+      "bitrate": "800kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2021/02/28/asset-4141066-1614508006953761.mp4"
+    },
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "768x562",
+      "bitrate": "1600kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2021/02/28/asset-4141066-1614508006349151.mp4"
+    },
+    {
+      "id": "pg-5",
+      "format": "mp4[h264+aac]",
+      "resolution": "590x432",
+      "bitrate": "852kbps",
+      "url": "https://d2bbsl4gakrtjf.cloudfront.net/autoblog/media/2021/02/28/4141066.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://autoblog.bbvms.com/p/autojunk_standard/c/2895330.json
+
+$ xidel -se 'json-doc("'$url'")/clipData'
+{
+  [...]
+  "src": "",
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as string?,$publ as string?,$title as string?) as object()? {let $json:=json-doc($url),$host:=$json/resolve-uri(publicationData/defaultMediaAssetPath,protocol),$orig:=parse-json($json/clipData/s3Info) return $json/clipData/map:merge(({"name":join((if ($publ) then $publ else $json/publicationData/label,if ($title) then $title else .[title]/title),": ")},if (sourcetype="live" or contains((assets)()[ends-with(src,"m3u8")]/src,"/live/") or ends-with((assets)()[ends-with(src,"m3u8")]/src,"hls.m3u8")) then {"date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z"} else {"date":if (ends-with(publisheddate,"Z")) then publisheddate else adjust-dateTime-to-timezone(xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")),"duration":length * duration("PT1S")},{"formats":array{(subtitles)()/{"id":"sub-1","format":"srt","language":isocode,"label":languagename,"url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")},xivid:m3u8-to-json((assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host))(),for $x at $i in (assets)()[not(ends-with(src,"m3u8"))] order by exists($x/isSource),$x/bandwidth count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":.[width]/concat(width,"x",height),"bitrate":.[bandwidth]/concat(bandwidth,"kbps"),"url":resolve-uri(src,$host) ! (if (ends-with(.,"mp4")) then . else x:request({"method":"HEAD","url":.})/url)},{"id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,"format":extract(src,".+\.(.+)",1) ! concat(.,if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else if (.="mkv") then "[h264+opus]" else "[h264+aac]"),"resolution":concat(originalWidth,"x",originalHeight),"bitrate":$orig/format/concat(round(tokenize(bit_rate)[1] * 1024),"kbps"),"url":if (exists($orig)) then $orig/format/filename else resolve-uri(.[not((assets)()/src = src) and src != ""]/src,$host)}[url]}[exists(.())]}))}; local:bbvms("'$url'",(),())'
+{
+  "name": "Autoblog: Placeholder clip",
+  "date": "2018-01-19T10:13:59Z",
+  "duration": null,
+  "formats": null
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:bbvms(
   $url as string?,
   $publ as string?,
   $title as string?
 ) as object()? {
   let $json:=json-doc($url),
-      $host:=$json/publicationData/resolve-uri(
-        defaultMediaAssetPath,
-        $json/protocol
+      $host:=$json/resolve-uri(
+        publicationData/defaultMediaAssetPath,
+        protocol
       ),
       $orig:=parse-json($json/clipData/s3Info)
   return
@@ -3494,18 +3630,13 @@ declare function xivid:bbvms(
           "format":"srt",
           "language":isocode,
           "label":languagename,
-          "url":concat(
-            $json/publicationData/baseurl,
-            "/subtitle/",
-            id,
-            ".srt"
-          )
+          "url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")
         },
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
-        ),
+        )(),
         for $x at $i in (assets)()[not(ends-with(src,"m3u8"))]
-        order by $x/bandwidth
+        order by exists($x/isSource),$x/bandwidth
         count $i
         return
         $x/{
@@ -3514,25 +3645,26 @@ declare function xivid:bbvms(
           "resolution":.[width]/concat(width,"x",height),
           "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
           "url":resolve-uri(src,$host) ! (
-            if (ends-with(.,"mp4")) then
-              .
-            else
-              x:request({"method":"HEAD","url":.})/url
+            if (ends-with(.,"mp4")) then .
+            else x:request({"method":"HEAD","url":.})/url
           )
         },
         {
           "id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,
-          "format":concat(
-            extract($orig/format/filename,".+\.(.+)",1),
-            if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]" else "[h264+aac]"
+          "format":extract(src,".+\.(.+)",1) ! concat(
+            .,
+            if ($orig/ContentType="video/mpeg2") then "[mpeg2+pcm]"
+            else if (.="mkv") then "[h264+opus]"
+            else "[h264+aac]"
           ),
           "resolution":concat(originalWidth,"x",originalHeight),
-          "bitrate":round(
-            tokenize($orig/format/bit_rate)[1] * 1024
-          )||"kbps",
-          "url":$orig/format/filename
+          "bitrate":$orig/format/concat(round(tokenize(bit_rate)[1] * 1024),"kbps"),
+          "url":if (exists($orig)) then
+            $orig/format/filename
+          else
+            resolve-uri(.[not((assets)()/src = src) and src != ""]/src,$host)
         }[url]
-      }
+      }[exists(.())]
     }
   ))
 };
