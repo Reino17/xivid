@@ -283,10 +283,7 @@ IF NOT "%~1"=="" (
   EXIT /B 1
 )
 
-IF NOT "%url:npostart.nl/live=%"=="%url%" (
-  ECHO xivid: url wordt niet ondersteund.
-  EXIT /B 1
-) ELSE IF NOT "%url:nos.nl=%"=="%url%" (
+IF NOT "%url:nos.nl=%"=="%url%" (
   CALL :nos "%url%"
 ) ELSE IF NOT "%url:twitch.tv=%"=="%url%" (
   CALL :twitch "%url%"

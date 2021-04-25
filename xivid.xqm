@@ -404,7 +404,10 @@ declare function xivid:bbvms(
  :)
 
 declare function xivid:npo($url as string) as object()? {
-  let $prid:=extract($url,".+/([\w_]+)",1),
+  let $prid:=if (contains($url,"/live/")) then
+        doc($url)//npo-player/@media-id
+      else
+        extract($url,"[A-Z\d_]+$"),
       $token:=x:request({
         "header":"X-Requested-With: XMLHttpRequest",
         "url":"https://www.npostart.nl/api/token"
@@ -415,37 +418,27 @@ declare function xivid:npo($url as string) as object()? {
       })/json,
       $info:=parse-json(
         doc($token2/embedUrl)//script/extract(.,"var video =(.+);",1)[.]
-      ),
-      $stream:=json-doc(
-        concat(
-          "https://start-player.npo.nl/video/",
-          $prid,
-          "/streams?profile=hls&amp;quality=npo&amp;tokenId=",
-          $token2/token
-        )
-      )/stream[not(exists(protection))]/src
+      )
   return
   map:merge((
     if (exists($info)) then $info/{
-      "name":concat(
-        franchiseTitle,
-        if (contains(franchiseTitle,title)) then () else ": "||title
-      ),
+      "name":if (type="livetv") then
+        concat(title,": Livestream")
+      else
+        concat(
+          franchiseTitle,
+          if (contains(franchiseTitle,title)) then () else ": "||title
+        ),
       "date":broadcastDate,
       "duration":duration * duration("PT1S"),
       "start":startAt,
       "end":startAt + duration
     } else
       doc("https://www.npostart.nl/"||$prid)/(
-        let $info:=parse-json(//script[@type="application/ld+json"]) return {
-          "name"://npo-player-header/concat(
-            @main-title,
-            ": ",
-            @share-title
-          ),
+        let $info:=parse-json((//script[@type="application/ld+json"])[1]) return {
+          "name"://npo-player-header/concat(@main-title,": ",@share-title),
           "date":adjust-dateTime-to-timezone(
-            dateTime($info/uploadDate),
-            duration("PT0S")
+            dateTime($info/uploadDate),duration("PT0S")
           ),
           "duration":$info/duration
         }
@@ -471,7 +464,14 @@ declare function xivid:npo($url as string) as object()? {
           "label":label,
           "url":src
         },
-        xivid:m3u8-to-json($stream)()
+        xivid:m3u8-to-json(
+          json-doc(
+            request-combine(
+              x"https://start-player.npo.nl/video/{$prid}/streams",
+              {"profile":"hls","quality":"npo","tokenId":$token2/token}
+            )/url
+          )/stream[not(exists(protection))]/src
+        )()
       }[exists(.())]
     }
   ))

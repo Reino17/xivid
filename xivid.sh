@@ -284,10 +284,7 @@ while true; do
   shift
 done
 
-if [[ $url =~ npostart.nl/live ]]; then
-  echo "xivid: url wordt niet ondersteund." 1>&2
-  exit 1
-elif [[ $url =~ nos.nl ]]; then
+if [[ $url =~ nos.nl ]]; then
   nos "$url"
 elif [[ $url =~ twitch.tv ]]; then
   twitch "$url"
