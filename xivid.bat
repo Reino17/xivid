@@ -292,49 +292,49 @@ IF NOT "%url:npostart.nl/live=%"=="%url%" (
   CALL :twitch "%url%"
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
   CALL :twitter "%url%"
-)
-
-FOR /F "delims=" %%A IN ('xidel --xquery ^"
-  let $extractors:^={
-        'npo':array{'npostart.nl'^,'gemi.st'}^,
-        'tvblik':array{'tvblik.nl'^,'uitzendinggemist.net'}^,
-        'rtl':array{'rtlxl.nl'^,'rtlnieuws.nl'}^,
-        'kijk':array{'kijk.nl'}^,
-        'regio':array{
-          'omropfryslan.nl'^,'rtvnoord.nl'^,'rtvdrenthe.nl'^,'rtvoost.nl'^,
-          'omroepwest.nl'^,'rijnmond.nl'^,'rtvutrecht.nl'^,'omroepgelderland.nl'^,
-          'omroepzeeland.nl'^,'omroepbrabant.nl'^,'l1.nl'
+) ELSE (
+  FOR /F "delims=" %%A IN ('xidel --xquery ^"
+    let $extractors:^={
+          'npo':array{'npostart.nl'^,'gemi.st'}^,
+          'rtl':array{'rtlxl.nl'^,'rtlnieuws.nl'}^,
+          'kijk':array{'kijk.nl'}^,
+          'tvblik':array{'tvblik.nl'^,'uitzendinggemist.net'}^,
+          'regio':array{
+            'omropfryslan.nl'^,'rtvnoord.nl'^,'rtvdrenthe.nl'^,'rtvoost.nl'^,
+            'omroepwest.nl'^,'rijnmond.nl'^,'rtvutrecht.nl'^,'omroepgelderland.nl'^,
+            'omroepzeeland.nl'^,'omroepbrabant.nl'^,'l1.nl'
+          }^,
+          'nhnieuws':array{'nhnieuws.nl'^,'at5.nl'}^,
+          'ofl':array{'omroepflevoland.nl'}^,
+          'dumpert':array{'dumpert.nl'}^,
+          'autojunk':array{'autojunk.nl'}^,
+          'abhd':array{'abhd.nl'}^,
+          'autoblog':array{'autoblog.nl'}^,
+          'telegraaf':array{'telegraaf.nl'}^,
+          'ad':array{'ad.nl'}^,
+          'lc':array{'lc.nl'}^,
+          'youtube':array{'youtube.com'^,'youtu.be'}^,
+          'vimeo':array{'vimeo.com'}^,
+          'dailymotion':array{'dailymotion.com'}^,
+          'mixcloud':array{'mixcloud.com'}^,
+          'soundcloud':array{'soundcloud.com'}^,
+          'facebook':array{'facebook.com'^,'fb.watch'}^,
+          'instagram':array{'instagram.com'}^,
+          'pornhub':array{'pornhub.com'}
         }^,
-        'nhnieuws':array{'nhnieuws.nl'^,'at5.nl'}^,
-        'ofl':array{'omroepflevoland.nl'}^,
-        'dumpert':array{'dumpert.nl'}^,
-        'autojunk':array{'autojunk.nl'}^,
-        'abhd':array{'abhd.nl'}^,
-        'autoblog':array{'autoblog.nl'}^,
-        'telegraaf':array{'telegraaf.nl'}^,
-        'ad':array{'ad.nl'}^,
-        'lc':array{'lc.nl'}^,
-        'youtube':array{'youtube.com'^,'youtu.be'}^,
-        'vimeo':array{'vimeo.com'}^,
-        'dailymotion':array{'dailymotion.com'}^,
-        'mixcloud':array{'mixcloud.com'}^,
-        'soundcloud':array{'soundcloud.com'}^,
-        'facebook':array{'facebook.com'^,'fb.watch'}^,
-        'instagram':array{'instagram.com'}^,
-        'pornhub':array{'pornhub.com'}
-      }^,
-      $temp:^=tokenize^(request-decode^('%url%'^)/host^,'\.'^)^,
-      $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
-  for $x in $extractors^(^)
-  return
-  if ^($extractors^($x^) ^= $host^) then ^(
-    json:^=eval^(x'xivid:{$x}^(''%url%''^)'^)^,
-    extractor:^=$x^,
-    fmts:^=join^($json/^(formats^)^(^)/id^)
-  ^)
-  else
-    ^(^)
-^" --output-format^=cmd') DO %%A
+        $temp:^=tokenize^(request-decode^('%url%'^)/host^,'\.'^)^,
+        $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
+    for $x in $extractors^(^)
+    return
+    if ^($extractors^($x^) ^= $host^) then ^(
+      json:^=eval^(x'xivid:{$x}^(''%url%''^)'^)^,
+      extractor:^=$x^,
+      fmts:^=join^($json/^(formats^)^(^)/id^)
+    ^)
+    else
+      ^(^)
+  ^" --output-format^=cmd') DO %%A
+)
 
 IF NOT DEFINED extractor (
   ECHO xivid: url wordt niet ondersteund.
