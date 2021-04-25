@@ -8438,19 +8438,20 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])'
   "name": "Strongest orgasm with magic wand in my life - Mini Diva",
   "embedUrl": "https://nl.pornhub.com/embed/ph5c8e7e44e1da9",
   "duration": "PT00H09M09S",
-  "thumbnailUrl": "https://ci.phncdn.com/videos/201903/17/213567022/thumbs_15/(m=eaAaGwObaaaa)(mh=y9U5PUCUUhw4TvQr)11.jpg",
+  "thumbnailUrl": "https://di.phncdn.com/videos/201903/17/213567022/thumbs_15/(m=eaAaGwObaaaa)(mh=y9U5PUCUUhw4TvQr)11.jpg",
   "uploadDate": "2019-03-17T17:12:50+00:00",
   "description": [...],
+  "author": "Mini Diva",
   "interactionStatistic": [
     {
       "@type": "InteractionCounter",
       "interactionType": "http://schema.org/WatchAction",
-      "userInteractionCount": "993 658"
+      "userInteractionCount": "1 234 998"
     },
     {
       "@type": "InteractionCounter",
       "interactionType": "http://schema.org/LikeAction",
-      "userInteractionCount": "7 300"
+      "userInteractionCount": "9 557"
     }
   ]
 }
@@ -8460,61 +8461,124 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])'
 Alle "media_"-streams incl. bijbehorende "ra"-variabelen:
 
 $ xidel -se 'doc("'$url'")//div[@id="player"]/tokenize(script,"flashvars.+?;")[contains(.,"var media_")]'
-var raf00sjayu3kra65raf00sjayu3kra65="f00sJAYu3K";var rapgfwrnalcara63rapgfwrnalcara63="pGfwrNA" + "lca";var ramp4validra80ramp4validra80=".mp4?valid";var rahttpsevra73rahttpsevra73="https://ev";var radto160545ra74radto160545ra74="dto=1" + "60545";var rah32fryhsra73rah32fryhsra73="h=3%2FryHS";var ra51893valira67ra51893valira67="51893&vali";var raphncdncora37raphncdncora37=".phncdn.co";var ra1400khasra69ra1400khasra69="=1400k&has";var rafrom16054ra80rafrom16054ra80="from=16054";var rak3dra83rak3dra83="k%3D";var ra135670221ra69ra135670221ra69="1356702" + "2/1";var ra9093ratera89ra9093ratera89="9093&rate=";var ra01903172ra87ra01903172ra87="01903/17/" + "2";var ra080p8000kra65ra080p8000kra65="080P_" + "8000K";var ra213567022ra73ra213567022ra73="_213567022";var ramvideos2ra82ramvideos2ra82="m/video" + "s/2";var ra500kburstra51ra500kburstra51="500k&burs" + "t";var media_0=/* + ra213567022ra73ra213567022ra73 + */rahttpsevra73rahttpsevra73 + /* + rapgfwrnalcara63rapgfwrnalcara63 + */raphncdncora37raphncdncora37 + /* + ra51893valira67ra51893valira67 + */ramvideos2ra82ramvideos2ra82 + /* + radto160545ra74radto160545ra74 + */ra01903172ra87ra01903172ra87 + /* + ra500kburstra51ra500kburstra51 + */ra135670221ra69ra135670221ra69 + /* + ra01903172ra87ra01903172ra87 + */ra080p8000kra65ra080p8000kra65 + /* + raphncdncora37raphncdncora37 + */ra213567022ra73ra213567022ra73 + /* + rak3dra83rak3dra83 + */ramp4validra80ramp4validra80 + /* + ra1400khasra69ra1400khasra69 + */rafrom16054ra80rafrom16054ra80 + /* + ra500kburstra51ra500kburstra51 + */ra51893valira67ra51893valira67 + /* + rak3dra83rak3dra83 + */radto160545ra74radto160545ra74 + /* + ra01903172ra87ra01903172ra87 + */ra9093ratera89ra9093ratera89 + /* + ramvideos2ra82ramvideos2ra82 + */ra500kburstra51ra500kburstra51 + /* + ra51893valira67ra51893valira67 + */ra1400khasra69ra1400khasra69 + /* + ra9093ratera89ra9093ratera89 + */rah32fryhsra73rah32fryhsra73 + /* + radto160545ra74radto160545ra74 + */rapgfwrnalcara63rapgfwrnalcara63 + /* + rak3dra83rak3dra83 + */raf00sjayu3kra65raf00sjayu3kra65 + /* + raphncdncora37raphncdncora37 + */rak3dra83rak3dra83;
+
+		var raornhubra64raornhubra64="ornhu" + "b";var rahttpsra17rahttpsra17="https:";var raky2e3yra90raky2e3yra90="kY2E3" + "Y";var raideogra87raideogra87="ideo/g";var racomvra46racomvra46=".com/v";var radu4mzrra32radu4mzrra32="DU4Mz" + "R";var ranqiojera14ranqiojera14="nQiOjE";var ralmmuznra98ralmmuznra98="lMmUzN";var ratpra88ratpra88="t=p";var rajy3ndmra17rajy3ndmra17="jY3NDM";var ra3mdgymra14ra3mdgymra14="3MDgyM";var ramy0mgyra17ramy0mgyra17="mY0MGY";var rajnyisira27rajnyisira27="jNyIs" + "I";var ratiwnjjra91ratiwnjjra91="TIwNjJ";var rajzguxmra86rajzguxmra86="jZGUxM";var raiasera93raiasera93="ia?s=" + "e";var ra2mtkxora90ra2mtkxora90="2MTkxO";var ra9e0ra59ra9e0ra59="9&e=0" + "&";var ra5c8e7era77ra5c8e7era77="5c8e7" + "e";var raindvkyra43raindvkyra43="iNDVkY";var ranlpra72ranlpra72="//nl." + "p";var raznmmdbra74raznmmdbra74="zNmMD" + "B";var razblmgzra20razblmgzra20="zBlMG" + "Z";var raetmedra36raetmedra36="et_me" + "d";var ra2m2vimra88ra2m2vimra88="2M2Vi" + "M";var ratbmnmnra17ratbmnmnra17="TBmNm" + "N";var ra9vphra13ra9vphra13="9&v=p" + "h";var ra44e1dara64ra44e1dara64="44e1d" + "a";var rawnlodrra100rawnlodrra100="WNlOD" + "R";var raiogy0zra24raiogy0zra24="iOGY0" + "Z";var rayjrijora88rayjrijora88="yJrIjo";var media_0=/* + raornhubra64raornhubra64 + */rahttpsra17rahttpsra17 + /* + radu4mzrra32radu4mzrra32 + */ranlpra72ranlpra72 + /* + racomvra46racomvra46 + */raornhubra64raornhubra64 + /* + ratiwnjjra91ratiwnjjra91 + */racomvra46racomvra46 + /* + ratbmnmnra17ratbmnmnra17 + */raideogra87raideogra87 + /* + ratiwnjjra91ratiwnjjra91 + */raetmedra36raetmedra36 + /* + rajnyisira27rajnyisira27 + */raiasera93raiasera93 + /* + razblmgzra20razblmgzra20 + */rayjrijora88rayjrijora88 + /* + ranlpra72ranlpra72 + */raiogy0zra24raiogy0zra24 + /* + ra2m2vimra88ra2m2vimra88 + */ramy0mgyra17ramy0mgyra17 + /* + raornhubra64raornhubra64 + */ra3mdgymra14ra3mdgymra14 + /* + raiogy0zra24raiogy0zra24 + */razblmgzra20razblmgzra20 + /* + racomvra46racomvra46 + */raky2e3yra90raky2e3yra90 + /* + rajy3ndmra17rajy3ndmra17 + */raznmmdbra74raznmmdbra74 + /* + ramy0mgyra17ramy0mgyra17 + */raindvkyra43raindvkyra43 + /* + ra44e1dara64ra44e1dara64 + */ratbmnmnra17ratbmnmnra17 + /* + ra2m2vimra88ra2m2vimra88 + */rajzguxmra86rajzguxmra86 + /* + raindvkyra43raindvkyra43 + */rajy3ndmra17rajy3ndmra17 + /* + raindvkyra43raindvkyra43 + */ra2m2vimra88ra2m2vimra88 + /* + rahttpsra17rahttpsra17 + */rawnlodrra100rawnlodrra100 + /* + raetmedra36raetmedra36 + */ralmmuznra98ralmmuznra98 + /* + rawnlodrra100rawnlodrra100 + */radu4mzrra32radu4mzrra32 + /* + ra2m2vimra88ra2m2vimra88 + */rajnyisira27rajnyisira27 + /* + ranlpra72ranlpra72 + */ranqiojera14ranqiojera14 + /* + raornhubra64raornhubra64 + */ra2mtkxora90ra2mtkxora90 + /* + rajzguxmra86rajzguxmra86 + */ratiwnjjra91ratiwnjjra91 + /* + raiogy0zra24raiogy0zra24 + */ra9vphra13ra9vphra13 + /* + ra9e0ra59ra9e0ra59 + */ra5c8e7era77ra5c8e7era77 + /* + raky2e3yra90raky2e3yra90 + */ra44e1dara64ra44e1dara64 + /* + ratiwnjjra91ratiwnjjra91 + */ra9e0ra59ra9e0ra59 + /* + ratiwnjjra91ratiwnjjra91 + */ratpra88ratpra88;
 [...]
 
-Verwijder de aanhalingstekens en de +jes in alle "ra"-variabelen en sorteer de streams op resolutie, waarbij "media_0" de hoogste resolutie heeft en "media_8" de laagste:
-$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] order by extract($x,"media_(\d+)",1) descending return $x'
-var ra2000k2ra85ra2000k2ra85=2000K,2;var rap4urlsra88rap4urlsra88=p4.urls;var ra67022ra99ra67022ra99=67022/,;var rahttpsra79rahttpsra79=https:/;var ra3l0hra60ra3l0hra60=3&l=0&h;var radra88radra88=d;var rak2135ra70rak2135ra70=K,_2135;var ra172135ra77ra172135ra77=17/2135;var raomhlsra64raomhlsra64=om/hls/;var ra4829f3era17ra4829f3era17=4829f3e;var rab661c11ra7rab661c11ra7=b661c11;var rak480pra55rak480pra55=K,480P_;var radvhpra19radvhpra19=/dv-h.p;var raetmastra43raetmastra43=et/mast;var ra2e481bcra28ra2e481bcra28=2e481bc;var rahncdncra48rahncdncra48=hncdn.c;var raash893ra45raash893ra45=ash=893;var ra0p4000ra82ra0p4000ra82=0P_4000;var ra4d0c712ra48ra4d0c712ra48=4d0c712;var rattl16ra10rattl16ra10=?ttl=16;var ra201903ra49ra201903ra49=201903/;var ra67022mra57ra67022mra57=67022.m;var ra40p400ra59ra40p400ra59=40P_400;var ra0545909ra43ra0545909ra43=0545909;var ra1080p4ra84ra1080p4ra84=1080P_4;var ra000k72ra32ra000k72ra32=000K,72;var ravideosra100ravideosra100=videos/;var raerm3u8ra92raerm3u8ra92=er.m3u8;var media_8=/* + ra0545909ra43ra0545909ra43 + */rahttpsra79rahttpsra79 + /* + ra172135ra77ra172135ra77 + */radvhpra19radvhpra19 + /* + raash893ra45raash893ra45 + */rahncdncra48rahncdncra48 + /* + ra1080p4ra84ra1080p4ra84 + */raomhlsra64raomhlsra64 + /* + radvhpra19radvhpra19 + */ravideosra100ravideosra100 + /* + ra3l0hra60ra3l0hra60 + */ra201903ra49ra201903ra49 + /* + rahncdncra48rahncdncra48 + */ra172135ra77ra172135ra77 + /* + rattl16ra10rattl16ra10 + */ra67022ra99ra67022ra99 + /* + rap4urlsra88rap4urlsra88 + */ra1080p4ra84ra1080p4ra84 + /* + ra000k72ra32ra000k72ra32 + */ra000k72ra32ra000k72ra32 + /* + raomhlsra64raomhlsra64 + */ra0p4000ra82ra0p4000ra82 + /* + raetmastra43raetmastra43 + */rak480pra55rak480pra55 + /* + rak2135ra70rak2135ra70 + */ra2000k2ra85ra2000k2ra85 + /* + ra67022ra99ra67022ra99 + */ra40p400ra59ra40p400ra59 + /* + radra88radra88 + */rak2135ra70rak2135ra70 + /* + rak2135ra70rak2135ra70 + */ra67022mra57ra67022mra57 + /* + ra000k72ra32ra000k72ra32 + */rap4urlsra88rap4urlsra88 + /* + raomhlsra64raomhlsra64 + */raetmastra43raetmastra43 + /* + radra88radra88 + */raerm3u8ra92raerm3u8ra92 + /* + ra1080p4ra84ra1080p4ra84 + */rattl16ra10rattl16ra10 + /* + ra1080p4ra84ra1080p4ra84 + */ra0545909ra43ra0545909ra43 + /* + radvhpra19radvhpra19 + */ra3l0hra60ra3l0hra60 + /* + rahttpsra79rahttpsra79 + */raash893ra45raash893ra45 + /* + ra67022ra99ra67022ra99 + */ra4d0c712ra48ra4d0c712ra48 + /* + ra000k72ra32ra000k72ra32 + */ra2e481bcra28ra2e481bcra28 + /* + radra88radra88 + */rab661c11ra7rab661c11ra7 + /* + rab661c11ra7rab661c11ra7 + */ra4829f3era17ra4829f3era17 + /* + raash893ra45raash893ra45 + */radra88radra88;
+Verwijder de aanhalingstekens en de +jes in alle "ra"-variabelen:
 
-Alle variabele-namen-strings in de "media_"-variabele
+$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return $x'
 
-$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] order by extract($x,"media_(\d+)",1) descending return extract($x,"\*/(\w+)",1,"*")'
-rahttpsra79rahttpsra79
-radvhpra19radvhpra19
-rahncdncra48rahncdncra48
-raomhlsra64raomhlsra64
-ravideosra100ravideosra100
-ra201903ra49ra201903ra49
-ra172135ra77ra172135ra77
-ra67022ra99ra67022ra99
-ra1080p4ra84ra1080p4ra84
-ra000k72ra32ra000k72ra32
-ra0p4000ra82ra0p4000ra82
-rak480pra55rak480pra55
-ra2000k2ra85ra2000k2ra85
-ra40p400ra59ra40p400ra59
-rak2135ra70rak2135ra70
-ra67022mra57ra67022mra57
-rap4urlsra88rap4urlsra88
-raetmastra43raetmastra43
-raerm3u8ra92raerm3u8ra92
-rattl16ra10rattl16ra10
-ra0545909ra43ra0545909ra43
-ra3l0hra60ra3l0hra60
-raash893ra45raash893ra45
-ra4d0c712ra48ra4d0c712ra48
-ra2e481bcra28ra2e481bcra28
-rab661c11ra7rab661c11ra7
-ra4829f3era17ra4829f3era17
-radra88radra88
+		var raornhubra64raornhubra64=ornhub;var rahttpsra17rahttpsra17=https:;var raky2e3yra90raky2e3yra90=kY2E3Y;var raideogra87raideogra87=ideo/g;var racomvra46racomvra46=.com/v;var radu4mzrra32radu4mzrra32=DU4MzR;var ranqiojera14ranqiojera14=nQiOjE;var ralmmuznra98ralmmuznra98=lMmUzN;var ratpra88ratpra88=t=p;var rajy3ndmra17rajy3ndmra17=jY3NDM;var ra3mdgymra14ra3mdgymra14=3MDgyM;var ramy0mgyra17ramy0mgyra17=mY0MGY;var rajnyisira27rajnyisira27=jNyIsI;var ratiwnjjra91ratiwnjjra91=TIwNjJ;var rajzguxmra86rajzguxmra86=jZGUxM;var raiasera93raiasera93=ia?s=e;var ra2mtkxora90ra2mtkxora90=2MTkxO;var ra9e0ra59ra9e0ra59=9&e=0&;var ra5c8e7era77ra5c8e7era77=5c8e7e;var raindvkyra43raindvkyra43=iNDVkY;var ranlpra72ranlpra72=//nl.p;var raznmmdbra74raznmmdbra74=zNmMDB;var razblmgzra20razblmgzra20=zBlMGZ;var raetmedra36raetmedra36=et_med;var ra2m2vimra88ra2m2vimra88=2M2ViM;var ratbmnmnra17ratbmnmnra17=TBmNmN;var ra9vphra13ra9vphra13=9&v=ph;var ra44e1dara64ra44e1dara64=44e1da;var rawnlodrra100rawnlodrra100=WNlODR;var raiogy0zra24raiogy0zra24=iOGY0Z;var rayjrijora88rayjrijora88=yJrIjo;var media_0=/* + raornhubra64raornhubra64 + */rahttpsra17rahttpsra17 + /* + radu4mzrra32radu4mzrra32 + */ranlpra72ranlpra72 + /* + racomvra46racomvra46 + */raornhubra64raornhubra64 + /* + ratiwnjjra91ratiwnjjra91 + */racomvra46racomvra46 + /* + ratbmnmnra17ratbmnmnra17 + */raideogra87raideogra87 + /* + ratiwnjjra91ratiwnjjra91 + */raetmedra36raetmedra36 + /* + rajnyisira27rajnyisira27 + */raiasera93raiasera93 + /* + razblmgzra20razblmgzra20 + */rayjrijora88rayjrijora88 + /* + ranlpra72ranlpra72 + */raiogy0zra24raiogy0zra24 + /* + ra2m2vimra88ra2m2vimra88 + */ramy0mgyra17ramy0mgyra17 + /* + raornhubra64raornhubra64 + */ra3mdgymra14ra3mdgymra14 + /* + raiogy0zra24raiogy0zra24 + */razblmgzra20razblmgzra20 + /* + racomvra46racomvra46 + */raky2e3yra90raky2e3yra90 + /* + rajy3ndmra17rajy3ndmra17 + */raznmmdbra74raznmmdbra74 + /* + ramy0mgyra17ramy0mgyra17 + */raindvkyra43raindvkyra43 + /* + ra44e1dara64ra44e1dara64 + */ratbmnmnra17ratbmnmnra17 + /* + ra2m2vimra88ra2m2vimra88 + */rajzguxmra86rajzguxmra86 + /* + raindvkyra43raindvkyra43 + */rajy3ndmra17rajy3ndmra17 + /* + raindvkyra43raindvkyra43 + */ra2m2vimra88ra2m2vimra88 + /* + rahttpsra17rahttpsra17 + */rawnlodrra100rawnlodrra100 + /* + raetmedra36raetmedra36 + */ralmmuznra98ralmmuznra98 + /* + rawnlodrra100rawnlodrra100 + */radu4mzrra32radu4mzrra32 + /* + ra2m2vimra88ra2m2vimra88 + */rajnyisira27rajnyisira27 + /* + ranlpra72ranlpra72 + */ranqiojera14ranqiojera14 + /* + raornhubra64raornhubra64 + */ra2mtkxora90ra2mtkxora90 + /* + rajzguxmra86rajzguxmra86 + */ratiwnjjra91ratiwnjjra91 + /* + raiogy0zra24raiogy0zra24 + */ra9vphra13ra9vphra13 + /* + ra9e0ra59ra9e0ra59 + */ra5c8e7era77ra5c8e7era77 + /* + raky2e3yra90raky2e3yra90 + */ra44e1dara64ra44e1dara64 + /* + ratiwnjjra91ratiwnjjra91 + */ra9e0ra59ra9e0ra59 + /* + ratiwnjjra91ratiwnjjra91 + */ratpra88ratpra88;
+[...]
+
+Alle variabele-namen-strings in de "media_"-variabele:
+
+$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return extract($x,"\*/(\w+)",1,"*")'
+rahttpsra17rahttpsra17
+ranlpra72ranlpra72
+raornhubra64raornhubra64
+racomvra46racomvra46
+raideogra87raideogra87
+raetmedra36raetmedra36
+raiasera93raiasera93
+rayjrijora88rayjrijora88
+raiogy0zra24raiogy0zra24
+ramy0mgyra17ramy0mgyra17
+ra3mdgymra14ra3mdgymra14
+razblmgzra20razblmgzra20
+raky2e3yra90raky2e3yra90
+raznmmdbra74raznmmdbra74
+raindvkyra43raindvkyra43
+ratbmnmnra17ratbmnmnra17
+rajzguxmra86rajzguxmra86
+rajy3ndmra17rajy3ndmra17
+ra2m2vimra88ra2m2vimra88
+rawnlodrra100rawnlodrra100
+ralmmuznra98ralmmuznra98
+radu4mzrra32radu4mzrra32
+rajnyisira27rajnyisira27
+ranqiojera14ranqiojera14
+ra2mtkxora90ra2mtkxora90
+ratiwnjjra91ratiwnjjra91
+ra9vphra13ra9vphra13
+ra5c8e7era77ra5c8e7era77
+ra44e1dara64ra44e1dara64
+ra9e0ra59ra9e0ra59
+ratpra88ratpra88
+[...]
 
 Haal in $x de waarde van deze variabelen op:
 
-$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] order by extract($x,"media_(\d+)",1) descending return join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))'
-https:/ /dv-h.p hncdn.c om/hls/ videos/ 201903/ 17/2135 67022/, 1080P_4 000K,72 0P_4000 K,480P_ 2000K,2 40P_400 K,_2135 67022.m p4.urls et/mast er.m3u8 ?ttl=16 0545909 3&l=0&h ash=893 4d0c712 2e481bc b661c11 4829f3e d
-https://d v-h.phncd n.com/hls /videos/2 01903/17/ 213567022 /240P_400 K_2135670 22.mp4/ma ster.m3u8 ?ttl=1605 459093&l= 0&hash=4d cecdf1a4e afd2f55af 5a3728151 ccf
-https://ev .phncdn.co m/videos/2 01903/17/2 13567022/2 40P_400K_2 13567022.m p4?validfr om=1605451 893&validt o=16054590 93&rate=50 0k&burst=1 400k&hash= fUNUyRD6%2 FHhi2twdsu TGf8TrvEE% 3D
-https:/ /dv-h.p hncdn.c om/hls/ videos/ 201903/ 17/2135 67022/4 80P_200 0K_2135 67022.m p4/mast er.m3u8 ?ttl=16 0545909 3&l=0&h ash=453 3b76695 1b27c9f c243a21 77287a9 7
-https://e v.phncdn. com/video s/201903/ 17/213567 022/480P_ 2000K_213 567022.mp 4?validfr om=160545 1893&vali dto=16054 59093&rat e=500k&bu rst=1400k &hash=PAu %2FPbYPYs TfemRsyc1 %2BRhjRO5 Q%3D
-https ://dv -h.ph ncdn. com/h ls/vi deos/ 20190 3/17/ 21356 7022/ 720P_ 4000K _2135 67022 .mp4/ maste r.m3u 8?ttl =1605 45909 3&l=0 &hash =2ff0 e7ae0 5f360 654d2 6b7c5 80294 46b
-https://e v.phncdn. com/video s/201903/ 17/213567 022/720P_ 4000K_213 567022.mp 4?validfr om=160545 1893&vali dto=16054 59093&rat e=500k&bu rst=1400k &hash=6Gf tAhqxcU8c vhWK1Zn13 l%2FoPa0% 3D
-https://d v-h.phncd n.com/hls /videos/2 01903/17/ 213567022 /1080P_80 00K_21356 7022.mp4/ master.m3 u8?ttl=16 05459093& l=0&hash= bdf8d3638 501a3aa78 f4d64fdf8 4c74e
-https://ev .phncdn.co m/videos/2 01903/17/2 13567022/1 080P_8000K _213567022 .mp4?valid from=16054 51893&vali dto=160545 9093&rate= 500k&burst =1400k&has h=3%2FryHS pGfwrNAlca f00sJAYu3K k%3D
+$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))'
+https: //nl.p ornhub .com/v ideo/g et_med ia?s=e yJrIjo iOGY0Z mY0MGY 3MDgyM zBlMGZ kY2E3Y zNmMDB iNDVkY TBmNmN jZGUxM jY3NDM 2M2ViM WNlODR lMmUzN DU4MzR jNyIsI nQiOjE 2MTkxO TIwNjJ 9&v=ph 5c8e7e 44e1da 9&e=0& t=p
+https://n l.pornhub .com/vide o/get_med ia?s=eyJr IjoiOGY0Z mY0MGY3MD gyMzBlMGZ kY2E3YzNm MDBiNDVkY TBmNmNjZG UxMjY3NDM 2M2ViMWNl ODRlMmUzN DU4MzRjNy IsInQiOjE 2MTkxOTIw NjJ9&v=ph 5c8e7e44e 1da9&e=0&t=a
+
+"t=p" en "t=a" zullen waarschijnlijk staan voor "type=progressive" en "type=adaptive". De JSON die deze urls bevatten:
+
+$ xidel -s --xquery 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return json-doc(string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")))'
+[
+  {
+    "defaultQuality": false,
+    "format": "mp4",
+    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/240P_400K_213567022.mp4?[...]",
+    "quality": "240"
+  },
+  {
+    "defaultQuality": false,
+    "format": "mp4",
+    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/480P_2000K_213567022.mp4?[...]",
+    "quality": "480"
+  },
+  {
+    "defaultQuality": true,
+    "format": "mp4",
+    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/720P_4000K_213567022.mp4?[...]",
+    "quality": "720"
+  },
+  {
+    "defaultQuality": false,
+    "format": "mp4",
+    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/1080P_8000K_213567022.mp4?[...]",
+    "quality": "1080"
+  }
+]
+[
+  {
+    "defaultQuality": false,
+    "format": "hls",
+    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/1080P_8000K_213567022.mp4/master.m3u8?[...]",
+    "quality": "1080"
+  },
+  {
+    "defaultQuality": false,
+    "format": "hls",
+    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/240P_400K_213567022.mp4/master.m3u8?[...]",
+    "quality": "240"
+  },
+  {
+    "defaultQuality": false,
+    "format": "hls",
+    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/480P_2000K_213567022.mp4/master.m3u8?[...]",
+    "quality": "480"
+  },
+  {
+    "defaultQuality": true,
+    "format": "hls",
+    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/720P_4000K_213567022.mp4/master.m3u8?[...]",
+    "quality": "720"
+  },
+  {
+    "defaultQuality": 720,
+    "format": "hls",
+    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/master.m3u8?[...]",
+    "quality": [1080, 720, 480]
+  }
+]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --module=xivid.xqm --xquery 'let $src:=doc("'$url'"),$info:=parse-json($src//script[@type="application/ld+json"]),$fmts:=for $x in $src//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] order by extract($x,"media_(\d+)",1) descending return string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")) return {"name":"Pornhub: "||$info/name,"date":dateTime($info/uploadDate),"duration":duration($info/duration),"formats":array{for $x at $i in $fmts[not(contains(.,"m3u8"))] count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x},xivid:m3u8-to-json($fmts[1])()}}'
+$ xidel -s --module=xivid.xqm --xquery 'let $src:=doc("'$url'"),$info:=parse-json($src//script[@type="application/ld+json"]),$fmts:=for $x in $src//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return json-doc(string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")))() return {"name":"Pornhub: "||$info/name,"date":dateTime($info/uploadDate),"duration":duration($info/duration),"formats":array{for $x at $i in $fmts[format="mp4"] return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()}}'
 {
   "name": "Pornhub: Strongest orgasm with magic wand in my life - Mini Diva",
   "date": "2019-03-17T17:12:50Z",
@@ -8524,34 +8588,90 @@ $ xidel -s --module=xivid.xqm --xquery 'let $src:=doc("'$url'"),$info:=parse-jso
       "id": "pg-1",
       "format": "mp4[h264+aac]",
       "resolution": "426x240",
-      "url": "https://dv.phncdn.com/videos/201903/17/213567022/240P_400K_213567022.mp4?[...]"
+      "url": "https://ev.phncdn.com/videos/201903/17/213567022/240P_400K_213567022.mp4?[...]"
     },
     [...]
     {
       "id": "pg-4",
       "format": "mp4[h264+aac]",
       "resolution": "1920x1080",
-      "url": "https://dv.phncdn.com/videos/201903/17/213567022/1080P_8000K_213567022.mp4?[...]"
+      "url": "https://ev.phncdn.com/videos/201903/17/213567022/1080P_8000K_213567022.mp4?[...]"
     },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://dv-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_213567022.mp4.urlset/master.m3u8?[...]"
+      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/master.m3u8?[...]"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "426x240@29.98fps",
-      "bitrate": "198kbps",
-      "url": "https://dv-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_213567022.mp4.urlset/index-f4-v1-a1.m3u8?[...]"
+      "resolution": "854x480@29.98fps",
+      "bitrate": "536kbps",
+      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/index-f3-v1-a1.m3u8?[...]"
     },
     [...]
     {
-      "id": "hls-4",
+      "id": "hls-3",
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080@29.98fps",
       "bitrate": "1675kbps",
-      "url": "https://dv-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_213567022.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
+      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.pornhub.com/embed/ph5e84c98a60012   # Embedded video met ondertiteling.
+
+$ xidel -se 'if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'"'
+https://www.pornhub.com/view_video.php?viewkey=ph5e84c98a60012
+
+$ xidel -se 'parse-json(extract(doc(if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'")//div[@id="player"]/script,"flashvars.+?(\{.+\})",1))/resolve-uri(closedCaptionsFile)'
+https://www.pornhub.com/video/caption?id=299204081&language_id=1&caption_type=0
+
+$ xidel -s --module=xivid.xqm --xquery 'let $src:=doc(if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'"),$info:=parse-json($src//script[@type="application/ld+json"]),$fmts:=for $x in $src//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return json-doc(string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")))() return {"name":"Pornhub: "||$info/parse-html(name),"date":dateTime($info/uploadDate),"duration":duration($info/duration),"formats":array{{"id":"sub-1","format":"srt","url":parse-json(extract($src//div[@id="player"]/script,"flashvars.+?(\{.+\})",1))/resolve-uri(closedCaptionsFile"'$url'")}[url],for $x at $i in $fmts[format="mp4"] return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()}}'
+{
+  "name": "Pornhub: CUM4K Multiple Dripping Creampies Deep Inside Soaked Pussy",
+  "date": "2020-04-01T17:05:23Z",
+  "duration": "PT10M19S",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "srt",
+      "url": "https://www.pornhub.com/video/caption?id=299204081&language_id=1&caption_type=0"
+    },
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "426x240",
+      "url": "https://ev.phncdn.com/videos/202004/01/299204081/240P_400K_299204081.mp4?[...]"
+    },
+    [...]
+    {
+      "id": "pg-3",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://ev.phncdn.com/videos/202004/01/299204081/720P_4000K_299204081.mp4?[...]"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://ev-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,_299204081.mp4.urlset/master.m3u8?[...]"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "854x480@59.92fps",
+      "bitrate": "1017kbps",
+      "url": "https://ev-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,_299204081.mp4.urlset/index-f2-v1-a1.m3u8?[...]"
+    },
+    {
+      "id": "hls-2",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720@59.92fps",
+      "bitrate": "1796kbps",
+      "url": "https://ev-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,_299204081.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
     }
   ]
 }
@@ -8559,31 +8679,42 @@ $ xidel -s --module=xivid.xqm --xquery 'let $src:=doc("'$url'"),$info:=parse-jso
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:pornhub($url as string) as object()? {
-  let $src:=doc($url),
+  let $src:=doc(
+        if (contains($url,"/embed/")) then
+          replace($url,"/embed/","/view_video.php?viewkey=")
+        else
+          $url
+      ),
       $info:=parse-json($src//script[@type="application/ld+json"]),
       $fmts:=for $x in $src//div[@id="player"]/tokenize(
         replace(script,"&quot; \+ &quot;|&quot;",""),
         "flashvars.+?;"
       )[contains(.,"var media_")]
-      order by extract($x,"media_(\d+)",1) descending
       return
-      string-join(
-        extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
-      )
+      json-doc(
+        string-join(
+          extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
+        )
+      )()
   return {
-    "name":"Pornhub: "||$info/name,
+    "name":"Pornhub: "||$info/parse-html(name),
     "date":dateTime($info/uploadDate),
     "duration":duration($info/duration),
     "formats":array{
-      for $x at $i in $fmts[not(contains(.,"m3u8"))]
-      count $i
-      return {
+      {
+        "id":"sub-1",
+        "format":"srt",
+        "url":parse-json(
+          extract($src//div[@id="player"]/script,"flashvars.+?(\{.+\})",1)
+        )/resolve-uri(closedCaptionsFile,$url)
+      }[url],
+      for $x at $i in $fmts[format="mp4"] return {
         "id":"pg-"||$i,
         "format":"mp4[h264+aac]",
         "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
-        "url":$x
+        "url":$x/videoUrl
       },
-      xivid:m3u8-to-json($fmts[1])()
+      xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()
     }
   }
 };

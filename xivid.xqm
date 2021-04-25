@@ -1148,31 +1148,42 @@ declare function xivid:instagram($url as string) as object()? {
 };
 
 declare function xivid:pornhub($url as string) as object()? {
-  let $src:=doc($url),
+  let $src:=doc(
+        if (contains($url,"/embed/")) then
+          replace($url,"/embed/","/view_video.php?viewkey=")
+        else
+          $url
+      ),
       $info:=parse-json($src//script[@type="application/ld+json"]),
       $fmts:=for $x in $src//div[@id="player"]/tokenize(
         replace(script,"&quot; \+ &quot;|&quot;",""),
         "flashvars.+?;"
       )[contains(.,"var media_")]
-      order by extract($x,"media_(\d+)",1) descending
       return
-      string-join(
-        extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
-      )
+      json-doc(
+        string-join(
+          extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
+        )
+      )()
   return {
-    "name":"Pornhub: "||$info/name,
+    "name":"Pornhub: "||$info/parse-html(name),
     "date":dateTime($info/uploadDate),
     "duration":duration($info/duration),
     "formats":array{
-      for $x at $i in $fmts[not(contains(.,"m3u8"))]
-      count $i
-      return {
+      {
+        "id":"sub-1",
+        "format":"srt",
+        "url":parse-json(
+          extract($src//div[@id="player"]/script,"flashvars.+?(\{.+\})",1)
+        )/resolve-uri(closedCaptionsFile,$url)
+      }[url],
+      for $x at $i in $fmts[format="mp4"] return {
         "id":"pg-"||$i,
         "format":"mp4[h264+aac]",
         "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
-        "url":$x
+        "url":$x/videoUrl
       },
-      xivid:m3u8-to-json($fmts[1])()
+      xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()
     }
   }
 };
