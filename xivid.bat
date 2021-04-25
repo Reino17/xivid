@@ -57,37 +57,6 @@ ECHO   xivid.bat -i https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724
 ECHO   xivid.bat -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EXIT /B
 
-:nos
-FOR /F "delims=" %%A IN ('xidel "%~1" -e ^"
-  let $a:^=json^(
-    //script[ends-with^(@data-ssr-name^,'VideoPlayer'^) or @data-ssr-name^='pages/Article/Article']
-  ^)/^(.//video^,.^)[1] return
-  json:^=if ^(//video/@data-type^='livestream'^) then {
-    'name':concat^(
-      'NOS: '^,
-      //h1[ends-with^(@class^,'__title'^)]^,
-      ' Livestream'
-    ^)^,
-    'date':format-date^(current-date^(^)^,'[D01]-[M01]-[Y]'^)^,
-    'formats':xivid:m3u8-to-json^(//@data-stream^)
-  } else {
-    'name':'NOS: '^|^|$a/title^,
-    'date':format-date^(
-      dateTime^(
-        replace^(
-          ^($a/published_at^,//@datetime^)[1]^,
-          '^(.+^)^(\d{2}^)'^,
-          '$1:$2'
-        ^)
-      ^)^,
-      '[D01]-[M01]-[Y]'
-    ^)^,
-    'duration':$a/duration * duration^('PT1S'^) + time^('00:00:00'^)^,
-    'formats':xivid:m3u8-to-json^($a/^(formats^)^(1^)/url/mp4^)
-  }
-^" --output-format^=cmd') DO %%A
-EXIT /B
-
 :twitch
 FOR /F "delims=" %%A IN ('xidel "%~1" --xquery ^"
   declare variable $id:^=extract^($url^,'.+/^(.+^)'^,1^)^;
@@ -283,9 +252,7 @@ IF NOT "%~1"=="" (
   EXIT /B 1
 )
 
-IF NOT "%url:nos.nl=%"=="%url%" (
-  CALL :nos "%url%"
-) ELSE IF NOT "%url:twitch.tv=%"=="%url%" (
+IF NOT "%url:twitch.tv=%"=="%url%" (
   CALL :twitch "%url%"
 ) ELSE IF NOT "%url:twitter.com=%"=="%url%" (
   CALL :twitter "%url%"
@@ -293,6 +260,7 @@ IF NOT "%url:nos.nl=%"=="%url%" (
   FOR /F "delims=" %%A IN ('xidel --xquery ^"
     let $extractors:^={
           'npo':array{'npostart.nl'^,'gemi.st'}^,
+          'nos':array{'nos.nl'}^,
           'rtl':array{'rtlxl.nl'^,'rtlnieuws.nl'}^,
           'kijk':array{'kijk.nl'}^,
           'tvblik':array{'tvblik.nl'^,'uitzendinggemist.net'}^,

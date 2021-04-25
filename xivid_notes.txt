@@ -6119,110 +6119,26 @@ declare function xivid:vimeo($url as string) as object()? {
 
 [nos]
 
-https://nos.nl/video/2308356-van-nieuwenhuizen-biedt-excuses-aan-voor-fouten-stint.html
+$ url=https://nos.nl/artikel/2378207-stafleider-navalny-overtuigd-van-rol-kremlin-bij-nepgesprek-met-tweede-kamer.html
 
-$ xidel -s "https://nos.nl/video/2308356-van-nieuwenhuizen-biedt-excuses-aan-voor-fouten-stint.html" -e 'parse-json(//script[ends-with(@data-ssr-name,"VideoPlayer")])'
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
 {
-  "id": 2308356,
-  "title": "Van Nieuwenhuizen biedt excuses aan voor fouten stint",
-  "poster": "https://nos.nl/data/image/2019/10/30/588578/xxl.jpg",
-  "formats": [
-    {
-      "width": 640,
-      "height": 360,
-      "name": "360p",
-      "label": "Laag - 360p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F10%2F30%2F246849-76251f8d49b26b36aaea7dadebcc599b%2F246849-76251f8d49b26b36aaea7dadebcc599b.ism%2F246849-76251f8d49b26b36aaea7dadebcc599b.m3u8"
-      }
-    },
-    {
-      "width": 1280,
-      "height": 720,
-      "name": "720p",
-      "label": "HD - 720p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F10%2F30%2F246849-76251f8d49b26b36aaea7dadebcc599b%2F246849-76251f8d49b26b36aaea7dadebcc599b.ism%2F246849-76251f8d49b26b36aaea7dadebcc599b.m3u8"
-      }
-    },
-    {
-      "width": 848,
-      "height": 480,
-      "name": "480p",
-      "label": "Normaal - 480p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F10%2F30%2F246849-76251f8d49b26b36aaea7dadebcc599b%2F246849-76251f8d49b26b36aaea7dadebcc599b.ism%2F246849-76251f8d49b26b36aaea7dadebcc599b.m3u8"
-      }
-    },
-    {
-      "width": 960,
-      "height": 540,
-      "name": "540p",
-      "label": "Hoog - 540p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F10%2F30%2F246849-76251f8d49b26b36aaea7dadebcc599b%2F246849-76251f8d49b26b36aaea7dadebcc599b.ism%2F246849-76251f8d49b26b36aaea7dadebcc599b.m3u8"
-      }
-    }
-  ],
-  "geoProtected": false,
-  "adConfig": "https://adconfig.ster.nl/adurl/[identifier]?ncc=[noCommercialCookies]&cust_params=omroep%3Dnos%26genre%3Dnieuws%26video_duur%3D61%26afleverings_titel%3Dvannieuwenhuizenbiedtexcusesaanvoorfoutenstint%26programma_titel%3Dnieuws",
-  "duration": 61,
-  "owner": "nieuws",
-  "showCaption": false
-}
-
-De m3u8-urls zijn allemaal hetzelfde! Het betreft hier het manifest.
-
-$ xidel -s --module=xivid.xqm "https://nos.nl/video/2308356-van-nieuwenhuizen-biedt-excuses-aan-voor-fouten-stint.html" -e 'let $a:=parse-json(//script[ends-with(@data-ssr-name,"VideoPlayer")]) return {"name":"NOS: "||$a/title,"date":format-date(dateTime(replace(//@datetime,"(.+)(\d{2})","$1:$2")),"[D01]-[M01]-[Y]"),"duration":$a/duration * duration("PT1S") + time("00:00:00"),"formats":xivid:m3u8-to-json($a/(formats)(1)/url/mp4)}'
-{
-  "name": "NOS: Van Nieuwenhuizen biedt excuses aan voor fouten stint",
-  "date": "30-10-2019",
-  "duration": "00:01:01",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m24be6d585b79227f005dc9f0cc000000.8bc28d1245f96afbbf7719c4a5a9f2f1/o/nos/content/video/2019/10/30/246849-76251f8d49b26b36aaea7dadebcc599b/246849-76251f8d49b26b36aaea7dadebcc599b.ism/246849-76251f8d49b26b36aaea7dadebcc599b.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "412|128kbps",
-      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m24be6d585b79227f005dc9f0cc000000.8bc28d1245f96afbbf7719c4a5a9f2f1/o/nos/content/video/2019/10/30/246849-76251f8d49b26b36aaea7dadebcc599b/246849-76251f8d49b26b36aaea7dadebcc599b.ism/246849-76251f8d49b26b36aaea7dadebcc599b-audio_eng=128000-video_eng=412000.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "1814|128kbps",
-      "url": "https://adaptive-e10c4b.npostreaming.nl/urishieldv2/l27m24be6d585b79227f005dc9f0cc000000.8bc28d1245f96afbbf7719c4a5a9f2f1/o/nos/content/video/2019/10/30/246849-76251f8d49b26b36aaea7dadebcc599b/246849-76251f8d49b26b36aaea7dadebcc599b.ism/246849-76251f8d49b26b36aaea7dadebcc599b-audio_eng=128000-video_eng=1814000.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-https://nos.nl/artikel/2311824-tesla-verkoopt-tienduizenden-cybertrucks-ondanks-kapotte-ruiten.html
-
-$ xidel -s https://nos.nl/artikel/2311824-tesla-verkoopt-tienduizenden-cybertrucks-ondanks-kapotte-ruiten.html -e 'parse-json(//script[ends-with(@data-ssr-name,"VideoPlayer") or @data-ssr-name="pages/Article/Article"])/(.//video,.)[1]'
-{
-  "id": 2311563,
-  "title": "Tesla medewerker gooit nieuwe auto kapot",
-  "description": "Tesla medewerker gooit nieuwe auto kapot",
+  "id": 2378198,
+  "title": "Echte Volkov trekt gekke bekken voor camera: 'Als ik een deepfake ben, kan dit niet'",
+  "description": "Leonid Volkov, stafchef van de Russische oppositieleider Aleksej Navalny, vertelt vandaag in gesprek met de NOS over zijn 'dubbelganger'. Nederlandse Tweede Kamerleden dachten deze week via Zoom met hem te spreken, maar werden bedrogen.",
   "geoprotection": false,
-  "pre_roll": "https://pubads.g.doubleclick.net/gampad/ads?sz=720x404&iu=/9233/npoplayer.nl/nosnieuws&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]&ad_rule=1&cust_params=omroep%3Dnos%26genre%3Dnos",
-  "pre_rolls": {
-    "consent": "https://pubads.g.doubleclick.net/gampad/ads?sz=720x404&iu=/9233/npoplayer.nl/nosnieuws&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]&ad_rule=1&cust_params=omroep%3Dnos%26genre%3Dnos",
-    "no_consent": "https://sterdfpproxy.ster.nl/gampad/ads?sz=720x404&iu=/9233/npoplayer.nl/nosnieuws&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]&ad_rule=1&cust_params=omroep%3Dnos%26genre%3Dnos",
-    "ad_config": "https://adconfig.ster.nl/adurl/[identifier]?ncc=[noCommercialCookies]&cust_params=omroep%3Dnos%26genre%3Djeugd%26video_duur%3D51%26afleverings_titel%3Dteslamedewerkergooitnieuweautokapot%26programma_titel%3Djeugdjournaal"
-  },
+  [...]
   "formats": [
+    {
+      "width": 960,
+      "height": 540,
+      "name": "540p",
+      "label": "Hoog - 540p",
+      "mimetype": "application/vnd.apple.mpegurl",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+      }
+    },
     {
       "width": 640,
       "height": 360,
@@ -6230,17 +6146,7 @@ $ xidel -s https://nos.nl/artikel/2311824-tesla-verkoopt-tienduizenden-cybertruc
       "label": "Laag - 360p",
       "mimetype": "application/vnd.apple.mpegurl",
       "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F11%2F22%2F248007-89413149430dd806a2ac05266c0d6592%2F248007-89413149430dd806a2ac05266c0d6592.ism%2F248007-89413149430dd806a2ac05266c0d6592.m3u8&legacy=resolve.php"
-      }
-    },
-    {
-      "width": 848,
-      "height": 480,
-      "name": "480p",
-      "label": "Normaal - 480p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F11%2F22%2F248007-89413149430dd806a2ac05266c0d6592%2F248007-89413149430dd806a2ac05266c0d6592.ism%2F248007-89413149430dd806a2ac05266c0d6592.m3u8&legacy=resolve.php"
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
       }
     },
     {
@@ -6250,7 +6156,124 @@ $ xidel -s https://nos.nl/artikel/2311824-tesla-verkoopt-tienduizenden-cybertruc
       "label": "HD - 720p",
       "mimetype": "application/vnd.apple.mpegurl",
       "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F11%2F22%2F248007-89413149430dd806a2ac05266c0d6592%2F248007-89413149430dd806a2ac05266c0d6592.ism%2F248007-89413149430dd806a2ac05266c0d6592.m3u8&legacy=resolve.php"
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+      }
+    },
+    {
+      "width": 848,
+      "height": 480,
+      "name": "480p",
+      "label": "Normaal - 480p",
+      "mimetype": "application/vnd.apple.mpegurl",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+      }
+    }
+  ],
+  "aspect_ratios": {
+    "ratio": "16:9",
+    "profiles": [
+      {
+        "name": "hls_unencrypted",
+        "mimetype": "application/vnd.apple.mpegurl",
+        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+      },
+      {
+        "name": "smooth_unencrypted",
+        "mimetype": "application/vnd.ms-sstr+xml",
+        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=smooth_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+      },
+      {
+        "name": "dash_unencrypted",
+        "mimetype": "application/dash+xml",
+        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=dash_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+      }
+    ]
+  },
+  [...]
+  "published_at": "2021-04-25T17:19:23+0200",
+  "duration": 86,
+  [...]
+}
+
+Alle urls in (formats)()/url/mp4 zijn precies dezelfde als aspect_ratios/(profiles)()[name="hls_unencrypted"]/url.
+
+$ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":aspect_ratios/profiles/array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":.()[name="dash_unencrypted"]/url})/url},xivid:m3u8-to-json(.()[name="hls_unencrypted"]/url)()}}'
+{
+  "name": "NOS: Echte Volkov trekt gekke bekken voor camera: 'Als ik een deepfake ben, kan dit niet'",
+  "date": "2021-04-25T15:19:23Z",
+  "duration": "PT1M26S",
+  "formats": [
+    {
+      "id": "dash-0",
+      "format": "mpd[manifest]",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/dash_unencrypted/[...]/stream.mpd"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/playlist.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360@25fps",
+      "bitrate": "397|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=396776.m3u8"
+    },
+    {
+      "id": "hls-2",
+      "format": "m3u8[h264+aac]",
+      "resolution": "960x540@25fps",
+      "bitrate": "1292|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=1291502.m3u8"
+    },
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720@25fps",
+      "bitrate": "1785|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=1784858.m3u8"
+    },
+    {
+      "id": "hls-4",
+      "format": "m3u8[h264+aac]",
+      "resolution": "848x480@25fps",   # Och, och, och, NOS toch!
+      "bitrate": "8855|128kbps",       # Een nul te veel in de bitrate?
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=8855220.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://nos.nl/artikel/2378116-persvrijheid-in-eu-landen-in-gevaar-het-zijn-kleine-stapjes-die-je-niet-doorhebt.html
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
+{
+  "id": 2341766,
+  "title": "Protest tegen ontslag Hongaarse hoofdredacteur: 'Grootste nieuwssite geruïneerd'",
+  "description": "In Boedapest zijn enkele duizenden betogers de straat opgegaan om te demonstreren tegen het ontslag van de hoofdredacteur van de nieuwssite index.hu, en om de medewerkers van de site die hierop zelf ontslag namen te steunen.",
+  [...]
+  "formats": [
+    {
+      "width": 848,
+      "height": 480,
+      "name": "480p",
+      "label": "Normaal - 480p",
+      "mimetype": "application/vnd.apple.mpegurl",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
+      }
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "name": "720p",
+      "label": "HD - 720p",
+      "mimetype": "application/vnd.apple.mpegurl",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
       }
     },
     {
@@ -6260,107 +6283,80 @@ $ xidel -s https://nos.nl/artikel/2311824-tesla-verkoopt-tienduizenden-cybertruc
       "label": "Hoog - 540p",
       "mimetype": "application/vnd.apple.mpegurl",
       "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?url=%2Fcontent%2Fvideo%2F2019%2F11%2F22%2F248007-89413149430dd806a2ac05266c0d6592%2F248007-89413149430dd806a2ac05266c0d6592.ism%2F248007-89413149430dd806a2ac05266c0d6592.m3u8&legacy=resolve.php"
+        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
+      }
+    },
+    {
+      "width": 640,
+      "height": 360,
+      "name": "360p",
+      "label": "Laag - 360p",
+      "mimetype": "application/vnd.apple.mpegurl",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
       }
     }
   ],
-  "image": {...},
-  "published_at": "2019-11-22T15:42:37+0100",
-  "duration": 51,
-  "related": [...]
+  [...]
+  "published_at": "2020-07-24T22:01:35+0200",
+  "duration": 97,
+  [...]
 }
 
-$ xidel -s --module=xivid.xqm "https://nos.nl/artikel/2311824-tesla-verkoopt-tienduizenden-cybertrucks-ondanks-kapotte-ruiten.html" -e 'let $a:=parse-json(//script[ends-with(@data-ssr-name,"VideoPlayer") or @data-ssr-name="pages/Article/Article"])/(.//video,.)[1] return {"name":"NOS: "||$a/title,"date":format-date(dateTime(replace(($a/published_at,//@datetime)[1],"(.+)(\d{2})","$1:$2")),"[D01]-[M01]-[Y]"),"duration":$a/duration * duration("PT1S") + time("00:00:00"),"formats":xivid:m3u8-to-json($a/(formats)(1)/url/mp4)}'
+Geen "aspect_ratios"-object en ook hier weer zijn alle urls hetzelfde.
+
+$ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((formats)(1)/url/mp4)()}}'
 {
-  "name": "NOS: Tesla medewerker gooit nieuwe auto kapot",
-  "date": "22-11-2019",
-  "duration": "00:00:51",
+  "name": "NOS: Protest tegen ontslag Hongaarse hoofdredacteur: 'Grootste nieuwssite geruïneerd'",
+  "date": "2020-07-24T20:01:35Z",
+  "duration": "PT1M37S",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://adaptive-e05c1h.npostreaming.nl/urishieldv2/l27m68c577c43d54b6ef005ddaa16c000000.49671f276b296a3fa48581894a4eb1e4/o/nos/content/video/2019/11/22/248007-89413149430dd806a2ac05266c0d6592/248007-89413149430dd806a2ac05266c0d6592.ism/248007-89413149430dd806a2ac05266c0d6592.m3u8"
+      "url": "https://adaptive-e05c1c.npostreaming.nl/urishieldv2/[...]/258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
       "resolution": "640x360",
-      "bitrate": "414|128kbps",
-      "url": "https://adaptive-e05c1h.npostreaming.nl/urishieldv2/l27m68c577c43d54b6ef005ddaa16c000000.49671f276b296a3fa48581894a4eb1e4/o/nos/content/video/2019/11/22/248007-89413149430dd806a2ac05266c0d6592/248007-89413149430dd806a2ac05266c0d6592.ism/248007-89413149430dd806a2ac05266c0d6592-audio_eng=128000-video_eng=414000.m3u8"
+      "bitrate": "400|128kbps",
+      "url": "https://adaptive-e05c1c.npostreaming.nl/urishieldv2/[...]/258706-1031d20fe5090b5bafa95a7f38c02153-audio_eng=128000-video_eng=400000.m3u8"
     },
     [...]
     {
       "id": "hls-4",
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720",
-      "bitrate": "1835|128kbps",
-      "url": "https://adaptive-e05c1h.npostreaming.nl/urishieldv2/l27m68c577c43d54b6ef005ddaa16c000000.49671f276b296a3fa48581894a4eb1e4/o/nos/content/video/2019/11/22/248007-89413149430dd806a2ac05266c0d6592/248007-89413149430dd806a2ac05266c0d6592.ism/248007-89413149430dd806a2ac05266c0d6592-audio_eng=128000-video_eng=1835000.m3u8"
+      "bitrate": "1799|128kbps",
+      "url": "https://adaptive-e05c1c.npostreaming.nl/urishieldv2/[...]/258706-1031d20fe5090b5bafa95a7f38c02153-audio_eng=128000-video_eng=1799000.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://nos.nl/livestream/npo-nieuws.html
-
-$ xidel -s --module=xivid.xqm "https://nos.nl/livestream/npo-nieuws.html" -e 'let $a:=parse-json(//script[ends-with(@data-ssr-name,"VideoPlayer") or @data-ssr-name="pages/Article/Article"])/(.//video,.)[1] return if (//video/@data-type="livestream") then {"name":concat("NOS: ",//h1[ends-with(@class,"__title")]," Livestream"),"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(//@data-stream)} else {"name":"NOS: "||$a/title,"date":format-date(dateTime(replace(($a/published_at,//@datetime)[1],"(.+)(\d{2})","$1:$2")),"[D01]-[M01]-[Y]"),"duration":$a/duration * duration("PT1S") + time("00:00:00"),"formats":xivid:m3u8-to-json($a/(formats)(1)/url/mp4)}'
-{
-  "name": "NOS: NPO Nieuws Livestream",
-  "date": "24-11-2019",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://pedgewarer24a.video.kpnstreaming.nl/session/6d85d332-0ec6-11ea-9fac-1458d041afa8/qkakz5/b2b/live/npo/live/npo/thematv/journaal24/journaal24.isml/journaal24.m3u8?token=33a164933a6705ea8695e357069c3d82_1574691999_1574691999"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "resolution": null,
-      "bitrate": "128kbps",
-      "url": "https://pedgewarer24a.video.kpnstreaming.nl/session/6d85d332-0ec6-11ea-9fac-1458d041afa8/qkakz5/b2b/live/npo/live/npo/thematv/journaal24/journaal24.isml/journaal24-audio_nld=128000.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-5",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1024x576@25fps",
-      "bitrate": "1400|128kbps",
-      "url": "https://pedgewarer24a.video.kpnstreaming.nl/session/6d85d332-0ec6-11ea-9fac-1458d041afa8/qkakz5/b2b/live/npo/live/npo/thematv/journaal24/journaal24.isml/journaal24-audio_nld=128000-video=1400000.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
--e '
-  let $a:=parse-json(
-    //script[ends-with(@data-ssr-name,"VideoPlayer") or @data-ssr-name="pages/Article/Article"]
-  )/(.//video,.)[1] return
-  if (//video/@data-type="livestream") then {
-    "name":concat(
-      "NOS: ",
-      //h1[ends-with(@class,"__title")],
-      " Livestream"
+declare function xivid:nos($url as string) as object()? {
+  parse-json(doc($url)//script[@type="application/json"])//video/{
+    "name":"NOS: "||title,
+    "date":adjust-dateTime-to-timezone(
+      dateTime(substring(published_at,1,22)||":00"),
+      duration("PT0S")
     ),
-    "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-    "formats":xivid:m3u8-to-json(//@data-stream)
-  } else {
-    "name":"NOS: "||$a/title,
-    "date":format-date(
-      dateTime(
-        replace(
-          ($a/published_at,//@datetime)[1],
-          "(.+)(\d{2})",
-          "$1:$2"
-        )
-      ),
-      "[D01]-[M01]-[Y]"
-    ),
-    "duration":$a/duration * duration("PT1S") + time("00:00:00"),
-    "formats":xivid:m3u8-to-json($a/(formats)(1)/url/mp4)
+    "duration":duration * duration("PT1S"),
+    "formats":array{
+       {
+         "id":"dash-0",
+         "format":"mpd[manifest]",
+         "url":x:request({
+           "method":"HEAD",
+           "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
+         }[url])/url
+       }[url],
+       xivid:m3u8-to-json((formats)(1)/url/mp4)()
+     }
   }
-'
+};
 
 ================================================================================================
 
@@ -7370,7 +7366,7 @@ $ xidel -se 'json-doc(concat("https://content.tmgvideo.nl/playlist/item=",parse-
   [...]
 }
 
-$ xidel -s --module=xivid.xqm -e 'json-doc(concat("https://content.tmgvideo.nl/playlist/item=",parse-json(doc("'$url'")//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json"))/(items)()/{"name":"Telegraaf: "||title,"date":xivid:string-to-utc-dateTime(replace(publishedstart,"\s","T")),"duration":duration * duration("PT1S"),"expdate":publishedend ! xivid:string-to-utc-dateTime(replace(.,"\s","T")),"formats":array{locations/reverse((progressive)())/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"url":.//src},xivid:m3u8-to-json(locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8")())}}'
+$ xidel -s --module=xivid.xqm -e 'json-doc(concat("https://content.tmgvideo.nl/playlist/item=",parse-json(doc("'$url'")//script/extract(.,"APOLLO_STATE__=(.+);",1)[.])/(.//videoId)[1],"/playlist.json"))/(items)()/{"name":"Telegraaf: "||title,"date":xivid:string-to-utc-dateTime(replace(publishedstart,"\s","T")),"duration":duration * duration("PT1S"),"expdate":publishedend ! xivid:string-to-utc-dateTime(replace(.,"\s","T")),"formats":array{locations/reverse((progressive)())/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":concat(width,"x",height),"url":.//src},xivid:m3u8-to-json(locations/(adaptive)()[type="application/x-mpegURL"]/extract(src,".+m3u8"))()}}'
 {
   "name": "Telegraaf: Ordinaire verkeersruzie op snelweg A10_duplicated",
   "date": "2020-09-04T16:57:14Z",

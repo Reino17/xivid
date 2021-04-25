@@ -477,6 +477,28 @@ declare function xivid:npo($url as string) as object()? {
   ))
 };
 
+declare function xivid:nos($url as string) as object()? {
+  parse-json(doc($url)//script[@type="application/json"])//video/{
+    "name":"NOS: "||title,
+    "date":adjust-dateTime-to-timezone(
+      dateTime(substring(published_at,1,22)||":00"),
+      duration("PT0S")
+    ),
+    "duration":duration * duration("PT1S"),
+    "formats":array{
+       {
+         "id":"dash-0",
+         "format":"mpd[manifest]",
+         "url":x:request({
+           "method":"HEAD",
+           "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
+         }[url])/url
+       }[url],
+       xivid:m3u8-to-json((formats)(1)/url/mp4)()
+     }
+  }
+};
+
 declare function xivid:rtl($url as string) as object()? {
   parse-json(
     doc(
