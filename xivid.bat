@@ -322,12 +322,12 @@ IF NOT "%url:npostart.nl/live=%"=="%url%" (
           'instagram':array{'instagram.com'}^,
           'pornhub':array{'pornhub.com'}
         }^,
-        $temp:^=tokenize^(request-decode^('%url%'^)/host^,'\.'^)^,
+        $temp:^=tokenize^(request-decode^(environment-variable^('url'^)^)/host^,'\.'^)^,
         $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
     for $x in $extractors^(^)
     return
     if ^($extractors^($x^) ^= $host^) then ^(
-      json:^=eval^(x'xivid:{$x}^(''%url%''^)'^)^,
+      json:^=eval^(x'xivid:{$x}^(''{environment-variable^('url'^)}''^)'^)^,
       extractor:^=$x^,
       fmts:^=join^($json/^(formats^)^(^)/id^)
     ^)
