@@ -48,7 +48,7 @@ ECHO   autojunk.nl             youtu.be              fb.watch
 ECHO   abhd.nl                 vimeo.com             instagram.com
 ECHO   autoblog.nl             dailymotion.com       twitter.com
 ECHO   telegraaf.nl            twitch.tv             pornhub.com
-ECHO   ad.nl                   mixcloud.com
+ECHO   ad.nl                   mixcloud.com          xhamster.com
 ECHO   lc.nl                   soundcloud.com
 ECHO.
 ECHO Voorbeelden:
@@ -285,7 +285,8 @@ IF NOT "%url:twitch.tv=%"=="%url%" (
           'soundcloud':array{'soundcloud.com'}^,
           'facebook':array{'facebook.com'^,'fb.watch'}^,
           'instagram':array{'instagram.com'}^,
-          'pornhub':array{'pornhub.com'}
+          'pornhub':array{'pornhub.com'}^,
+          'xhamster':array{'xhamster.com'}
         }^,
         $temp:^=tokenize^(request-decode^(environment-variable^('url'^)^)/host^,'\.'^)^,
         $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)

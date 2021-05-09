@@ -49,7 +49,7 @@ Ondersteunde websites:
   abhd.nl                 vimeo.com             instagram.com
   autoblog.nl             dailymotion.com       twitter.com
   telegraaf.nl            twitch.tv             pornhub.com
-  ad.nl                   mixcloud.com
+  ad.nl                   mixcloud.com          xhamster.com
   lc.nl                   soundcloud.com
 
 Voorbeelden:
@@ -286,7 +286,8 @@ else
           "soundcloud":array{"soundcloud.com"},
           "facebook":array{"facebook.com","fb.watch"},
           "instagram":array{"instagram.com"},
-          "pornhub":array{"pornhub.com"}
+          "pornhub":array{"pornhub.com"},
+          "xhamster":array{"xhamster.com"}
         },
         $temp:=tokenize(request-decode("'$url'")/host,"\."),
         $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")

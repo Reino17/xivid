@@ -44,7 +44,7 @@ Deze websites worden op dit moment ondersteund:
   abhd.nl                 vimeo.com             instagram.com
   autoblog.nl             dailymotion.com       twitter.com
   telegraaf.nl            twitch.tv             pornhub.com
-  ad.nl                   mixcloud.com
+  ad.nl                   mixcloud.com          xhamster.com
   lc.nl                   soundcloud.com
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  

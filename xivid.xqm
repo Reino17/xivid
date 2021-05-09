@@ -1209,3 +1209,16 @@ declare function xivid:pornhub($url as string) as object()? {
     }
   }
 };
+
+declare function xivid:xhamster($url as string) as object()? {
+  parse-json(
+    extract(doc($url)//script[@id="initials-script"],"\{.+\}")
+  )/{
+    "name":"xHamster: "||videoModel/title,
+    "date":videoModel/created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":videoModel/duration * duration("PT1S"),
+    "formats":xivid:m3u8-to-json(
+      xplayerSettings/sources/hls/(url,fallback)[contains(.,"master.m3u8")]
+    )
+  }
+};
