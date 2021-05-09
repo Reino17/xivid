@@ -108,7 +108,7 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
   }
 };
 
-declare function xivid:mpd-to-json($mpd) as object()* {
+declare function xivid:mpd-to-json($mpd) as array() {
   array{
     {
       "id":"dash-0",
