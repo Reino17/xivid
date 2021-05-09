@@ -1152,6 +1152,72 @@ declare function xivid:facebook($url as string) as object()? {
   ))
 };
 
+declare function xivid:twitter($url as string) as object()? {
+  let $bearer_token:=extract(
+        unparsed-text((doc($url)//script/@src)[last()]),
+        "c=&quot;([A-Za-z0-9%]{96,})&quot;",1
+      ),
+      $guest_token:=x:request({
+        "method":"POST",
+        "headers":"Authorization: Bearer "||$bearer_token,
+        "url":"https://api.twitter.com/1.1/guest/activate.json"
+      })/json/guest_token,
+      $call_api:=function($path as string,$query as object()?) as object() {
+        x:request({
+          "headers":(
+            "Authorization: Bearer "||$bearer_token,
+            "x-guest-token: "||$guest_token
+          ),
+          "url":if (empty($query)) then
+            concat("https://api.twitter.com/1.1/",$path)
+          else
+            request-combine("https://api.twitter.com/1.1/"||$path,$query)/url
+        })/json
+      },
+      $statuses:=$call_api(
+        "statuses/show.json",
+        {"id":extract($url,"\d+$"),"tweet_mode":"extended"}
+      )
+  return
+  if (exists($statuses/extended_entities)) then
+    $statuses/extended_entities/(media)()/{
+      "name":"Twitter: "||(.//title,$statuses/full_text)[1],
+      "date":parse-ietf-date($statuses/created_at),
+      "duration":round(.//duration_millis div 1000) * duration("PT1S"),
+      "formats":array{
+        for $x at $i in (.//variants)()[content_type="video/mp4"]
+        order by $x/bitrate
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":extract($x/url,"\d+x\d+"),
+          "bitrate":$x/bitrate div 1000||"kbps",
+          "url":$x/url
+        },
+        xivid:m3u8-to-json(
+          (.//variants)()[content_type="application/x-mpegURL"]/url
+        )()
+      }
+    }
+  else
+    let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return
+    $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{
+      "name":"Twitter: "||status,
+      "date":round(start_ms div 1000) *
+        duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+      "duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),
+      "formats":array{
+        {
+          "id":"hls-1",
+          "format":"m3u8[h264+aac]",
+          "resolution":concat(width,"x",height),
+          "url":$call_api("live_video_stream/status/"||media_key,())//location
+        }
+      }
+    }
+};
+
 declare function xivid:instagram($url as string) as object()? {
   parse-json(
     doc($url)//script/extract(.,"_sharedData = (.+);",1)[.]
