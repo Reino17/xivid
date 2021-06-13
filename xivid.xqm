@@ -231,79 +231,65 @@ declare function xivid:bin-xor($a as integer,$b as integer) as integer {
 };
 
 declare function xivid:info($json as object()) as string* {
-  let $a:={
-        "name":"Naam:",
-        "date":"Datum:",
-        "duration":"Tijdsduur:",
-        "start":"Begin:",
-        "end":"Einde:",
-        "expdate":"Gratis tot:",
+  let $lbl:={
+        "name":"Naam:","date":"Datum:","duration":"Tijdsduur:",
+        "start":"Begin:","end":"Einde:","expdate":"Gratis tot:",
         "formats":"Formaten:"
       },
-      $b:=max(
-        $a()[exists($json(.))] ! $a(.) ! string-length()
-      ),
-      $c:=array{
+      $len:=$json() ! string-length($lbl(.)),
+      $fmts:=array{
         {
-          "id":"id",
-          "format":"formaat",
-          "language":"taal",
-          "resolution":"resolutie",
-          "samplerate":"frequentie",
-          "bitrate":"bitrate"
+          "id":"id","format":"formaat",
+          "language":"taal","resolution":"resolutie",
+          "samplerate":"frequentie","bitrate":"bitrate"
         },
         $json/(formats)()
       },
-      $d:=$c(1)() ! distinct-values(
-        for $x in $c()[position() gt 1] return
-        .[$x(.)]
+      $f_lbl:=$fmts(1)() ! distinct-values(
+        for $x in $fmts()[position() gt 1] return .[$x(.)]
       ),
-      $e:=$d ! max($c()(.) ! string-length())
+      $f_len:=$f_lbl[position() lt last()] ! max(
+        $fmts()(.) ! string-length()
+      ),
+      $dur:=$json[start]/(start,duration) ! (
+        dayTimeDuration(.) div dayTimeDuration("PT1S")
+      ),
+      $ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30)
   return (
-    $a()[exists($json(.))] ! concat(
-      substring(
-        $a(.)||string-join((1 to $b) ! " "),
-        1,$b + 1
-      ),
-      if (.=$a()[last()]) then
-        if (exists($c(2))) then
-          join(
-            $c() ! string-join(
-              for $x at $i in $d return
-              if (position() eq count($c()) and $i eq count($d)) then
+    for $x at $i in $json() return
+    concat(
+      $lbl($x),
+      string-join((1 to max($len) - $len[$i] + 1) ! " "),
+      if ($x="formats") then
+        join(
+          $fmts() ! string-join(
+            for $x at $i in $f_lbl return (
+              if (position() eq count($fmts()) and $i eq count($f_lbl)) then
                 .($x)||" (best)"
               else
-                substring(
-                  .($x)||string-join((1 to $e[$i] + 2) ! " "),
-                  1,$e[$i] + 2
-                )
-            ),
-            "&#10;"||string-join((1 to $b + 1) ! " ")
-          )
-        else
-          "-"
+                .($x),
+              (1 to $f_len[$i] - string-length(.($x)) + 2) ! " "
+            )
+          ),
+          "&#10;"||(1 to max($len) + 1) ! " "
+        )
+      else if ($x=("date","expdate")) then
+        format-dateTime(
+          xivid:adjust-dateTime-to-dst($json($x)),
+          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+        )
+      else if ($x=("duration","start","end")) then
+        duration($json($x)) + time("00:00:00")
       else
-        $json(.)
+        $json($x)
     ),
-    $json[start]/(
-      "",
-      let $f:=(start,duration) ! (
-        (time(.) - time("00:00:00")) div dayTimeDuration("PT1S")
-      ) return
-      concat(
-        substring(
-          "Download:"||string-join((1 to $b) ! " "),
-          1,$b + 1
-        ),
-        "ffmpeg",
-        ($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
-        " -i <url>",
-        ($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
-        " -t ",
-        $f[2],
-        " [...]"
-      )
-    )
+    concat(
+      x"Download:{string-join((1 to max($len) - 9 + 1) ! " ")}ffmpeg ",
+      $ss[1][. gt 0] ! x"-ss {.} ",
+      "-i <url> ",
+      $ss[2][. gt 0] ! x"-ss {.} ",
+      x"-t {$dur[2]} [...]"
+    )[exists($dur)]
   )
 };
 

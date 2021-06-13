@@ -1419,9 +1419,11 @@ xidel -s --xquery "let $a:=file:read-text-lines('xivid_notes.txt') return (repla
 
 [xivid -i, video informatie optie]
 
+$ var='{"name":"NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde","date":"2017-02-14T12:00:00Z","duration":"PT1M5S","start":"PT9M2S","end":"PT10M7S","formats":[{"id":"sub-1","format":"vtt","language":"nl","label":"Nederlands","url":null},{"id":"hls-0","format":"m3u8[manifest]","url":null},{"id":"hls-1","format":"m3u8[aac]","resolution":null,"bitrate":"64kbps","url":null},{"id":"hls-2","format":"m3u8[aac]","resolution":null,"bitrate":"128kbps","url":null},{"id":"hls-3","format":"m3u8[h264+aac]","resolution":"480x270","bitrate":"209|64kbps","url":null},{"id":"hls-4","format":"m3u8[h264+aac]","resolution":"640x360","bitrate":"517|128kbps","url":null},{"id":"hls-5","format":"m3u8[h264+aac]","resolution":"768x432","bitrate":"721|128kbps","url":null},{"id":"hls-6","format":"m3u8[h264+aac]","resolution":"1024x576","bitrate":"1027|128kbps","url":null}]}'
+
 Alle attribuut-namen:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e '$json()'
+$ xidel -s "$var" -e '$json()'
 name
 date
 duration
@@ -1429,19 +1431,9 @@ start
 end
 formats
 
-Alle attribuut-namen met een waarde die NIET null is:
+Vertaalslag van JSON-attribuut naar Nederlandse string:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e '$json()[exists($json(.))]'
-name
-date
-duration
-start
-end
-formats
-
-Vertaalslag van attribuut-naam naar string:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $a()[exists($json(.))] ! $a(.)'
+$ xidel -s "$var" -e 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $json() ! $lbl(.)'
 Naam:
 Datum:
 Tijdsduur:
@@ -1449,11 +1441,9 @@ Begin:
 Einde:
 Formaten:
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Aantal tekens string:
 
-Aantal tekens:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $a()[exists($json(.))] ! $a(.) ! string-length()'
+$ xidel -s "$var" -e 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return $json() ! string-length($lbl(.))'
 5
 6
 10
@@ -1461,48 +1451,31 @@ $ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","da
 6
 9
 
-String + spaties tot de lengte van de langste string + 1 spatie speling:
+String + spaties tot lengte van langste string + 1 spatie speling:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=$a()[exists($json(.))] ! $a(.) ! string-length() for $x at $i in $a()[exists($json(.))] return $a($x)||string-join((1 to max($b) - $b[$i] + 1) ! "-")'
-Naam:------     # 10 - 5 + 1 = 6 spaties
-Datum:-----     # 10 - 6 + 1 = 5 spaties
-Tijdsduur:-     # etc.
+$ xidel -s "$var" --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)) for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! "-"))'
+Naam:------   # 10 - 5 + 1 = 6 spaties
+Datum:-----   # 10 - 6 + 1 = 5 spaties
+Tijdsduur:-   # etc.
 Begin:-----
 Einde:-----
 Formaten:--
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Met de attribuut-waarden erbij (en daadwerkelijk spaties):
 
-Aantal tekens van de langste string:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"} return max($a()[exists($json(.))] ! $a(.) ! string-length())'
-10
-
-String + 10 spaties:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()) return $a()[exists($json(.))] ! ($a(.)||string-join((1 to $b) ! "-"))'
-Naam:----------
-Datum:----------
-Tijdsduur:----------
-Begin:----------
-Einde:----------
-Formaten:----------
-
-String + 10 spaties, afgeknot na 10 + 1 = 11 tekens:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()) return $a()[exists($json(.))] ! substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1)'
-Naam:------
-Datum:-----
-Tijdsduur:-
-Begin:-----
-Einde:-----
-Formaten:--
-
-Met de attribuut-waarden erbij:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()) return $a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then () else $json(.))'
+$ xidel -s "$var" --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)) for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! " "),if ($x="formats") then () else $json($x))'
 Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
-Datum:     14-02-2017
+Datum:     2017-02-14T12:00:00Z
+Tijdsduur: PT1M5S
+Begin:     PT9M2S
+Einde:     PT10M7S
+Formaten:
+
+De UTC tijd geconverteerd naar lokale tijd in aangepast formaat en tijdsduur geconverteerd naar tijd:
+
+$ xidel -s "$var" --module=xivid.xqm --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)) for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! " "),if ($x="formats") then () else if ($x=("date","expdate")) then format-dateTime(xivid:adjust-dateTime-to-dst($json($x)),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]") else if ($x=("duration","start","end")) then duration($json($x)) + time("00:00:00") else $json($x))'
+Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
+Datum:     14-02-2017 13:00:00
 Tijdsduur: 00:01:05
 Begin:     00:09:02
 Einde:     00:10:07
@@ -1510,9 +1483,20 @@ Formaten:
 
 ------------------------------------------------------------------------------------------------
 
-De attribuut-namen die we in deze volgorde willen weergeven (dus niet "label" of "url"):
+De unieke attribuut-namen in alle objecten in de "formats"-array:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"}} return $a(1)()'
+$ xidel -s "$var" -e 'distinct-values($json/(formats)()())'
+id
+format
+language
+label
+url
+resolution
+bitrate
+
+Vertaalslag van specifieke op volgorde gezette JSON-attributen naar Nederlandse string:
+
+$ xidel -se 'let $fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"}} return $fmts(1)()'
 id
 format
 language
@@ -1520,132 +1504,109 @@ resolution
 samplerate
 bitrate
 
-Van de legenda en de "formats"-objecten maken we één array voor het makkelijker achterhalen van de langste string per te vormen kolom.
-Alle aanwezige attribuut-namen in de "formats"-objecten met een waarde die NIET null is:
+Van dit object met kolom-titels en alle objecten in de "formats"-array maak ik één array voor het makkelijker achterhalen van de langste string per te vormen kolom.
+Alle kolom-titels die in die volgorde in alle objecten van de "formats"-array aanwezig zijn:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()} return $a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)])'
+$ xidel -s "$var" -e 'let $fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()} return $fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)])'
 id
 format
 language
 resolution
 bitrate
 
-Per attribuut-naam / kolom het aantal tekens van de langste string:
+Per attribuut-naam / kolom (behalve de laatste) het aantal tekens van de langste string:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$b:=$a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)]) return $b ! max($a()(.) ! string-length())'
+$ xidel -s "$var" -e 'let $fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]) return $f_lbl[position() lt last()] ! max($fmts()(.) ! string-length())'
 5
 14
 4
 9
-12
 
-Per object alle attribuut-waarden achter elkaar:
+Per object in $fmts van alle attributen in $f_lbl de waardes achter elkaar:
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$b:=$a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)]) return $a() ! string-join(for $x in $b return .($x))'
-idformaattaalresolutiebitrate
-sub-1vttnl
-hls-0m3u8[manifest]
-hls-1m3u8[aac]64kbps
-hls-2m3u8[aac]128kbps
-hls-3m3u8[h264+aac]480x270209|64kbps
-hls-4m3u8[h264+aac]640x360517|128kbps
-hls-5m3u8[h264+aac]768x432721|128kbps
-hls-6m3u8[h264+aac]1024x5761027|128kbps
+$ xidel -s "$var" -e 'let $fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]) return $fmts() ! join(for $x in $f_lbl return .($x))'
+id formaat taal resolutie bitrate
+sub-1 vtt nl
+hls-0 m3u8[manifest]
+hls-1 m3u8[aac] 64kbps
+hls-2 m3u8[aac] 128kbps
+hls-3 m3u8[h264+aac] 480x270 209|64kbps
+hls-4 m3u8[h264+aac] 640x360 517|128kbps
+hls-5 m3u8[h264+aac] 768x432 721|128kbps
+hls-6 m3u8[h264+aac] 1024x576 1027|128kbps
 
-String + (5, 14, 4, 9, of 12) spaties + 2 spaties speling, afgeknot na (5, 14, 4, 9, of 12) + 2 tekens:
+Met de spaties erbij:
+kolom-titels als voorbeeld;
+"id", 5 - 2 + 2 spaties, "formaat", 14 - 7 + 2 spaties, "taal", 4 - 4 + 2 spaties, "resolutie", 9 - 9 + 2 spaties, "bitrate".
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'let $a:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$b:=$a(1)() ! distinct-values(for $x in $a()[position() gt 1] return .[$x(.)]),$c:=$b ! max($a()(.) ! string-length()) return $a() ! string-join(for $x at $i in $b return substring(.($x)||string-join((1 to $c[$i] + 2) ! "-"),1,$c[$i] + 2))'
-id-----formaat---------taal--resolutie--bitrate-------
-sub-1--vtt-------------nl-----------------------------
-hls-0--m3u8[manifest]---------------------------------
-hls-1--m3u8[aac]------------------------64kbps--------
-hls-2--m3u8[aac]------------------------128kbps-------
-hls-3--m3u8[h264+aac]--------480x270----209|64kbps----
-hls-4--m3u8[h264+aac]--------640x360----517|128kbps---
-hls-5--m3u8[h264+aac]--------768x432----721|128kbps---
-hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--
-
-------------------------------------------------------------------------------------------------
-
-Alles bij elkaar. Als "formats"="formats", dan verwerk "formats"-objecten, anders geef attribuut-waarde terug:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()),$c:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then $c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)) else $json(.))'
-Error:
-err:XPTY0004: Invalid conversion from ("id-----formaat---------taal--resolutie--bitrate-------", [...] "hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--") to type singleton
-
-concat() verwacht één enkele string, maar de tabel is een reeks van strings.
-Dit is op te lossen door van de tabel één string te maken m.b.v. new-line-characters (en weer wat spaties):
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()),$c:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! "-"),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return substring(.($x)||string-join((1 to $e[$i] + 2) ! "-"),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! "-")) else $json(.))'
-Naam:------NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
-Datum:-----14-02-2017
-Tijdsduur:-00:01:05
-Begin:-----00:09:02
-Einde:-----00:10:07
-Formaten:--id-----formaat---------taal--resolutie--bitrate-------
------------sub-1--vtt-------------nl-----------------------------
------------hls-0--m3u8[manifest]---------------------------------
------------hls-1--m3u8[aac]------------------------64kbps--------
------------hls-2--m3u8[aac]------------------------128kbps-------
------------hls-3--m3u8[h264+aac]--------480x270----209|64kbps----
------------hls-4--m3u8[h264+aac]--------640x360----517|128kbps---
------------hls-5--m3u8[h264+aac]--------768x432----721|128kbps---
------------hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps--
-
-Als gearriveerd bij laatste attribuut-waarde, dan plak " (best)" er achter, anders voeg spaties toe voor uitlijning:
-
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()),$c:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return $a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.))'
-Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
-Datum:     14-02-2017
-Tijdsduur: 00:01:05
-Begin:     00:09:02
-Einde:     00:10:07
-Formaten:  id     formaat         taal  resolutie  bitrate
-           sub-1  vtt             nl
-           hls-0  m3u8[manifest]
-           hls-1  m3u8[aac]                        64kbps
-           hls-2  m3u8[aac]                        128kbps
-           hls-3  m3u8[h264+aac]        480x270    209|64kbps
-           hls-4  m3u8[h264+aac]        640x360    517|128kbps
-           hls-5  m3u8[h264+aac]        768x432    721|128kbps
-           hls-6  m3u8[h264+aac]        1024x576   1027|128kbps (best)
+$ xidel -s "$var" --xquery 'let $fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]),$f_len:=$f_lbl[position() lt last()] ! max($fmts()(.) ! string-length()) return $fmts() ! string-join(for $x at $i in $f_lbl return (.($x),(1 to $f_len[$i] - string-length(.($x)) + 2) ! "-"))'
+id-----formaat---------taal--resolutie--bitrate
+sub-1--vtt-------------nl---------------
+hls-0--m3u8[manifest]-------------------
+hls-1--m3u8[aac]------------------------64kbps
+hls-2--m3u8[aac]------------------------128kbps
+hls-3--m3u8[h264+aac]--------480x270----209|64kbps
+hls-4--m3u8[h264+aac]--------640x360----517|128kbps
+hls-5--m3u8[h264+aac]--------768x432----721|128kbps
+hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e '$json[start]/(start,duration)'
-00:09:02   # Begin.
-00:01:05   # Tijdsduur.
+$ xidel -s "$var" -e '$json[start]/(start,duration)'
+PT9M2S   # Begin.
+PT1M5S   # Tijdsduur.
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e '$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S"))'
+$ xidel -s "$var" -e '$json[start]/(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S"))'
 542   # Begin in sec.
 65    # Tijdsduur in sec.
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:=$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return ($a[1] - $a[1] mod 30,$a[1] mod 30,$a[2])'
+$ xidel -s "$var" -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return ($ss,$dur[2]))'
 540   # Begin op 30 sec nauwkeurig.
 2     # Begin restant.
 65    # Tijdsduur.
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - -e 'let $a:=$json[start]/(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg -ss ",$a[1] - $a[1] mod 30," -i <url> -ss ",$a[1] mod 30," -t ",$a[2]," [...]")'
+$ xidel -s "$var" -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return x"Download: ffmpeg -ss {$ss[1]} -i <url> -ss {$ss[2]} -t {$dur[2]} [...]")'
 Download: ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
 
-Begin 00:00:29 :
+Begin PT29S:
 
-$ xidel -se 'let $a:=("00:00:29","00:00:10") ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg",($a[1] - $a[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url> -ss ",$a[1] mod 30," -t ",$a[2]," [...]")'
+$ xidel -s '{"duration":"PT10S","start":"PT29S"}' -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return concat("Download: ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ",x"-i <url> -ss {$ss[2]} -t {$dur[2]} [...]"))'
 Download: ffmpeg -i <url> -ss 29 -t 10 [...]
 
-Begin 00:00:30 :
+Begin PT30S:
 
-$ xidel -se 'let $a:=("00:00:30","00:00:10") ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat("Download: ffmpeg",($a[1] - $a[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($a[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$a[2]," [...]")'
+$ xidel -s '{"duration":"PT10S","start":"PT30S"}' -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return concat("Download: ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ","-i <url> ",$ss[2][. gt 0] ! x"-ss {.} ",x"-t {$dur[2]} [...]"))'
 Download: ffmpeg -ss 30 -i <url> -t 10 [...]
 
-00:00:29 --> ffmpeg -i <url> -ss 29 -t 10 [...]
-00:00:30 --> ffmpeg -ss 30 -i <url> -t 10 [...]
-00:00:31 --> ffmpeg -ss 30 -i <url> -ss 1 -t 10 [...]
+PT29S --> ffmpeg -i <url> -ss 29 -t 10 [...]
+PT30S --> ffmpeg -ss 30 -i <url> -t 10 [...]
+PT31S --> ffmpeg -ss 30 -i <url> -ss 1 -t 10 [...]
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()),$c:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
-Datum:     14-02-2017
+Alles bij elkaar:
+
+$ xidel -s "$var" --module=xivid.xqm --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)),$fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]),$f_len:=$f_lbl[position() lt last()] ! max($fmts()(.) ! string-length()) for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! "-"),if ($x="formats") then join($fmts() ! string-join(for $x at $i in $f_lbl return (.($x),(1 to $f_len[$i] - string-length(.($x)) + 2) ! "-")),"&#10;"||(1 to max($len) + 1) ! "-") else if ($x=("date","expdate")) then format-dateTime(xivid:adjust-dateTime-to-dst($json($x)),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]") else if ($x=("duration","start","end")) then duration($json($x)) + time("00:00:00") else $json($x))'
+Naam:------NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
+Datum:-----14-02-2017 13:00:00
+Tijdsduur:-00:01:05
+Begin:-----00:09:02
+Einde:-----00:10:07
+Formaten:--id-----formaat---------taal--resolutie--bitrate
+-----------sub-1--vtt-------------nl---------------               # "&#10;"||(1 to max($len) + 1) ! "-" --> line feed, 11 spaties.
+-----------hls-0--m3u8[manifest]-------------------
+-----------hls-1--m3u8[aac]------------------------64kbps
+-----------hls-2--m3u8[aac]------------------------128kbps
+-----------hls-3--m3u8[h264+aac]--------480x270----209|64kbps
+-----------hls-4--m3u8[h264+aac]--------640x360----517|128kbps
+-----------hls-5--m3u8[h264+aac]--------768x432----721|128kbps
+-----------hls-6--m3u8[h264+aac]--------1024x576---1027|128kbps
+
+Plak " (best)" achter de waarde van het laatste attribuut van het laatste object + de FFmpeg commando (en daadwerkelijk spaties):
+
+$ xidel -s "$var" --module=xivid.xqm --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)),$fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]),$f_len:=$f_lbl[position() lt last()] ! max($fmts()(.) ! string-length()),$dur:=$json[start]/(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return (for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! " "),if ($x="formats") then join($fmts() ! string-join(for $x at $i in $f_lbl return (if (position() eq count($fmts()) and $i eq count($f_lbl)) then .($x)||" (best)" else .($x),(1 to $f_len[$i] - string-length(.($x)) + 2) ! " ")),"&#10;"||(1 to max($len) + 1) ! " ") else if ($x=("date","expdate")) then format-dateTime(xivid:adjust-dateTime-to-dst($json($x)),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]") else if ($x=("duration","start","end")) then duration($json($x)) + time("00:00:00") else $json($x)),concat(x"Download:{string-join((1 to max($len) - 9 + 1) ! " ")}ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ","-i <url> ",$ss[2][. gt 0] ! x"-ss {.} ",x"-t {$dur[2]} [...]")[exists($dur)])'
+Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
+Datum:     14-02-2017 13:00:00
 Tijdsduur: 00:01:05
 Begin:     00:09:02
 Einde:     00:10:07
@@ -1658,103 +1619,70 @@ Formaten:  id     formaat         taal  resolutie  bitrate
            hls-4  m3u8[h264+aac]        640x360    517|128kbps
            hls-5  m3u8[h264+aac]        768x432    721|128kbps
            hls-6  m3u8[h264+aac]        1024x576   1027|128kbps (best)
-
 Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
-
-$ sed -n 3762,3767p xivid_notes.txt | xidel -s - --xquery 'let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()),$c:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if (exists($c(2))) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))'
-Naam:      Flikken Maastricht: Virtus et justitia
-Datum:     01-03-2019
-Tijdsduur: 00:47:27
-Formaten:  -
-
-$ sed -n '5087,5098p;5100,5114p;5116,5125p' xivid_notes.txt | xidel -s - --xquery '[...]'
-Naam:      Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)
-Datum:     01-02-2019
-Tijdsduur: 00:18:13
-Formaten:  id       formaat        resolutie       frequentie  bitrate
-           pg-1     mp4[h264+aac]  640x360                     489kbps
-           pg-3     mp4[h264+aac]  1280x720                    1603kbps
-           dash-1   mp4[aac]                       44.1kHz     131kbps
-           dash-14  mp4[h264]      1280x720@50fps              2866kbps (best)
 
 ------------------------------------------------------------------------------------------------
 
-$ sed -n 3668,3730p xivid_notes.txt | xidel -s - --xquery 'declare function local:info($json as object()) as string* {let $a:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$b:=max($a()[exists($json(.))] ! $a(.) ! string-length()),$c:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$d:=$c(1)() ! distinct-values(for $x in $c()[position() gt 1] return .[$x(.)]),$e:=$d ! max($c()(.) ! string-length()) return ($a()[exists($json(.))] ! concat(substring($a(.)||string-join((1 to $b) ! " "),1,$b + 1),if (.=$a()[last()]) then if (exists($c(2))) then join($c() ! string-join(for $x at $i in $d return if (position() eq count($c()) and $i eq count($d)) then .($x)||" (best)" else substring(.($x)||string-join((1 to $e[$i] + 2) ! " "),1,$e[$i] + 2)),"&#10;"||string-join((1 to $b + 1) ! " ")) else "-" else $json(.)),$json[start]/("",let $f:=(start,duration) ! ((time(.) - time("00:00:00")) div dayTimeDuration("PT1S")) return concat(substring("Download:"||string-join((1 to $b) ! " "),1,$b + 1),"ffmpeg",($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -i <url>",($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.)," -t ",$f[2]," [...]")))}; local:info($json)'
-
 declare function xivid:info($json as object()) as string* {
-  let $a:={
-        "name":"Naam:",
-        "date":"Datum:",
-        "duration":"Tijdsduur:",
-        "start":"Begin:",
-        "end":"Einde:",
-        "expdate":"Gratis tot:",
+  let $lbl:={
+        "name":"Naam:","date":"Datum:","duration":"Tijdsduur:",
+        "start":"Begin:","end":"Einde:","expdate":"Gratis tot:",
         "formats":"Formaten:"
       },
-      $b:=max(
-        $a()[exists($json(.))] ! $a(.) ! string-length()
-      ),
-      $c:=array{
+      $len:=$json() ! string-length($lbl(.)),
+      $fmts:=array{
         {
-          "id":"id",
-          "format":"formaat",
-          "language":"taal",
-          "resolution":"resolutie",
-          "samplerate":"frequentie",
-          "bitrate":"bitrate"
+          "id":"id","format":"formaat",
+          "language":"taal","resolution":"resolutie",
+          "samplerate":"frequentie","bitrate":"bitrate"
         },
         $json/(formats)()
       },
-      $d:=$c(1)() ! distinct-values(
-        for $x in $c()[position() gt 1] return
-        .[$x(.)]
+      $f_lbl:=$fmts(1)() ! distinct-values(
+        for $x in $fmts()[position() gt 1] return .[$x(.)]
       ),
-      $e:=$d ! max($c()(.) ! string-length())
+      $f_len:=$f_lbl[position() lt last()] ! max(
+        $fmts()(.) ! string-length()
+      ),
+      $dur:=$json[start]/(start,duration) ! (
+        dayTimeDuration(.) div dayTimeDuration("PT1S")
+      ),
+      $ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30)
   return (
-    $a()[exists($json(.))] ! concat(
-      substring(
-        $a(.)||string-join((1 to $b) ! " "),
-        1,$b + 1
-      ),
-      if (.=$a()[last()]) then
-        if (exists($c(2))) then
-          join(
-            $c() ! string-join(
-              for $x at $i in $d return
-              if (position() eq count($c()) and $i eq count($d)) then
+    for $x at $i in $json() return
+    concat(
+      $lbl($x),
+      string-join((1 to max($len) - $len[$i] + 1) ! " "),
+      if ($x="formats") then
+        join(
+          $fmts() ! string-join(
+            for $x at $i in $f_lbl return (
+              if (position() eq count($fmts()) and $i eq count($f_lbl)) then
                 .($x)||" (best)"
               else
-                substring(
-                  .($x)||string-join((1 to $e[$i] + 2) ! " "),
-                  1,$e[$i] + 2
-                )
-            ),
-            "&#10;"||string-join((1 to $b + 1) ! " ")
-          )
-        else
-          "-"
+                .($x),
+              (1 to $f_len[$i] - string-length(.($x)) + 2) ! " "
+            )
+          ),
+          "&#10;"||(1 to max($len) + 1) ! " "
+        )
+      else if ($x=("date","expdate")) then
+        format-dateTime(
+          xivid:adjust-dateTime-to-dst($json($x)),
+          "[D01]-[M01]-[Y] [H01]:[m01]:[s01]"
+        )
+      else if ($x=("duration","start","end")) then
+        duration($json($x)) + time("00:00:00")
       else
-        $json(.)
+        $json($x)
     ),
-    $json[start]/(
-      "",
-      let $f:=(start,duration) ! (
-        (time(.) - time("00:00:00")) div dayTimeDuration("PT1S")
-      ) return
-      concat(
-        substring(
-          "Download:"||string-join((1 to $b) ! " "),
-          1,$b + 1
-        ),
-        "ffmpeg",
-        ($f[1] - $f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
-        " -i <url>",
-        ($f[1] mod 30) ! (if (. eq 0) then () else " -ss "||.),
-        " -t ",
-        $f[2],
-        " [...]"
-      )
-    )
+    concat(
+      x"Download:{string-join((1 to max($len) - 9 + 1) ! " ")}ffmpeg ",
+      $ss[1][. gt 0] ! x"-ss {.} ",
+      "-i <url> ",
+      $ss[2][. gt 0] ! x"-ss {.} ",
+      x"-t {$dur[2]} [...]"
+    )[exists($dur)]
   )
 };
 
