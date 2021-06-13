@@ -756,27 +756,24 @@ declare function xivid:autojunk($url as string) as object()? {
     "date":xivid:string-to-utc-dateTime(
       join(extract(//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
     ),
-    "formats"?:if (//div[@id="playerWrapper"]/script) then
-      array{
-        let $id:=extract(//meta[@property="og:image"]/@content,"\d{4}/\d{4}/\d+")
-        for $x at $i in (".mp4","_hq.mp4","_720p.mp4") ! concat(
-          "https://static.autojunk.nl/flv/",$id,.
-        )
-        where x:request({
-          "method":"HEAD",
-          "error-handling":"xxx=accept",
-          "url":$x
-        })/headers[1] = "HTTP/1.1 200 OK"
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":("640x360","852x480","1280x720")[$i],
-          "bitrate":(600,1200,2000)[$i]||"kbps",
-          "url":$x
-        }
+    "formats"?://div[@id="playerWrapper" and script]/array{
+      let $id:=extract(//meta[@property="og:image"]/@content,"\d{4}/\d{4}/\d+")
+      for $x at $i in (".mp4","_hq.mp4","_720p.mp4") ! concat(
+        "https://static.autojunk.nl/flv/",$id,.
+      )
+      where x:request({
+        "method":"HEAD",
+        "error-handling":"xxx=accept",
+        "url":$x
+      })/headers[1] = "HTTP/1.1 200 OK"
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":("640x360","852x480","1280x720")[$i],
+        "bitrate":(600,1200,2000)[$i]||"kbps",
+        "url":$x
       }
-    else
-      ()
+    }
   }
 };
 
