@@ -92,12 +92,12 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
         "m3u8[h264+aac]"
       else
         "m3u8[aac]",
-      "resolution":concat(
+      "resolution"?:concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
         extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] !
           concat("@",round-half-to-even(.,3),"fps")
       )[.],
-      "bitrate":(
+      "bitrate"?:(
         if ($br3[1]) then
           join((round($br3[2] div 1000),round($br3[1] div 1000)),"|")
         else 
@@ -131,10 +131,10 @@ declare function xivid:mpd-to-json($mpd) as array() {
         ),
         "]"
       ),
-      "resolution":$x/@width ! concat(
+      "resolution"?:$x/@width ! concat(
         .,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"
       ),
-      "samplerate":$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
+      "samplerate"?:$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
       "bitrate":round($x/@bandwidth div 1000)||"kbps",
       "url":$x/BaseUrl
     }
@@ -349,10 +349,10 @@ declare function xivid:bbvms(
           xivid:adjust-dateTime-to-dst(publisheddate),
           duration("PT0S")
         ),
-      "duration":length * duration("PT1S")
+      "duration"?:length * duration("PT1S")
     },
     {
-      "formats":array{
+      "formats"?:array{
         (subtitles)()/{
           "id":"sub-1",
           "format":"srt",
@@ -370,8 +370,8 @@ declare function xivid:bbvms(
         $x/{
           "id":"pg-"||$i,
           "format":"mp4[h264+aac]",
-          "resolution":.[width]/concat(width,"x",height),
-          "bitrate":.[bandwidth]/concat(bandwidth,"kbps"),
+          "resolution"?:.[width]/concat(width,"x",height),
+          "bitrate"?:.[bandwidth]/concat(bandwidth,"kbps"),
           "url":resolve-uri(src,$host) ! (
             if (ends-with(.,"mp4")) then .
             else x:request({"method":"HEAD","url":.})/url
@@ -430,9 +430,9 @@ declare function xivid:npo($url as string) as object()? {
           if (contains(franchiseTitle,title)) then () else ": "||title
         ),
       "date":broadcastDate,
-      "duration":duration * duration("PT1S"),
-      "start":startAt,
-      "end":startAt + duration
+      "duration"?:duration * duration("PT1S"),
+      "start"?:startAt * duration("PT1S"),
+      "end"?:(startAt + duration) * duration("PT1S")
     } else
       doc("https://www.npostart.nl/"||$prid)/(
         let $info:=parse-json((//script[@type="application/ld+json"])[1]) return {
@@ -444,7 +444,7 @@ declare function xivid:npo($url as string) as object()? {
         }
       ),
     {
-      "formats":array{
+      "formats"?:array{
         (
           if (not(exists($info/(subtitles)())) and $info/parentId) then
             parse-json(
@@ -740,7 +740,7 @@ declare function xivid:dumpert($url as string) as object()? {
     "name":"Dumpert: "||title,
     "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
     "duration":(media)()/duration * duration("PT1S"),
-    "formats":array{
+    "formats"?:array{
       for $x at $i in ("mobile","tablet","720p","original") return {
         "id":"pg-"||$i,
         "format":"mp4[h264+aac]",
@@ -756,7 +756,7 @@ declare function xivid:autojunk($url as string) as object()? {
     "date":xivid:string-to-utc-dateTime(
       join(extract(//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
     ),
-    "formats":if (//div[@id="playerWrapper"]/script) then
+    "formats"?:if (//div[@id="playerWrapper"]/script) then
       array{
         let $id:=extract(//meta[@property="og:image"]/@content,"\d{4}/\d{4}/\d+")
         for $x at $i in (".mp4","_hq.mp4","_720p.mp4") ! concat(
@@ -937,7 +937,7 @@ declare function xivid:youtube($url as string) as object()? {
     } else {
       "name":title/simpleText,
       "date":dateTime(date(uploadDate),time("00:00:00"))||"Z",
-      "duration":lengthSeconds * duration("PT1S"),
+      "duration"?:lengthSeconds * duration("PT1S"),
       "formats":array{
         ($json//captionTracks)()[languageCode=("nl","en")]/{
           "id":"sub-"||position(),
@@ -985,7 +985,7 @@ declare function xivid:vimeo($url as string) as object()? {
     doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.]
   )/{
     "name":video/concat(owner/name,": ",title),
-    "date":if (contains($url,"player.vimeo.com")) then
+    "date"?:if (contains($url,"player.vimeo.com")) then
       ()
     else
       parse-json(
