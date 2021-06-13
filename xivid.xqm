@@ -901,65 +901,72 @@ declare function xivid:lc($url as string) as object()? {
 };
 
 declare function xivid:youtube($url as string) as object()? {
-  let $json:=request-decode(
-    "?"||unparsed-text(
-      "https://www.youtube.com/get_video_info?video_id="||extract($url,"\w+$")
+  x:request({
+    "headers":"Content-Type: application/json",
+    "post":serialize(
+      {
+        "context":{
+          "client":{
+            "clientName":"WEB",
+            "clientVersion":"2.20210520.09.00"
+          }
+        },
+        "videoId":extract($url,"\w+$")
+      },
+      {"method":"json"}
+    ),
+    "url":request-combine(
+      "https://www.youtube.com/youtubei/v1/player",
+      {"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"}
     )
-  )/params/parse-json(player_response) return
-  $json//playerMicroformatRenderer/(
-    if (liveBroadcastDetails/isLiveNow) then {
-      "name":title/simpleText,
-      "date":substring(
-        adjust-dateTime-to-timezone(
-          current-dateTime() + duration("PT0.5S"),
-          duration("PT0S")
+  })/json/{
+    "name":videoDetails/title,
+    "date":dateTime(
+      microformat/playerMicroformatRenderer/(
+        liveBroadcastDetails/startTimestamp,
+        uploadDate||"T00:00:00Z"
+      )[1]
+    ),
+    "duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),
+    "formats":array{
+      (.//captionTracks)()[languageCode=("nl","en")]/{
+        "id":"sub-"||position(),
+        "format":"ttml",
+        "language":languageCode,
+        "label":name/simpleText,
+        "url":baseUrl
+      },
+      for $x at $i in streamingData/(formats)()[url]
+      order by $x/width
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":let $mt:=tokenize($x/mimeType,";"),
+            $c:=tokenize(
+              extract($mt[2],"&quot;(.+)&quot;",1),
+              ", "
+            ) ! tokenize(.,"\.")[1]
+        return
+        concat(
+          substring-after($mt[1],"/"),
+          "[",
+          if ($c[1]="avc1") then "h264" else $c[1],
+          "+",
+          if ($c[2]="mp4a") then "aac" else $c[2],
+          "]"
         ),
-        1,19
-      )||"Z",
-      "formats":xivid:m3u8-to-json($json/streamingData/hlsManifestUrl)
-    } else {
-      "name":title/simpleText,
-      "date":dateTime(date(uploadDate),time("00:00:00"))||"Z",
-      "duration"?:lengthSeconds * duration("PT1S"),
-      "formats":array{
-        ($json//captionTracks)()[languageCode=("nl","en")]/{
-          "id":"sub-"||position(),
-          "format":"ttml",
-          "language":languageCode,
-          "label":name/simpleText,
-          "url":baseUrl
-        },
-        for $x at $i in $json/streamingData/(formats)()[url]
-        order by $x/width
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":let $mt:=tokenize($x/mimeType,";"),
-              $c:=tokenize(
-                extract($mt[2],"&quot;(.+)&quot;",1),
-                ", "
-              ) ! tokenize(.,"\.")[1]
-          return
-          concat(
-            substring-after($mt[1],"/"),
-            "[",
-            if ($c[1]="avc1") then "h264" else $c[1],
-            "+",
-            if ($c[2]="mp4a") then "aac" else $c[2],
-            "]"
-          ),
-          "resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),
-          "bitrate":concat(round($x/bitrate div 1000),"kbps"),
-          "url":$x/url
-        },
-        {
-          "id":"dash-0",
-          "format":"mpd[manifest]",
-          "url":$json/streamingData/dashManifestUrl
-        }[url]
-      }
+        "resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),
+        "bitrate":concat(round($x/bitrate div 1000),"kbps"),
+        "url":$x/url
+      },
+      {
+        "id":"dash-0",
+        "format":"mpd[manifest]",
+        "url":streamingData/dashManifestUrl
+      }[url],
+      xivid:m3u8-to-json(streamingData/hlsManifestUrl)()
     }
-  )
+  }
 };
 
 declare function xivid:vimeo($url as string) as object()? {
