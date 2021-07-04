@@ -5158,11 +5158,11 @@ $ xidel -se '{"context":{"client":{"clientName":"WEB","clientVersion":"2.2021052
   "videoId": "nG_LtCRRZ20"
 }
 
-$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json'
+$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json'
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/(videoDetails,microformat/playerMicroformatRenderer)'
+$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/(videoDetails,microformat/playerMicroformatRenderer)'
 {
   "videoId": "nG_LtCRRZ20",
   "title": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
@@ -5176,7 +5176,7 @@ $ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serial
   "uploadDate": "2019-02-01"
 }
 
-$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/uploadDate||"T00:00:00Z"),"duration":videoDetails/lengthSeconds * duration("PT1S")}'
+$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/uploadDate||"T00:00:00Z"),"duration":videoDetails/lengthSeconds * duration("PT1S")}'
 {
   "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
   "date": "2019-02-01T00:00:00Z",
@@ -5185,7 +5185,7 @@ $ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serial
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData'
+$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData'
 {
   "expiresInSeconds": "21540",
   "formats": [
@@ -5271,11 +5271,11 @@ $ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serial
 
 De progressive videostreams:
 
-$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData/(formats)()/(let $mt:=tokenize(mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return join((substring-after($mt[1],"/"),$c)))'
+$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData/(formats)()/(let $mt:=tokenize(mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return join((substring-after($mt[1],"/"),$c)))'
 mp4 avc1 mp4a
 mp4 avc1 mp4a
 
-$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData/(for $x at $i in (formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url})'
+$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData/(for $x at $i in (formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url})'
 {
   "id": "pg-1",
   "format": "mp4[h264+aac]",
@@ -5293,13 +5293,13 @@ $ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post
 
 De adaptive videostreams:
 
-$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData/(adaptiveFormats)()/(let $mt:=tokenize(mimeType,";"),$c:=extract($mt[2],"&quot;(\w+)",1) return join((substring-after($mt[1],"/"),$c)))'
+$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData/(adaptiveFormats)()/(let $mt:=tokenize(mimeType,";"),$c:=extract($mt[2],"&quot;(\w+)",1) return join((substring-after($mt[1],"/"),$c)))'
 mp4 avc1
 webm vp9
 [...]
 webm opus
 
-$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData/(for $x at $i in (adaptiveFormats)() order by boolean($x/width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=extract($mt[2],"&quot;(\w+)",1) return concat(substring-after($mt[1],"/"),"[",if ($c="avc1") then "h264" else if ($c="mp4a") then "aac" else $c,"]"),"resolution"?:$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate"?:$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url})'
+$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData/(for $x at $i in (adaptiveFormats)() order by boolean($x/width),$x/bitrate count $i return {"id":"dash-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=extract($mt[2],"&quot;(\w+)",1) return concat(substring-after($mt[1],"/"),"[",if ($c="avc1") then "h264" else if ($c="mp4a") then "aac" else $c,"]"),"resolution"?:$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),"samplerate"?:$x/audioSampleRate ! concat(. div 1000,"kHz"),"bitrate":round($x/bitrate div 1000)||"kbps","url":$x/url})'
 {
   "id": "dash-1",
   "format": "mp4[aac]",
@@ -5325,7 +5325,7 @@ $ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post
 
 De meeste van deze urls blijken echter helemaal niet te werken:
 
-$ xidel -s --xquery 'for $x in x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData/(adaptiveFormats)() order by boolean($x/width),$x/bitrate return join(("itag="||$x/itag,let $mt:=tokenize($x/mimeType,";"),$c:=extract($mt[2],"&quot;(\w+)",1) return concat(substring-after($mt[1],"/"),"[",if ($c="avc1") then "h264" else if ($c="mp4a") then "aac" else $c,"]"),$x/audioSampleRate ! concat(. div 1000,"kHz"),$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),round($x/bitrate div 1000)||"kbps",x:request({"method":"HEAD","error-handling":"xxx=accept","url":$x/url})/headers[1]))'
+$ xidel -s --xquery 'for $x in x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData/(adaptiveFormats)() order by boolean($x/width),$x/bitrate return join(("itag="||$x/itag,let $mt:=tokenize($x/mimeType,";"),$c:=extract($mt[2],"&quot;(\w+)",1) return concat(substring-after($mt[1],"/"),"[",if ($c="avc1") then "h264" else if ($c="mp4a") then "aac" else $c,"]"),$x/audioSampleRate ! concat(. div 1000,"kHz"),$x/width ! concat(.,"x",$x/height,"@",$x/fps,"fps"),round($x/bitrate div 1000)||"kbps",x:request({"method":"HEAD","error-handling":"xxx=accept","url":$x/url})/headers[1]))'
 itag=140 mp4[aac] 44.1kHz 131kbps HTTP/1.1 200 OK
 itag=251 webm[opus] 48kHz 134kbps HTTP/1.1 200 OK
 itag=278 webm[vp9] 256x144@25fps 95kbps HTTP/1.1 404 Not Found
@@ -5343,7 +5343,7 @@ itag=298 mp4[h264] 1280x720@50fps 2866kbps HTTP/1.1 200 OK
 
 Bij het DASH manifest hetzelfde verhaal:
 
-$ xidel -s --xquery 'for $x in x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/streamingData/doc(dashManifestUrl)//Representation order by boolean($x/@width),$x/@bandwidth return join(("itag/"||$x/@id,concat(substring-after($x/../@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),$x/@audioSamplingRate ! concat(. div 1000,"kHz"),$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),round($x/@bandwidth div 1000)||"kbps",x:request({"method":"HEAD","error-handling":"xxx=accept","url":$x/BaseUrl})/headers[1]))'
+$ xidel -s --xquery 'for $x in x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/streamingData/doc(dashManifestUrl)//Representation order by boolean($x/@width),$x/@bandwidth return join(("itag/"||$x/@id,concat(substring-after($x/../@mimeType,"/"),"[",tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .),"]"),$x/@audioSamplingRate ! concat(. div 1000,"kHz"),$x/@width ! concat(.,"x",$x/@height,"@",$x/@frameRate,"fps"),round($x/@bandwidth div 1000)||"kbps",x:request({"method":"HEAD","error-handling":"xxx=accept","url":$x/BaseUrl})/headers[1]))'
 itag/139 mp4[aac] 22.05kHz 51kbps HTTP/1.1 200 OK
 itag/140 mp4[aac] 44.1kHz 131kbps HTTP/1.1 200 OK
 itag/251 webm[opus] 48kHz 134kbps HTTP/1.1 200 OK
@@ -5386,7 +5386,7 @@ FFmpeg kan met het DASH manifest wel alle videostreams openen, dus alleen die da
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/uploadDate||"T00:00:00Z"),"duration":videoDetails/lengthSeconds * duration("PT1S"),"formats":streamingData/array{for $x at $i in (formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url},{"id":"dash-0","format":"mpd[manifest]","url":dashManifestUrl}[url]}}'
+$ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/uploadDate||"T00:00:00Z"),"duration":videoDetails/lengthSeconds * duration("PT1S"),"formats":streamingData/array{for $x at $i in (formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url},{"id":"dash-0","format":"mpd[manifest]","url":dashManifestUrl}[url]}}'
 {
   "name": "Delta Impuls 2 - Delta Impuls 3 (regionale 1e klasse tafeltennis, 18-01-2019)",
   "date": "2019-02-01T00:00:00Z",
@@ -5418,7 +5418,7 @@ $ xidel -s --xquery 'x:request({"headers":"Content-Type: application/json","post
 
 $ url=https://www.youtube.com/watch?v=P1pUkhX4PKg   # Live videostream.
 
-$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/(videoDetails,microformat/playerMicroformatRenderer,streamingData)'
+$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/(videoDetails,microformat/playerMicroformatRenderer,streamingData)'
 {
   "videoId": "P1pUkhX4PKg",
   "title": "24/7 Live In-Stock Alerts RTX 3060/3060TI/3070/3080/3080TI/3090 RX 6700/6800/6900  Ryzen 5900x/5950x",
@@ -5442,7 +5442,7 @@ $ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serial
   "hlsManifestUrl": "https://manifest.googlevideo.com/api/manifest/hls_variant/[...]/itag/0/[...]/file/index.m3u8"
 }
 
-$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/(liveBroadcastDetails/startTimestamp,uploadDate||"T00:00:00Z")[1]),"duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),"formats":streamingData/array{for $x at $i in (formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url},{"id":"dash-0","format":"mpd[manifest]","url":dashManifestUrl}[url],xivid:m3u8-to-json(hlsManifestUrl)()}}'
+$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/(liveBroadcastDetails/startTimestamp,uploadDate||"T00:00:00Z")[1]),"duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),"formats":streamingData/array{for $x at $i in (formats)() order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url},{"id":"dash-0","format":"mpd[manifest]","url":dashManifestUrl}[url],xivid:m3u8-to-json(hlsManifestUrl)()}}'
 {
   "name": "24/7 Live In-Stock Alerts RTX 3060/3060TI/3070/3080/3080TI/3090 RX 6700/6800/6900  Ryzen 5900x/5950x",
   "date": "2021-05-04T04:51:49Z",
@@ -5479,7 +5479,7 @@ $ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Content-Type: appl
 
 $ url=https://www.youtube.com/watch?v=GuoxLggqI_g   # Video met ondertiteling én "signature".
 
-$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/((.//captionTracks)()[languageCode=("nl","en")],streamingData/(formats)(2))'
+$ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/((.//captionTracks)()[languageCode=("nl","en")],streamingData/(formats)(2))'
 {
   "baseUrl": "https://www.youtube.com/api/timedtext?[...]lang=en",
   "name": {
@@ -5518,7 +5518,7 @@ Youtube-dl maakt gebruik van een of andere Javascript runtime, zonder de code te
 
 Filter deze beveiligde video's eruit door bij de progressive videostreams het "url"-attribuut verplicht te stellen en omdat er in dit geval toch geen DASH manifest beschikbaar is, hoef ik de "adaptiveFormats"-array ook niet te benaderen:
 
-$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/(liveBroadcastDetails/startTimestamp,uploadDate||"T00:00:00Z")[1]),"duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),"formats":array{(.//captionTracks)()[languageCode=("nl","en")]/{"id":"sub-"||position(),"format":"ttml","language":languageCode,"label":name/simpleText,"url":baseUrl},for $x at $i in streamingData/(formats)()[url] order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url},{"id":"dash-0","format":"mpd[manifest]","url":streamingData/dashManifestUrl}[url],xivid:m3u8-to-json(streamingData/hlsManifestUrl)()}}'
+$ xidel -s --module=xivid.xqm --xquery 'x:request({"headers":"Content-Type: application/json","post":serialize({"context":{"client":{"clientName":"WEB","clientVersion":"2.20210520.09.00"}},"videoId":extract("'$url'","\w+$")},{"method":"json"}),"url":request-combine("https://www.youtube.com/youtubei/v1/player",{"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"})/url})/json/{"name":videoDetails/title,"date":dateTime(microformat/playerMicroformatRenderer/(liveBroadcastDetails/startTimestamp,uploadDate||"T00:00:00Z")[1]),"duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),"formats":array{(.//captionTracks)()[languageCode=("nl","en")]/{"id":"sub-"||position(),"format":"ttml","language":languageCode,"label":name/simpleText,"url":baseUrl},for $x at $i in streamingData/(formats)()[url] order by $x/width count $i return {"id":"pg-"||$i,"format":let $mt:=tokenize($x/mimeType,";"),$c:=tokenize(extract($mt[2],"&quot;(.+)&quot;",1),", ") ! tokenize(.,"\.")[1] return concat(substring-after($mt[1],"/"),"[",if ($c[1]="avc1") then "h264" else $c[1],"+",if ($c[2]="mp4a") then "aac" else $c[2],"]"),"resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),"bitrate":concat(round($x/bitrate div 1000),"kbps"),"url":$x/url},{"id":"dash-0","format":"mpd[manifest]","url":streamingData/dashManifestUrl}[url],xivid:m3u8-to-json(streamingData/hlsManifestUrl)()}}'
 {
   "name": "The Uncertainty Has Settled (Full film)",
   "date": "2018-11-07T00:00:00Z",
@@ -5554,7 +5554,7 @@ declare function xivid:youtube($url as string) as object()? {
     "url":request-combine(
       "https://www.youtube.com/youtubei/v1/player",
       {"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"}
-    )
+    )/url
   })/json/{
     "name":videoDetails/title,
     "date":dateTime(

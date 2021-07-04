@@ -918,7 +918,7 @@ declare function xivid:youtube($url as string) as object()? {
     "url":request-combine(
       "https://www.youtube.com/youtubei/v1/player",
       {"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"}
-    )
+    )/url
   })/json/{
     "name":videoDetails/title,
     "date":dateTime(
