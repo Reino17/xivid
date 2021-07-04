@@ -5907,26 +5907,16 @@ declare function xivid:vimeo($url as string) as object()? {
 
 [nos]
 
-$ url=https://nos.nl/artikel/2378207-stafleider-navalny-overtuigd-van-rol-kremlin-bij-nepgesprek-met-tweede-kamer.html
+$ url=https://nos.nl/collectie/13781/video/2385546-bekijk-de-samenvatting-van-nederland-oostenrijk-2-0
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
+$ xidel -se 'parse-json(doc("'$url'")//main/script)/item'
 {
-  "id": 2378198,
-  "title": "Echte Volkov trekt gekke bekken voor camera: 'Als ik een deepfake ben, kan dit niet'",
-  "description": "Leonid Volkov, stafchef van de Russische oppositieleider Aleksej Navalny, vertelt vandaag in gesprek met de NOS over zijn 'dubbelganger'. Nederlandse Tweede Kamerleden dachten deze week via Zoom met hem te spreken, maar werden bedrogen.",
-  "geoprotection": false,
+  "id": 2385546,
+  "title": "Bekijk de samenvatting van Nederland-Oostenrijk (2-0)",
+  "description": "Een samenvatting van de tweede groepswedstrijd van het Nederlands elftal op het EK voetbal, tegen Oostenrijk.",
+  "geoprotection": true,
   [...]
   "formats": [
-    {
-      "width": 960,
-      "height": 540,
-      "name": "540p",
-      "label": "Hoog - 540p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
-      }
-    },
     {
       "width": 640,
       "height": 360,
@@ -5934,7 +5924,17 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
       "label": "Laag - 360p",
       "mimetype": "application/vnd.apple.mpegurl",
       "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
+      }
+    },
+    {
+      "width": 960,
+      "height": 540,
+      "name": "540p",
+      "label": "Hoog - 540p",
+      "mimetype": "application/vnd.apple.mpegurl",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
       }
     },
     {
@@ -5944,7 +5944,7 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
       "label": "HD - 720p",
       "mimetype": "application/vnd.apple.mpegurl",
       "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
       }
     },
     {
@@ -5954,7 +5954,7 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
       "label": "Normaal - 480p",
       "mimetype": "application/vnd.apple.mpegurl",
       "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
       }
     }
   ],
@@ -5964,33 +5964,35 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
       {
         "name": "hls_unencrypted",
         "mimetype": "application/vnd.apple.mpegurl",
-        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=hls_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
       },
       {
         "name": "smooth_unencrypted",
         "mimetype": "application/vnd.ms-sstr+xml",
-        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=smooth_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=smooth_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
       },
       {
         "name": "dash_unencrypted",
         "mimetype": "application/dash+xml",
-        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_34e1bb52_b737_485b_aedf_507c7252eb04&profile=dash_unencrypted&policy=eyJ0eXA[...]Iv6A61Q"
+        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=dash_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
       }
     ]
   },
   [...]
-  "published_at": "2021-04-25T17:19:23+0200",
-  "duration": 86,
+  "published_at": "2021-06-17T23:06:27+0200",
+  "duration": 307,
+  [...]
+  "modified_at": "2021-06-17T23:06:27+0200",
   [...]
 }
 
 Alle urls in (formats)()/url/mp4 zijn precies dezelfde als aspect_ratios/(profiles)()[name="hls_unencrypted"]/url.
 
-$ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":aspect_ratios/profiles/array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":.()[name="dash_unencrypted"]/url})/url},xivid:m3u8-to-json(.()[name="hls_unencrypted"]/url)()}}'
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/item/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":aspect_ratios/profiles/array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":.()[name="dash_unencrypted"]/url})/url},xivid:m3u8-to-json(.()[name="hls_unencrypted"]/url)()}}'
 {
-  "name": "NOS: Echte Volkov trekt gekke bekken voor camera: 'Als ik een deepfake ben, kan dit niet'",
-  "date": "2021-04-25T15:19:23Z",
-  "duration": "PT1M26S",
+  "name": "NOS: Bekijk de samenvatting van Nederland-Oostenrijk (2-0)",
+  "date": "2021-06-17T21:06:27Z",
+  "duration": "PT5M7S",
   "formats": [
     {
       "id": "dash-0",
@@ -6006,29 +6008,29 @@ $ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
       "resolution": "640x360@25fps",
-      "bitrate": "397|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=396776.m3u8"
+      "bitrate": "355|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=355156.m3u8"
     },
     {
       "id": "hls-2",
       "format": "m3u8[h264+aac]",
       "resolution": "960x540@25fps",
-      "bitrate": "1292|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=1291502.m3u8"
+      "bitrate": "1170|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=1170001.m3u8"
     },
     {
       "id": "hls-3",
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720@25fps",
-      "bitrate": "1785|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=1784858.m3u8"
+      "bitrate": "1635|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=1634927.m3u8"
     },
     {
       "id": "hls-4",
       "format": "m3u8[h264+aac]",
       "resolution": "848x480@25fps",   # Och, och, och, NOS toch!
-      "bitrate": "8855|128kbps",       # Een nul te veel in de bitrate?
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_34e1bb52_b737_485b_aedf_507c7252eb04_v1619363991-audio=128000-video=8855220.m3u8"
+      "bitrate": "8413|128kbps",       # Een nul te veel in de bitrate?
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=8412720.m3u8"
     }
   ]
 }
@@ -6037,7 +6039,7 @@ $ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="
 
 $ url=https://nos.nl/artikel/2378116-persvrijheid-in-eu-landen-in-gevaar-het-zijn-kleine-stapjes-die-je-niet-doorhebt.html
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
+$ xidel -se 'parse-json(doc("'$url'")//main/script)/(item,.//video)'
 {
   "id": 2341766,
   "title": "Protest tegen ontslag Hongaarse hoofdredacteur: 'Grootste nieuwssite geruïneerd'",
@@ -6093,7 +6095,7 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
 
 Geen "aspect_ratios"-object en ook hier weer zijn alle urls hetzelfde.
 
-$ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((formats)(1)/url/mp4)()}}'
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.//video)/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,(formats)(1)/url/mp4)[1])()}}'
 {
   "name": "NOS: Protest tegen ontslag Hongaarse hoofdredacteur: 'Grootste nieuwssite geruïneerd'",
   "date": "2020-07-24T20:01:35Z",
@@ -6124,8 +6126,119 @@ $ xidel -s --module=xivid.xqm --xquery 'parse-json(doc("'$url'")//script[@type="
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://nos.nl/l/2011289
+
+$ xidel -se 'parse-json(doc("'$url'")//main/script)/(item,.//video)'
+{
+  "id": 2011289,
+  "title": "Samenvatting Spanje-Nederland WK 2014",
+  "description": "Samenvatting van de inmiddels historische wedstrijd tussen Nederland en Spanje op het WK van 2014.",
+  "geoprotection": true,
+  [...]
+  "formats": [
+    {
+      "width": 640,
+      "height": 360,
+      "name": "360p",
+      "label": "Laag - 360p",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fvod01.mp4"
+      }
+    },
+    {
+      "width": 848,
+      "height": 480,
+      "name": "480p",
+      "label": "Normaal - 480p",
+      "url": {
+        "mp4": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fweb03.mp4"
+      }
+    }
+  ],
+  [...]
+  "published_at": "2014-12-30T21:47:07+0100",
+  "duration": 573,
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.//video)/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{(formats)()[ends-with(url/mp4,"mp4")]/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":x"{width}x{height}","url":url/mp4},{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,(formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4)[1])()}}'
+{
+  "name": "NOS: Samenvatting Spanje-Nederland WK 2014",
+  "date": "2014-12-30T20:47:07Z",
+  "duration": "PT9M33S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "url": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fvod01.mp4"
+    },
+    {
+      "id": "pg-2",
+      "format": "mp4[h264+aac]",
+      "resolution": "848x480",
+      "url": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fweb03.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://nos.nl/artikel/2372728-eerland-pakt-olympische-nominatie-voor-tokio-maar-hikt-tegen-eis-noc-nsf-aan
+
+$ xidel -se 'parse-json(doc("'$url'")//main/script)/(item,.//video)'
+{
+  "id": 2372784,
+  "title": "Eerland pakt olympische nominatie: 'Goed spelen op OKT was altijd challenge voor mij' ",
+  [...]
+}
+{
+  "id": 2373574,
+  "title": "Eerland hoopt op NOC*NSF: 'Want voor mijn gevoel heb ik de Spelen al gehaald'",
+  [...]
+}
+
+Meerdere video's. Vooralsnog pik ik alleen de eerste. Ondersteuning voor meerdere video's moet ik over nadenken.
+
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.//video)[1]/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{(formats)()[ends-with(url/mp4,"mp4")]/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":x"{width}x{height}","url":url/mp4},{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,(formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4)[1])()}}'
+{
+  "name": "NOS: Eerland pakt olympische nominatie: 'Goed spelen op OKT was altijd challenge voor mij
+' ",
+  "date": "2021-03-15T18:32:27Z",
+  "duration": "PT1M18S",
+  "formats": [
+    {
+      "id": "dash-0",
+      "format": "mpd[manifest]",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/dash_unencrypted/[...]/stream.mpd"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/playlist.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360@25fps",
+      "bitrate": "370|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_21f98521_e69d_4068_af2d_f16c46e0a138_v1615879196-audio=128000-video=370018.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-4",
+      "format": "m3u8[h264+aac]",
+      "resolution": "848x480@25fps",
+      "bitrate": "8861|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_21f98521_e69d_4068_af2d_f16c46e0a138_v1615879196-audio=128000-video=8860784.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:nos($url as string) as object()? {
-  parse-json(doc($url)//script[@type="application/json"])//video/{
+  parse-json(doc($url)//main/script)/(item,.//video)[1]/{
     "name":"NOS: "||title,
     "date":adjust-dateTime-to-timezone(
       dateTime(substring(published_at,1,22)||":00"),
@@ -6133,16 +6246,27 @@ declare function xivid:nos($url as string) as object()? {
     ),
     "duration":duration * duration("PT1S"),
     "formats":array{
-       {
-         "id":"dash-0",
-         "format":"mpd[manifest]",
-         "url":x:request({
-           "method":"HEAD",
-           "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
-         }[url])/url
-       }[url],
-       xivid:m3u8-to-json((formats)(1)/url/mp4)()
-     }
+      (formats)()[ends-with(url/mp4,"mp4")]/{
+        "id":"pg-"||position(),
+        "format":"mp4[h264+aac]",
+        "resolution":x"{width}x{height}",
+        "url":url/mp4
+      },
+      {
+        "id":"dash-0",
+        "format":"mpd[manifest]",
+        "url":x:request({
+          "method":"HEAD",
+          "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
+        }[url])/url
+      }[url],
+      xivid:m3u8-to-json(
+        (
+          aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,
+          (formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4
+        )[1]
+      )()
+    }
   }
 };
 

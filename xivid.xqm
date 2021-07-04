@@ -462,7 +462,7 @@ declare function xivid:npo($url as string) as object()? {
 };
 
 declare function xivid:nos($url as string) as object()? {
-  parse-json(doc($url)//script[@type="application/json"])//video/{
+  parse-json(doc($url)//main/script)/(item,.//video)[1]/{
     "name":"NOS: "||title,
     "date":adjust-dateTime-to-timezone(
       dateTime(substring(published_at,1,22)||":00"),
@@ -470,16 +470,27 @@ declare function xivid:nos($url as string) as object()? {
     ),
     "duration":duration * duration("PT1S"),
     "formats":array{
-       {
-         "id":"dash-0",
-         "format":"mpd[manifest]",
-         "url":x:request({
-           "method":"HEAD",
-           "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
-         }[url])/url
-       }[url],
-       xivid:m3u8-to-json((formats)(1)/url/mp4)()
-     }
+      (formats)()[ends-with(url/mp4,"mp4")]/{
+        "id":"pg-"||position(),
+        "format":"mp4[h264+aac]",
+        "resolution":x"{width}x{height}",
+        "url":url/mp4
+      },
+      {
+        "id":"dash-0",
+        "format":"mpd[manifest]",
+        "url":x:request({
+          "method":"HEAD",
+          "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
+        }[url])/url
+      }[url],
+      xivid:m3u8-to-json(
+        (
+          aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,
+          (formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4
+        )[1]
+      )()
+    }
   }
 };
 
