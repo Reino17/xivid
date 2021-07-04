@@ -25,11 +25,11 @@
 ECHO Xivid, een video-url extractie script.
 ECHO Gebruik: xivid.bat [optie] url
 ECHO.
-ECHO   -f ID[+ID]    Selecteer specifiek formaat, of specifieke formaten.
-ECHO                 Met een ID dat eindigt op een '#' wordt het formaat
-ECHO                 met het hoogste nummer geselecteerd.
-ECHO                 Zonder opgave wordt het formaat met de hoogste
-ECHO                 resolutie en/of bitrate geselecteerd.
+ECHO   -f id[+id]    Toon specifiek formaat, of specifieke formaten.
+ECHO                 Met een id dat eindigt op een '$' wordt het formaat
+ECHO                 met het hoogste nummer getoond.
+ECHO                 Zonder optie wordt het formaat met de hoogste
+ECHO                 resolutie en/of bitrate getoond.
 ECHO   -i            Toon video informatie, incl. een opsomming van alle
 ECHO                 beschikbare formaten.
 ECHO   -j            Toon video informatie als JSON.
@@ -54,7 +54,7 @@ ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
 ECHO   xivid.bat -i https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724-9a6f-91de543b8a4c
-ECHO   xivid.bat -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
+ECHO   xivid.bat -f hls-$+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EXIT /B
 
 :twitch
@@ -268,7 +268,7 @@ IF DEFINED f (
     SETLOCAL ENABLEDELAYEDEXPANSION
     FOR %%A IN (%f:+= %) DO (
       SET _f=%%A
-      IF "!_f:~-1!"=="#" (
+      IF "!_f:~-1!"=="$" (
         CALL SET _fmts=%%fmts:!_f:~0,-1!=%%
         IF "%fmts%"=="!_fmts!" (
           ECHO xivid: formaat id '!_f!' ongeldig.
@@ -284,7 +284,7 @@ IF DEFINED f (
     )
     ECHO !json! | xidel -e ^"^
       for $x in tokenize^('%f%'^,'\+'^) return^
-      if ^(ends-with^($x^,'#'^)^) then^
+      if ^(ends-with^($x^,'$'^)^) then^
         $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
       else^
         $json/^(formats^)^(^)[id^=$x]/url^

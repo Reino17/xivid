@@ -26,11 +26,11 @@ help() {
 Xivid, een video-url extractie script.
 Gebruik: ./xivid.sh [optie] url
 
-  -f ID[+ID]    Selecteer specifiek formaat, of specifieke formaten.
-                Met een ID dat eindigt op een '#' wordt het formaat
-                met het hoogste nummer geselecteerd.
-                Zonder opgave wordt het formaat met de hoogste
-                resolutie en/of bitrate geselecteerd.
+  -f id[+id]    Toon specifiek formaat, of specifieke formaten.
+                Met een id dat eindigt op een '$' wordt het formaat
+                met het hoogste nummer getoond.
+                Zonder optie wordt het formaat met de hoogste
+                resolutie en/of bitrate getoond.
   -i            Toon video informatie, incl. een opsomming van alle
                 beschikbare formaten.
   -j            Toon video informatie als JSON.
@@ -55,7 +55,7 @@ Ondersteunde websites:
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
   ./xivid.sh -i https://www.rtlxl.nl/programma/rtl-nieuws/bf475894-02ce-3724-9a6f-91de543b8a4c
-  ./xivid.sh -f hls-#+sub-1 https://kijk.nl/video/AgvoU4AJTpy
+  ./xivid.sh -f hls-$+sub-1 https://kijk.nl/video/AgvoU4AJTpy
 EOF
 }
 
@@ -267,7 +267,7 @@ fi
 if [[ $f ]]; then
   if [[ ${fmts[@]} ]]; then
     for a in ${f/+/ }; do
-      if [[ ${a: -1} == \# ]]; then
+      if [[ ${a: -1} == \$ ]]; then
         if [[ ! ${fmts[@]} =~ ${a:0: -1} ]]; then
           echo "xivid: formaat id '$a' ongeldig." 1>&2
           exit 1
@@ -281,7 +281,7 @@ if [[ $f ]]; then
     done
     xidel -e '
       for $x in tokenize("'$f'","\+") return
-      if (ends-with($x,"#")) then
+      if (ends-with($x,"$")) then
         $json/(formats)()[starts-with(id,substring($x,1,string-length($x) - 1))][last()]/url
       else
         $json/(formats)()[id=$x]/url

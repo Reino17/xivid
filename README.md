@@ -20,11 +20,11 @@ Of download de [tarball](https://github.com/Reino17/xivid/archive/master.zip).
 Gebruik (Windows): xivid.bat [optie] url
 Gebruik (Linux): ./xivid.sh [optie] url
 
-  -f ID[+ID]    Selecteer specifiek formaat, of specifieke formaten.
-                Met een ID dat eindigt op een '#' wordt het formaat
-                met het hoogste nummer geselecteerd.
-                Zonder opgave wordt het formaat met de hoogste
-                resolutie en/of bitrate geselecteerd.
+  -f id[+id]    Toon specifiek formaat, of specifieke formaten.
+                Met een id dat eindigt op een '$' wordt het formaat
+                met het hoogste nummer getoond.
+                Zonder optie wordt het formaat met de hoogste
+                resolutie en/of bitrate getoond.
   -i            Toon video informatie, incl. een opsomming van alle
                 beschikbare formaten.
   -j            Toon video informatie als JSON.
@@ -74,12 +74,12 @@ Formaten:  id     formaat         taal  resolutie  bitrate
            hls-5  m3u8[h264+aac]        768x432    707|128kbps
            hls-6  m3u8[h264+aac]        1024x576   1109|128kbps (best)
 ```
-Met `-f` kun je een ander gewenst formaat, of meerdere formaten tegelijk, selecteren. Eindigt het `ID` op een '#', dan wordt het formaat met het hoogste nummer geselecteerd:
+Met `-f` kun je een ander gewenst formaat, of meerdere formaten tegelijk, selecteren. Eindigt het `id` op een '$', dan wordt het formaat met het hoogste nummer geselecteerd:
 ```bat
 xivid.bat -f hls-4 https://www.npostart.nl/POW_03375558
 https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03375558_v4-audio=128000-video=506000.m3u8
 
-xivid.bat -f hls-#+sub-1 https://www.npostart.nl/POW_03375558
+xivid.bat -f hls-$+sub-1 https://www.npostart.nl/POW_03375558
 https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03375558_v4-audio=128000-video=1109000.m3u8
 https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt
 ```
