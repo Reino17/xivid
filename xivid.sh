@@ -123,12 +123,12 @@ twitch() {
 }
 
 if command -v xidel >/dev/null; then
-  if [[ $(xidel --version | xidel - -se 'extract($raw,"\d{8}")') -ge 20200726 ]]; then
+  if [[ $(xidel --version | xidel -s - -e 'extract($raw,"\d{8}")') -ge 20210529 ]]; then
     export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
-Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
     exit 1
@@ -136,7 +136,7 @@ EOF
 else
   cat 1>&2 <<EOF
 xivid: 'xidel' niet gevonden!
-Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
@@ -244,9 +244,8 @@ else
         },
         $temp:=tokenize(request-decode("'$url'")/host,"\."),
         $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")
-    for $x in $extractors()
-    return
-    if ($extractors($x) = $host) then (
+    for $x in $extractors() return
+    if ($extractors($x)=$host) then (
       json:=eval(x"xivid:{$x}(""'$url'"")"),
       extractor:=$x,
       fmts:=$json/(formats)()/id
@@ -280,7 +279,7 @@ if [[ $f ]]; then
         fi
       fi
     done
-    xidel - -e '
+    xidel -e '
       for $x in tokenize("'$f'","\+") return
       if (ends-with($x,"#")) then
         $json/(formats)()[starts-with(id,substring($x,1,string-length($x) - 1))][last()]/url
@@ -292,11 +291,11 @@ if [[ $f ]]; then
     exit 1
   fi
 elif [[ $i ]]; then
-  xidel - -e 'xivid:info($json)' <<< $json
+  xidel -e 'xivid:info($json)' <<< $json
 elif [[ $j ]]; then
-  xidel - -e '$json' <<< $json
+  xidel -e '$json' <<< $json
 elif [[ ${fmts[@]} ]]; then
-  xidel - -e '$json/(formats)()[last()]/url' <<< $json
+  xidel -e '$json/(formats)()[last()]/url' <<< $json
 else
   echo "xivid: geen video beschikbaar." 1>&2
   exit 1

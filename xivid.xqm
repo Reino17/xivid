@@ -294,9 +294,7 @@ declare function xivid:info($json as object()) as string* {
 };
 
 declare function xivid:bbvms(
-  $url as string?,
-  $publ as string?,
-  $title as string?
+  $url as string?, $publ as string?, $title as string?
 ) as object()? {
   let $json:=json-doc($url),
       $host:=$json/resolve-uri(

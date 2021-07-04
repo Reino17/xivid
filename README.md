@@ -88,7 +88,7 @@ https://rs.poms.omroep.nl/v1/api/subtitles/POW_03375558/nl_NL/CAPTION.vtt
 # Xidel
 [Xidel](http://videlibri.sourceforge.net/xidel.html) is een commandoregel programma voor het downloaden en informatie onttrekken van HTML/XML pagina's, JSON-APIs en lokale bestanden door gebruik te maken van CSS, XPath 3.0, XQuery 3.0, JSONiq, of pattern templates.
 
-Xivid maakt veelvuldig gebruik van Xidel en is dus essentieel. Minimale vereiste versie is `0.9.9.7433`.
+Xivid maakt veelvuldig gebruik van Xidel en is dus essentieel. Minimale vereiste versie is `0.9.9.7880`.
 
 ## Linux
 Download de Xidel [Linux binary](http://videlibri.sourceforge.net/xidel.html#downloads) en plaats `xidel` in `/usr/bin`, of ergens anders in `$PATH`.  

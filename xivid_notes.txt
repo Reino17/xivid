@@ -140,7 +140,7 @@ $ xidel -se '
 
 ------------------------------------------------------------------------------------------------
 
-$ echo '{"a":null}' | xidel - -se '
+$ echo '{"a":null}' | xidel -se '
   $json/join((exists(a),a)),
   jn:parse-json($raw)/join((exists(a),a)),
   parse-json($raw)/join((exists(a),a))
@@ -149,7 +149,7 @@ false
 true null
 false
 
-$ echo '{"a":null}' | xidel --json-mode=deprecated - -se '
+$ echo '{"a":null}' | xidel --json-mode=deprecated -se '
   $json/join((exists(a),a)),
   jn:parse-json($raw)/join((exists(a),a)),
   parse-json($raw)/join((exists(a),a))
@@ -158,15 +158,15 @@ true null
 true null
 false
 
-$ echo '{"a":null,"b":"foo"}' | xidel - -se '$json/concat((a,b),"bar")'
-$ echo '{"a":null,"b":"foo"}' | xidel - -se 'parse-json($raw)/concat((a,b),"bar")'
-$ echo '{"a":null,"b":"foo"}' | xidel - -se 'jn:parse-json($raw)/concat((a,b)[.],"bar")'
-$ echo '{"a":null,"b":"foo"}' | xidel --json-mode=deprecated - -se '$json/concat((a,b)[.],"bar")'
-$ echo '{"a":null,"b":"foo"}' | xidel --json-mode=deprecated - -se 'parse-json($raw)/concat((a,b),"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel -se '$json/concat((a,b),"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel -se 'parse-json($raw)/concat((a,b),"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel -se 'jn:parse-json($raw)/concat((a,b)[.],"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel --json-mode=deprecated -se '$json/concat((a,b)[.],"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel --json-mode=deprecated -se 'parse-json($raw)/concat((a,b),"bar")'
 foobar
 
-$ echo '{"a":null,"b":"foo"}' | xidel --json-mode=deprecated - -se '$json/concat((a,b),"bar")'
-$ echo '{"a":null,"b":"foo"}' | xidel - -se 'jn:parse-json($raw)/concat((a,b),"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel --json-mode=deprecated -se '$json/concat((a,b),"bar")'
+$ echo '{"a":null,"b":"foo"}' | xidel -se 'jn:parse-json($raw)/concat((a,b),"bar")'
 Error:
 err:XPTY0004: Invalid conversion from (null, "foo") to type singleton
 
@@ -497,7 +497,7 @@ $ xidel -se 'let $a:=33,$b:=73 return system(x"bash -c ""printf $(({$a} ^ {$b}))
 33_10  = 0100001_2
 73_10  = 1001001_2
          ------- XOR
-104_10 = 1101000_2 # Output is alleen 1 als input 0 én 1 of 1 én 0 is.
+104_10 = 1101000_2   # Output is alleen 1 als input 0 én 1 of 1 én 0 is.
 
 $ xidel -se '(33,73) ! x:integer-to-base(.,2)'
 100001
@@ -1267,7 +1267,7 @@ $ xidel -s --xquery 'let $a:=file:read-text-lines("xivid_notes.txt") return (rep
 
 Een here-string als input werkt ook, maar de $ moet dan wel ge-escaped worden:
 
-$ xidel -s - --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position() = 2 to last() - 1] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))' <<EOF
+$ xidel -s --xquery 'let $a:=x:lines($raw) return (replace($a[1],"&apos;","^&quot;")||"^",$a[position() = 2 to last() - 1] ! (replace(replace(replace(.,"%","%%"),"&quot;","&apos;"),"([&amp;<>^|])","^$1")||"^"),replace($a[last()],"&apos;","&quot;"))' <<EOF
 -e '
   let \$a:=string-join(
         tokenize(\$raw) ! x:integer-to-base(.,16)
@@ -2463,7 +2463,7 @@ https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2V
 
 - Creëer een m3u8-to-json functie van deze query.
 
-$ xidel -s --xquery 'declare function local:m3u8-to-json($url as string?) as object()* {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[raw[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then array{{"id":"hls-1","format":"m3u8[h264+aac]","url":$url}} else array{extract($m3u8/raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams group by $path:=x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")) let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate"?:(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! concat(.,"kbps"),"url":resolve-uri($path,$m3u8Url)}}}; local:m3u8-to-json(<url>)'
+$ xidel -s --xquery 'declare function local:m3u8-to-json($url as string?) as array() {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[raw[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then array{{"id":"hls-1","format":"m3u8[h264+aac]","url":$m3u8Url}} else array{extract($m3u8/raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams group by $path:=x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")) let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! concat("@",round-half-to-even(.,3),"fps"))[.],"bitrate"?:(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! concat(.,"kbps"),"url":resolve-uri($path,$m3u8Url)}}}; local:m3u8-to-json(<url>)'
 
 string    # Een string.
 string+   # Eén of meerdere strings.
@@ -3506,9 +3506,7 @@ $ xidel -s --module=xivid.xqm --xquery 'declare function local:bbvms($url as str
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:bbvms(
-  $url as string?,
-  $publ as string?,
-  $title as string?
+  $url as string?, $publ as string?, $title as string?
 ) as object()? {
   let $json:=json-doc($url),
       $host:=$json/resolve-uri(
@@ -6552,7 +6550,7 @@ $ xidel -s --module=xivid.xqm --xquery '
 
 Blue Billywig on-demand video-streams:
 
-$ xidel -se '
+$ xidel -s --xquery '
   for $x in (
     "https://www.omropfryslan.nl/utstjoering/fryslan-hjoed-fan-3-oktober-2020-1800",
     "https://www.rtvnoord.nl/tv/programma/10010/Noord-Vandaag/aflevering/35117",
@@ -7533,7 +7531,7 @@ Minimale wat voor mij (en hopelijk iedereen) werkt:
 
 Cookie: ndc_consent={"permissions":{"functional":true}}
 
-$ xidel -s --xquery '"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}}))'
+$ xidel -se '"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}}))'
 Cookie: ndc_consent=%7B%22permissions%22%3A%20%7B%22functional%22%3A%20true%7D%7D
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -8670,7 +8668,7 @@ declare function xivid:xhamster($url as string) as object()? {
 https://www.twitch.tv/esl_csgo
 
 $ xidel -s "https://www.twitch.tv/esl_csgo" -e '//script[contains(.,"Client-ID")]'
-try{var defaultSpadeEndpoint="https://spade.twitch.tv/track"; [...] headers:{"Client-ID":"kimne78kx3ncx6brgo4mv6wki5h1ko", [...]
+try{var defaultSpadeEndpoint="https://spade.twitch.tv/track";[...]headers:{"Client-ID":"kimne78kx3ncx6brgo4mv6wki5h1ko",[...]
 
 Deze client-id is altijd hetzelfde en is nodig voor het raadplegen van de Twitch API.
 

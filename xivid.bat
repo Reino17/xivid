@@ -125,19 +125,19 @@ EXIT /B
 SETLOCAL DISABLEDELAYEDEXPANSION
 SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
-  FOR /F "delims=" %%B IN ('xidel --version ^| xidel - -se "extract($raw,'\d{8}')"') DO (
-    IF %%B GEQ 20200726 (
-      SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm"
-    ) ELSE (
-      ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
-      ECHO Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
-      ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
-      EXIT /B 1
-    )
+  FOR /F "delims=" %%B IN ('
+    xidel --version ^| xidel -s - -e "extract($raw,'\d{8}')"
+  ') DO IF %%B GEQ 20210529 (
+    SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm"
+  ) ELSE (
+    ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
+    ECHO Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+    ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
+    EXIT /B 1
   )
 ) ELSE (
   ECHO xivid: 'xidel.exe' niet gevonden!
-  ECHO Installeer Xidel 0.9.9.7433 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+  ECHO Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
   ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
   EXIT /B 1
 )
@@ -243,9 +243,8 @@ IF NOT "%url:twitch.tv=%"=="%url%" (
         }^,
         $temp:^=tokenize^(request-decode^(environment-variable^('url'^)^)/host^,'\.'^)^,
         $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
-    for $x in $extractors^(^)
-    return
-    if ^($extractors^($x^) ^= $host^) then ^(
+    for $x in $extractors^(^) return
+    if ^($extractors^($x^)^=$host^) then ^(
       json:^=eval^(x'xivid:{$x}^(''{environment-variable^('url'^)}''^)'^)^,
       extractor:^=$x^,
       fmts:^=join^($json/^(formats^)^(^)/id^)
@@ -283,7 +282,7 @@ IF DEFINED f (
         )
       )
     )
-    ECHO !json! | xidel - -e ^"^
+    ECHO !json! | xidel -e ^"^
       for $x in tokenize^('%f%'^,'\+'^) return^
       if ^(ends-with^($x^,'#'^)^) then^
         $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
@@ -295,11 +294,11 @@ IF DEFINED f (
     EXIT /B 1
   )
 ) ELSE IF DEFINED i (
-  ECHO %json% | xidel - -e "xivid:info($json)"
+  ECHO %json% | xidel -e "xivid:info($json)"
 ) ELSE IF DEFINED j (
-  ECHO %json% | xidel - -e "$json"
+  ECHO %json% | xidel -e "$json"
 ) ELSE IF DEFINED fmts (
-  ECHO %json% | xidel - -e "$json/(formats)()[last()]/url"
+  ECHO %json% | xidel -e "$json/(formats)()[last()]/url"
 ) ELSE (
   ECHO xivid: geen video beschikbaar.
   EXIT /B 1
