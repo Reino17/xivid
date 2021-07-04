@@ -1565,22 +1565,22 @@ $ xidel -s "$var" -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuratio
 2     # Begin restant.
 65    # Tijdsduur.
 
-$ xidel -s "$var" -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return x"Download: ffmpeg -ss {$ss[1]} -i <url> -ss {$ss[2]} -t {$dur[2]} [...]")'
-Download: ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
+$ xidel -s "$var" -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return x"Download: ffmpeg -ss {$ss[1]} -i <url> -ss {$ss[2]} -t {$dur[2]} -c copy <bestandsnaam>")'
+Download: ffmpeg -ss 540 -i <url> -ss 2 -t 65 -c copy <bestandsnaam>
 
 Begin PT29S:
 
-$ xidel -s '{"duration":"PT10S","start":"PT29S"}' -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return concat("Download: ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ",x"-i <url> -ss {$ss[2]} -t {$dur[2]} [...]"))'
-Download: ffmpeg -i <url> -ss 29 -t 10 [...]
+$ xidel -s '{"duration":"PT10S","start":"PT29S"}' -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return concat("Download: ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ",x"-i <url> -ss {$ss[2]} -t {$dur[2]} <bestandsnaam>"))'
+Download: ffmpeg -i <url> -ss 29 -t 10 -c copy <bestandsnaam>
 
 Begin PT30S:
 
-$ xidel -s '{"duration":"PT10S","start":"PT30S"}' -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return concat("Download: ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ","-i <url> ",$ss[2][. gt 0] ! x"-ss {.} ",x"-t {$dur[2]} [...]"))'
-Download: ffmpeg -ss 30 -i <url> -t 10 [...]
+$ xidel -s '{"duration":"PT10S","start":"PT30S"}' -e '$json[start]/(let $dur:=(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return concat("Download: ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ","-i <url> ",$ss[2][. gt 0] ! x"-ss {.} ",x"-t {$dur[2]} <bestandsnaam>"))'
+Download: ffmpeg -ss 30 -i <url> -t 10 -c copy <bestandsnaam>
 
-PT29S --> ffmpeg -i <url> -ss 29 -t 10 [...]
-PT30S --> ffmpeg -ss 30 -i <url> -t 10 [...]
-PT31S --> ffmpeg -ss 30 -i <url> -ss 1 -t 10 [...]
+PT29S --> ffmpeg -i <url> -ss 29 -t 10 -c copy <bestandsnaam>
+PT30S --> ffmpeg -ss 30 -i <url> -t 10 -c copy <bestandsnaam>
+PT31S --> ffmpeg -ss 30 -i <url> -ss 1 -t 10 -c copy <bestandsnaam>
 
 ------------------------------------------------------------------------------------------------
 
@@ -1604,7 +1604,7 @@ Formaten:--id-----formaat---------taal--resolutie--bitrate
 
 Plak " (best)" achter de waarde van het laatste attribuut van het laatste object + de FFmpeg commando (en daadwerkelijk spaties):
 
-$ xidel -s "$var" --module=xivid.xqm --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)),$fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]),$f_len:=$f_lbl[position() lt last()] ! max($fmts()(.) ! string-length()),$dur:=$json[start]/(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return (for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! " "),if ($x="formats") then join($fmts() ! string-join(for $x at $i in $f_lbl return (if (position() eq count($fmts()) and $i eq count($f_lbl)) then .($x)||" (best)" else .($x),(1 to $f_len[$i] - string-length(.($x)) + 2) ! " ")),"&#10;"||(1 to max($len) + 1) ! " ") else if ($x=("date","expdate")) then format-dateTime(xivid:adjust-dateTime-to-dst($json($x)),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]") else if ($x=("duration","start","end")) then duration($json($x)) + time("00:00:00") else $json($x)),concat(x"Download:{string-join((1 to max($len) - 9 + 1) ! " ")}ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ","-i <url> ",$ss[2][. gt 0] ! x"-ss {.} ",x"-t {$dur[2]} [...]")[exists($dur)])'
+$ xidel -s "$var" --module=xivid.xqm --xquery 'let $lbl:={"name":"Naam:","date":"Datum:","duration":"Tijdsduur:","start":"Begin:","end":"Einde:","expdate":"Gratis tot:","formats":"Formaten:"},$len:=$json() ! string-length($lbl(.)),$fmts:=array{{"id":"id","format":"formaat","language":"taal","resolution":"resolutie","samplerate":"frequentie","bitrate":"bitrate"},$json/(formats)()},$f_lbl:=$fmts(1)() ! distinct-values(for $x in $fmts()[position() gt 1] return .[$x(.)]),$f_len:=$f_lbl[position() lt last()] ! max($fmts()(.) ! string-length()),$dur:=$json[start]/(start,duration) ! (dayTimeDuration(.) div dayTimeDuration("PT1S")),$ss:=($dur[1] - $dur[1] mod 30,$dur[1] mod 30) return (for $x at $i in $json() return concat($lbl($x),string-join((1 to max($len) - $len[$i] + 1) ! " "),if ($x="formats") then join($fmts() ! string-join(for $x at $i in $f_lbl return (if (position() eq count($fmts()) and $i eq count($f_lbl)) then .($x)||" (best)" else .($x),(1 to $f_len[$i] - string-length(.($x)) + 2) ! " ")),"&#10;"||(1 to max($len) + 1) ! " ") else if ($x=("date","expdate")) then format-dateTime(xivid:adjust-dateTime-to-dst($json($x)),"[D01]-[M01]-[Y] [H01]:[m01]:[s01]") else if ($x=("duration","start","end")) then duration($json($x)) + time("00:00:00") else $json($x)),concat(x"Download:{string-join((1 to max($len) - 9 + 1) ! " ")}ffmpeg ",$ss[1][. gt 0] ! x"-ss {.} ","-i <url> ",$ss[2][. gt 0] ! x"-ss {.} ",x"-t {$dur[2]} -c copy <bestandsnaam>")[exists($dur)])'
 Naam:      NOS Journaal: STOP! Verkeerslicht voor telefoonverslaafde
 Datum:     14-02-2017 13:00:00
 Tijdsduur: 00:01:05
@@ -1619,7 +1619,7 @@ Formaten:  id     formaat         taal  resolutie  bitrate
            hls-4  m3u8[h264+aac]        640x360    517|128kbps
            hls-5  m3u8[h264+aac]        768x432    721|128kbps
            hls-6  m3u8[h264+aac]        1024x576   1027|128kbps (best)
-Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 [...]
+Download:  ffmpeg -ss 540 -i <url> -ss 2 -t 65 -c copy <bestandsnaam>
 
 ------------------------------------------------------------------------------------------------
 
@@ -1681,7 +1681,7 @@ declare function xivid:info($json as object()) as string* {
       $ss[1][. gt 0] ! x"-ss {.} ",
       "-i <url> ",
       $ss[2][. gt 0] ! x"-ss {.} ",
-      x"-t {$dur[2]} [...]"
+      x"-t {$dur[2]} -c copy <bestandsnaam>"
     )[exists($dur)]
   )
 };

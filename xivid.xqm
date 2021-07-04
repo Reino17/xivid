@@ -288,7 +288,7 @@ declare function xivid:info($json as object()) as string* {
       $ss[1][. gt 0] ! x"-ss {.} ",
       "-i <url> ",
       $ss[2][. gt 0] ! x"-ss {.} ",
-      x"-t {$dur[2]} [...]"
+      x"-t {$dur[2]} -c copy <bestandsnaam>"
     )[exists($dur)]
   )
 };
