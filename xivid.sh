@@ -59,69 +59,6 @@ Voorbeelden:
 EOF
 }
 
-twitch() {
-  eval "$(xidel "$1" --xquery '
-    declare variable $id:=extract($url,".+/(.+)",1);
-    declare variable $cid:="kimne78kx3ncx6brgo4mv6wki5h1ko";
-    json:=if ($id castable as integer) then
-      let $a:=x:request({
-            "headers":"Client-ID: "||$cid,
-            "url":"https://api.twitch.tv/kraken/videos/"||$id
-          })/json,
-          $b:=x:request({
-            "headers":"Client-ID: "||$cid,
-            "url":concat("http://api.twitch.tv/api/vods/",$id,"/access_token")
-          })/json
-      return {
-        "name":"Twitch: "||$a/title,
-        "date":format-date(
-          dateTime($a/published_at),
-          "[D01]-[M01]-[Y]"
-        ),
-        "duration":format-time(
-          $a/length * duration("PT1S"),
-          "[H01]:[m01]:[s01]"
-        ),
-        "formats":xivid:m3u8-to-json(
-          concat(
-            "https://usher.ttvnw.net/vod/",
-            $id,
-            ".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;player=twitchweb&amp;sig=",
-            $b/sig,
-            "&amp;token=",
-            uri-encode($b/token)
-          )
-        )
-      }
-    else
-      let $a:=x:request({
-            "headers":"Client-ID: "||$cid,
-            "url":concat("http://api.twitch.tv/kraken/streams/",$id,"?stream_type=all")
-          })/json,
-          $b:=x:request({
-            "headers":"Client-ID: "||$cid,
-            "url":concat("http://api.twitch.tv/api/channels/",$id,"/access_token")
-          })/json
-      return {
-        "name":"Twitch: "||$a//status,
-        "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-        "formats":xivid:m3u8-to-json(
-          concat(
-            "https://usher.ttvnw.net/api/channel/hls/",
-            $id,
-            ".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;p=",
-            random-seed(),
-            random(1000000),
-            "&amp;player=twitchweb&amp;segment_preference=4&amp;sig=",
-            $b/sig,
-            "&amp;token=",
-            uri-encode($b/token)
-          )
-        )
-      }
-  ' --output-format=bash)"
-}
-
 if command -v xidel >/dev/null; then
   if [[ $(xidel --version | xidel -s - -e 'extract($raw,"\d{8}")') -ge 20210708 ]]; then
     export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm"
@@ -207,54 +144,51 @@ while true; do
   shift
 done
 
-if [[ $url =~ twitch.tv ]]; then
-  twitch "$url"
-else
-  eval "$(xidel -e '
-    let $extractors:={
-          "npo":array{"npostart.nl","gemi.st"},
-          "nos":array{"nos.nl"},
-          "rtl":array{"rtlxl.nl","rtlnieuws.nl"},
-          "kijk":array{"kijk.nl"},
-          "tvblik":array{"tvblik.nl","uitzendinggemist.net"},
-          "regio":array{
-            "omropfryslan.nl","rtvnoord.nl","rtvdrenthe.nl","rtvoost.nl",
-            "omroepwest.nl","rijnmond.nl","rtvutrecht.nl","omroepgelderland.nl",
-            "omroepzeeland.nl","omroepbrabant.nl","l1.nl"
-          },
-          "nhnieuws":array{"nhnieuws.nl","at5.nl"},
-          "ofl":array{"omroepflevoland.nl"},
-          "dumpert":array{"dumpert.nl"},
-          "autojunk":array{"autojunk.nl"},
-          "abhd":array{"abhd.nl"},
-          "autoblog":array{"autoblog.nl"},
-          "telegraaf":array{"telegraaf.nl"},
-          "ad":array{"ad.nl"},
-          "lc":array{"lc.nl"},
-          "youtube":array{"youtube.com","youtu.be"},
-          "vimeo":array{"vimeo.com"},
-          "dailymotion":array{"dailymotion.com"},
-          "mixcloud":array{"mixcloud.com"},
-          "soundcloud":array{"soundcloud.com"},
-          "facebook":array{"facebook.com","fb.watch"},
-          "twitter":array{"twitter.com"},
-          "instagram":array{"instagram.com"},
-          "pornhub":array{"pornhub.com"},
-          "xhamster":array{"xhamster.com"},
-          "xtube":array{"xtube.com"}
+eval "$(xidel -e '
+  let $extractors:={
+        "npo":array{"npostart.nl","gemi.st"},
+        "nos":array{"nos.nl"},
+        "rtl":array{"rtlxl.nl","rtlnieuws.nl"},
+        "kijk":array{"kijk.nl"},
+        "tvblik":array{"tvblik.nl","uitzendinggemist.net"},
+        "regio":array{
+          "omropfryslan.nl","rtvnoord.nl","rtvdrenthe.nl","rtvoost.nl",
+          "omroepwest.nl","rijnmond.nl","rtvutrecht.nl","omroepgelderland.nl",
+          "omroepzeeland.nl","omroepbrabant.nl","l1.nl"
         },
-        $temp:=tokenize(request-decode("'$url'")/host,"\."),
-        $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")
-    for $x in $extractors() return
-    if ($extractors($x)=$host) then (
-      json:=eval(x"xivid:{$x}(""'$url'"")"),
-      extractor:=$x,
-      fmts:=$json/(formats)()/id
-    )
-    else
-      ()
-  ' --output-format=bash)"
-fi
+        "nhnieuws":array{"nhnieuws.nl","at5.nl"},
+        "ofl":array{"omroepflevoland.nl"},
+        "dumpert":array{"dumpert.nl"},
+        "autojunk":array{"autojunk.nl"},
+        "abhd":array{"abhd.nl"},
+        "autoblog":array{"autoblog.nl"},
+        "telegraaf":array{"telegraaf.nl"},
+        "ad":array{"ad.nl"},
+        "lc":array{"lc.nl"},
+        "youtube":array{"youtube.com","youtu.be"},
+        "vimeo":array{"vimeo.com"},
+        "dailymotion":array{"dailymotion.com"},
+        "twitch":array{"twitch.tv"},
+        "mixcloud":array{"mixcloud.com"},
+        "soundcloud":array{"soundcloud.com"},
+        "facebook":array{"facebook.com","fb.watch"},
+        "twitter":array{"twitter.com"},
+        "instagram":array{"instagram.com"},
+        "pornhub":array{"pornhub.com"},
+        "xhamster":array{"xhamster.com"},
+        "xtube":array{"xtube.com"}
+      },
+      $temp:=tokenize(request-decode("'$url'")/host,"\."),
+      $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")
+  for $x in $extractors() return
+  if ($extractors($x)=$host) then (
+    json:=eval(x"xivid:{$x}(""'$url'"")"),
+    extractor:=$x,
+    fmts:=$json/(formats)()/id
+  )
+  else
+    ()
+' --output-format=bash)"
 
 if [[ ! $extractor ]]; then
   echo "xivid: url wordt niet ondersteund." 1>&2

@@ -1019,6 +1019,119 @@ declare function xivid:dailymotion($url as string) as object()? {
   }
 };
 
+declare function xivid:twitch($url as string) as object()? {
+  let $call_api:=function($query as object()) as object() {
+        x:request({
+          "headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko",
+          "post":serialize($query,{"method":"json"}),
+          "url":"https://gql.twitch.tv/gql"
+        })/json
+      },
+      $path:=tokenize(
+        request-decode($url)/substring-after(url,host),"/"
+      )[.],
+      $token:=$call_api(
+        if ($path="clip") then {
+          "operationName":"VideoAccessToken_Clip",
+          "variables":{"slug":$path[last()]},
+          "extensions":{
+            "persistedQuery":{
+              "version":1,
+              "sha256Hash":"36b89d2507fce29e5ca551df756d27c1cfe079e2609642b4390aa4c35796eb11"
+            }
+          }
+        } else {
+          "query":concat(
+            if ($path="video") then
+              "{videoPlaybackAccessToken(id:&quot;"
+            else
+              "{streamPlaybackAccessToken(channelName:&quot;",
+              $path[last()],
+              "&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;",
+              "mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}"
+          )
+        }
+      )/data/*
+  return
+  $call_api(
+    {
+      "operationName":"ComscoreStreamingQuery",
+      "variables":if ($path="video") then {
+        "channel":"",
+        "isLive":false(),
+        "isVodOrCollection":true(),
+        "vodID":$path[last()],
+        "isClip":false(),
+        "clipSlug":""
+      } else if ($path="clip") then {
+        "channel":"",
+        "isLive":false(),
+        "isVodOrCollection":false(),
+        "vodID":"",
+        "isClip":true(),
+        "clipSlug":$path[last()]
+      } else {
+        "channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),
+        "vodID":"","isClip":false(),"clipSlug":""
+      },
+      "extensions":{
+        "persistedQuery":{
+          "version":1,
+          "sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"
+        }
+      }
+    }
+  )/data/*/{
+    "name":"Twitch: "||(
+      .[__typename="Video"]/concat(owner/displayName," - ",title),
+      .[__typename="Clip"]/concat(broadcaster/displayName," - ",title),
+      .[__typename="User"]/concat(displayName,": ",broadcastSettings/title)
+    ),
+    "date":(stream/createdAt,createdAt),
+    "duration"?:lengthSeconds * duration("PT1S"),
+    "formats":if ($path="clip") then
+      $token/array{
+        for $x at $i in (videoQualities)()
+        order by $x/quality
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("640x320","854x480","1280x720")[$i],
+          "url":request-combine(
+            $x/sourceURL,
+            playbackAccessToken/{"sig":signature,"token":value}
+          )/url
+        }
+      }
+    else
+      xivid:m3u8-to-json(
+        request-combine(
+          concat(
+            "https://usher.ttvnw.net/",
+            if ($path="video") then
+              "vod/"
+            else
+              "api/channel/hls/",
+            $path[last()],
+            ".m3u8"
+          ),
+          {
+            "allow_source":true(),
+            "allow_audio_only":true(),
+            "allow_spectre":true(),
+            "fast_bread"?:if ($path="video") then () else true(),
+            "p":(random-seed(),100000 + random(9900000)),
+            "player_backend":"mediaplayer",
+            "playlist_include_framerate":true(),
+            "sig":$token/signature,
+            "token":$token/value
+          }
+        )/url
+      )
+  }
+};
+
 declare function xivid:mixcloud($url as string) as object()? {
   let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),
       $decrypt:=function($arg as string) as string {

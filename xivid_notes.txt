@@ -8909,211 +8909,297 @@ declare function xivid:xtube($url as string) as object()? {
 
 [twitch]
 
-https://www.twitch.tv/esl_csgo
+$ url=https://www.twitch.tv/esl_csgo
 
-$ xidel -s "https://www.twitch.tv/esl_csgo" -e '//script[contains(.,"Client-ID")]'
+$ xidel -se '{"operationName":"ComscoreStreamingQuery","variables":{"channel":extract("'$url'",".+/(.+)",1),"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}}'
+{
+  "operationName": "ComscoreStreamingQuery",
+  "variables": {
+    "channel": "esl_csgo",
+    "isLive": true,
+    "isVodOrCollection": false,
+    "vodID": "",
+    "isClip": false,
+    "clipSlug": ""
+  },
+  "extensions": {
+    "persistedQuery": {
+      "version": 1,
+      "sha256Hash": "e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"
+    }
+  }
+}
+
+$ xidel -se 'doc("'$url'")//script[contains(.,"Client-ID")]'
 try{var defaultSpadeEndpoint="https://spade.twitch.tv/track";[...]headers:{"Client-ID":"kimne78kx3ncx6brgo4mv6wki5h1ko",[...]
 
 Deze client-id is altijd hetzelfde en is nodig voor het raadplegen van de Twitch API.
 
-$ xidel -s -H "Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko" "http://api.twitch.tv/kraken/streams/esl_csgo?stream_type=all" -e '$json'
+$ xidel -se '{"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize({"operationName":"ComscoreStreamingQuery","variables":{"channel":extract("'$url'",".+/(.+)",1),"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}},{"method":"json"}),"url":"https://gql.twitch.tv/gql"}'
 {
-  "stream": {
-    "_id": 1.75897697E8,
-    "game": "Counter-Strike: Global Offensive",
-    "viewers": 4457,
-    "video_height": 1080,
-    "average_fps": 60,
-    "delay": 0,
-    "created_at": "2019-11-16T08:42:23Z",
-    "is_playlist": false,
-    "stream_type": "live",
-    "preview": {
-      "small": "https://static-cdn.jtvnw.net/previews-ttv/live_user_esl_csgo-80x45.jpg",
-      "medium": "https://static-cdn.jtvnw.net/previews-ttv/live_user_esl_csgo-320x180.jpg",
-      "large": "https://static-cdn.jtvnw.net/previews-ttv/live_user_esl_csgo-640x360.jpg",
-      "template": "https://static-cdn.jtvnw.net/previews-ttv/live_user_esl_csgo-{width}x{height}.jpg"
-    },
-    "channel": {
-      "mature": false,
-      "partner": true,
-      "status": "RERUN: CS:GO - Envy vs. Singularity [Dust2] Map 2 - Group A - ESL NA Pro League Season 10",
-      "broadcaster_language": "en",
-      "broadcaster_software": "",
-      "display_name": "ESL_CSGO",
-      "game": "Counter-Strike: Global Offensive",
-      "language": "en",
-      "_id": 3.1239503E7,
-      "name": "esl_csgo",
-      "created_at": "2012-06-11T13:36:21Z",
-      "updated_at": "2019-11-16T15:04:11Z",
-      "delay": null,
-      "logo": "https://static-cdn.jtvnw.net/jtv_user_pictures/1975b18f-fa7d-443f-b191-fba08f92f3a2-profile_image-300x300.jpeg",
-      "banner": null,
-      "video_banner": "https://static-cdn.jtvnw.net/jtv_user_pictures/7d7ef6e1-7db0-445c-8e8c-1c963afd4cd6-channel_offline_image-1920x1080.jpeg",
-      "background": null,
-      "profile_banner": "https://static-cdn.jtvnw.net/jtv_user_pictures/b94955f2-b9f6-4200-8179-3bdf5e032bdf-profile_banner-480.jpeg",
-      "profile_banner_background_color": "#000000",
-      "url": "https://www.twitch.tv/esl_csgo",
-      "views": 4.06584807E8,
-      "followers": 3.34725E6,
-      "_links": {
-        "self": "https://api.twitch.tv/kraken/channels/esl_csgo",
-        "follows": "https://api.twitch.tv/kraken/channels/esl_csgo/follows",
-        "commercial": "https://api.twitch.tv/kraken/channels/esl_csgo/commercial",
-        "stream_key": "https://api.twitch.tv/kraken/channels/esl_csgo/stream_key",
-        "chat": "https://api.twitch.tv/kraken/chat/esl_csgo",
-        "features": "https://api.twitch.tv/kraken/channels/esl_csgo/features",
-        "subscriptions": "https://api.twitch.tv/kraken/channels/esl_csgo/subscriptions",
-        "editors": "https://api.twitch.tv/kraken/channels/esl_csgo/editors",
-        "teams": "https://api.twitch.tv/kraken/channels/esl_csgo/teams",
-        "videos": "https://api.twitch.tv/kraken/channels/esl_csgo/videos"
-      }
-    },
-    "_links": {
-      "self": "https://api.twitch.tv/kraken/streams/esl_csgo"
+  "headers": "Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko",
+  "post": "{\"operationName\":\"ComscoreStreamingQuery\",\"variables\":{\"channel\":\"esl_csgo\",\"isLive\":true,\"isVodOrCollection\":false,\"vodID\":\"\",\"isClip\":false,\"clipSlug\":\"\"},\"extensions\":{\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01\"}}}",
+  "url": "https://gql.twitch.tv/gql"
+}
+
+$ xidel -se 'x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize({"operationName":"ComscoreStreamingQuery","variables":{"channel":extract("'$url'",".+/(.+)",1),"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}},{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json'
+{
+  "data": {
+    "user": {
+      "id": "31239503",
+      "displayName": "ESL_CSGO",
+      "stream": {
+        "id": "42734840236",
+        "createdAt": "2021-07-24T09:07:25Z",
+        "game": {
+          "id": "32399",
+          "name": "Counter-Strike: Global Offensive",
+          "__typename": "Game"
+        },
+        "__typename": "Stream"
+      },
+      "broadcastSettings": {
+        "id": "31239503",
+        "title": "FaZe Up or Down?! - Gambit vs. FaZe Clan IEM Cologne 2021 Quarterfinals OFFICIAL HIGHLIGHTS",
+        "__typename": "BroadcastSettings"
+      },
+      "__typename": "User"
     }
   },
-  "_links": {
-    "self": "https://api.twitch.tv/kraken/streams/esl_csgo",
-    "channel": "https://api.twitch.tv/kraken/channels/esl_csgo"
+  "extensions": {
+    "durationMilliseconds": 67,
+    "operationName": "ComscoreStreamingQuery",
+    "requestID": "01FBDAFM7SHJ317SFBRMYHSCX3"
   }
 }
 
-$ xidel -s -H "Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko" "http://api.twitch.tv/api/channels/esl_csgo/access_token" -e '$json'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+GraphQL query voor het genereren van een token en signature:
+
 {
-  "token": "{\"adblock\":false,\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"blackout_enabled\":false,\"channel\":\"esl_csgo\",\"channel_id\":31239503,\"chansub\":{\"restricted_bitrates\":[],\"view_until\":1924905600},\"ci_gb\":false,\"geoblock_reason\":\"\",\"device_id\":null,\"expires\":1573919018,\"game\":\"Counter-Strike: Global Offensive\",\"hide_ads\":false,\"https_required\":false,\"mature\":false,\"partner\":false,\"platform\":null,\"player_type\":null,\"private\":{\"allowed_to_view\":true},\"privileged\":false,\"server_ads\":true,\"show_ads\":true,\"subscriber\":false,\"turbo\":false,\"user_id\":null,\"user_ip\":\"x.x.x.x\",\"version\":2}",
-  "sig": "63d1cdb256c5593de5cc287e1f6c9bbe876c255e",
-  "mobile_restricted": false,
-  "expires_at": "2019-11-16T15:43:38Z"
+  streamPlaybackAccessToken(
+    channelName: "esl_csgo",
+    params:{
+      platform: "web",
+      playerBackend: "mediaplayer",
+      playerType: "site"
+    }
+  ) {
+    value,
+    signature
+  }
 }
 
-$ xidel -s -H "Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko" "http://api.twitch.tv/api/channels/esl_csgo/access_token" -e '$json/token'
-{"adblock":false,"authorization":{"forbidden":false,"reason":""},"blackout_enabled":false,"channel":"esl_csgo","channel_id":31239503,"chansub":{"restricted_bitrates":[],"view_until":1924905600},"ci_gb":false,"geoblock_reason":"","device_id":null,"expires":1573919018,"game":"Counter-Strike: Global Offensive","hide_ads":false,"https_required":false,"mature":false,"partner":false,"platform":null,"player_type":null,"private":{"allowed_to_view":true},"privileged":false,"server_ads":true,"show_ads":true,"subscriber":false,"turbo":false,"user_id":null,"user_ip":"x.x.x.x","version":2}
+Minified:
 
-$ xidel -s -H "Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko" "http://api.twitch.tv/api/channels/esl_csgo/access_token" -e '$json/uri-encode(token)'
-%7B%22adblock%22%3Afalse%2C%22authorization%22%3A%7B%22forbidden%22%3Afalse%2C%22reason%22%3A%22%22%7D%2C%22blackout_enabled%22%3Afalse%2C%22channel%22%3A%22esl_csgo%22%2C%22channel_id%22%3A31239503%2C%22chansub%22%3A%7B%22restricted_bitrates%22%3A%5B%5D%2C%22view_until%22%3A1924905600%7D%2C%22ci_gb%22%3Afalse%2C%22geoblock_reason%22%3A%22%22%2C%22device_id%22%3Anull%2C%22expires%22%3A1573919018%2C%22game%22%3A%22Counter-Strike%3A%20Global%20Offensive%22%2C%22hide_ads%22%3Afalse%2C%22https_required%22%3Afalse%2C%22mature%22%3Afalse%2C%22partner%22%3Afalse%2C%22platform%22%3Anull%2C%22player_type%22%3Anull%2C%22private%22%3A%7B%22allowed_to_view%22%3Atrue%7D%2C%22privileged%22%3Afalse%2C%22server_ads%22%3Atrue%2C%22show_ads%22%3Atrue%2C%22subscriber%22%3Afalse%2C%22turbo%22%3Afalse%2C%22user_id%22%3Anull%2C%22user_ip%22%3A%22x.x.x.x%22%2C%22version%22%3A2%7D
+{streamPlaybackAccessToken(channelName:"esl_csgo",params:{platform:"web",playerBackend:"mediaplayer",playerType:"site"}){value,signature}}
 
-Voor de "usher.ttvnw.net"-url-parameters zie https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/twitch.py.
+Dient als string(!) waarde van een "query" attribuut in een geserialiseerd JSON object als POST request naar https://gql.twitch.tv/gql gestuurd te worden.
 
-$ xidel -s --module=xivid.xqm -e 'let $a:="kimne78kx3ncx6brgo4mv6wki5h1ko",$b:=x:request({"headers":"Client-ID: "||$a,"url":"http://api.twitch.tv/kraken/streams/esl_csgo?stream_type=all"})/json,$c:=x:request({"headers":"Client-ID: "||$a,"url":"http://api.twitch.tv/api/channels/esl_csgo/access_token"})/json return {"name":"Twitch: "||$b//status,"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(concat("https://usher.ttvnw.net/api/channel/hls/esl_csgo.m3u8?allow_source=true&allow_audio_only=true&allow_spectre=true&p=",random-seed(),random(1000000),"&player=twitchweb&segment_preference=4&sig=",$c/sig,"&token=",uri-encode($c/token)))}'
+$ xidel -se '{"query":concat("{streamPlaybackAccessToken(channelName:""",extract("'$url'",".+/(.+)",1),""",params:{platform:""web"",playerBackend:""mediaplayer"",playerType:""site""}){value,signature}}")}'
+$ xidel -se '{"query":concat("{streamPlaybackAccessToken(channelName:&quot;",extract("'$url'",".+/(.+)",1),"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")}'
 {
-  "name": "Twitch: RERUN: CS:GO - Envy vs. Singularity [Nuke] Map 3 - Group A - ESL NA Pro League Season 10",
-  "date": "16-11-2019",
+  "query": "{streamPlaybackAccessToken(channelName:\"esl_csgo\",params:{platform:\"web\",playerBackend:\"mediaplayer\",playerType:\"site\"}){value,signature}}"
+}
+
+$ xidel -se '{"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize({"query":concat("{streamPlaybackAccessToken(channelName:&quot;",extract("'$url'",".+/(.+)",1),"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")},{"method":"json"}),"url":"https://gql.twitch.tv/gql"}'
+{
+  "headers": "Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko",
+  "post": "{\"query\":\"{streamPlaybackAccessToken(channelName:\\\"esl_csgo\\\",params:{platform:\\\"web\\\",playerBackend:\\\"mediaplayer\\\",playerType:\\\"site\\\"}){value,signature}}\"}",
+  "url": "https://gql.twitch.tv/gql"
+}
+
+$ xidel -se 'x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize({"query":concat("{streamPlaybackAccessToken(channelName:&quot;",extract("'$url'",".+/(.+)",1),"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")},{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json'
+{
+  "data": {
+    "streamPlaybackAccessToken": {
+      "value": "{\"adblock\":false,\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"blackout_enabled\":false,\"channel\":\"esl_csgo\",\"channel_id\":31239503,\"chansub\":{\"restricted_bitrates\":[],\"view_until\":1924905600},\"ci_gb\":false,\"geoblock_reason\":\"\",\"device_id\":null,\"expires\":1627062617,\"extended_history_allowed\":false,\"game\":\"\",\"hide_ads\":false,\"https_required\":true,\"mature\":false,\"partner\":false,\"platform\":\"web\",\"player_type\":\"site\",\"private\":{\"allowed_to_view\":true},\"privileged\":false,\"role\":\"\",\"server_ads\":true,\"show_ads\":true,\"subscriber\":false,\"turbo\":false,\"user_id\":null,\"user_ip\":\"x.x.x.x\",\"version\":2}",
+      "signature": "f1f8c28323aedeaff9b2468eca978b2ca74174fd"
+    }
+  },
+  "extensions": {
+    "durationMilliseconds": 57,
+    "requestID": "01FBA6NXTWEZ2WQN4393D2A3TY"
+  }
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Het token en de signature dienen vervolgens als parameter in een lange query toegevoegd te worden voor toegang tot het HLS manifest.
+
+$ xidel -se 'let $token:=x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize({"query":concat("{streamPlaybackAccessToken(channelName:&quot;",extract("'$url'",".+/(.+)",1),"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")},{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json/data/streamPlaybackAccessToken return {"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread":true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value}'
+{
+  "allow_source": true,
+  "allow_audio_only": true,
+  "allow_spectre": true,
+  "fast_bread": true,
+  "p": 262133,
+  "player_backend": "mediaplayer",
+  "playlist_include_framerate": true,
+  "sig": "f1f8c28323aedeaff9b2468eca978b2ca74174fd",
+  "token": "{\"adblock\":false,\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"blackout_enabled\":false,\"channel\":\"esl_csgo\",\"channel_id\":31239503,\"chansub\":{\"restricted_bitrates\":[],\"view_until\":1924905600},\"ci_gb\":false,\"geoblock_reason\":\"\",\"device_id\":null,\"expires\":1627062617,\"extended_history_allowed\":false,\"game\":\"\",\"hide_ads\":false,\"https_required\":true,\"mature\":false,\"partner\":false,\"platform\":\"web\",\"player_type\":\"site\",\"private\":{\"allowed_to_view\":true},\"privileged\":false,\"role\":\"\",\"server_ads\":true,\"show_ads\":true,\"subscriber\":false,\"turbo\":false,\"user_id\":null,\"user_ip\":\"x.x.x.x\",\"version\":2}"
+}
+
+$ xidel -se 'let $token:=x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize({"query":concat("{streamPlaybackAccessToken(channelName:&quot;",extract("'$url'",".+/(.+)",1),"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")},{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json/data/streamPlaybackAccessToken return request-combine(x"https://usher.ttvnw.net/api/channel/hls/{extract("'$url'",".+/(.+)",1)}.m3u8",{"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread":true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value})/url'
+https://usher.ttvnw.net/api/channel/hls/esl_csgo.m3u8?allow_source=true&allow_audio_only=true&allow_spectre=true&fast_bread=true&p=165272&player_backend=mediaplayer&playlist_include_framerate=true&sig=f1f8c28323aedeaff9b2468eca978b2ca74174fd&token=%7B%22adblock%22%3Afalse%2C%22authorization%22%3A%7B%22forbidden%22%3Afalse%2C%22reason%22%3A%22%22%7D%2C%22blackout_enabled%22%3Afalse%2C%22channel%22%3A%22esl_csgo%22%2C%22channel_id%22%3A31239503%2C%22chansub%22%3A%7B%22restricted_bitrates%22%3A%5B%5D%2C%22view_until%22%3A1924905600%7D%2C%22ci_gb%22%3Afalse%2C%22geoblock_reason%22%3A%22%22%2C%22device_id%22%3Anull%2C%22expires%22%3A1627062617%2C%22extended_history_allowed%22%3Afalse%2C%22game%22%3A%22%22%2C%22hide_ads%22%3Afalse%2C%22https_required%22%3Atrue%2C%22mature%22%3Afalse%2C%22partner%22%3Afalse%2C%22platform%22%3A%22web%22%2C%22player_type%22%3A%22site%22%2C%22private%22%3A%7B%22allowed_to_view%22%3Atrue%7D%2C%22privileged%22%3Afalse%2C%22role%22%3A%22%22%2C%22server_ads%22%3Atrue%2C%22show_ads%22%3Atrue%2C%22subscriber%22%3Afalse%2C%22turbo%22%3Afalse%2C%22user_id%22%3Anull%2C%22user_ip%22%3A%22x.x.x.x%22%2C%22version%22%3A2%7D
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s --module=xivid.xqm -e 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json} return $call_api({"operationName":"ComscoreStreamingQuery","variables":{"channel":extract("'$url'",".+/(.+)",1),"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}})/data/user/{"name":x"Twitch: {displayName}: {broadcastSettings/title}","date":stream/createdAt,"formats":let $token:=$call_api({"query":concat("{streamPlaybackAccessToken(channelName:&quot;",extract("'$url'",".+/(.+)",1),"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})/data/streamPlaybackAccessToken return xivid:m3u8-to-json(request-combine(x"https://usher.ttvnw.net/api/channel/hls/{extract("'$url'",".+/(.+)",1)}.m3u8",{"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread":true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value})/url)}'
+{
+  "name": "Twitch: ESL_CSGO: EPIC G2 COMEBACK! - IEM Cologne HIGHLIGHTS Day 4",
+  "date": "2021-07-22T09:07:18Z",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://usher.ttvnw.net/api/channel/hls/esl_csgo.m3u8?allow_source=true&allow_audio_only=true&allow_spectre=true&p=791163&player=twitchweb&segment_preference=4&sig=3e44e827a9b30f48f6cf7c56d16871b563fc57ea&token=%7B%22adblock%22%3Afalse%2C%22authorization%22%3A%7B%22forbidden%22%3Afalse%2C%22reason%22%3A%22%22%7D%2C%22blackout_enabled%22%3Afalse%2C%22channel%22%3A%22esl_csgo%22%2C%22channel_id%22%3A31239503%2C%22chansub%22%3A%7B%22restricted_bitrates%22%3A%5B%5D%2C%22view_until%22%3A1924905600%7D%2C%22ci_gb%22%3Afalse%2C%22geoblock_reason%22%3A%22%22%2C%22device_id%22%3Anull%2C%22expires%22%3A1573919160%2C%22game%22%3A%22Counter-Strike%3A%20Global%20Offensive%22%2C%22hide_ads%22%3Afalse%2C%22https_required%22%3Afalse%2C%22mature%22%3Afalse%2C%22partner%22%3Afalse%2C%22platform%22%3Anull%2C%22player_type%22%3Anull%2C%22private%22%3A%7B%22allowed_to_view%22%3Atrue%7D%2C%22privileged%22%3Afalse%2C%22server_ads%22%3Atrue%2C%22show_ads%22%3Atrue%2C%22subscriber%22%3Afalse%2C%22turbo%22%3Afalse%2C%22user_id%22%3Anull%2C%22user_ip%22%3A%22x.x.x.x%22%2C%22version%22%3A2%7D"
+      "url": "https://usher.ttvnw.net/api/channel/hls/esl_csgo.m3u8?[...]"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
-      "bitrate": "162kbps",
-      "url": "https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/CrADNZcDLYk6Q8DExljI2iBNvfbxM6k0BvBzwP4D4ktYkcNdsheMrLp5VBB96jqR3JHF9iAxdFV6zu3LLRz3xFdTk4jYHbpoObqvJ9DKdUTVOVwL5UhSCBlOXH3ztCcx_X-o5zhBlqDsvbAbmicSTdU3QvGyHIOhi8-40K2fm9aMflE6r89zN8_hA7GojPUMbkuqIeywyWfHbPPZdpSxVgEKoLdZ598anCkpjZg3__m0jRAhhf1buGi8WVIBhwlyiPMw4_OT1ZXauAivEakpZv5Zj1WWut1e5cYjSHU4H9nqrmPrPkwYSkkOqT5kgINkSma1js6IH19uH2ai7afXownprgM0Woz957k7-PFwtWYfnmVCsBuBIdvrRfPtAJwYjHw5o790tps15j3OdZgPSx1IauubHr6FopT0tlNXxMZzLL1-oBZXof7oPePnAuca6I4m3njo0WsBqqxBNIgh4UWW5TpW_Fv7A0dEOhQTBNgXp-Cs0Dq9VA7VNzWjqCsi1swhZZ43BkU95tWIQBHPIom3tN0DhezHuPuCx3Ao2NaKvdCMao8DOhbFr64y7iX4FfByEhBZZPZj9whZCoc9qcMo8p-aGgyc-QXwog0DIwImRc8.m3u8"
+      "bitrate": "171kbps",
+      "url": "https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/CoQEO0J[...]J-N63gA.m3u8"
     },
     [...]
     {
       "id": "hls-7",
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080@60fps",
-      "bitrate": "6922kbps",
-      "url": "https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/CqoDjf3E1CJyy1GRW5wPxGtHnB-2ENDAfkHOr23_CEH9Dq6-eBFRrn58oJONUcdjpxkBEdklu7sKzwqzra924axTVkg3itRufOaN-zA6Bay42TADnRCosQYMbzXkd6kNJXP26r3gKEXYmnVKHd_R8bz29v6lF31FHSVBYe5BlSqZcedu3STjG9CTRBp0KTMR5jGtIK7tFq4t7LO9r5Xr1hDZti06FJt4QYVpffpFnDqt16E5pTZmHhC81Q8ZV91vKT-LunuROiWk1PEJDfGOO0BCsgJUgCGOboEWVtWG9unP5FbT22jLNqyuCrnSw1sDZ4ptcyxgC8WXpMpBI3IjoQaBTCWVry_d5IUflok3iP2-4Q9YkIboWwR2t2QJNrp3ikrCWPXYuQZCc8CJV_QXU5c6l0AbtW2LlY9TVcBldDj8X0dkrCyVe4Z7bQBdJSa9agViWxXjySefE4A_IL4GluUHYhqktVeGLZZtnJ90sLwBsdb3eEOaN7_zCnjodDBYRKv8Nsoc3vP398VpZpWkySDtlZ1pU1KA4SK2hodVLirOhlZCCC_UmJ1nkFyoEhDarIRiInrISjG-_RWMIX7aGgzliR1iod2NClS6zlQ.m3u8"
+      "bitrate": "6913kbps",
+      "url": "https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/CoQENQA[...]UzF1NtQ.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-https://www.twitch.tv/hktanaka/video/218588783
+$ url=https://www.twitch.tv/hktanaka/video/218588783
 
-$ xidel -se 'declare variable $id:=extract("https://www.twitch.tv/hktanaka/video/218588783",".+/(.+)",1); declare variable $cid:="kimne78kx3ncx6brgo4mv6wki5h1ko"; if ($id castable as integer) then x:request({"headers":"Client-ID: "||$cid,"url":"https://api.twitch.tv/kraken/videos/"||$id})/json else x:request({"headers":"Client-ID: "||$cid,"url":concat("http://api.twitch.tv/kraken/streams/",$id,"?stream_type=all")})/json'
+$ xidel -se 'tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.]'
+hktanaka
+video
+218588783
+
+$ xidel -se 'let $path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return {"operationName":"ComscoreStreamingQuery","variables":if ($path="video") then {"channel":"","isLive":false(),"isVodOrCollection":true(),"vodID":$path[last()],"isClip":false(),"clipSlug":""} else {"channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}}'
 {
-  "title": "Tactical Ops. Rapidwaters on sg public server",
-  "description": "",
-  "description_html": "",
-  "broadcast_id": 1,
-  "broadcast_type": "upload",
-  "status": "recorded",
-  "language": "en",
-  "tag_list": "",
-  "views": 108,
-  "created_at": "2018-01-14T19:06:51Z",
-  "published_at": "2018-01-14T20:36:07Z",
-  "url": "https://www.twitch.tv/videos/218588783",
-  "_id": "v218588783",
-  "recorded_at": "2018-01-14T19:06:51Z",
-  "game": "Tactical Ops: Assault on Terror",
-  "length": 1373,
-  "preview": "https://static-cdn.jtvnw.net/s3_vods/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/thumb/index-0000000000-320x240.jpg",
-  "animated_preview_url": "https://vod-storyboards.twitch.tv/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/storyboards/218588783-strip-0.jpg",
-  "thumbnails": [
-    {
-      "type": "generated",
-      "url": "https://static-cdn.jtvnw.net/s3_vods/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/thumb/index-0000000000-320x240.jpg"
-    },
-    {
-      "type": "generated",
-      "url": "https://static-cdn.jtvnw.net/s3_vods/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/thumb/index-0000000003-320x240.jpg"
-    },
-    {
-      "type": "generated",
-      "url": "https://static-cdn.jtvnw.net/s3_vods/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/thumb/index-0000000006-320x240.jpg"
-    },
-    {
-      "type": "generated",
-      "url": "https://static-cdn.jtvnw.net/s3_vods/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/thumb/index-0000000009-320x240.jpg"
+  "operationName": "ComscoreStreamingQuery",
+  "variables": {
+    "channel": "",
+    "isLive": false,
+    "isVodOrCollection": true,
+    "vodID": "218588783",
+    "isClip": false,
+    "clipSlug": ""
+  },
+  "extensions": {
+    "persistedQuery": {
+      "version": 1,
+      "sha256Hash": "e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"
     }
-  ],
-  "fps": {
-    "1080p60": 59.99985440462411,
-    "144p30": 30.000655179191508,
-    "360p30": 30.000655179191508,
-    "480p30": 30.000655179191508,
-    "720p30": 30.000655179191508,
-    "720p60": 59.99985440462411
-  },
-  "resolutions": {
-    "1080p60": "1920x1080",
-    "144p30": "256x144",
-    "360p30": "640x360",
-    "480p30": "852x480",
-    "720p30": "1280x720",
-    "720p60": "1280x720"
-  },
-  "channel": {
-    "name": "hktanaka",
-    "display_name": "hkTaNaKa"
-  },
-  "_links": {
-    "self": "https://api.twitch.tv/kraken/videos/v218588783",
-    "channel": "https://api.twitch.tv/kraken/channels/hktanaka"
   }
 }
 
-$ xidel -se 'declare variable $id:=extract("https://www.twitch.tv/hktanaka/video/218588783",".+/(.+)",1); declare variable $cid:="kimne78kx3ncx6brgo4mv6wki5h1ko"; if ($id castable as integer) then x:request({"headers":"Client-ID: "||$cid,"url":concat("http://api.twitch.tv/api/vods/",$id,"/access_token")})/json else x:request({"headers":"Client-ID: "||$cid,"url":concat("http://api.twitch.tv/api/channels/",$id,"/access_token")})/json'
+$ xidel -se 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return $call_api({"operationName":"ComscoreStreamingQuery","variables":if ($path="video") then {"channel":"","isLive":false(),"isVodOrCollection":true(),"vodID":$path[last()],"isClip":false(),"clipSlug":""} else {"channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}})'
 {
-  "token": "{\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"chansub\":{\"restricted_bitrates\":[]},\"device_id\":null,\"expires\":1573415548,\"https_required\":false,\"privileged\":false,\"user_id\":null,\"version\":2,\"vod_id\":218588783}",
-  "sig": "07e3c14f94423f6f7bee77e84b3df1446c5b82f0",
-  "expires_at": "2019-11-10T19:52:28Z"
+  "data": {
+    "video": {
+      "id": "218588783",
+      "broadcastType": "UPLOAD",
+      "createdAt": "2018-01-14T19:06:51Z",
+      "game": {
+        "id": "7571",
+        "name": "Tactical Ops: Assault on Terror",
+        "__typename": "Game"
+      },
+      "lengthSeconds": 1373,
+      "owner": {
+        "id": "180296347",
+        "displayName": "tanakafromapex",
+        "__typename": "User"
+      },
+      "title": "Tactical Ops. Rapidwaters on sg public server",
+      "__typename": "Video"
+    }
+  },
+  "extensions": {
+    "durationMilliseconds": 49,
+    "operationName": "ComscoreStreamingQuery",
+    "requestID": "01FBF758P7WBAP3M3V9R3TQP9S"
+  }
 }
 
-$ xidel -s --module=xivid.xqm -e 'declare variable $id:=extract("https://www.twitch.tv/hktanaka/video/218588783",".+/(.+)",1); declare variable $cid:="kimne78kx3ncx6brgo4mv6wki5h1ko"; if ($id castable as integer) then let $a:=x:request({"headers":"Client-ID: "||$cid,"url":"https://api.twitch.tv/kraken/videos/"||$id})/json,$b:=x:request({"headers":"Client-ID: "||$cid,"url":concat("http://api.twitch.tv/api/vods/",$id,"/access_token")})/json return {"name":"Twitch: "||$a/title,"date":format-date(dateTime($a/published_at),"[D01]-[M01]-[Y]"),"duration":format-time($a/length * duration("PT1S"),"[H01]:[m01]:[s01]"),"formats":xivid:m3u8-to-json(concat("https://usher.ttvnw.net/vod/",$id,".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;player=twitchweb&amp;sig=",$b/sig,"&amp;token=",uri-encode($b/token)))} else let $a:=x:request({"headers":"Client-ID: "||$cid,"url":concat("http://api.twitch.tv/kraken/streams/",$id,"?stream_type=all")})/json,$b:=x:request({"headers":"Client-ID: "||$cid,"url":concat("http://api.twitch.tv/api/channels/",$id,"/access_token")})/json return {"name":"Twitch: "||$a//status,"date":format-date(current-date(),"[D01]-[M01]-[Y]"),"formats":xivid:m3u8-to-json(concat("https://usher.ttvnw.net/api/channel/hls/",$id,".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;p=",random-seed(),random(1000000),"&amp;player=twitchweb&amp;segment_preference=4&amp;sig=",$b/sig,"&amp;token=",uri-encode($b/token)))}'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 {
-  "name": "Twitch: Tactical Ops. Rapidwaters on sg public server",
-  "date": "14-01-2018",
-  "duration": "00:22:53",
+  videoPlaybackAccessToken(
+    id: "218588783",
+    params:{
+      platform: "web",
+      playerBackend: "mediaplayer",
+      playerType: "site"
+    }
+  ) {
+    value,
+    signature
+  }
+}
+
+$ xidel -se 'let $path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return {"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")}'
+{
+  "query": "{videoPlaybackAccessToken(id:\"218588783\",params:{platform:\"web\",playerBackend:\"mediaplayer\",playerType:\"site\"}){value,signature}}"
+}
+
+$ xidel -se 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return $call_api({"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})'
+{
+  "data": {
+    "videoPlaybackAccessToken": {
+      "value": "{\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"chansub\":{\"restricted_bitrates\":[]},\"device_id\":null,\"expires\":1627152797,\"https_required\":true,\"privileged\":false,\"user_id\":null,\"version\":2,\"vod_id\":218588783}",
+      "signature": "51f7604bd928a4374cf7a270dcbd559a9241e7ce"
+    }
+  },
+  "extensions": {
+    "durationMilliseconds": 92,
+    "requestID": "01FBAS5AVQS89605B9C0R946FH"
+  }
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.],$token:=$call_api({"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})/data/* return {"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread"?:if ($path="video") then () else true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value}'
+{
+  "allow_source": true,
+  "allow_audio_only": true,
+  "allow_spectre": true,
+  "p": 6894399,
+  "player_backend": "mediaplayer",
+  "playlist_include_framerate": true,
+  "sig": "2b45ac4b5fefd5d96ed2dd7452399aa78a0fa6cb",
+  "token": "{\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"chansub\":{\"restricted_bitrates\":[]},\"device_id\":null,\"expires\":1627290809,\"https_required\":true,\"privileged\":false,\"user_id\":null,\"version\":2,\"vod_id\":218588783}"
+}
+
+$ xidel -se 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.],$token:=$call_api({"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})/data/* return request-combine(concat("https://usher.ttvnw.net/",if ($path="video") then "vod/" else "api/channel/hls/",$path[last()],".m3u8"),{"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread"?:if ($path="video") then () else true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value})/url'
+https://usher.ttvnw.net/vod/218588783.m3u8?allow_source=true&allow_audio_only=true&allow_spectre=true&p=6.894399E6&player_backend=mediaplayer&playlist_include_framerate=true&sig=2b45ac4b5fefd5d96ed2dd7452399aa78a0fa6cb&token=%7B%22authorization%22%3A%7B%22forbidden%22%3Afalse%2C%22reason%22%3A%22%22%7D%2C%22chansub%22%3A%7B%22restricted_bitrates%22%3A%5B%5D%7D%2C%22device_id%22%3Anull%2C%22expires%22%3A1627290809%2C%22https_required%22%3Atrue%2C%22privileged%22%3Afalse%2C%22user_id%22%3Anull%2C%22version%22%3A2%2C%22vod_id%22%3A218588783%7D
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s --module=xivid.xqm -e 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.],$token:=$call_api({"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})/data/* return $call_api({"operationName":"ComscoreStreamingQuery","variables":if ($path="video") then {"channel":"","isLive":false(),"isVodOrCollection":true(),"vodID":$path[last()],"isClip":false(),"clipSlug":""} else {"channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}})/data/*/{"name":"Twitch: "||(.[__typename="Video"]/concat(owner/displayName," - ",title),.[__typename="User"]/concat(displayName,": ",broadcastSettings/title)),"date":(stream/createdAt,createdAt),"duration"?:lengthSeconds * duration("PT1S"),"formats":xivid:m3u8-to-json(request-combine(concat("https://usher.ttvnw.net/",if ($path="video") then "vod/" else "api/channel/hls/",$path[last()],".m3u8"),{"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread"?:if ($path="video") then () else true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value})/url)}'
+{
+  "name": "Twitch: tanakafromapex -Tactical Ops. Rapidwaters on sg public server",
+  "date": "2018-01-14T20:36:07Z",
+  "duration": "PT22M53S",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://usher.ttvnw.net/vod/218588783.m3u8?allow_source=true&allow_audio_only=true&allow_spectre=true&player=twitchweb&sig=2bf22c1068454fd2a92056bc6b9571b1388bcff0&token=%7B%22authorization%22%3A%7B%22forbidden%22%3Afalse%2C%22reason%22%3A%22%22%7D%2C%22chansub%22%3A%7B%22restricted_bitrates%22%3A%5B%5D%7D%2C%22device_id%22%3Anull%2C%22expires%22%3A1577022804%2C%22https_required%22%3Afalse%2C%22privileged%22%3Afalse%2C%22user_id%22%3Anull%2C%22version%22%3A2%2C%22vod_id%22%3A218588783%7D"
+      "url": "https://usher.ttvnw.net/vod/218588783.m3u8?[...]"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
       "bitrate": "143kbps",
-      "url": "https://vod-metro.twitch.tv/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/audio_only/index-dvr.m3u8"
+      "url": "https://dqrpb9wgowsf5.cloudfront.net/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/audio_only/index-dvr.m3u8"
     },
     [...]
     {
@@ -9121,73 +9207,265 @@ $ xidel -s --module=xivid.xqm -e 'declare variable $id:=extract("https://www.twi
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080@60fps",
       "bitrate": "5117kbps",
-      "url": "https://vod-metro.twitch.tv/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/1080p60/index-dvr.m3u8"
+      "url": "https://dqrpb9wgowsf5.cloudfront.net/nltanaka/218588783/9cf22346-f095-490b-b0cb-a8d02e668000/1080p60/index-dvr.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
--e '
-  declare variable $id:=extract("https://www.twitch.tv/hktanaka/video/218588783",".+/(.+)",1);
-  declare variable $cid:="kimne78kx3ncx6brgo4mv6wki5h1ko";
-  if ($id castable as integer) then
-    let $a:=x:request({
-          "headers":"Client-ID: "||$cid,
-          "url":"https://api.twitch.tv/kraken/videos/"||$id
-        })/json,
-        $b:=x:request({
-          "headers":"Client-ID: "||$cid,
-          "url":concat("http://api.twitch.tv/api/vods/",$id,"/access_token")
-        })/json
-    return {
-      "name":"Twitch: "||$a/title,
-      "date":format-date(
-        dateTime($a/published_at),
-        "[D01]-[M01]-[Y]"
-      ),
-      "duration":format-time(
-        $a/length * duration("PT1S"),
-        "[H01]:[m01]:[s01]"
-      ),
-      "formats":xivid:m3u8-to-json(
-        concat(
-          "https://usher.ttvnw.net/vod/",
-          $id,
-          ".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;player=twitchweb&amp;sig=",
-          $b/sig,
-          "&amp;token=",
-          uri-encode($b/token)
-        )
-      )
+$ url=https://www.twitch.tv/maura_46/clip/RoughTardyGoatGrammarKing
+
+$ xidel -se 'tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.]'
+maura_46
+clip
+RoughTardyGoatGrammarKing
+
+$ xidel -se 'let $path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return {"operationName":"ComscoreStreamingQuery","variables":if ($path="video") then {"channel":"","isLive":false(),"isVodOrCollection":true(),"vodID":$path[last()],"isClip":false(),"clipSlug":""} else if ($path="clip") then {"channel":"","isLive":false(),"isVodOrCollection":false(),"vodID":"","isClip":true(),"clipSlug":$path[last()]} else {"channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}}'
+{
+  "operationName": "ComscoreStreamingQuery",
+  "variables": {
+    "channel": "",
+    "isLive": false,
+    "isVodOrCollection": false,
+    "vodID": "",
+    "isClip": true,
+    "clipSlug": "RoughTardyGoatGrammarKing"
+  },
+  "extensions": {
+    "persistedQuery": {
+      "version": 1,
+      "sha256Hash": "e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"
     }
-  else
-    let $a:=x:request({
-          "headers":"Client-ID: "||$cid,
-          "url":concat("http://api.twitch.tv/kraken/streams/",$id,"?stream_type=all")
-        })/json,
-        $b:=x:request({
-          "headers":"Client-ID: "||$cid,
-          "url":concat("http://api.twitch.tv/api/channels/",$id,"/access_token")
-        })/json
-    return {
-      "name":"Twitch: "||$a//status,
-      "date":format-date(current-date(),"[D01]-[M01]-[Y]"),
-      "formats":xivid:m3u8-to-json(
-        concat(
-          "https://usher.ttvnw.net/api/channel/hls/",
-          $id,
-          ".m3u8?allow_source=true&amp;allow_audio_only=true&amp;allow_spectre=true&amp;p=",
-          random-seed(),
-          random(1000000),
-          "&amp;player=twitchweb&amp;segment_preference=4&amp;sig=",
-          $b/sig,
-          "&amp;token=",
-          uri-encode($b/token)
-        )
-      )
+  }
+}
+
+$ xidel -se 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return $call_api({"operationName":"ComscoreStreamingQuery","variables":if ($path="video") then {"channel":"","isLive":false(),"isVodOrCollection":true(),"vodID":$path[last()],"isClip":false(),"clipSlug":""} else if ($path="clip") then {"channel":"","isLive":false(),"isVodOrCollection":false(),"vodID":"","isClip":true(),"clipSlug":$path[last()]} else {"channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}})'
+{
+  "data": {
+    "clip": {
+      "id": "739790045",
+      "broadcaster": {
+        "id": "271861782",
+        "displayName": "MaurA_46",
+        "__typename": "User"
+      },
+      "createdAt": "2020-06-06T04:05:02Z",
+      "durationSeconds": 25,
+      "title": "esa doble suculenta",
+      "game": {
+        "id": "7571",
+        "name": "Tactical Ops: Assault on Terror",
+        "__typename": "Game"
+      },
+      "__typename": "Clip"
     }
-'
+  },
+  "extensions": {
+    "durationMilliseconds": 46,
+    "operationName": "ComscoreStreamingQuery",
+    "requestID": "01FBF7YY53CTWYDTDTGFQJGBJM"
+  }
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se 'let $path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return if ($path="clip") then {"operationName":"VideoAccessToken_Clip","variables":{"slug":$path[last()]},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"36b89d2507fce29e5ca551df756d27c1cfe079e2609642b4390aa4c35796eb11"}}} else {"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")}'
+{
+  "operationName": "VideoAccessToken_Clip",
+  "variables": {
+    "slug": "RoughTardyGoatGrammarKing"
+  },
+  "extensions": {
+    "persistedQuery": {
+      "version": 1,
+      "sha256Hash": "36b89d2507fce29e5ca551df756d27c1cfe079e2609642b4390aa4c35796eb11"
+    }
+  }
+}
+
+$ xidel -se 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.] return $call_api(if ($path="clip") then {"operationName":"VideoAccessToken_Clip","variables":{"slug":$path[last()]},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"36b89d2507fce29e5ca551df756d27c1cfe079e2609642b4390aa4c35796eb11"}}} else {"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})'
+{
+  "data": {
+    "clip": {
+      "id": "739790045",
+      "playbackAccessToken": {
+        "signature": "ac556f55a422c8fccb7af68ca639ad81022c5bac",
+        "value": "{\"authorization\":{\"forbidden\":false,\"reason\":\"\"},\"clip_uri\":\"https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045.mp4\",\"device_id\":null,\"expires\":1627298525,\"user_id\":\"\",\"version\":2}",
+        "__typename": "PlaybackAccessToken"
+      },
+      "videoQualities": [
+        {
+          "frameRate": 30,
+          "quality": "720",
+          "sourceURL": "https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045.mp4",
+          "__typename": "ClipVideoQuality"
+        },
+        {
+          "frameRate": 30,
+          "quality": "480",
+          "sourceURL": "https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045-480.mp4",
+          "__typename": "ClipVideoQuality"
+        },
+        {
+          "frameRate": 30,
+          "quality": "360",
+          "sourceURL": "https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045-360.mp4",
+          "__typename": "ClipVideoQuality"
+        }
+      ],
+      "__typename": "Clip"
+    }
+  },
+  "extensions": {
+    "durationMilliseconds": 111,
+    "operationName": "VideoAccessToken_Clip",
+    "requestID": "01FBF44KKCM54G962DAH2B3M2K"
+  }
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s --module=xivid.xqm -e 'let $call_api:=function($query as object()) as object() {x:request({"headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko","post":serialize($query,{"method":"json"}),"url":"https://gql.twitch.tv/gql"})/json},$path:=tokenize(request-decode("'$url'")/substring-after(url,host),"/")[.],$token:=$call_api(if ($path="clip") then {"operationName":"VideoAccessToken_Clip","variables":{"slug":$path[last()]},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"36b89d2507fce29e5ca551df756d27c1cfe079e2609642b4390aa4c35796eb11"}}} else {"query":concat(if ($path="video") then "{videoPlaybackAccessToken(id:&quot;" else "{streamPlaybackAccessToken(channelName:&quot;",$path[last()],"&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}")})/data/* return $call_api({"operationName":"ComscoreStreamingQuery","variables":if ($path="video") then {"channel":"","isLive":false(),"isVodOrCollection":true(),"vodID":$path[last()],"isClip":false(),"clipSlug":""} else if ($path="clip") then {"channel":"","isLive":false(),"isVodOrCollection":false(),"vodID":"","isClip":true(),"clipSlug":$path[last()]} else {"channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),"vodID":"","isClip":false(),"clipSlug":""},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"}}})/data/*/{"name":"Twitch: "||(.[__typename="Video"]/concat(owner/displayName," - ",title),.[__typename="Clip"]/concat(broadcaster/displayName," - ",title),.[__typename="User"]/concat(displayName,": ",broadcastSettings/title)),"date":(stream/createdAt,createdAt),"duration"?:lengthSeconds * duration("PT1S"),"formats":if ($path="clip") then $token/array{for $x at $i in (videoQualities)() order by $x/quality count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("640x320","854x480","1280x720")[$i],"url":request-combine($x/sourceURL,playbackAccessToken/{"sig":signature,"token":value})/url}} else xivid:m3u8-to-json(request-combine(concat("https://usher.ttvnw.net/",if ($path="video") then "vod/" else "api/channel/hls/",$path[last()],".m3u8"),{"allow_source":true(),"allow_audio_only":true(),"allow_spectre":true(),"fast_bread"?:if ($path="video") then () else true(),"p":(random-seed(),100000 + random(9900000)),"player_backend":"mediaplayer","playlist_include_framerate":true(),"sig":$token/signature,"token":$token/value})/url)}'
+{
+  "name": "Twitch: MaurA_46 - esa doble suculenta",
+  "date": "2020-06-06T04:05:02Z",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x320",
+      "url": "https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045-360.mp4?sig=[...]&token=[...]"
+    },
+    {
+      "id": "pg-2",
+      "format": "mp4[h264+aac]",
+      "resolution": "854x480",
+      "url": "https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045-480.mp4?sig=[...]&token=[...]"
+    },
+    {
+      "id": "pg-3",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://production.assets.clips.twitchcdn.net/AT-cm%7C739790045.mp4?sig=[...]&token=[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:twitch($url as string) as object()? {
+  let $call_api:=function($query as object()) as object() {
+        x:request({
+          "headers":"Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko",
+          "post":serialize($query,{"method":"json"}),
+          "url":"https://gql.twitch.tv/gql"
+        })/json
+      },
+      $path:=tokenize(
+        request-decode($url)/substring-after(url,host),"/"
+      )[.],
+      $token:=$call_api(
+        if ($path="clip") then {
+          "operationName":"VideoAccessToken_Clip",
+          "variables":{"slug":$path[last()]},
+          "extensions":{
+            "persistedQuery":{
+              "version":1,
+              "sha256Hash":"36b89d2507fce29e5ca551df756d27c1cfe079e2609642b4390aa4c35796eb11"
+            }
+          }
+        } else {
+          "query":concat(
+            if ($path="video") then
+              "{videoPlaybackAccessToken(id:&quot;"
+            else
+              "{streamPlaybackAccessToken(channelName:&quot;",
+              $path[last()],
+              "&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;",
+              "mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}"
+          )
+        }
+      )/data/*
+  return
+  $call_api(
+    {
+      "operationName":"ComscoreStreamingQuery",
+      "variables":if ($path="video") then {
+        "channel":"",
+        "isLive":false(),
+        "isVodOrCollection":true(),
+        "vodID":$path[last()],
+        "isClip":false(),
+        "clipSlug":""
+      } else if ($path="clip") then {
+        "channel":"",
+        "isLive":false(),
+        "isVodOrCollection":false(),
+        "vodID":"",
+        "isClip":true(),
+        "clipSlug":$path[last()]
+      } else {
+        "channel":$path[last()],"isLive":true(),"isVodOrCollection":false(),
+        "vodID":"","isClip":false(),"clipSlug":""
+      },
+      "extensions":{
+        "persistedQuery":{
+          "version":1,
+          "sha256Hash":"e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01"
+        }
+      }
+    }
+  )/data/*/{
+    "name":"Twitch: "||(
+      .[__typename="Video"]/concat(owner/displayName," - ",title),
+      .[__typename="Clip"]/concat(broadcaster/displayName," - ",title),
+      .[__typename="User"]/concat(displayName,": ",broadcastSettings/title)
+    ),
+    "date":(stream/createdAt,createdAt),
+    "duration"?:lengthSeconds * duration("PT1S"),
+    "formats":if ($path="clip") then
+      $token/array{
+        for $x at $i in (videoQualities)()
+        order by $x/quality
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("640x320","854x480","1280x720")[$i],
+          "url":request-combine(
+            $x/sourceURL,
+            playbackAccessToken/{"sig":signature,"token":value}
+          )/url
+        }
+      }
+    else
+      xivid:m3u8-to-json(
+        request-combine(
+          concat(
+            "https://usher.ttvnw.net/",
+            if ($path="video") then
+              "vod/"
+            else
+              "api/channel/hls/",
+            $path[last()],
+            ".m3u8"
+          ),
+          {
+            "allow_source":true(),
+            "allow_audio_only":true(),
+            "allow_spectre":true(),
+            "fast_bread"?:if ($path="video") then () else true(),
+            "p":(random-seed(),100000 + random(9900000)),
+            "player_backend":"mediaplayer",
+            "playlist_include_framerate":true(),
+            "sig":$token/signature,
+            "token":$token/value
+          }
+        )/url
+      )
+  }
+};
 
 ================================================================================================
 
