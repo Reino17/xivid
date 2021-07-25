@@ -8787,6 +8787,126 @@ declare function xivid:xhamster($url as string) as object()? {
 
 ================================================================================================
 
+[xtube]
+
+$ url=https://www.xtube.com/video-watch/mydirtyhobby-outdoor-stranger-fuck-with-petite-amateur-45543551   # https://github.com/ytdl-org/youtube-dl/issues/29357
+
+$ xidel -se 'doc("'$url'")/parse-json(//script[@type="application/ld+json"])'
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "MyDirtyHobby - Outdoor stranger fuck with petite amateur",
+  "duration": "PT0H10M54S",
+  "uploadDate": "2020-11-23T07:35:58-05:00",
+  [...]
+}
+
+$ xidel -se 'doc("'$url'")/parse-json(//script[@type="application/ld+json"])/{"name":"XTube: "||name,"date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),"duration":duration(duration)}'
+{
+  "name": "XTube: MyDirtyHobby - Outdoor stranger fuck with petite amateur",
+  "date": "2020-11-23T12:35:58Z",
+  "duration": "PT10M54S"
+}
+
+$ xidel -se 'doc("'$url'")/parse-json(replace(//script/extract(.,"playerConf=(.+?),playerWrapper",1),"!",""),{"liberal":true()})/(.//mediaDefinition)()'
+{
+  "defaultQuality": 1,
+  "format": "upsell",
+  "quality": "1080",
+  "videoUrl": ""
+}
+{
+  "defaultQuality": 1,
+  "format": "mp4",
+  "quality": "720",
+  "videoUrl": "https://cdn1-l-hw-e7.xtube.com/videos/202011/23/45543551/xtube_mp4_720.mp4?l=0&ttl=1626103524&hash=8d602cefacc34805f1298e9bbfc7aad8"
+}
+[...]
+{
+  "format": "hls",
+  "quality": [720, 480, 240, 180],
+  "videoUrl": "https://cdn-hls-ht.xtube.com/hls/videos/202011/23/45543551/xtube_mp4_,1080,720,ultra,high,normal,.mp4.urlset/master.m3u8?validfrom=1626013524&validto=1626020724&hdl=-1&hash=SDI3EU9uELNBDYNNLfxCH5l4FfQ%3D",
+  "defaultQuality": 480
+}
+
+$ xidel -s --module=xivid/xivid.xqm -e 'doc("'$url'")/map:merge((parse-json(//script[@type="application/ld+json"])/{"name":"XTube: "||name,"date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),"duration":duration(duration)},parse-json(replace(//script/extract(.,"playerConf=(.+?),playerWrapper",1),"!",""),{"liberal":true()})//mediaDefinition/{"formats":array{for $x at $i in .()[format="mp4"] order by $x/quality count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("320x180","426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json(.()[format="hls" and quality instance of array()]/videoUrl)()}}))'
+{
+  "name": "XTube: MyDirtyHobby - Outdoor stranger fuck with petite amateur",
+  "date": "2020-11-23T12:35:58Z",
+  "duration": "PT10M54S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "320x180",
+      "url": "https://cdn1-l-hw-e7.xtube.com/videos/202011/23/45543551/xtube_mp4_normal.mp4?l=0&ttl=1626103524&hash=a9fe16a450779c00522be7aee8a174a8"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://cdn1-l-hw-e7.xtube.com/videos/202011/23/45543551/xtube_mp4_720.mp4?l=0&ttl=1626103524&hash=8d602cefacc34805f1298e9bbfc7aad8"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://cdn-hls-ht.xtube.com/hls/videos/202011/23/45543551/xtube_mp4_,1080,720,ultra,high,normal,.mp4.urlset/master.m3u8?validfrom=1626013524&validto=1626020724&hdl=-1&hash=SDI3EU9uELNBDYNNLfxCH5l4FfQ%3D"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "320x180@25fps",
+      "bitrate": "506kbps",
+      "url": "https://cdn-hls-ht.xtube.com/hls/videos/202011/23/45543551/xtube_mp4_,1080,720,ultra,high,normal,.mp4.urlset/index-f5-v1-a1.m3u8?validfrom=1626013524&validto=1626020724&hdl=-1&hash=SDI3EU9uELNBDYNNLfxCH5l4FfQ%3D"
+    },
+    [...]
+    {
+      "id": "hls-5",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "4591kbps",
+      "url": "https://cdn-hls-ht.xtube.com/hls/videos/202011/23/45543551/xtube_mp4_,1080,720,ultra,high,normal,.mp4.urlset/index-f1-v1-a1.m3u8?validfrom=1626013524&validto=1626020724&hdl=-1&hash=SDI3EU9uELNBDYNNLfxCH5l4FfQ%3D"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:xtube($url as string) as object()? {
+  doc($url)/map:merge((
+    parse-json(//script[@type="application/ld+json"])/{
+      "name":"XTube: "||name,
+      "date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),
+      "duration":duration(duration)
+    },
+    parse-json(
+      replace(
+        //script/extract(.,"playerConf=(.+?),playerWrapper",1),
+        "!",""
+      ),
+      {"liberal":true()}
+    )//mediaDefinition/{
+      "formats":array{
+        for $x at $i in .()[format="mp4"]
+        order by $x/quality
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("320x180","426x240","854x480","1280x720","1920x1080")[$i],
+          "url":$x/videoUrl
+        },
+        xivid:m3u8-to-json(
+          .()[format="hls" and quality instance of array()]/videoUrl
+        )()
+      }
+    }
+  ))
+};
+
+================================================================================================
+
 [twitch]
 
 https://www.twitch.tv/esl_csgo

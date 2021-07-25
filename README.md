@@ -79,7 +79,7 @@ abhd.nl                 vimeo.com             instagram.com
 autoblog.nl             dailymotion.com       twitter.com
 telegraaf.nl            twitch.tv             pornhub.com
 ad.nl                   mixcloud.com          xhamster.com
-lc.nl                   soundcloud.com
+lc.nl                   soundcloud.com        xtube.com
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.

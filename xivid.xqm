@@ -1287,3 +1287,35 @@ declare function xivid:xhamster($url as string) as object()? {
     )
   }
 };
+
+declare function xivid:xtube($url as string) as object()? {
+  doc($url)/map:merge((
+    parse-json(//script[@type="application/ld+json"])/{
+      "name":"XTube: "||name,
+      "date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),
+      "duration":duration(duration)
+    },
+    parse-json(
+      replace(
+        //script/extract(.,"playerConf=(.+?),playerWrapper",1),
+        "!",""
+      ),
+      {"liberal":true()}
+    )//mediaDefinition/{
+      "formats":array{
+        for $x at $i in .()[format="mp4"]
+        order by $x/quality
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("320x180","426x240","854x480","1280x720","1920x1080")[$i],
+          "url":$x/videoUrl
+        },
+        xivid:m3u8-to-json(
+          .()[format="hls" and quality instance of array()]/videoUrl
+        )()
+      }
+    }
+  ))
+};

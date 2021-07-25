@@ -50,7 +50,7 @@ Ondersteunde websites:
   autoblog.nl             dailymotion.com       twitter.com
   telegraaf.nl            twitch.tv             pornhub.com
   ad.nl                   mixcloud.com          xhamster.com
-  lc.nl                   soundcloud.com
+  lc.nl                   soundcloud.com        xtube.com
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -240,7 +240,8 @@ else
           "twitter":array{"twitter.com"},
           "instagram":array{"instagram.com"},
           "pornhub":array{"pornhub.com"},
-          "xhamster":array{"xhamster.com"}
+          "xhamster":array{"xhamster.com"},
+          "xtube":array{"xtube.com"}
         },
         $temp:=tokenize(request-decode("'$url'")/host,"\."),
         $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")

@@ -49,7 +49,7 @@ ECHO   abhd.nl                 vimeo.com             instagram.com
 ECHO   autoblog.nl             dailymotion.com       twitter.com
 ECHO   telegraaf.nl            twitch.tv             pornhub.com
 ECHO   ad.nl                   mixcloud.com          xhamster.com
-ECHO   lc.nl                   soundcloud.com
+ECHO   lc.nl                   soundcloud.com        xtube.com
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -239,7 +239,8 @@ IF NOT "%url:twitch.tv=%"=="%url%" (
           'twitter':array{'twitter.com'}^,
           'instagram':array{'instagram.com'}^,
           'pornhub':array{'pornhub.com'}^,
-          'xhamster':array{'xhamster.com'}
+          'xhamster':array{'xhamster.com'}^,
+          'xtube':array{'xtube.com'}
         }^,
         $temp:^=tokenize^(request-decode^(environment-variable^('url'^)^)/host^,'\.'^)^,
         $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
