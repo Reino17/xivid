@@ -127,17 +127,17 @@ SET "PATH=%PATH%;%~dp0"
 FOR %%A IN (xidel.exe) DO IF EXIST "%%~$PATH:A" (
   FOR /F "delims=" %%B IN ('
     xidel --version ^| xidel -s - -e "extract($raw,'\d{8}')"
-  ') DO IF %%B GEQ 20210529 (
+  ') DO IF %%B GEQ 20210708 (
     SET "XIDEL_OPTIONS=--silent --module=%~dp0xivid.xqm"
   ) ELSE (
     ECHO xivid: '%%~$PATH:A' gevonden, maar versie is te oud.
-    ECHO Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+    ECHO Installeer Xidel 0.9.9.7941 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
     ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
     EXIT /B 1
   )
 ) ELSE (
   ECHO xivid: 'xidel.exe' niet gevonden!
-  ECHO Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+  ECHO Installeer Xidel 0.9.9.7941 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
   ECHO Ga naar http://videlibri.sourceforge.net/xidel.html.
   EXIT /B 1
 )
@@ -209,7 +209,7 @@ IF NOT "%~1"=="" (
 IF NOT "%url:twitch.tv=%"=="%url%" (
   CALL :twitch "%url%"
 ) ELSE (
-  FOR /F "delims=" %%A IN ('xidel --xquery ^"
+  FOR /F "delims=" %%A IN ('xidel -e ^"
     let $extractors:^={
           'npo':array{'npostart.nl'^,'gemi.st'}^,
           'nos':array{'nos.nl'}^,

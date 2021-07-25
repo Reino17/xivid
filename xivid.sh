@@ -123,12 +123,12 @@ twitch() {
 }
 
 if command -v xidel >/dev/null; then
-  if [[ $(xidel --version | xidel -s - -e 'extract($raw,"\d{8}")') -ge 20210529 ]]; then
+  if [[ $(xidel --version | xidel -s - -e 'extract($raw,"\d{8}")') -ge 20210708 ]]; then
     export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
-Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.7941 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
     exit 1
@@ -136,7 +136,7 @@ EOF
 else
   cat 1>&2 <<EOF
 xivid: 'xidel' niet gevonden!
-Installeer Xidel 0.9.9.7880 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.7941 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
@@ -210,7 +210,7 @@ done
 if [[ $url =~ twitch.tv ]]; then
   twitch "$url"
 else
-  eval "$(xidel --xquery '
+  eval "$(xidel -e '
     let $extractors:={
           "npo":array{"npostart.nl","gemi.st"},
           "nos":array{"nos.nl"},

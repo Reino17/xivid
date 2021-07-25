@@ -14,7 +14,7 @@ Of download de [tarball](https://github.com/Reino17/xivid/archive/master.zip).
 ## Vereiste
 [Xidel](http://videlibri.sourceforge.net/xidel.html) is een commandoregel programma en een waar Zwitsers zakmes voor het downloaden en informatie onttrekken van HTML/XML pagina's, JSON-APIs en lokale bestanden door gebruik te maken van XPath 3.1, XQuery 3.1, JSONiq, CSS, of pattern templates.
 
-Beide scripts maken veelvuldig gebruik van `xidel` (i.c.m. `xivid.xqm`) en is dus essentieel. Minimale vereiste versie is `xidel 0.9.9-7880`. Op Xidel's website vind je onder het kopje "Downloads" een url voor deze "0.9.9 development" reeks.
+Beide scripts maken veelvuldig gebruik van `xidel` (i.c.m. `xivid.xqm`) en is dus essentieel. Minimale vereiste versie is `xidel 0.9.9-7941`. Op Xidel's website vind je onder het kopje "Downloads" een url voor deze "0.9.9 development" reeks.
 
 Als alternatief kun je Xidel Windows binaries ook op [mijn website](https://rwijnsma.home.xs4all.nl/files/xidel) vinden. Deze zijn meer dan 3 keer zo klein omdat ik, i.t.t de originele binaries, de voor normaal gebruik overbodige "[debug symbols](https://en.wikipedia.org/wiki/Debug_symbol)" heb verwijderd.
 
