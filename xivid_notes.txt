@@ -4453,7 +4453,10 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
   "type": "Episode"
 }
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video/(assets)()[type="Video"]/json-doc(url||"?device=web&format=hls")'
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video/(assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/url'
+https://api.rtl.nl/watch/play/api/play/xl/37f2e7ec-5a27-3084-981b-1f77bd06732d?device=web&format=hls
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video/(assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)'
 {
   "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
   "canPlay": false,
@@ -4466,7 +4469,7 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video/
   }
 }
 
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":concat("RTL: ",series/title," - ",title),"date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/json-doc(url||"?device=web&format=hls")/manifest)}'
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
 {
   "name": "RTL: RTL Nieuws - RTL Nieuws - 19:30 uur",
   "date": "2021-01-15T18:30:00Z",
@@ -4500,8 +4503,48 @@ $ url=https://www.rtlnieuws.nl/video/uitzendingen/video/5208952/rtl-nieuws-1930-
 $ xidel -se 'doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href'
 https://www.rtlxl.nl/video/37f2e7ec-5a27-3084-981b-1f77bd06732d
 
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href else "'$url'")//script[@type="application/json"])//video/{"name":concat("RTL: ",series/title," - ",title),"date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/json-doc(url||"?device=web&format=hls")/manifest)}'
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href else "'$url'")//script[@type="application/json"])//video/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
+{
+  "name": "RTL: RTL Nieuws - RTL Nieuws - 19:30 uur",
+  "date": "2021-01-15T18:30:00Z",
+  "duration": "PT20M27S",
+  "formats": [...]
+}
 
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.rtl.nl/gemist?nodeId=5250814
+
+$ xidel -se 'parse-json(doc("'$url'")//script/substring-after(.,"APOLLO_STATE__ = "))/*[__typename="Video"]/uuid'
+52f257a9-0e61-3f33-b011-7fc1c338f77f
+
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href else if (contains("'$url'","rtl.nl")) then "https://www.rtlxl.nl/video/"||parse-json(doc("'$url'")//script/substring-after(.,"APOLLO_STATE__ = "))/*[__typename="Video"]/uuid else "'$url'")//script[@type="application/json"])//video/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
+{
+  "name": "RTL: Ninja Warrior Australië - Afl. 6",
+  "date": "2021-08-28T16:25:00Z",
+  "duration": "PT1H12M24S",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "bitrate": "136kbps",
+      "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/QualityLevels(125436)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "4407kbps",
+      "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/QualityLevels(4171000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+    }
+  ]
+}
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:rtl($url as string) as object()? {
@@ -4509,15 +4552,21 @@ declare function xivid:rtl($url as string) as object()? {
     doc(
       if (contains($url,"rtlnieuws.nl")) then
         doc($url)//div[@class="rtl-player__fallback-overlay"]/a/@href
+      else if (contains($url,"rtl.nl")) then
+        "https://www.rtlxl.nl/video/"||parse-json(
+          doc($url)//script/substring-after(.,"APOLLO_STATE__ = ")
+        )/*[__typename="Video"]/uuid
       else
         $url
     )//script[@type="application/json"]
   )//video/{
-    "name":concat("RTL: ",series/title," - ",title),
+    "name":x"RTL: {series/title} - {title}",
     "date":broadcastDateTime,
     "duration":duration * duration("PT1S"),
     "formats":xivid:m3u8-to-json(
-      (assets)()[type="Video"]/json-doc(url||"?device=web&amp;format=hls")/manifest
+      (assets)()[type="Video"]/request-combine(
+        url,{"device":"web","format":"hls"}
+      )/json-doc(url)/manifest
     )
   }
 };

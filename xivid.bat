@@ -35,21 +35,21 @@ ECHO                 beschikbare formaten.
 ECHO   -j            Toon video informatie als JSON.
 ECHO.
 ECHO Ondersteunde websites:
-ECHO   npostart.nl             omropfryslan.nl       omroepwest.nl
-ECHO   gemi.st                 rtvnoord.nl           rijnmond.nl
-ECHO   nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
-ECHO   tvblik.nl               nhnieuws.nl           omroepgelderland.nl
-ECHO   uitzendinggemist.net    at5.nl                omroepzeeland.nl
-ECHO   rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
-ECHO   kijk.nl                 rtvoost.nl            l1.nl
-ECHO.
-ECHO   dumpert.nl              youtube.com           facebook.com
-ECHO   autojunk.nl             youtu.be              fb.watch
-ECHO   abhd.nl                 vimeo.com             instagram.com
-ECHO   autoblog.nl             dailymotion.com       twitter.com
-ECHO   telegraaf.nl            twitch.tv             pornhub.com
-ECHO   ad.nl                   mixcloud.com          xhamster.com
-ECHO   lc.nl                   soundcloud.com        xtube.com
+ECHO   npostart.nl             rtvoost.nl             youtube.com
+ECHO   gemi.st                 omroepwest.nl          youtu.be
+ECHO   nos.nl                  rijnmond.nl            vimeo.com
+ECHO   tvblik.nl               rtvutrecht.nl          dailymotion.com
+ECHO   uitzendinggemist.net    omroepgelderland.nl    twitch.tv
+ECHO   rtl.nl                  omroepzeeland.nl       mixcloud.com
+ECHO   rtlxl.nl                omroepbrabant.nl       soundcloud.com
+ECHO   rtlnieuws.nl            l1.nl                  facebook.com
+ECHO   kijk.nl                 dumpert.nl             fb.watch
+ECHO   omropfryslan.nl         autojunk.nl            instagram.com
+ECHO   rtvnoord.nl             abhd.nl                twitter.com
+ECHO   rtvdrenthe.nl           autoblog.nl            pornhub.com
+ECHO   nhnieuws.nl             telegraaf.nl           xhamster.com
+ECHO   at5.nl                  ad.nl                  xtube.com
+ECHO   omroepflevoland.nl      lc.nl
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -147,7 +147,7 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
   let $extractors:^={
         'npo':array{'npostart.nl'^,'gemi.st'}^,
         'nos':array{'nos.nl'}^,
-        'rtl':array{'rtlxl.nl'^,'rtlnieuws.nl'}^,
+        'rtl':array{'rtl.nl'^,'rtlxl.nl'^,'rtlnieuws.nl'}^,
         'kijk':array{'kijk.nl'}^,
         'tvblik':array{'tvblik.nl'^,'uitzendinggemist.net'}^,
         'regio':array{

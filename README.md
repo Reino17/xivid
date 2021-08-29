@@ -65,21 +65,21 @@ Gebruik (Linux):  ./xivid.sh [optie] url
 ```
 Deze websites worden op dit moment ondersteund:
 ```
-npostart.nl             omropfryslan.nl       omroepwest.nl
-gemi.st                 rtvnoord.nl           rijnmond.nl
-nos.nl                  rtvdrenthe.nl         rtvutrecht.nl
-tvblik.nl               nhnieuws.nl           omroepgelderland.nl
-uitzendinggemist.net    at5.nl                omroepzeeland.nl
-rtlxl.nl                omroepflevoland.nl    omroepbrabant.nl
-kijk.nl                 rtvoost.nl            l1.nl
-
-dumpert.nl              youtube.com           facebook.com
-autojunk.nl             youtu.be              fb.watch
-abhd.nl                 vimeo.com             instagram.com
-autoblog.nl             dailymotion.com       twitter.com
-telegraaf.nl            twitch.tv             pornhub.com
-ad.nl                   mixcloud.com          xhamster.com
-lc.nl                   soundcloud.com        xtube.com
+npostart.nl             rtvoost.nl             youtube.com
+gemi.st                 omroepwest.nl          youtu.be
+nos.nl                  rijnmond.nl            vimeo.com
+tvblik.nl               rtvutrecht.nl          dailymotion.com
+uitzendinggemist.net    omroepgelderland.nl    twitch.tv
+rtl.nl                  omroepzeeland.nl       mixcloud.com
+rtlxl.nl                omroepbrabant.nl       soundcloud.com
+rtlnieuws.nl            l1.nl                  facebook.com
+kijk.nl                 dumpert.nl             fb.watch
+omropfryslan.nl         autojunk.nl            instagram.com
+rtvnoord.nl             abhd.nl                twitter.com
+rtvdrenthe.nl           autoblog.nl            pornhub.com
+nhnieuws.nl             telegraaf.nl           xhamster.com
+at5.nl                  ad.nl                  xtube.com
+omroepflevoland.nl      lc.nl
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.

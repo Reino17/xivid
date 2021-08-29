@@ -499,15 +499,21 @@ declare function xivid:rtl($url as string) as object()? {
     doc(
       if (contains($url,"rtlnieuws.nl")) then
         doc($url)//div[@class="rtl-player__fallback-overlay"]/a/@href
+      else if (contains($url,"rtl.nl")) then
+        "https://www.rtlxl.nl/video/"||parse-json(
+          doc($url)//script/substring-after(.,"APOLLO_STATE__ = ")
+        )/*[__typename="Video"]/uuid
       else
         $url
     )//script[@type="application/json"]
   )//video/{
-    "name":concat("RTL: ",series/title," - ",title),
+    "name":x"RTL: {series/title} - {title}",
     "date":broadcastDateTime,
     "duration":duration * duration("PT1S"),
     "formats":xivid:m3u8-to-json(
-      (assets)()[type="Video"]/json-doc(url||"?device=web&amp;format=hls")/manifest
+      (assets)()[type="Video"]/request-combine(
+        url,{"device":"web","format":"hls"}
+      )/json-doc(url)/manifest
     )
   }
 };
