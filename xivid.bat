@@ -48,7 +48,7 @@ ECHO   omropfryslan.nl         autojunk.nl            instagram.com
 ECHO   rtvnoord.nl             abhd.nl                twitter.com
 ECHO   rtvdrenthe.nl           autoblog.nl            pornhub.com
 ECHO   nhnieuws.nl             telegraaf.nl           xhamster.com
-ECHO   at5.nl                  ad.nl
+ECHO   at5.nl                  ad.nl                  youporn.com
 ECHO   omroepflevoland.nl      lc.nl
 ECHO.
 ECHO Voorbeelden:
@@ -174,7 +174,8 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
         'twitter':array{'twitter.com'}^,
         'instagram':array{'instagram.com'}^,
         'pornhub':array{'pornhub.com'}^,
-        'xhamster':array{'xhamster.com'}
+        'xhamster':array{'xhamster.com'}^,
+        'youporn':array{'youporn.com'}
       }^,
       $temp:^=tokenize^(request-decode^(environment-variable^('url'^)^)/host^,'\.'^)^,
       $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)

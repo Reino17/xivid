@@ -8836,6 +8836,211 @@ declare function xivid:xhamster($url as string) as object()? {
 
 ================================================================================================
 
+[youporn]
+
+$ url=https://www.youporn.com/watch/16118402/amateur-girl-with-a-million-dollar-pussy-cant-stop-squirting-pov/
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])'
+{
+  "@context": "http://schema.org/",
+  "@type": "VideoObject",
+  "name": "Amateur Girl with a Million dollar Pussy can't stop Squirting - POV",
+  "contentUrl": "https://www.youporn.com/embed/16118402/amateur-girl-with-a-million-dollar-pussy-cant-stop-squirting-pov/",
+  "duration": "PT00H07M12S",
+  "thumbnailUrl": "https://fi1-ph.ypncdn.com/videos/202007/22/335226502/thumbs_5/8(m=e8KSKgaaaa)(mh=qffEJ85rSJ-cw7p9).jpg",
+  "uploadDate": "2020-08-13",
+  [...]
+}
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])/{"name":"YouPorn: "||name,"date":dateTime(uploadDate||"T00:00:00Z"),"duration":duration(duration)}'
+{
+  "name": "YouPorn: Amateur Girl with a Million dollar Pussy can't stop Squirting - POV",
+  "date": "2020-08-13T00:00:00Z",
+  "duration": "PT7M12S"
+}
+
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"mediaDefinition: (.+),",1))'
+[
+  {
+    "remote": true,
+    "format": "hls",
+    "videoUrl": "/api/video/media_definitions/16118402/",
+    "defaultQuality": true
+  },
+  {
+    "remote": true,
+    "format": "mp4",
+    "videoUrl": "/api/video/media_definitions/16118402/",
+    "defaultQuality": false
+  }
+]
+
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"mediaDefinition: (.+),",1))(1)/json-doc(resolve-uri(videoUrl))'
+[
+  {
+    "quality": "1080",
+    "format": "mp4",
+    "videoUrl": "https://ev-ph.ypncdn.com/videos/202007/22/335226502/1080P_4000K_335226502.mp4?[...]",
+    "codec": "h264",
+    "defaultQuality": false,
+    "videoSize": 187901162
+  },
+  [...]
+  {
+    "quality": "240",
+    "format": "mp4",
+    "videoUrl": "https://ev-ph.ypncdn.com/videos/202007/22/335226502/240P_400K_335226502.mp4?[...]",
+    "codec": "h264",
+    "defaultQuality": false,
+    "videoSize": 28099199
+  }
+]
+
+$ xidel -se 'doc("'$url'")/map:merge((parse-json(//script[@type="application/ld+json"])/{"name":"YouPorn: "||name,"date":dateTime(uploadDate||"T00:00:00Z"),"duration":duration(duration)},{"formats":array{for $x at $i in parse-json(//script/extract(.,"mediaDefinition: (.+),",1))(1)/json-doc(resolve-uri(videoUrl))() order by $x/quality count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl}}}))'
+{
+  "name": "YouPorn: Amateur Girl with a Million dollar Pussy can't stop Squirting - POV",
+  "date": "2020-08-13T00:00:00Z",
+  "duration": "PT7M12S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "426x240",
+      "url": "https://ev-ph.ypncdn.com/videos/202007/22/335226502/240P_400K_335226502.mp4?[...]"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "url": "https://ev-ph.ypncdn.com/videos/202007/22/335226502/1080P_4000K_335226502.mp4?[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.youporn.com/watch/16012090/young-busty-teenager-tries-a-big-cock-suddenly-squirts-with-many-orgasms/
+
+$ xidel -se 'doc("'$url'")/parse-json(//script[@type="application/ld+json"])'
+Error:
+err:FOJS0001:  at
+
+                                         (tkCurlyBraceOpen) in                                  {"@context":"http:\/\/schema.org\/",[...],"userInteractionCount":647296}}
+
+$ xidel -s $url -e '$raw'
+<!DOCTYPE html>
+
+<html lang="en" class="grid">
+[...]
+					</span>
+<!DOCTYPE html>
+
+<html lang="en" class="grid">
+[...]
+
+Op de een of andere manier wordt er af en toe een 2e HTML-bron in hetzelfde bestand gegenereert. Heel eigenaardig!
+
+$ xidel -se 'doc("'$url'")/parse-json((//script[@type="application/ld+json"])[1])'
+{
+  "@context": "http://schema.org/",
+  "@type": "VideoObject",
+  "name": "Young busty teenager tries a big cock & suddenly squirts with many orgasms",
+  "contentUrl": "https://www.youporn.com/embed/16012090/young-busty-teenager-tries-a-big-cock-suddenly-squirts-with-many-orgasms/",
+  "duration": "PT00H17M33S",
+  "thumbnailUrl": "https://fi1-ph.ypncdn.com/videos/201908/22/243253621/thumbs_5/5(m=e8KSKgaaaa)(mh=VlR-BSV4NtySbfBA).jpg",
+  "uploadDate": "2020-06-02",
+  [...]
+}
+
+$ xidel -se 'doc("'$url'")/parse-json(extract(//script,"mediaDefinition: (.+),",1))()[1]/json-doc(resolve-uri(videoUrl))'
+[
+  {
+    "quality": "2160",
+    "format": "upsell",
+    "videoUrl": "",
+    "codec": "h264",
+    "defaultQuality": false,
+    "videoSize": 898836643
+  },
+  {
+    "quality": "1440",
+    "format": "upsell",
+    "videoUrl": "",
+    "codec": "h264",
+    "defaultQuality": false,
+    "videoSize": 420529509
+  },
+  {
+    "quality": "1080",
+    "format": "mp4",
+    "videoUrl": "https://ev-ph.ypncdn.com/videos/201908/22/243253621/1080P_4000K_243253621.mp4?[...]",
+    "codec": "h264",
+    "defaultQuality": false,
+    "videoSize": 262784855
+  },
+  [...]
+  {
+    "quality": "240",
+    "format": "mp4",
+    "videoUrl": "https://ev-ph.ypncdn.com/videos/201908/22/243253621/240P_400K_243253621.mp4?[...]",
+    "codec": "h264",
+    "defaultQuality": false,
+    "videoSize": 42407086
+  }
+]
+
+$ xidel -se 'doc("'$url'")/map:merge((parse-json((//script[@type="application/ld+json"])[1])/{"name":"YouPorn: "||name,"date":dateTime(uploadDate||"T00:00:00Z"),"duration":duration(duration)},{"formats":array{for $x at $i in parse-json(extract(//script,"mediaDefinition: (.+),",1))(1)/json-doc(resolve-uri(videoUrl))()[format="mp4"] order by $x/quality count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl}}}))'
+{
+  "name": "YouPorn: Young busty teenager tries a big cock & suddenly squirts with many orgasms",
+  "date": "2020-06-02T00:00:00Z",
+  "duration": "PT17M33S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "426x240",
+      "url": "https://cv-ph.ypncdn.com/videos/201908/22/243253621/240P_400K_243253621.mp4?[...]"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "url": "https://cv-ph.ypncdn.com/videos/201908/22/243253621/1080P_4000K_243253621.mp4?[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:youporn($url as string) as object()? {
+  doc($url)/map:merge((
+    parse-json((//script[@type="application/ld+json"])[1])/{
+      "name":"YouPorn: "||name,
+      "date":dateTime(uploadDate||"T00:00:00Z"),
+      "duration":duration(duration)
+    },
+    {
+      "formats":array{
+        for $x at $i in parse-json(
+          extract(//script,"mediaDefinition: (.+),",1)
+        )(1)/json-doc(resolve-uri(videoUrl,$url))()[format="mp4"]
+        order by $x/quality
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
+          "url":$x/videoUrl
+        }
+      }
+    }
+  ))
+};
+
+================================================================================================
+
 [twitch]
 
 $ url=https://www.twitch.tv/esl_csgo

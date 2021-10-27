@@ -1391,3 +1391,28 @@ declare function xivid:xhamster($url as string) as object()? {
     )
   }
 };
+
+declare function xivid:youporn($url as string) as object()? {
+  doc($url)/map:merge((
+    parse-json((//script[@type="application/ld+json"])[1])/{
+      "name":"YouPorn: "||name,
+      "date":dateTime(uploadDate||"T00:00:00Z"),
+      "duration":duration(duration)
+    },
+    {
+      "formats":array{
+        for $x at $i in parse-json(
+          extract(//script,"mediaDefinition: (.+),",1)
+        )(1)/json-doc(resolve-uri(videoUrl,$url))()[format="mp4"]
+        order by $x/quality
+        count $i
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
+          "url":$x/videoUrl
+        }
+      }
+    }
+  ))
+};

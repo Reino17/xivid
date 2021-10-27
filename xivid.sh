@@ -49,7 +49,7 @@ Ondersteunde websites:
   rtvnoord.nl             abhd.nl                twitter.com
   rtvdrenthe.nl           autoblog.nl            pornhub.com
   nhnieuws.nl             telegraaf.nl           xhamster.com
-  at5.nl                  ad.nl
+  at5.nl                  ad.nl                  youporn.com
   omroepflevoland.nl      lc.nl
 
 Voorbeelden:
@@ -175,7 +175,8 @@ eval "$(xidel -e '
         "twitter":array{"twitter.com"},
         "instagram":array{"instagram.com"},
         "pornhub":array{"pornhub.com"},
-        "xhamster":array{"xhamster.com"}
+        "xhamster":array{"xhamster.com"},
+        "youporn":array{"youporn.com"}
       },
       $temp:=tokenize(request-decode("'$url'")/host,"\."),
       $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")
