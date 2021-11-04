@@ -922,11 +922,11 @@ declare function xivid:youtube($url as string) as object()? {
       {
         "context":{
           "client":{
-            "clientName":"WEB",
-            "clientVersion":"2.20210520.09.00"
+            "clientName":"ANDROID",
+            "clientVersion":"16.43.34"
           }
         },
-        "videoId":extract($url,"\w+$")
+        "videoId":extract($url,"[\w-]+$")
       },
       {"method":"json"}
     ),
@@ -936,49 +936,43 @@ declare function xivid:youtube($url as string) as object()? {
     )/url
   })/json/{
     "name":videoDetails/title,
-    "date":dateTime(
-      microformat/playerMicroformatRenderer/(
-        liveBroadcastDetails/startTimestamp,
-        uploadDate||"T00:00:00Z"
-      )[1]
-    ),
     "duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),
     "formats":array{
       (.//captionTracks)()[languageCode=("nl","en")]/{
         "id":"sub-"||position(),
         "format":"ttml",
         "language":languageCode,
-        "label":name/simpleText,
+        "label":name//text,
         "url":baseUrl
       },
-      for $x at $i in streamingData/(formats)()[url]
+      for $x at $i in streamingData/(formats)()
       order by $x/width
       count $i
       return {
         "id":"pg-"||$i,
-        "format":let $mt:=tokenize($x/mimeType,";"),
-            $c:=tokenize(
-              extract($mt[2],"&quot;(.+)&quot;",1),
-              ", "
-            ) ! tokenize(.,"\.")[1]
-        return
-        concat(
-          substring-after($mt[1],"/"),
-          "[",
-          if ($c[1]="avc1") then "h264" else $c[1],
-          "+",
-          if ($c[2]="mp4a") then "aac" else $c[2],
-          "]"
+        "format":extract($x/mimeType,"video/(.+?);",1) ! (
+          if (.="3gpp") then "3gpp[mp4v+aac]" else "mp4[h264+aac]"
         ),
-        "resolution":concat($x/width,"x",$x/height,"@",$x/fps,"fps"),
-        "bitrate":concat(round($x/bitrate div 1000),"kbps"),
+        "resolution":x"{$x/width}x{$x/height}@{$x/fps}fps",
+        "bitrate":round($x/bitrate div 1000)||"kbps",
         "url":$x/url
       },
-      {
-        "id":"dash-0",
-        "format":"mpd[manifest]",
-        "url":streamingData/dashManifestUrl
-      }[url],
+      for $x at $i in streamingData[not(hlsManifestUrl)]/(adaptiveFormats)()
+      order by boolean($x/width),$x/bitrate
+      count $i
+      return {
+        "id":"dash-"||$i,
+        "format":let $mt:=extract($x/mimeType,"/(.+?);.+&quot;(\w+)",(1,2)) return
+        x"{$mt[1]}[{
+          if ($mt[2]="avc1") then "h264"
+          else if ($mt[2]="mp4a") then "aac"
+          else $mt[2]
+        }]",
+        "resolution"?:$x/width ! x"{.}x{$x/height}@{$x/fps}fps",
+        "samplerate"?:$x/audioSampleRate ! x"{. div 1000}kHz",
+        "bitrate":round($x/bitrate div 1000)||"kbps",
+        "url":$x/url
+      },
       xivid:m3u8-to-json(streamingData/hlsManifestUrl)()
     }
   }
