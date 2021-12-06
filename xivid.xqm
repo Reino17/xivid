@@ -733,22 +733,29 @@ declare function xivid:ofl($url as string) as object()? {
 };
 
 declare function xivid:dumpert($url as string) as object()? {
-  parse-json(
-    parse-json(
-      doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
-    )
-  )/items/item/item[exists((media)()[mediatype="VIDEO"])]/{
-    "name":"Dumpert: "||title,
-    "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
-    "duration":(media)()/duration * duration("PT1S"),
-    "formats"?:array{
-      for $x at $i in ("mobile","tablet","720p","original") return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "url":(.//variants)()[version=$x]/uri
-      }[url]
-    }[exists(.())]
-  }
+  let $json:=parse-json(parse-json(
+        doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
+      ))/items/item/item[media_type="VIDEO"],
+      $fmts:=$json//variants,
+      $host:={"youtube":"https://youtu.be/","twitter":"https://twitter.com/i/status/"}
+  return
+  if ($fmts()/version="embed" and not($fmts()/version="stream")) then
+    let $uri:=tokenize($fmts()/uri,":") return
+    eval(x"xivid:{$uri[1]}(&quot;{$host($uri[1])}{$uri[2]}&quot;)")
+  else
+    $json/{
+      "name":"Dumpert: "||title,
+      "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
+      "duration":(media)()/duration * duration("PT1S"),
+      "formats":array{
+        for $x at $i in ("mobile","tablet","720p","original") return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "url":$fmts()[version=$x and ends-with(uri,"mp4")]/uri
+        }[url],
+        xivid:m3u8-to-json($fmts()[version="stream"]/uri)()
+      }
+    }
 };
 
 declare function xivid:autojunk($url as string) as object()? {

@@ -6355,6 +6355,7 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
       ]
     }
   ],
+  "media_type": "VIDEO",
   [...]
   "title": "Telefoon checken tijdens het fietsen",
   [...]
@@ -6408,18 +6409,151 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
       ]
     }
   ],
+  "media_type": "FOTO",
   [...]
   "title": "Onschuldige dames zijn stiekem rellertjes",
   [...]
 }
 
-[(media)()[mediatype="VIDEO"]] om alleen de video's te ontleden.
+[media_type="VIDEO"] om alleen de video's te ontleden.
 
 ------------------------------------------------------------------------------------------------
 
-$ url=https://www.dumpert.nl/item/7944807_3df1ea7a (embedded youtube video)
+$ url=https://www.dumpert.nl/item/100015471_dc48229b (embedded youtube video, met HLS videostream op dumpert)
 
-$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]'
+$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"]'
+{
+  "date": "2021-11-21T08:41:01+01:00",
+  "description": "<p>Nunspeter Henry verricht heldendaad op A28.  (Meer info bij  <a href=\"https://www.rtvnunspeet.nl/16780-nunspeter-henry-temmermans-verricht-heldendaad-op-a28\" target=\"_blank\" rel=\"noreferrer\">RTV Nunspeet</a>)</p>",
+  "id": "100015471_dc48229b",
+  "media": [
+    {
+      "description": "",
+      "duration": 34,
+      "mediatype": "VIDEO",
+      "variants": [
+        {
+          "uri": "youtube:pevyn9Jb_4g",
+          "version": "embed"
+        },
+        [...]
+        {
+          "uri": "https://media.dumpert.nl/dmp/media/video/7/2/f/72fbd770-493f-0c70-773e-7670b3368495/index.m3u8",
+          "version": "stream"
+        }
+      ]
+    }
+  ],
+  "media_type": "VIDEO",
+  [...]
+  "title": "Eindbaas op de snelweg!",
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm -e 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"]/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":array{for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x]/uri}[url],xivid:m3u8-to-json((.//variants)()[version="stream"]/uri)()}}'
+{
+  "name": "Dumpert: Eindbaas op de snelweg!",
+  "date": "2021-11-21T07:41:01Z",
+  "duration": "PT34S",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://media.dumpert.nl/dmp/media/video/7/2/f/72fbd770-493f-0c70-773e-7670b3368495/index.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "641kbps",
+      "url": "https://media.dumpert.nl/dmp/media/video/7/2/f/72fbd770-493f-0c70-773e-7670b3368495/270/index.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "3059kbps",
+      "url": "https://media.dumpert.nl/dmp/media/video/7/2/f/72fbd770-493f-0c70-773e-7670b3368495/720/index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.dumpert.nl/item/100015432_eac2c390
+
+$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"]'
+{
+  "date": "2021-11-20T19:42:28+01:00",
+  "description": "<p>Rustaaaaaaag! <a href=\"https://www.youtube.com/watch?v=ouCQF3LLmI8\" target=\"_blank\" rel=\"noreferrer\"> (Via Flashphoto NL)</a></p>",
+  "id": "100015432_eac2c390",
+  "media": [
+    {
+      "description": "",
+      "duration": 13,
+      "mediatype": "VIDEO",
+      "variants": [
+        {
+          "uri": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/270/index.m3u8",
+          "version": "mobile"
+        },
+        {
+          "uri": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/480/index.m3u8",
+          "version": "tablet"
+        },
+        {
+          "uri": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/720/index.m3u8",
+          "version": "720p"
+        },
+        [...]
+        {
+          "uri": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/index.m3u8",
+          "version": "stream"
+        }
+      ]
+    }
+  ],
+  "media_type": "VIDEO",
+  [...]
+  "title": "Rotterdams onderonsje",
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm -e 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"]/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":array{for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x and ends-with(uri,"mp4")]/uri}[url],xivid:m3u8-to-json((.//variants)()[version="stream"]/uri)()}}'
+{
+  "name": "Dumpert: Rotterdams onderonsje",
+  "date": "2021-11-20T18:42:28Z",
+  "duration": "PT13S",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/index.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "480x270",
+      "bitrate": "986kbps",
+      "url": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/270/index.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "3548kbps",
+      "url": "https://media.dumpert.nl/dmp/media/video/8/8/d/88d42c3c-c5cb-6cda-a5c6-d18ea4bc61d9/720/index.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.dumpert.nl/item/7944807_3df1ea7a (oudere embedded youtube video)
+
+$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"]'
 {
   "date": "2020-08-03T17:00:39+02:00",
   "description": "Alle sadisten opgelet: er staat weer een nieuwe #FAIL-compilatie voor je klaar. Genieten!",
@@ -6442,16 +6576,9 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
   [...]
 }
 
-$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats"?:array{for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x]/uri}[url]}[exists(.())]}'
-{
-  "name": "Dumpert: Deze mensen kunnen echt helemaal niks! #FAIL (6) | Dumpert Tags",
-  "date": "2020-08-03T15:00:39Z",
-  "duration": "PT6M22S"
-}
-
 $ url=https://www.dumpert.nl/item/7971823_1f7a4dfc (embedded twitter video)
 
-$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[(media)()[mediatype="VIDEO"]]'
+$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"]'
 {
   "date": "2020-08-21T21:43:10+02:00",
   "description": "Scoort zijn tweede in de finale",
@@ -6474,31 +6601,39 @@ $ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\
   [...]
 }
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+$ xidel -se 'let $json:=parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"],$fmts:=$json//variants,$host:={"youtube":"https://youtu.be/","twitter":"https://twitter.com/i/status/"} return if ($fmts()/version="embed" and not($fmts()/version="stream")) then let $uri:=tokenize($fmts()/uri,":") return x"xivid:{$uri[1]}(&quot;{$host($uri[1])}{$uri[2]}&quot;)" else "..."'
+xivid:youtube("https://youtu.be/uF1ztwahGeA")
+en
+xivid:twitter("https://twitter.com/i/status/1296893972804247552")
 
-Nog te doen: af laten handelen door xivid:youtube() en xivid:twitter() als die klaar zijn.
-
-$ xidel -se 'parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[exists((media)()[mediatype="VIDEO"])]/(if ((.//variants)()/version="embed") then (.//variants)()/(if (starts-with(uri,"youtube")) then xivid:youtube(replace(uri,"youtube:","https://youtu.be/")) else xivid:twitter(replace(uri,"twitter:","https://twitter.com/i/status/"))) else {"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats"?:array{for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":(.//variants)()[version=$x]/uri}[url]}[exists(.())]})'
+$ xidel -s --module=xivid.xqm -e 'let $json:=parse-json(parse-json(doc("'$url'")//script/extract(.,"JSON\.parse\((.+)\)",1)[.]))/items/item/item[media_type="VIDEO"],$fmts:=$json//variants,$host:={"youtube":"https://youtu.be/","twitter":"https://twitter.com/i/status/"} return if ($fmts()/version="embed" and not($fmts()/version="stream")) then let $uri:=tokenize($fmts()/uri,":") return eval(x"xivid:{$uri[1]}(&quot;{$host($uri[1])}{$uri[2]}&quot;)") else $json/{"name":"Dumpert: "||title,"date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),"duration":(media)()/duration * duration("PT1S"),"formats":array{for $x at $i in ("mobile","tablet","720p","original") return {"id":"pg-"||$i,"format":"mp4[h264+aac]","url":$fmts()[version=$x and ends-with(uri,"mp4")]/uri}[url],xivid:m3u8-to-json($fmts()[version="stream"]/uri)()}}'
 
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:dumpert($url as string) as object()? {
-  parse-json(
-    parse-json(
-      doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
-    )
-  )/items/item/item[exists((media)()[mediatype="VIDEO"])]/{
-    "name":"Dumpert: "||title,
-    "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
-    "duration":(media)()/duration * duration("PT1S"),
-    "formats"?:array{
-      for $x at $i in ("mobile","tablet","720p","original") return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "url":(.//variants)()[version=$x]/uri
-      }[url]
-    }[exists(.())]
-  }
+  let $json:=parse-json(parse-json(
+        doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
+      ))/items/item/item[media_type="VIDEO"],
+      $fmts:=$json//variants,
+      $host:={"youtube":"https://youtu.be/","twitter":"https://twitter.com/i/status/"}
+  return
+  if ($fmts()/version="embed" and not($fmts()/version="stream")) then
+    let $uri:=tokenize($fmts()/uri,":") return
+    eval(x"xivid:{$uri[1]}(&quot;{$host($uri[1])}{$uri[2]}&quot;)")
+  else
+    $json/{
+      "name":"Dumpert: "||title,
+      "date":adjust-dateTime-to-timezone(dateTime(date),duration("PT0S")),
+      "duration":(media)()/duration * duration("PT1S"),
+      "formats":array{
+        for $x at $i in ("mobile","tablet","720p","original") return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "url":$fmts()[version=$x and ends-with(uri,"mp4")]/uri
+        }[url],
+        xivid:m3u8-to-json($fmts()[version="stream"]/uri)()
+      }
+    }
 };
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
