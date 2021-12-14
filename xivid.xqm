@@ -1214,38 +1214,30 @@ declare function xivid:soundcloud($url as string) as object()? {
 };
 
 declare function xivid:facebook($url as string) as object()? {
-  x:request({
-    "headers":"User-Agent: Mozilla/5.0 Firefox/84.0",
-    "url":$url
-  })/doc/map:merge((
-    parse-json(//script[@type="application/ld+json"])/{
-      "name":join(
-        reverse(tokenize(name," \| ")),
-        ": "
-      ),
+  doc($url)/map:merge((
+    {
+      "name":"Facebook: "||//meta[@property="og:title"]/@content,
       "date":adjust-dateTime-to-timezone(
-        dateTime(uploadDate),
+        dateTime(
+          parse-json(
+            //script[@type="application/ld+json"]
+          )/substring(dateCreated,1,22)||":00"
+        ),
         duration("PT0S")
-      ),
-      "duration":duration("P"||duration)
+      )
     },
-    parse-json(
-      replace(
-        //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
-        "\\x","\\u00"
-      ),
-      {"liberal":true()}
-    )/(.//videoData)()/{
+    //script/extract(.,"ScheduledApplyEach,(.+?)\);",1)[.] !
+    parse-json(.)[.//playable_url]//media/{
+      "duration":round(playable_duration_in_ms div 1000) * duration("PT1S"),
       "formats":array{
-        {
+        (video_available_captions_locales)()/{
           "id":"sub-1",
           "format":"srt",
-          "url":subtitles_src
+          "language":locale,
+          "label":localized_language,
+          "url":captions_url
         }[url],
-        (
-          (sd_src_no_ratelimit,sd_src)[.][1],
-          (hd_src_no_ratelimit,hd_src)[.][1]
-        ) ! {
+        (playable_url,playable_url_quality_hd) ! {
           "id":"pg-"||position(),
           "format":"mp4[h264+aac]",
           "url":.

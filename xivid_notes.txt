@@ -7913,130 +7913,72 @@ declare function xivid:lc($url as string) as object()? {
 
 $ url=https://www.facebook.com/watch/?v=374747990176575   # https://nl.hardware.info/nieuws/72584/
 
-$ xidel -se 'doc("'$url'")/parse-json(//script[@type="application/ld+json"])'
+$ xidel -se 'doc("'$url'") ! (//meta[@property="og:title"]/@content,parse-json(//script[@type="application/ld+json"])/dateCreated)'
+LEGO NES
+2020-07-14T05:00:02-0700
+
+$ xidel -se 'doc("'$url'")//script/extract(.,"ScheduledApplyEach,(.+?)\);",1)[.] ! parse-json(.)[.//playable_url]//media'
 {
-  "@type": "VideoObject",
-  "name": "LEGO NES | Facebook",
-  "description": "Het LEGO Nintendo Entertainment System, de perfecte combinatie van videogames en LEGO. \n\nhttps://lego.build/NESReveal",
-  "thumbnailUrl": "https://scontent.fams1-1.fna.fbcdn.net/v/t15.5256-10/108554373_374751573509550_5904191927523521476_n.jpg?[...]",
-  "duration": "T1M8S",
-  "uploadDate": "2020-07-14T01:06:20-07:00",
-  "contentUrl": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
-  "interactionCount": 33659,
-  "publication": [
+  "__typename": "Video",
+  [...]
+  "dash_manifest": "<?xml version=\"1.0\"?>\n<MPD xmlns=\"urn:mpeg:dash:schema:mpd:2011\" minBufferTime=\"PT1.500S\" type=\"static\" mediaPresentationDuration=\"PT0H1M7.008S\" maxSegmentDuration=\"PT0H0M2.880S\" profiles=\"urn:mpeg:dash:profile:isoff-on-demand:2011,http://dashif.org/guidelines/dash264\" FBTagsetUsed=\"dash_gen3basic_5secgop\">[...]</MPD>\n",
+  [...]
+  "captions_url": "https://scontent-amt2-1.xx.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]",
+  [...]
+  "video_available_captions_locales": [
     {
-      "@type": "BroadcastEvent",
-      "isLiveBroadcast": false
+      "localized_creation_method": null,
+      "captions_url": "https://scontent-amt2-1.xx.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]",
+      "locale": "nl_NL",
+      "localized_language": "Nederlands",
+      "localized_country": null
     }
   ],
-  "@id": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
-  "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
-  "datePublished": "2020-07-14T01:06:20-07:00",
   [...]
-  "headline": "LEGO NES | Facebook",
-  "isFamilyFriendly": true,
+  "playable_url": "https://video-ams4-1.xx.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
+  "playable_url_quality_hd": "https://video-amt2-1.xx.fbcdn.net/v/t39.25447-2/244769909_568813207538062_7750032324585417716_n.mp4?[...]",
+  [...]
+  "playable_duration_in_ms": 67157,
   [...]
 }
 
-$ xidel -se 'doc("'$url'")//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
-{displayResources:["gthHO","t9MZQ","Y4UD9",[...],dash_manifest:null,[...]
-
-$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
-{displayResources:["gthHO","t9MZQ","Y4UD9",[...],dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-$ xidel -se 'x:request({"user-agent":"Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")]'
-Dit werkt (nog) niet. Zie https://github.com/benibela/xidel/issues/58.
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc/parse-json(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],{"liberal":true()})'
-Error:
-jerr:JNDY0021: Failed to parse JSON: Invalid character at line 0, pos 9360: 'x' at  (tkColon) in [...]
-
-[...]dash_manifest:"\x3C?xml version=\"1.0\"?>\n\x3CMPD[...]
-                    ^positie 9360
-
-$ xidel -se 'join(("3C_16",x:integer("3C",16)||"_10",x:cps(x:integer("3C",16)))," = ")'
-3C_16 = 60_10 = <
-
-\x3C is de Javascript notatie voor <. In JSON is alleen de Unicode codering, \u003C ,toegestaan.
-
-$ xidel -se 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc/parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/(.//videoData)()'   # Alleen de "videoData"-array is van belang voor de video formaten.
-{
-  "is_hls": false,
-  "video_id": "374747990176575",
-  "is_live_stream": false,
-  "is_servable_via_fbms": false,
-  "rotation": 0,
-  "is_facecast_audio": false,
-  "content_category": "general",
-  "is_low_latency": false,
-  "desired_latency_ms": null,
-  "latency_tolerance_ms": null,
-  "is_predictive_dash": false,
-  "is_live_trace_enabled_on_player": false,
-  "p2p_settings": null,
-  "ms_param": null,
-  "captions_autogenerated_indicator_config": null,
-  "sd_src_no_ratelimit": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
-  "aspect_ratio": 0.8,
-  "hd_src": "https://scontent.fams1-2.fna.fbcdn.net/v/t66.36240-6/49915952_378325833593524_1098325198102408920_n.mp4?[...]",
-  "sd_src": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]",
-  "hd_tag": "oep_hd",
-  "sd_tag": "sve_sd",
-  "stream_type": "dash",
-  "live_routing_token": "",
-  "projection": "flat",
-  "subtitles_src": "https://scontent.fams1-1.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]",
-  "dash_manifest": "<?xml version=\"1.0\"?>\n<MPD [...]\x3C/AdaptationSet>\x3C/Period>\x3C/MPD>\n",
-  "dash_prefetched_representation_ids": ["1243446782689657v", "405461810413399a"],
-  "player_version_overwrite": "pleasantville",
-  "spherical_config": {},
-  "is_spherical": false,
-  "original_height": 1080,
-  "original_width": 864,
-  "video_url": "https://www.facebook.com/LEGONetherlands/videos/374747990176575/",
-  "is_broadcast": false,
-  "override_config": null,
-  "prefetch_cache": null
-}
-
-$ xidel -s --module=xivid.xqm -e 'x:request({"headers":"User-Agent: Mozilla/5.0 Firefox/84.0","url":"'$url'"})/doc/map:merge((parse-json(//script[@type="application/ld+json"])/{"name":join(reverse(tokenize(name," \| ")),": "),"date":adjust-dateTime-to-timezone(dateTime(uploadDate),duration("PT0S")),"duration":duration("P"||duration)},parse-json(replace(//script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],"\\\x","\\\u00"),{"liberal":true()})/(.//videoData)()/{"formats":array{{"id":"sub-1","format":"srt","url":subtitles_src}[url],((sd_src_no_ratelimit,sd_src)[.][1],(hd_src_no_ratelimit,hd_src)[.][1]) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":.},xivid:mpd-to-json(parse-xml(dash_manifest))()}}))'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/map:merge(({"name":"Facebook: "||//meta[@property="og:title"]/@content,"date":adjust-dateTime-to-timezone(dateTime(parse-json(//script[@type="application/ld+json"])/substring(dateCreated,1,22)||":00"),duration("PT0S"))},//script/extract(.,"ScheduledApplyEach,(.+?)\);",1)[.] ! parse-json(.)[.//playable_url]//media/{"duration":round(playable_duration_in_ms div 1000) * duration("PT1S"),"formats":array{(video_available_captions_locales)()/{"id":"sub-1","format":"srt","language":locale,"label":localized_language,"url":captions_url}[url],(playable_url,playable_url_quality_hd) ! {"id":"pg-"||position(),"format":"mp4[h264+aac]","url":.},xivid:mpd-to-json(parse-xml(dash_manifest))()}}))'
 {
   "name": "Facebook: LEGO NES",
-  "date": "2020-07-14T08:06:20Z",
-  "duration": "PT1M8S",
+  "date": "2020-07-14T12:00:02Z",
+  "duration": "PT1M7S",
   "formats": [
     {
       "id": "sub-1",
       "format": "srt",
-      "url": "https://scontent.fams1-1.fna.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]"
+      "language": "nl_NL",
+      "label": "Nederlands",
+      "url": "https://scontent-amt2-1.xx.fbcdn.net/v/t39.2093-6/109296938_710113536438950_7732833811523707442_n.srt?[...]"
     },
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "url": "https://video.fams1-2.fna.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]"
+      "url": "https://video-ams4-1.xx.fbcdn.net/v/t42.9040-2/108049244_739098363574790_5900093428100578067_n.mp4?[...]"
     },
     {
       "id": "pg-2",
       "format": "mp4[h264+aac]",
-      "url": "https://scontent.fams1-2.fna.fbcdn.net/v/t66.36240-6/49915952_378325833593524_1098325198102408920_n.mp4?[...]"
+      "url": "https://scontent-amt2-1.xx.fbcdn.net/v/t66.36240-6/174879080_600412104583580_5939889326118957700_n.mp4?[...]"
     },
     {
       "id": "dash-1",
       "format": "mp4[aac]",
       "samplerate": "48kHz",
       "bitrate": "65kbps",
-      "url": "https://video.fams1-1.fna.fbcdn.net/v/t42.1790-2/109281327_405461813746732_178858496964516997_n.mp4?[...]"
-
+      "url": "https://video-ams4-1.xx.fbcdn.net/v/t42.1790-2/109281327_405461813746732_178858496964516997_n.mp4?[...]"
     },
     [...]
     {
       "id": "dash-5",
       "format": "mp4[h264]",
       "resolution": "720x900@25fps",
-      "bitrate": "378kbps",
-      "url": "https://video.fams1-1.fna.fbcdn.net/v/t39.25447-2/121418431_154480879657509_7493886390368626002_n.mp4?[...]"
+      "bitrate": "708kbps",
+      "url": "https://video-amt2-1.xx.fbcdn.net/v/t39.25447-2/244769909_568813207538062_7750032324585417716_n.mp4?[...]"
     }
   ]
 }
@@ -8044,38 +7986,30 @@ $ xidel -s --module=xivid.xqm -e 'x:request({"headers":"User-Agent: Mozilla/5.0 
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:facebook($url as string) as object()? {
-  x:request({
-    "headers":"User-Agent: Mozilla/5.0 Firefox/84.0",
-    "url":$url
-  })/doc/map:merge((
-    parse-json(//script[@type="application/ld+json"])/{
-      "name":join(
-        reverse(tokenize(name," \| ")),
-        ": "
-      ),
+  doc($url)/map:merge((
+    {
+      "name":"Facebook: "||//meta[@property="og:title"]/@content,
       "date":adjust-dateTime-to-timezone(
-        dateTime(uploadDate),
+        dateTime(
+          parse-json(
+            //script[@type="application/ld+json"]
+          )/substring(dateCreated,1,22)||":00"
+        ),
         duration("PT0S")
-      ),
-      "duration":duration("P"||duration)
+      )
     },
-    parse-json(
-      replace(
-        //script/extract(.,"onPageletArrive\((.+?)\);",1)[contains(.,"videoData")],
-        "\\x","\\u00"
-      ),
-      {"liberal":true()}
-    )/(.//videoData)()/{
+    //script/extract(.,"ScheduledApplyEach,(.+?)\);",1)[.] !
+    parse-json(.)[.//playable_url]//media/{
+      "duration":round(playable_duration_in_ms div 1000) * duration("PT1S"),
       "formats":array{
-        {
+        (video_available_captions_locales)()/{
           "id":"sub-1",
           "format":"srt",
-          "url":subtitles_src
+          "language":locale,
+          "label":localized_language,
+          "url":captions_url
         }[url],
-        (
-          (sd_src_no_ratelimit,sd_src)[.][1],
-          (hd_src_no_ratelimit,hd_src)[.][1]
-        ) ! {
+        (playable_url,playable_url_quality_hd) ! {
           "id":"pg-"||position(),
           "format":"mp4[h264+aac]",
           "url":.
