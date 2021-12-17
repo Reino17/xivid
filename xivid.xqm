@@ -933,7 +933,7 @@ declare function xivid:youtube($url as string) as object()? {
             "clientVersion":"16.43.34"
           }
         },
-        "videoId":extract($url,"[\w-]+$")
+        "videoId":extract($url,"[A-Za-z0-9_-]+$")
       },
       {"method":"json"}
     ),
