@@ -734,30 +734,32 @@ declare function xivid:dumpert($url as string) as object()? {
 };
 
 declare function xivid:autojunk($url as string) as object()? {
-  doc($url)/{
-    "name":"Autojunk: "||//meta[@property="og:title"]/@content,
-    "date":xivid:string-to-utc-dateTime(
-      join(extract(//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
-    ),
-    "formats"?://div[@id="playerWrapper" and script]/array{
-      let $id:=extract(//meta[@property="og:image"]/@content,"\d{4}/\d{4}/\d+")
-      for $x at $i in (".mp4","_hq.mp4","_720p.mp4") ! concat(
-        "https://static.autojunk.nl/flv/",$id,.
-      )
-      where x:request({
-        "method":"HEAD",
-        "error-handling":"xxx=accept",
-        "url":$x
-      })/headers[1] = "HTTP/1.1 200 OK"
-      return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":("640x360","852x480","1280x720")[$i],
-        "bitrate":(600,1200,2000)[$i]||"kbps",
-        "url":$x
+  doc($url)//div[@id="playerWrapper"]/(
+    .[iframe]/xivid:youtube(iframe/@src),
+    .[script]/{
+      "name":"Autojunk: "||//meta[@property="og:title"]/@content,
+      "date":xivid:string-to-utc-dateTime(
+        join(extract(//span[@class="posted"]/text(),"[\d:-]+",0,"*"))
+      ),
+      "formats"?:array{
+        let $id:=extract(//meta[@property="og:image"]/@content,"\d{4}/\d{4}/\d+")
+        for $x at $i in (".mp4","_hq.mp4","_720p.mp4") !
+          x"https://static.autojunk.nl/flv/{$id}{.}"
+        where x:request({
+          "method":"HEAD",
+          "error-handling":"xxx=accept",
+          "url":$x
+        })/headers[1] = "HTTP/1.1 200 OK"
+        return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":("640x360","852x480","1280x720")[$i],
+          "bitrate":(600,1200,2000)[$i]||"kbps",
+          "url":$x
+        }
       }
     }
-  }
+  )
 };
 
 declare function xivid:abhd($url as string) as object()? {
