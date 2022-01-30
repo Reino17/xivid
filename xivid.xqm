@@ -795,8 +795,13 @@ declare function xivid:abhd($url as string) as object()? {
 };
 
 declare function xivid:autoblog($url as string) as object()? {
-  doc($url)//iframe[starts-with(@data-lazy-src,"//autoblog.bbvms.com")]/xivid:bbvms(
-    resolve-uri(replace(@data-lazy-src,"html.+","json"),$url),(),()
+  doc($url)/(
+    //iframe[contains(@data-lazy-src,"bbvms")]/xivid:bbvms(
+      resolve-uri(replace(@data-lazy-src,"html.+","json"),$url),(),()
+    ),
+    //iframe[contains(@data-lazy-src,"youtube")]/xivid:youtube(
+      substring-before(@data-lazy-src,"?")
+    )
   )
 };
 

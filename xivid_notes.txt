@@ -10070,13 +10070,46 @@ $ url=https://www.autoblog.nl/nieuws/volvo-s60-t8-polestar-engineered-rijtest-en
 $ xidel -se 'doc("'$url'")//iframe[@data-lazy-src]/@data-lazy-src'
 https://www.youtube.com/embed/IR8AlNUP5xo?feature=oembed
 
-$ xidel -s --module=xivid.xqm -e 'doc("'$url'")//iframe[starts-with(@data-lazy-src,"//autoblog.bbvms.com")]/xivid:bbvms(resolve-uri(replace(@data-lazy-src,"html.+","json")),(),())'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(//iframe[contains(@data-lazy-src,"bbvms")]/xivid:bbvms(resolve-uri(replace(@data-lazy-src,"html.+","json")),(),()),//iframe[contains(@data-lazy-src,"youtube")]/xivid:youtube(substring-before(@data-lazy-src,"?")))'
+{
+  "name": "Volvo S60 T8 Polestar rijtest: 405 pk plug-in hybride",
+  "duration": "PT13M1S",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "ttml",
+      "language": "nl",
+      "label": "Dutch (auto-generated)",
+      "url": "https://www.youtube.com/api/timedtext?v=IR8AlNUP5xo&[...]"
+    },
+    {
+      "id": "pg-1",
+      "format": "3gpp[mp4v+aac]",
+      "resolution": "176x144@6fps",
+      "bitrate": "78kbps",
+      "url": "https://rr2---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?[...]"
+    },
+    [...]
+    {
+      "id": "dash-17",
+      "format": "mp4[h264]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "4548kbps",
+      "url": "https://rr2---sn-mn4vg5aa-5hnl.googlevideo.com/videoplayback?[...]"
+    }
+  ]
+}
 
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:autoblog($url as string) as object()? {
-  doc($url)//iframe[starts-with(@data-lazy-src,"//autoblog.bbvms.com")]/xivid:bbvms(
-    resolve-uri(replace(@data-lazy-src,"html.+","json")),(),()
+  doc($url)/(
+    //iframe[contains(@data-lazy-src,"bbvms")]/xivid:bbvms(
+      resolve-uri(replace(@data-lazy-src,"html.+","json"),$url),(),()
+    ),
+    //iframe[contains(@data-lazy-src,"youtube")]/xivid:youtube(
+      substring-before(@data-lazy-src,"?")
+    )
   )
 };
 
