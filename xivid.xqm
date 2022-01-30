@@ -1309,44 +1309,52 @@ declare function xivid:instagram($url as string) as object()? {
 };
 
 declare function xivid:pornhub($url as string) as object()? {
-  let $src:=doc(
-        if (contains($url,"/embed/")) then
-          replace($url,"/embed/","/view_video.php?viewkey=")
-        else
-          $url
-      ),
-      $info:=parse-json($src//script[@type="application/ld+json"]),
-      $fmts:=for $x in $src//div[@id="player"]/tokenize(
-        replace(script,"&quot; \+ &quot;|&quot;",""),
-        "flashvars.+?;"
-      )[contains(.,"var media_")]
-      return
-      json-doc(
-        string-join(
-          extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
-        )
-      )()
-  return {
-    "name":"Pornhub: "||$info/parse-html(name),
-    "date":dateTime($info/uploadDate),
-    "duration":duration($info/duration),
-    "formats":array{
+  doc(
+    if (contains($url,"/embed/"))
+    then replace($url,"/embed/","/view_video.php?viewkey=")
+    else $url
+  )/map:put(
+    if (exists(//script[@type="application/ld+json"])) then
+      parse-json(//script[@type="application/ld+json"])/{
+        "name":"Pornhub: "||parse-html(name),
+        "date":dateTime(uploadDate),
+        "duration":duration(duration)
+      }
+    else
+      parse-json(
+        extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1)
+      )/{
+        "name":"Pornhub: "||video_title,
+        "date":dateTime(
+          date(replace(image_url,".+(\d{4})(\d{2})/(\d{2}).+","$1-$2-$3")),
+          time("00:00:00Z")
+        ),
+        "duration":duration(video_duration * duration("PT1S"))
+      },
+    "formats",
+    let $fmts:=tokenize(
+      replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),
+      "flashvars.+?;"
+    )[contains(.,"var media_")][position() ge last() - 1] ! string-join(
+      for $var in extract(.,"\*/(\w+)",1,"*") return
+      substring-before(substring-after(.,$var||"="),";")
+    ) return array{
       {
         "id":"sub-1",
         "format":"srt",
         "url":parse-json(
-          extract($src//div[@id="player"]/script,"flashvars.+?(\{.+\})",1)
+          extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1)
         )/resolve-uri(closedCaptionsFile,$url)
       }[url],
-      for $x at $i in $fmts[format="mp4"] return {
+      for $x at $i in json-doc($fmts[2])() return {
         "id":"pg-"||$i,
         "format":"mp4[h264+aac]",
         "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
         "url":$x/videoUrl
       },
-      xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()
+      xivid:m3u8-to-json($fmts[1])()
     }
-  }
+  )
 };
 
 declare function xivid:xhamster($url as string) as object()? {

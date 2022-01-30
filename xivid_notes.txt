@@ -8501,159 +8501,204 @@ declare function xivid:instagram($url as string) as object()? {
 
 [pornhub]
 
-$ url=https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9
+$ url=https://nl.pornhub.com/view_video.php?viewkey=ph5d6aab8607eb4
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])'
+$ xidel -se 'doc("'$url'")/parse-json(//script[@type="application/ld+json"])'
 {
   "@context": "http://schema.org/",
   "@type": "VideoObject",
-  "name": "Strongest orgasm with magic wand in my life - Mini Diva",
-  "embedUrl": "https://nl.pornhub.com/embed/ph5c8e7e44e1da9",
-  "duration": "PT00H09M09S",
-  "thumbnailUrl": "https://di.phncdn.com/videos/201903/17/213567022/thumbs_15/(m=eaAaGwObaaaa)(mh=y9U5PUCUUhw4TvQr)11.jpg",
-  "uploadDate": "2019-03-17T17:12:50+00:00",
-  "description": [...],
+  "name": "Kom klaar met mij&period; dicht bij masturberen alleen voor jou - MINI DIVA",
+  "embedUrl": "https://nl.pornhub.com/embed/ph5d6aab8607eb4",
+  "duration": "PT00H11M57S",
+  "thumbnailUrl": "https://ei.phncdn.com/videos/201908/31/245342771/thumbs_20/(m=eaAaGwObaaaa)(mh=Ub_PE9qBIOiXGtaZ)13.jpg",
+  "uploadDate": "2019-08-31T17:24:21+00:00",
+  "description": "Bekijk Kom klaar met mij&period; dicht bij masturberen alleen voor jou - MINI DIVA in Dutch op Pornhub&period;com&comma; de beste hardcore pornosite&period; Pornhub is de thuis van de breedste verzameling Porno in Dutch&period;",
   "author": "Mini Diva",
   "interactionStatistic": [
     {
       "@type": "InteractionCounter",
       "interactionType": "http://schema.org/WatchAction",
-      "userInteractionCount": "1 234 998"
+      "userInteractionCount": "2 936 049"
     },
     {
       "@type": "InteractionCounter",
       "interactionType": "http://schema.org/LikeAction",
-      "userInteractionCount": "9 557"
+      "userInteractionCount": "18 351"
     }
   ]
 }
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-Alle "media_"-streams incl. bijbehorende "ra"-variabelen:
+In //div[@id="player"]/script de JSON in de eerste Javascript variabele "var flashvars_245342771 = ":
 
-$ xidel -se 'doc("'$url'")//div[@id="player"]/tokenize(script,"flashvars.+?;")[contains(.,"var media_")]'
+$ xidel -se 'doc("'$url'")/parse-json(extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1))'
+{
+  [...]
+  "video_duration": "717",
+  [...]
+  "video_title": "Kom klaar met mij. dicht bij masturberen alleen voor jou - MINI DIVA",
+  "defaultQuality": [720, 480, 240, 1080],
+  [...]
+  "mediaPriority": "hls",
+  "mediaDefinitions": [
+    {
+      "defaultQuality": false,
+      "format": "hls",
+      "videoUrl": "",
+      "quality": "1080"
+    },
+    {
+      "defaultQuality": false,
+      "format": "hls",
+      "videoUrl": "",
+      "quality": "240"
+    },
+    {
+      "defaultQuality": false,
+      "format": "hls",
+      "videoUrl": "",
+      "quality": "480"
+    },
+    {
+      "defaultQuality": true,
+      "format": "hls",
+      "videoUrl": "",
+      "quality": "720"
+    },
+    {
+      "defaultQuality": 720,
+      "format": "hls",
+      "videoUrl": "",
+      "quality": [1080, 720, 480, 240]
+    },
+    {
+      "defaultQuality": false,
+      "format": "mp4",
+      "videoUrl": "",
+      "quality": [],
+      "remote": true
+    }
+  ],
+  [...]
+}
 
-		var raornhubra64raornhubra64="ornhu" + "b";var rahttpsra17rahttpsra17="https:";var raky2e3yra90raky2e3yra90="kY2E3" + "Y";var raideogra87raideogra87="ideo/g";var racomvra46racomvra46=".com/v";var radu4mzrra32radu4mzrra32="DU4Mz" + "R";var ranqiojera14ranqiojera14="nQiOjE";var ralmmuznra98ralmmuznra98="lMmUzN";var ratpra88ratpra88="t=p";var rajy3ndmra17rajy3ndmra17="jY3NDM";var ra3mdgymra14ra3mdgymra14="3MDgyM";var ramy0mgyra17ramy0mgyra17="mY0MGY";var rajnyisira27rajnyisira27="jNyIs" + "I";var ratiwnjjra91ratiwnjjra91="TIwNjJ";var rajzguxmra86rajzguxmra86="jZGUxM";var raiasera93raiasera93="ia?s=" + "e";var ra2mtkxora90ra2mtkxora90="2MTkxO";var ra9e0ra59ra9e0ra59="9&e=0" + "&";var ra5c8e7era77ra5c8e7era77="5c8e7" + "e";var raindvkyra43raindvkyra43="iNDVkY";var ranlpra72ranlpra72="//nl." + "p";var raznmmdbra74raznmmdbra74="zNmMD" + "B";var razblmgzra20razblmgzra20="zBlMG" + "Z";var raetmedra36raetmedra36="et_me" + "d";var ra2m2vimra88ra2m2vimra88="2M2Vi" + "M";var ratbmnmnra17ratbmnmnra17="TBmNm" + "N";var ra9vphra13ra9vphra13="9&v=p" + "h";var ra44e1dara64ra44e1dara64="44e1d" + "a";var rawnlodrra100rawnlodrra100="WNlOD" + "R";var raiogy0zra24raiogy0zra24="iOGY0" + "Z";var rayjrijora88rayjrijora88="yJrIjo";var media_0=/* + raornhubra64raornhubra64 + */rahttpsra17rahttpsra17 + /* + radu4mzrra32radu4mzrra32 + */ranlpra72ranlpra72 + /* + racomvra46racomvra46 + */raornhubra64raornhubra64 + /* + ratiwnjjra91ratiwnjjra91 + */racomvra46racomvra46 + /* + ratbmnmnra17ratbmnmnra17 + */raideogra87raideogra87 + /* + ratiwnjjra91ratiwnjjra91 + */raetmedra36raetmedra36 + /* + rajnyisira27rajnyisira27 + */raiasera93raiasera93 + /* + razblmgzra20razblmgzra20 + */rayjrijora88rayjrijora88 + /* + ranlpra72ranlpra72 + */raiogy0zra24raiogy0zra24 + /* + ra2m2vimra88ra2m2vimra88 + */ramy0mgyra17ramy0mgyra17 + /* + raornhubra64raornhubra64 + */ra3mdgymra14ra3mdgymra14 + /* + raiogy0zra24raiogy0zra24 + */razblmgzra20razblmgzra20 + /* + racomvra46racomvra46 + */raky2e3yra90raky2e3yra90 + /* + rajy3ndmra17rajy3ndmra17 + */raznmmdbra74raznmmdbra74 + /* + ramy0mgyra17ramy0mgyra17 + */raindvkyra43raindvkyra43 + /* + ra44e1dara64ra44e1dara64 + */ratbmnmnra17ratbmnmnra17 + /* + ra2m2vimra88ra2m2vimra88 + */rajzguxmra86rajzguxmra86 + /* + raindvkyra43raindvkyra43 + */rajy3ndmra17rajy3ndmra17 + /* + raindvkyra43raindvkyra43 + */ra2m2vimra88ra2m2vimra88 + /* + rahttpsra17rahttpsra17 + */rawnlodrra100rawnlodrra100 + /* + raetmedra36raetmedra36 + */ralmmuznra98ralmmuznra98 + /* + rawnlodrra100rawnlodrra100 + */radu4mzrra32radu4mzrra32 + /* + ra2m2vimra88ra2m2vimra88 + */rajnyisira27rajnyisira27 + /* + ranlpra72ranlpra72 + */ranqiojera14ranqiojera14 + /* + raornhubra64raornhubra64 + */ra2mtkxora90ra2mtkxora90 + /* + rajzguxmra86rajzguxmra86 + */ratiwnjjra91ratiwnjjra91 + /* + raiogy0zra24raiogy0zra24 + */ra9vphra13ra9vphra13 + /* + ra9e0ra59ra9e0ra59 + */ra5c8e7era77ra5c8e7era77 + /* + raky2e3yra90raky2e3yra90 + */ra44e1dara64ra44e1dara64 + /* + ratiwnjjra91ratiwnjjra91 + */ra9e0ra59ra9e0ra59 + /* + ratiwnjjra91ratiwnjjra91 + */ratpra88ratpra88;
-[...]
+In //div[@id="player"]/script de grote puzzel van variabelen ná "// var nextVideoObject = flashvars_['nextVideo'];". De volgorde komt overeen met de items in de "mediaDefinitions"-array hierboven. Alleen de laatste 2 zijn nodig; het HLS manifest en de progressieve videostreams:
 
-Verwijder de aanhalingstekens en de +jes in alle "ra"-variabelen:
+$ xidel -se 'doc("'$url'")/tokenize(//div[@id="player"]/script[1],"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1]'
+var ra3u8validfra77ra3u8validfra77="3u8?valid" + "f";var rarom164185ra26rarom164185ra26="rom=164185";var rahz9r2bhhra26rahz9r2bhhra26="h=Z9R%2Bh" + "h";[...];var media_4=/* + rahphncdnra40rahphncdnra40 + */rahttpsevra97rahttpsevra97 + /* + racomhlsvira68racomhlsvira68 + [...] */raul8vk3dra45raul8vk3dra45;
+var ra7eb4e0ra30ra7eb4e0ra30="7eb4&e=0&";var ray2jlogjjzra52ray2jlogjjzra52="Y2JlOGJjZ";var raxn2m2ywm0ra35raxn2m2ywm0ra35="xN2M2YWM0";[...];var media_5=/* + raiaseyjrra72raiaseyjrra72 + */rahttpsnra72rahttpsnra72 + /* + rajg3ztvjnjra51rajg3ztvjnjra51 + [...] */ratpra52ratpra52;
 
-$ xidel -se 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return $x'
+Verwijder de aanhalings- en plustekens:
 
-		var raornhubra64raornhubra64=ornhub;var rahttpsra17rahttpsra17=https:;var raky2e3yra90raky2e3yra90=kY2E3Y;var raideogra87raideogra87=ideo/g;var racomvra46racomvra46=.com/v;var radu4mzrra32radu4mzrra32=DU4MzR;var ranqiojera14ranqiojera14=nQiOjE;var ralmmuznra98ralmmuznra98=lMmUzN;var ratpra88ratpra88=t=p;var rajy3ndmra17rajy3ndmra17=jY3NDM;var ra3mdgymra14ra3mdgymra14=3MDgyM;var ramy0mgyra17ramy0mgyra17=mY0MGY;var rajnyisira27rajnyisira27=jNyIsI;var ratiwnjjra91ratiwnjjra91=TIwNjJ;var rajzguxmra86rajzguxmra86=jZGUxM;var raiasera93raiasera93=ia?s=e;var ra2mtkxora90ra2mtkxora90=2MTkxO;var ra9e0ra59ra9e0ra59=9&e=0&;var ra5c8e7era77ra5c8e7era77=5c8e7e;var raindvkyra43raindvkyra43=iNDVkY;var ranlpra72ranlpra72=//nl.p;var raznmmdbra74raznmmdbra74=zNmMDB;var razblmgzra20razblmgzra20=zBlMGZ;var raetmedra36raetmedra36=et_med;var ra2m2vimra88ra2m2vimra88=2M2ViM;var ratbmnmnra17ratbmnmnra17=TBmNmN;var ra9vphra13ra9vphra13=9&v=ph;var ra44e1dara64ra44e1dara64=44e1da;var rawnlodrra100rawnlodrra100=WNlODR;var raiogy0zra24raiogy0zra24=iOGY0Z;var rayjrijora88rayjrijora88=yJrIjo;var media_0=/* + raornhubra64raornhubra64 + */rahttpsra17rahttpsra17 + /* + radu4mzrra32radu4mzrra32 + */ranlpra72ranlpra72 + /* + racomvra46racomvra46 + */raornhubra64raornhubra64 + /* + ratiwnjjra91ratiwnjjra91 + */racomvra46racomvra46 + /* + ratbmnmnra17ratbmnmnra17 + */raideogra87raideogra87 + /* + ratiwnjjra91ratiwnjjra91 + */raetmedra36raetmedra36 + /* + rajnyisira27rajnyisira27 + */raiasera93raiasera93 + /* + razblmgzra20razblmgzra20 + */rayjrijora88rayjrijora88 + /* + ranlpra72ranlpra72 + */raiogy0zra24raiogy0zra24 + /* + ra2m2vimra88ra2m2vimra88 + */ramy0mgyra17ramy0mgyra17 + /* + raornhubra64raornhubra64 + */ra3mdgymra14ra3mdgymra14 + /* + raiogy0zra24raiogy0zra24 + */razblmgzra20razblmgzra20 + /* + racomvra46racomvra46 + */raky2e3yra90raky2e3yra90 + /* + rajy3ndmra17rajy3ndmra17 + */raznmmdbra74raznmmdbra74 + /* + ramy0mgyra17ramy0mgyra17 + */raindvkyra43raindvkyra43 + /* + ra44e1dara64ra44e1dara64 + */ratbmnmnra17ratbmnmnra17 + /* + ra2m2vimra88ra2m2vimra88 + */rajzguxmra86rajzguxmra86 + /* + raindvkyra43raindvkyra43 + */rajy3ndmra17rajy3ndmra17 + /* + raindvkyra43raindvkyra43 + */ra2m2vimra88ra2m2vimra88 + /* + rahttpsra17rahttpsra17 + */rawnlodrra100rawnlodrra100 + /* + raetmedra36raetmedra36 + */ralmmuznra98ralmmuznra98 + /* + rawnlodrra100rawnlodrra100 + */radu4mzrra32radu4mzrra32 + /* + ra2m2vimra88ra2m2vimra88 + */rajnyisira27rajnyisira27 + /* + ranlpra72ranlpra72 + */ranqiojera14ranqiojera14 + /* + raornhubra64raornhubra64 + */ra2mtkxora90ra2mtkxora90 + /* + rajzguxmra86rajzguxmra86 + */ratiwnjjra91ratiwnjjra91 + /* + raiogy0zra24raiogy0zra24 + */ra9vphra13ra9vphra13 + /* + ra9e0ra59ra9e0ra59 + */ra5c8e7era77ra5c8e7era77 + /* + raky2e3yra90raky2e3yra90 + */ra44e1dara64ra44e1dara64 + /* + ratiwnjjra91ratiwnjjra91 + */ra9e0ra59ra9e0ra59 + /* + ratiwnjjra91ratiwnjjra91 + */ratpra88ratpra88;
-[...]
+$ xidel -se 'doc("'$url'")/tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1]'
+var ra3u8validfra77ra3u8validfra77=3u8?validf;var rarom164185ra26rarom164185ra26=rom=164185;var rahz9r2bhhra26rahz9r2bhhra26=h=Z9R%2Bhh;[...];var media_4=/* + rahphncdnra40rahphncdnra40 + */rahttpsevra97rahttpsevra97 + /* + racomhlsvira68racomhlsvira68 [...] */raul8vk3dra45raul8vk3dra45;
+var ra7eb4e0ra30ra7eb4e0ra30=7eb4&e=0&;var ray2jlogjjzra52ray2jlogjjzra52=Y2JlOGJjZ;var raxn2m2ywm0ra35raxn2m2ywm0ra35=xN2M2YWM0;[...];var media_5=/* + raiaseyjrra72raiaseyjrra72 + */rahttpsnra72rahttpsnra72 + /* + rajg3ztvjnjra51rajg3ztvjnjra51 + [...] */ratpra52ratpra52;
 
-Alle variabele-namen-strings in de "media_"-variabele:
+Ná "media_4=" en "media_5=" alle variabele-namen die niet als multi-line commentaar tussen /* ... */ staan:
 
-$ xidel -se 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return extract($x,"\*/(\w+)",1,"*")'
-rahttpsra17rahttpsra17
-ranlpra72ranlpra72
-raornhubra64raornhubra64
-racomvra46racomvra46
-raideogra87raideogra87
-raetmedra36raetmedra36
-raiasera93raiasera93
-rayjrijora88rayjrijora88
-raiogy0zra24raiogy0zra24
-ramy0mgyra17ramy0mgyra17
-ra3mdgymra14ra3mdgymra14
-razblmgzra20razblmgzra20
-raky2e3yra90raky2e3yra90
-raznmmdbra74raznmmdbra74
-raindvkyra43raindvkyra43
-ratbmnmnra17ratbmnmnra17
-rajzguxmra86rajzguxmra86
-rajy3ndmra17rajy3ndmra17
-ra2m2vimra88ra2m2vimra88
-rawnlodrra100rawnlodrra100
-ralmmuznra98ralmmuznra98
-radu4mzrra32radu4mzrra32
-rajnyisira27rajnyisira27
-ranqiojera14ranqiojera14
-ra2mtkxora90ra2mtkxora90
-ratiwnjjra91ratiwnjjra91
-ra9vphra13ra9vphra13
-ra5c8e7era77ra5c8e7era77
-ra44e1dara64ra44e1dara64
-ra9e0ra59ra9e0ra59
-ratpra88ratpra88
-[...]
+$ xidel -se 'doc("'$url'")/tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1] ! join(extract(.,"\*/(\w+)",1,"*"))'
+rahttpsevra97rahttpsevra97 rahphncdnra40rahphncdnra40 racomhlsvira68racomhlsvira68 [...] raul8vk3dra45raul8vk3dra45
+rahttpsnra72rahttpsnra72 ralpornhubra18ralpornhubra18 racomvidera26racomvidera26 [...] ratpra52ratpra52
 
-Haal in $x de waarde van deze variabelen op:
+Haal de waarde van deze variabelen op:
 
-$ xidel -se 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";"))'
-https: //nl.p ornhub .com/v ideo/g et_med ia?s=e yJrIjo iOGY0Z mY0MGY 3MDgyM zBlMGZ kY2E3Y zNmMDB iNDVkY TBmNmN jZGUxM jY3NDM 2M2ViM WNlODR lMmUzN DU4MzR jNyIsI nQiOjE 2MTkxO TIwNjJ 9&v=ph 5c8e7e 44e1da 9&e=0& t=p
-https://n l.pornhub .com/vide o/get_med ia?s=eyJr IjoiOGY0Z mY0MGY3MD gyMzBlMGZ kY2E3YzNm MDBiNDVkY TBmNmNjZG UxMjY3NDM 2M2ViMWNl ODRlMmUzN DU4MzRjNy IsInQiOjE 2MTkxOTIw NjJ9&v=ph 5c8e7e44e 1da9&e=0&t=a
+$ xidel -se 'doc("'$url'")/tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1] ! join(for $var in extract(.,"\*/(\w+)",1,"*") return substring-before(substring-after(.,$var||"="),";"))'
+https://ev -h.phncdn. com/hls/vi deos/20190 8/31/24534 2771/,1080 P_4000K,72 0P_4000K,4 80P_2000K, 240P_400K, _245342771 .mp4.urlse t/master.m 3u8?validf rom=164185 5951&valid to=1641863 151&ipa=xx .xxx.xx.x& hdl=-1&has h=Z9R%2Bhh %2FD%2BMe8 MDQd7BnN5n uL8vk%3D
+https://n l.pornhub .com/vide o/get_med ia?s=eyJr IjoiMWRlN DBiOGJhND U0NzRlYTB lNDNlMTJl Y2JlOGJjZ jg3ZTVjNj NmYWNmNzc xN2M2YWM0 MjIxZWEwM TBmNmU4Yy IsInQiOjE 2NDE4NTk1 NTF9&v=ph 5d6aab860 7eb4&e=0& t=p
 
-"t=p" en "t=a" zullen waarschijnlijk staan voor "type=progressive" en "type=adaptive". De JSON die deze urls bevatten:
+De progressieve videostreams:
 
-$ xidel -se 'for $x in doc("'$url'")//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return json-doc(string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")))'
+$ xidel -se 'doc("'$url'")/tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][last()] ! json-doc(string-join(for $var in extract(.,"\*/(\w+)",1,"*") return substring-before(substring-after(.,$var||"="),";")))'
 [
   {
     "defaultQuality": false,
     "format": "mp4",
-    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/240P_400K_213567022.mp4?[...]",
+    "videoUrl": "https://dv.phncdn.com/videos/201908/31/245342771/240P_400K_245342771.mp4?[...]",
     "quality": "240"
   },
+  [...]
   {
     "defaultQuality": false,
     "format": "mp4",
-    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/480P_2000K_213567022.mp4?[...]",
-    "quality": "480"
-  },
-  {
-    "defaultQuality": true,
-    "format": "mp4",
-    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/720P_4000K_213567022.mp4?[...]",
-    "quality": "720"
-  },
-  {
-    "defaultQuality": false,
-    "format": "mp4",
-    "videoUrl": "https://ev.phncdn.com/videos/201903/17/213567022/1080P_8000K_213567022.mp4?[...]",
+    "videoUrl": "https://dv.phncdn.com/videos/201908/31/245342771/1080P_8000K_245342771.mp4?[...]",
     "quality": "1080"
-  }
-]
-[
-  {
-    "defaultQuality": false,
-    "format": "hls",
-    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/1080P_8000K_213567022.mp4/master.m3u8?[...]",
-    "quality": "1080"
-  },
-  {
-    "defaultQuality": false,
-    "format": "hls",
-    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/240P_400K_213567022.mp4/master.m3u8?[...]",
-    "quality": "240"
-  },
-  {
-    "defaultQuality": false,
-    "format": "hls",
-    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/480P_2000K_213567022.mp4/master.m3u8?[...]",
-    "quality": "480"
-  },
-  {
-    "defaultQuality": true,
-    "format": "hls",
-    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/720P_4000K_213567022.mp4/master.m3u8?[...]",
-    "quality": "720"
-  },
-  {
-    "defaultQuality": 720,
-    "format": "hls",
-    "videoUrl": "https://cv-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/master.m3u8?[...]",
-    "quality": [1080, 720, 480]
   }
 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -s --module=xivid.xqm -e 'let $src:=doc("'$url'"),$info:=parse-json($src//script[@type="application/ld+json"]),$fmts:=for $x in $src//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return json-doc(string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")))() return {"name":"Pornhub: "||$info/name,"date":dateTime($info/uploadDate),"duration":duration($info/duration),"formats":array{for $x at $i in $fmts[format="mp4"] return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()}}'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/map:put(parse-json(//script[@type="application/ld+json"])/{"name":"Pornhub: "||parse-html(name),"date":dateTime(uploadDate),"duration":duration(duration)},"formats",let $fmts:=tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1] ! string-join(for $var in extract(.,"\*/(\w+)",1,"*") return substring-before(substring-after(.,$var||"="),";")) return array{for $x at $i in json-doc($fmts[2])() return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[1])()})'
+{
+  "name": "Pornhub: Kom klaar met mij. dicht bij masturberen alleen voor jou - MINI DIVA",
+  "date": "2019-08-31T17:24:21Z",
+  "duration": "PT11M57S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "426x240",
+      "url": "https://ev.phncdn.com/videos/201908/31/245342771/240P_400K_245342771.mp4?[...]"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "url": "https://ev.phncdn.com/videos/201908/31/245342771/1080P_8000K_245342771.mp4?[...]"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://ev-h.phncdn.com/hls/videos/201908/31/245342771/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_245342771.mp4.urlset/master.m3u8?[...]"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "426x240@30fps",
+      "bitrate": "342kbps",
+      "url": "https://ev-h.phncdn.com/hls/videos/201908/31/245342771/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_245342771.mp4.urlset/index-f4-v1-a1.m3u8?[...]"
+    },
+    [...]
+    {
+      "id": "hls-4",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080@30fps",
+      "bitrate": "3071kbps",
+      "url": "https://ev-h.phncdn.com/hls/videos/201908/31/245342771/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_245342771.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9   # "Geheime" video welke eerder gewoon publiekelijk toegankelijk was.
+
+$ xidel -se 'doc("'$url'")/parse-json(extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1))'
+{
+  "experimentId": "experimentId unknown",
+  [...]
+  "video_duration": "549",
+  "actionTags": "",
+  "link_url": "https://nl.pornhub.com/view_video.php?viewkey=ph5c8e7e44e1da9",
+  "related_url": "https://nl.pornhub.com/video/player_related_datas?id=213567022",
+  "image_url": "https://ci.phncdn.com/videos/201903/17/213567022/thumbs_15/(m=eaAaGwObaaaa)(mh=y9U5PUCUUhw4TvQr)11.jpg",
+  "video_title": "Strongest orgasm with magic wand in my life - Mini Diva",
+  "defaultQuality": [720, 480, 240, 1080],
+  "vcServerUrl": "/svvt/add?stype=svv&svalue=213567022&snonce=jspc94yitwtwu5ud&skey=ffb58f14a27380fe1a6fcae8660416255605910bc72db53aba4e50586b611b00&stime=1641689374",
+  "mediaPriority": "hls",
+  "mediaDefinitions": [
+    [...]
+  ],
+  [...]
+}
+
+//script[@type="application/ld+json"] is er niet!
+
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/map:put(if (exists(//script[@type="application/ld+json"])) then parse-json(//script[@type="application/ld+json"])/{"name":"Pornhub: "||parse-html(name),"date":dateTime(uploadDate),"duration":duration(duration)} else parse-json(extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1))/{"name":"Pornhub: "||video_title,"date":dateTime(date(replace(image_url,".+(\d{4})(\d{2})/(\d{2}).+","$1-$2-$3")),time("00:00:00Z")),"duration":duration(video_duration * duration("PT1S"))},"formats",let $fmts:=tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1] ! string-join(for $var in extract(.,"\*/(\w+)",1,"*") return substring-before(substring-after(.,$var||"="),";")) return array{for $x at $i in json-doc($fmts[2])() return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[1])()})'
 {
   "name": "Pornhub: Strongest orgasm with magic wand in my life - Mini Diva",
-  "date": "2019-03-17T17:12:50Z",
+  "date": "2019-03-17T00:00:00Z",
   "duration": "PT9M9S",
   "formats": [
     {
@@ -8672,22 +8717,22 @@ $ xidel -s --module=xivid.xqm -e 'let $src:=doc("'$url'"),$info:=parse-json($src
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/master.m3u8?[...]"
+      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_213567022.mp4.urlset/master.m3u8?[...]"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "854x480@29.98fps",
-      "bitrate": "536kbps",
-      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/index-f3-v1-a1.m3u8?[...]"
+      "resolution": "426x240@29.98fps",
+      "bitrate": "198kbps",
+      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_213567022.mp4.urlset/index-f4-v1-a1.m3u8?[...]"
     },
     [...]
     {
-      "id": "hls-3",
+      "id": "hls-4",
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080@29.98fps",
       "bitrate": "1675kbps",
-      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,_213567022.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
+      "url": "https://ev-h.phncdn.com/hls/videos/201903/17/213567022/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_213567022.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
     }
   ]
 }
@@ -8699,10 +8744,10 @@ $ url=https://www.pornhub.com/embed/ph5e84c98a60012   # Embedded video met onder
 $ xidel -se 'if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'"'
 https://www.pornhub.com/view_video.php?viewkey=ph5e84c98a60012
 
-$ xidel -se 'parse-json(extract(doc(if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'")//div[@id="player"]/script,"flashvars.+?(\{.+\})",1))/resolve-uri(closedCaptionsFile)'
+$ xidel -se 'doc(if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'")/parse-json(extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1))/resolve-uri(closedCaptionsFile)'
 https://www.pornhub.com/video/caption?id=299204081&language_id=1&caption_type=0
 
-$ xidel -s --module=xivid.xqm -e 'let $src:=doc(if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'"),$info:=parse-json($src//script[@type="application/ld+json"]),$fmts:=for $x in $src//div[@id="player"]/tokenize(replace(script,"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")] return json-doc(string-join(extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")))() return {"name":"Pornhub: "||$info/parse-html(name),"date":dateTime($info/uploadDate),"duration":duration($info/duration),"formats":array{{"id":"sub-1","format":"srt","url":parse-json(extract($src//div[@id="player"]/script,"flashvars.+?(\{.+\})",1))/resolve-uri(closedCaptionsFile"'$url'")}[url],for $x at $i in $fmts[format="mp4"] return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()}}'
+$ xidel -s --module=xivid.xqm -e 'doc(if (contains("'$url'","/embed/")) then replace("'$url'","/embed/","/view_video.php?viewkey=") else "'$url'")/map:put(if (exists(//script[@type="application/ld+json"])) then parse-json(//script[@type="application/ld+json"])/{"name":"Pornhub: "||parse-html(name),"date":dateTime(uploadDate),"duration":duration(duration)} else parse-json(extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1))/{"name":"Pornhub: "||video_title,"date":dateTime(date(replace(image_url,".+(\d{4})(\d{2})/(\d{2}).+","$1-$2-$3")),time("00:00:00Z")),"duration":duration(video_duration * duration("PT1S"))},"formats",let $fmts:=tokenize(replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),"flashvars.+?;")[contains(.,"var media_")][position() ge last() - 1] ! string-join(for $var in extract(.,"\*/(\w+)",1,"*") return substring-before(substring-after(.,$var||"="),";")) return array{{"id":"sub-1","format":"srt","url":parse-json(extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1))/resolve-uri(closedCaptionsFile)}[url],for $x at $i in json-doc($fmts[2])() return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":("426x240","854x480","1280x720","1920x1080")[$i],"url":$x/videoUrl},xivid:m3u8-to-json($fmts[1])()})'
 {
   "name": "Pornhub: CUM4K Multiple Dripping Creampies Deep Inside Soaked Pussy",
   "date": "2020-04-01T17:05:23Z",
@@ -8729,21 +8774,22 @@ $ xidel -s --module=xivid.xqm -e 'let $src:=doc(if (contains("'$url'","/embed/")
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://ev-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,_299204081.mp4.urlset/master.m3u8?[...]"
+      "url": "https://dv-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,240P_400K,_299204081.mp4.urlset/master.m3u8?[...]"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "854x480@59.92fps",
-      "bitrate": "1017kbps",
-      "url": "https://ev-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,_299204081.mp4.urlset/index-f2-v1-a1.m3u8?[...]"
+      "resolution": "426x240@59.92fps",
+      "bitrate": "586kbps",
+      "url": "https://dv-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,240P_400K,_299204081.mp4.urlset/index-f3-v1-a1.m3u8?[...]"
     },
+    [...]
     {
-      "id": "hls-2",
+      "id": "hls-3",
       "format": "m3u8[h264+aac]",
       "resolution": "1280x720@59.92fps",
       "bitrate": "1796kbps",
-      "url": "https://ev-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,_299204081.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
+      "url": "https://dv-h.phncdn.com/hls/videos/202004/01/299204081/,720P_4000K,480P_2000K,240P_400K,_299204081.mp4.urlset/index-f1-v1-a1.m3u8?[...]"
     }
   ]
 }
@@ -8751,44 +8797,52 @@ $ xidel -s --module=xivid.xqm -e 'let $src:=doc(if (contains("'$url'","/embed/")
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:pornhub($url as string) as object()? {
-  let $src:=doc(
-        if (contains($url,"/embed/")) then
-          replace($url,"/embed/","/view_video.php?viewkey=")
-        else
-          $url
-      ),
-      $info:=parse-json($src//script[@type="application/ld+json"]),
-      $fmts:=for $x in $src//div[@id="player"]/tokenize(
-        replace(script,"&quot; \+ &quot;|&quot;",""),
-        "flashvars.+?;"
-      )[contains(.,"var media_")]
-      return
-      json-doc(
-        string-join(
-          extract($x,"\*/(\w+)",1,"*") ! substring-before(substring-after($x,.||"="),";")
-        )
-      )()
-  return {
-    "name":"Pornhub: "||$info/parse-html(name),
-    "date":dateTime($info/uploadDate),
-    "duration":duration($info/duration),
-    "formats":array{
+  doc(
+    if (contains($url,"/embed/"))
+    then replace($url,"/embed/","/view_video.php?viewkey=")
+    else $url
+  )/map:put(
+    if (exists(//script[@type="application/ld+json"])) then
+      parse-json(//script[@type="application/ld+json"])/{
+        "name":"Pornhub: "||parse-html(name),
+        "date":dateTime(uploadDate),
+        "duration":duration(duration)
+      }
+    else
+      parse-json(
+        extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1)
+      )/{
+        "name":"Pornhub: "||video_title,
+        "date":dateTime(
+          date(replace(image_url,".+(\d{4})(\d{2})/(\d{2}).+","$1-$2-$3")),
+          time("00:00:00Z")
+        ),
+        "duration":duration(video_duration * duration("PT1S"))
+      },
+    "formats",
+    let $fmts:=tokenize(
+      replace(//div[@id="player"]/script[1],"&quot; \+ &quot;|&quot;",""),
+      "flashvars.+?;"
+    )[contains(.,"var media_")][position() ge last() - 1] ! string-join(
+      for $var in extract(.,"\*/(\w+)",1,"*") return
+      substring-before(substring-after(.,$var||"="),";")
+    ) return array{
       {
         "id":"sub-1",
         "format":"srt",
         "url":parse-json(
-          extract($src//div[@id="player"]/script,"flashvars.+?(\{.+\})",1)
+          extract(//div[@id="player"]/script[1],"flashvars_\d+ = (.+);",1)
         )/resolve-uri(closedCaptionsFile,$url)
       }[url],
-      for $x at $i in $fmts[format="mp4"] return {
+      for $x at $i in json-doc($fmts[2])() return {
         "id":"pg-"||$i,
         "format":"mp4[h264+aac]",
         "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
         "url":$x/videoUrl
       },
-      xivid:m3u8-to-json($fmts[quality instance of array()]/videoUrl)()
+      xivid:m3u8-to-json($fmts[1])()
     }
-  }
+  )
 };
 
 ================================================================================================
