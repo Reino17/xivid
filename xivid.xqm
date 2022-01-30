@@ -1154,38 +1154,37 @@ declare function xivid:mixcloud($url as string) as object()? {
 };
 
 declare function xivid:soundcloud($url as string) as object()? {
-  let $src:=doc($url),
-      $cid:=substring(
-        substring-after(
-          unparsed-text($src//script[@crossorigin][last()]/@src),
-          "client_id:"
-        ),2,32
-      ),
-      $json:=parse-json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(data)(),
-      $fmts:=($json//transcodings)()
-  return
-  $json/{
+  parse-json(
+    doc($url)//script/extract(.,"__sc_hydration = (.+);",1)
+  )()[hydratable="sound"]/data/{
     "name":x"{user/(full_name,username)[.][1]} - {title}",
     "date":created_at,
     "duration":round(duration div 1000) * duration("PT1S"),
-    "formats":array{
-      $fmts[format/protocol="progressive"]/(
-        let $url:=json-doc(x"{url}?client_id={$cid}")/url return {
+    "formats":media/transcodings/array{
+      .()[format/protocol="progressive"]/map:merge((
+        {
           "id":"pg-1",
-          "format":substring-before(preset,"_"),
-          "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
-          "url":$url
+          "format":substring-before(preset,"_")
+        },
+        request-combine(
+          url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"}
+        )/json-doc(url)/{
+          "bitrate":extract(url,"\.(\d+)\.",1)||"kbps",
+          "url":url
         }
-      ),
-      for $x at $i in $fmts[format/protocol="hls"]
-      order by $x/preset descending
+      )),
+      for $x at $i in .()[format/protocol="hls"]
+      let $a_url:=request-combine(
+            $x/url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"}
+          )/json-doc(url)/url,
+          $br:=extract($a_url,"\.(\d+)\.",1)
+      order by $br
       count $i
-      let $url:=json-doc(x"{url}?client_id={$cid}")/url
       return {
         "id":"hls-"||$i,
         "format":x"m3u8[{substring-before($x/preset,"_")}]",
-        "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
-        "url":$url
+        "bitrate":$br||"kbps",
+        "url":$a_url
       }
     }
   }

@@ -10620,13 +10620,16 @@ declare function xivid:mixcloud($url as string) as object()? {
 
 $ url=https://soundcloud.com/laidbackluke/laidback-luke-dj-set-live-at
 
-$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(data)()'
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"__sc_hydration = (.+);",1))()[hydratable="sound"]/data'
 {
-  "comment_count": 675,
-  "full_duration": 3610982,
-  "downloadable": true,
+  [...]
   "created_at": "2012-11-05T10:53:55Z",
-  "description": "",
+  [...]
+  "duration": 3610982,
+  [...]
+  "title": "Laidback Luke DJ set Live At Escape From Wonderland Oct 2012",
+  [...]
+  "display_date": "2012-11-05T10:53:55Z",
   "media": {
     "transcodings": [
       {
@@ -10664,113 +10667,32 @@ $ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"(\[\{.+)\)",1)[.])()[la
       }
     ]
   },
-  "title": "Laidback Luke DJ set Live At Escape From Wonderland Oct 2012",
-  "publisher_metadata": null,
-  "duration": 3610982,
-  "has_downloads_left": true,
-  "artwork_url": "https://i1.sndcdn.com/artworks-000033583042-nk61e0-large.jpg",
-  "public": true,
-  "streamable": true,
-  "tag_list": "",
-  "genre": "DJ Mix",
-  "id": 66196563,
-  "reposts_count": 1068,
-  "state": "finished",
-  "label_name": "",
-  "last_modified": "2020-02-26T06:13:28Z",
-  "commentable": true,
-  "policy": "MONETIZE",
-  "visuals": null,
-  "kind": "track",
-  "purchase_url": null,
-  "sharing": "public",
-  "uri": "https://api.soundcloud.com/tracks/66196563",
-  "secret_token": null,
-  "download_count": 19606,
-  "likes_count": 7306,
-  "urn": "soundcloud:tracks:66196563",
-  "license": "cc-by",
-  "purchase_title": null,
-  "display_date": "2012-11-05T10:53:55Z",
-  "embeddable_by": "all",
-  "release_date": null,
-  "user_id": 236295,
-  "monetization_model": "BLACKBOX",
-  "waveform_url": "https://wave.sndcdn.com/gF2U20J9lZfU_m.json",
-  "permalink": "laidback-luke-dj-set-live-at",
-  "permalink_url": "https://soundcloud.com/laidbackluke/laidback-luke-dj-set-live-at",
-  "user": {
-    "avatar_url": "https://i1.sndcdn.com/avatars-000332190570-lfp2jp-large.jpg",
-    "city": "",
-    "comments_count": 69,
-    "country_code": "NL",
-    "created_at": "2009-08-31T23:58:14Z",
-    "creator_subscriptions": [
-      {
-        "product": {
-          "id": "creator-pro-unlimited"
-        }
-      }
-    ],
-    "creator_subscription": {
-      "product": {
-        "id": "creator-pro-unlimited"
-      }
-    },
-    "description": "",
-    "followers_count": 428519,
-    "followings_count": 9,
-    "first_name": "Laidback",
-    "full_name": "Laidback Luke",
-    "groups_count": 0,
-    "id": 236295,
-    "kind": "user",
-    "last_modified": "2020-06-26T10:26:41Z",
-    "last_name": "Luke",
-    "likes_count": 49,
-    "playlist_likes_count": 8,
-    "permalink": "laidbackluke",
-    "permalink_url": "https://soundcloud.com/laidbackluke",
-    "playlist_count": 92,
-    "reposts_count": null,
-    "track_count": 375,
-    "uri": "https://api.soundcloud.com/users/236295",
-    "urn": "soundcloud:users:236295",
-    "username": "LaidbackLuke",
-    "verified": false,
-    "visuals": {
-      "urn": "soundcloud:users:236295",
-      "enabled": true,
-      "visuals": [
-        {
-          "urn": "soundcloud:visuals:102511671",
-          "entry_time": 0,
-          "visual_url": "https://i1.sndcdn.com/visuals-000000236295-JBYMVN-original.jpg"
-        }
-      ],
-      "tracking": null
-    }
-  },
-  "playback_count": 319259
+  "station_urn": "soundcloud:system-playlists:track-stations:66196563",
+  "station_permalink": "track-stations:66196563",
+  "track_authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJOTCIsInN1YiI6IiIsInJpZCI6IjZlMGVkOWVkLTZiNDctNDQ1MC05NzU1LTA2NmQ0ZjY1ZTdmMSIsImlhdCI6MTY0MzE0OTA0MX0.vDDKZ-6csdfTbWDX-pgN-2ikKoU5GwLFzGZH5BBZozo",
+  [...]
 }
 
-$ xidel -se 'doc("'$url'")//script[@crossorigin][last()]/@src'
-https://a-v2.sndcdn.com/assets/46-4d78cbe8-3.js
+$ xidel -se '
+  doc("'$url'")//script[@crossorigin][last()]/(
+    @src,
+    extract(unparsed-text(@src),"client_id:&quot;(.+?)&quot;",1)
+  )
+'
+https://a-v2.sndcdn.com/assets/48-3e9e330a.js
+RCfT93M4biAV6sjNiab6pMV1eYEgatjk
 
-$ xidel -se 'substring(substring-after(unparsed-text(doc("'$url'")//script[@crossorigin][last()]/@src),"client_id:"),2,32)'
-rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"__sc_hydration = (.+);",1))()[hydratable="sound"]/data/media/(transcodings)()/request-combine(url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"})/url'
+https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/hls?client_id=RCfT93M4biAV6sjNiab6pMV1eYEgatjk
+https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/progressive?client_id=RCfT93M4biAV6sjNiab6pMV1eYEgatjk
+https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/354da271-3480-4c98-8b3d-8729d4014a9d/stream/hls?client_id=RCfT93M4biAV6sjNiab6pMV1eYEgatjk
 
-$ xidel -se 'let $src:=doc("'$url'"),$cid:=substring(substring-after(unparsed-text($src//script[@crossorigin][last()]/@src),"client_id:"),2,32) return parse-json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(.//transcodings)()/x"{url}?client_id={$cid}"'
-https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/hls?client_id=rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
-https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/da74b653-7f46-443b-ad44-2337d07383c3/stream/progressive?client_id=rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
-https://api-v2.soundcloud.com/media/soundcloud:tracks:66196563/354da271-3480-4c98-8b3d-8729d4014a9d/stream/hls?client_id=rlZXIMK5JrRgRVARIuViQdb5WzF7VlHP
-
-$ xidel -se 'let $src:=doc("'$url'"),$cid:=substring(substring-after(unparsed-text($src//script[@crossorigin][last()]/@src),"client_id:"),2,32) return parse-json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(.//transcodings)()/json-doc(x"{url}?client_id={$cid}")/url'
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"__sc_hydration = (.+);",1))()[hydratable="sound"]/data/media/(transcodings)()/request-combine(url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"})/json-doc(url)/url'
 https://cf-hls-media.sndcdn.com/playlist/gF2U20J9lZfU.128.mp3/playlist.m3u8?[...]
 https://cf-media.sndcdn.com/gF2U20J9lZfU.128.mp3?[...]
 https://cf-hls-opus-media.sndcdn.com/playlist/gF2U20J9lZfU.64.opus/playlist.m3u8?[...]
 
-$ xidel -se 'let $src:=doc("'$url'"),$cid:=substring(substring-after(unparsed-text($src//script[@crossorigin][last()]/@src),"client_id:"),2,32),$json:=parse-json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(data)(),$fmts:=($json//transcodings)() return $json/{"name":x"{user/(full_name,username)[.][1]} - {title}","date":created_at,"duration":round(duration div 1000) * duration("PT1S"),"formats":array{$fmts[format/protocol="progressive"]/(let $url:=json-doc(x"{url}?client_id={$cid}")/url return {"id":"pg-1","format":substring-before(preset,"_"),"bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}),for $x at $i in $fmts[format/protocol="hls"] order by $x/preset descending count $i let $url:=json-doc(x"{url}?client_id={$cid}")/url return {"id":"hls-"||$i,"format":x"m3u8[{substring-before($x/preset,"_")}]","bitrate":extract($url,"\.(\d+)\.",1)||"kbps","url":$url}}}'
+$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"__sc_hydration = (.+);",1))()[hydratable="sound"]/data/{"name":x"{user/(full_name,username)[.][1]} - {title}","date":created_at,"duration":round(duration div 1000) * duration("PT1S"),"formats":media/transcodings/array{.()[format/protocol="progressive"]/map:merge(({"id":"pg-1","format":substring-before(preset,"_")},request-combine(url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"})/json-doc(url)/{"bitrate":extract(url,"\.(\d+)\.",1)||"kbps","url":url})),for $x at $i in .()[format/protocol="hls"] let $a_url:=request-combine($x/url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"})/json-doc(url)/url,$br:=extract($a_url,"\.(\d+)\.",1) order by $br count $i return {"id":"hls-"||$i,"format":x"m3u8[{substring-before($x/preset,"_")}]","bitrate":$br||"kbps","url":$a_url}}}'
 {
   "name": "Laidback Luke - Laidback Luke DJ set Live At Escape From Wonderland Oct 2012",
   "date": "2012-11-05T10:53:55Z",
@@ -10800,38 +10722,37 @@ $ xidel -se 'let $src:=doc("'$url'"),$cid:=substring(substring-after(unparsed-te
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:soundcloud($url as string) as object()? {
-  let $src:=doc($url),
-      $cid:=substring(
-        substring-after(
-          unparsed-text($src//script[@crossorigin][last()]/@src),
-          "client_id:"
-        ),2,32
-      ),
-      $json:=parse-json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(data)(),
-      $fmts:=($json//transcodings)()
-  return
-  $json/{
+  parse-json(
+    doc($url)//script/extract(.,"__sc_hydration = (.+);",1)
+  )()[hydratable="sound"]/data/{
     "name":x"{user/(full_name,username)[.][1]} - {title}",
     "date":created_at,
     "duration":round(duration div 1000) * duration("PT1S"),
-    "formats":array{
-      $fmts[format/protocol="progressive"]/(
-        let $url:=json-doc(x"{url}?client_id={$cid}")/url return {
+    "formats":media/transcodings/array{
+      .()[format/protocol="progressive"]/map:merge((
+        {
           "id":"pg-1",
-          "format":substring-before(preset,"_"),
-          "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
-          "url":$url
+          "format":substring-before(preset,"_")
+        },
+        request-combine(
+          url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"}
+        )/json-doc(url)/{
+          "bitrate":extract(url,"\.(\d+)\.",1)||"kbps",
+          "url":url
         }
-      ),
-      for $x at $i in $fmts[format/protocol="hls"]
-      order by $x/preset descending
+      )),
+      for $x at $i in .()[format/protocol="hls"]
+      let $a_url:=request-combine(
+            $x/url,{"client_id":"RCfT93M4biAV6sjNiab6pMV1eYEgatjk"}
+          )/json-doc(url)/url,
+          $br:=extract($a_url,"\.(\d+)\.",1)
+      order by $br
       count $i
-      let $url:=json-doc(x"{url}?client_id={$cid}")/url
       return {
         "id":"hls-"||$i,
         "format":x"m3u8[{substring-before($x/preset,"_")}]",
-        "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
-        "url":$url
+        "bitrate":$br||"kbps",
+        "url":$a_url
       }
     }
   }
