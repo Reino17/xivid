@@ -1364,9 +1364,18 @@ declare function xivid:xhamster($url as string) as object()? {
     "name":"xHamster: "||videoModel/title,
     "date":videoModel/created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "duration":videoModel/duration * duration("PT1S"),
-    "formats":xivid:m3u8-to-json(
-      xplayerSettings/sources/hls/(url,fallback)[contains(.,"master.m3u8")]
-    )
+    "formats":xplayerSettings/sources/standard/mp4/array{
+      .()[label != "auto"]/{
+        "id":"pg-"||position(),
+        "format":"mp4[h264+aac]",
+        "resolution":{
+          "144p":"256x144","240p":"426x240","480p":"854x480",
+          "720p":"1280x720","1080p":"1920x1080","2160p":"3840x2160"
+        }(quality),
+        "url":url
+      },
+      xivid:m3u8-to-json(.()[label = "auto"]/url)()
+    }
   }
 };
 

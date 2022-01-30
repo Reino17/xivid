@@ -8853,6 +8853,7 @@ $ url=https://nl.xhamster.com/videos/mommy-helps-on-stepson-s-stubborn-erection-
 
 $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))'
 {
+  "widgetUnderPlayer": null,
   "visitFavorite": null,
   "videoModel": {
     "id": 11722647,
@@ -8869,21 +8870,34 @@ $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{
     "duration": 381,
     [...]
     "sources": {
-      "hls": {
-        "url": "https://19-12.b.cdn13.com/hls/011/722/647/,144p,240p,480p,720p,.h264.mp4/urlset/master.m3u8?cdn_creation_time=1620169200&cdn_ttl=14400&cdn_cv_data=[...]&cdn_hash=0678727dbc04f62b67a16375934d685b",
-        "fallback": "https://video3.xhcdn.com/key=HmMVaggXjjbfyn7W-QgQ-w,end=1620183600/data=[...]/media=hlsA/multi=256x144:144p,426x240:240p,854x480:480p,1280x720:720p/011/722/647/_TPL_.h264.mp4"
-      },
       "standard": {
         "mp4": [
+          {
+            "url": "https://video-lmo.xhcdn.com/[...]/_TPL_.h264.mp4.m3u8",
+            "fallback": "https://video3.xhcdn.com/[...]/_TPL_.h264.mp4.m3u8",
+            "quality": "auto",
+            "label": "auto",
+            "type": ""
+          },
+          {
+            "url": "https://19-14.b.cdn13.com/011/722/647/144p.h264.mp4?[...]",
+            "fallback": "https://video5.xhcdn.com/[...]/144p.h264.mp4",
+            "quality": "144p",
+            "label": "144p",
+            "type": ""
+          },
           [...]
           {
-            "url": "https://19-14.b.cdn13.com/011/722/647/720p.h264.mp4?cdn_creation_time=1620169200&cdn_ttl=14400&cdn_bw=312k&cdn_bw_fs=390k&cdn_cv_data=[...]&cdn_hash=a696a7fea365539b1e9900e0c2c044b4",
-            "fallback": "https://video5.xhcdn.com/key=3EVUspBee+sp6Kyi1+j0cg,end=1620183600,limit=3/data=[...]/speed=312k/initial_buffer=398512/referer=force,.xhcdn.com,.xhamster.com/011/722/647/720p.h264.mp4",
+            "url": "https://19-14.b.cdn13.com/011/722/647/720p.h264.mp4?[...]",
+            "fallback": "https://video5.xhcdn.com/[...]/720p.h264.mp4",
             "quality": "720p",
             "label": "720p",
             "type": "HD"
           }
         ]
+      },
+      "hls": {
+        "url": "https://video-lmo.xhcdn.com/[...]/_TPL_.h264.mp4.m3u8"
       }
     },
     "debug": false
@@ -8891,14 +8905,14 @@ $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{
   [...]
 }
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/xplayerSettings/sources/standard/(mp4)()[quality = "720p"]/x:request({"method":"HEAD","error-handling":"xxx=accept","url":url})'
 {
-  "url": "https://19-14.b.cdn13.com/011/722/647/720p.h264.mp4?cdn_creation_time=1620172800&cdn_ttl=14400&cdn_bw=312k&cdn_bw_fs=390k&cdn_cv_data=[...]&cdn_hash=7eab7454b72912fa1f3e6162b447ae31",
+  "url": "https://19-14.b.cdn13.com/011/722/647/720p.h264.mp4?[...]",
   "type": "text/html",
   "headers": [
     "HTTP/1.1 302 Moved Temporarily",
-    [...]
-    "Location: https://1-1247-19-14.b.cdn13.com/011/722/647/720p.h264.mp4?cdn_creation_time=1620172800&cdn_ttl=14400&cdn_bw=312k&cdn_bw_fs=390k&cdn_cv_data=[...]&cdn_hash=7eab7454b72912fa1f3e6162b447ae31",
     [...]
     ""
   ],
@@ -8908,7 +8922,7 @@ $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{
 
 $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/xplayerSettings/sources/standard/(mp4)()[quality = "720p"]/x:request({"method":"HEAD","url":url})/x:request({"method":"HEAD","error-handling":"xxx=accept","url":url})'
 {
-  "url": "https://1-1247-19-14.b.cdn13.com/011/722/647/720p.h264.mp4?cdn_creation_time=1620169200&cdn_ttl=14400&cdn_bw=312k&cdn_bw_fs=390k&cdn_cv_data=[...]&cdn_hash=a696a7fea365539b1e9900e0c2c044b4",
+  "url": "https://1-963-19-14.b.cdn13.com/011/722/647/720p.h264.mp4?[...]",
   "type": "text/html",
   "headers": [
     "HTTP/1.1 403 Forbidden",
@@ -8918,71 +8932,81 @@ $ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{
   "doc": null
 }
 
-De progressieve videostreams doen het helemaal niet.
+$ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))//xplayerSettings/sources/standard/(mp4)()[quality = "720p"]/x:request({"method":"HEAD","url":url})/x:request({"method":"HEAD","headers":"Referer: '$url'","error-handling":"xxx=accept","url":url})'
+{
+  "url": "https://1-963-19-14.b.cdn13.com/011/722/647/720p.h264.mp4?[...]",
+  "type": "video/mp4",
+  "headers": [
+    "HTTP/1.1 200 OK",
+    [...]
+    "Content-Type: video/mp4",
+    "Content-Length: 60849274",
+    [...]
+  ],
+  "raw": ""
+}
 
-$ xidel -s --module=xivid.xqm -e 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/{"name":"xHamster: "||videoModel/title,"date":videoModel/created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":videoModel/duration * duration("PT1S"),"formats":xivid:m3u8-to-json(xplayerSettings/sources/hls/url)}'
+De referer is nodig om deze video te downloaden:
+
+$ ffmpeg -hide_banner -referer "$url" -i "$(xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/xplayerSettings/sources/standard/(mp4)()[quality = "720p"]/url' | tr -d '\r')"
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://19-14.b.cdn13.com/011/722/647/720p.h264.mp4?[...]':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.12.100
+    description     : {"xh_id":11722647,"v":"v1"}
+  Duration: 00:06:20.63, start: 0.000000, bitrate: 1278 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1280x720 [SAR 1:1 DAR 16:9], 1202 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1[0x2](eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 72 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+At least one output file must be specified
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -s --module=xivid.xqm -e 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/{"name":"xHamster: "||videoModel/title,"date":videoModel/created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":videoModel/duration * duration("PT1S"),"formats":xplayerSettings/sources/standard/mp4/array{.()[label != "auto"]/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":{"144p":"256x144","240p":"426x240","480p":"854x480","720p":"1280x720","1080p":"1920x1080","2160p":"3840x2160"}(quality),"url":url},xivid:m3u8-to-json(.()[label = "auto"]/url)()}}'
 {
   "name": "xHamster: Mommy Helps On Stepson's Stubborn Erection",
   "date": "2019-06-02T02:41:32Z",
   "duration": "PT6M21S",
   "formats": [
     {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "256x144",
+      "url": "https://19-14.b.cdn13.com/011/722/647/144p.h264.mp4?[...]"
+    },
+    [...]
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720",
+      "url": "https://19-14.b.cdn13.com/011/722/647/720p.h264.mp4?[...]"
+    },
+    {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://19-12.b.cdn13.com/hls/011/722/647/,144p,240p,480p,720p,.h264.mp4/urlset/master.m3u8?cdn_creation_time=1620169200&cdn_ttl=14400&cdn_cv_data=[...]&cdn_hash=0678727dbc04f62b67a16375934d685b"
+      "url": "https://video-lmo.xhcdn.com/[...]/_TPL_.h264.mp4.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "256x144@24fps",
-      "bitrate": "128kbps",
-      "url": "https://19-12.b.cdn13.com/hls/011/722/647/144p.h264.mp4/index-v1-a1.m3u8?cdn_hash=7b2b0eb89e144af1da10d0ba6eb8be9d&cdn_creation_time=1620172038&cdn_ttl=14400&cdn_cv_data=[...]"
+      "resolution": "256x144",
+      "bitrate": "132kbps",
+      "url": "https://video-lmo.xhcdn.com/[...]/144p.h264.mp4.m3u8"
     },
     [...]
     {
       "id": "hls-4",
       "format": "m3u8[h264+aac]",
-      "resolution": "1280x720@24fps",
-      "bitrate": "1275kbps",
-      "url": "https://19-12.b.cdn13.com/hls/011/722/647/720p.h264.mp4/index-v1-a1.m3u8?cdn_hash=914eb063dd70498bf0c824d7238c2d8a&cdn_creation_time=1620172038&cdn_ttl=14400&cdn_cv_data=[...]"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://nl.xhamster.com/videos/he-s-in-my-ass-honey-5660667
-
-$ xidel -se 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/xplayerSettings/sources/hls'
-{
-  "url": "https://video3.xhcdn.com/key=jpVWV7qq7sU7SFZsAmVpQQ,end=1620187200/data=[...]/media=hlsA/multi=256x144:144p,426x240:240p,854x480:480p,1280x720:720p/005/660/667/_TPL_.h264.mp4",
-  "fallback": "https://19-12.b.cdn13.com/hls/005/660/667/,144p,240p,480p,720p,.h264.mp4/urlset/master.m3u8?cdn_creation_time=1620172800&cdn_ttl=14400&cdn_cv_data=[...]&cdn_hash=e643f0dc33401a0e8da6c0ad1643d37a"
-}
-
-$ xidel -s --module=xivid.xqm -e 'parse-json(extract(doc("'$url'")//script[@id="initials-script"],"\{.+\}"))/{"name":"xHamster: "||videoModel/title,"date":videoModel/created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":videoModel/duration * duration("PT1S"),"formats":xivid:m3u8-to-json(xplayerSettings/sources/hls/(url,fallback)[contains(.,"master.m3u8")])}'
-{
-  "name": "xHamster: He's In My Ass, Honey",
-  "date": "2016-02-05T23:57:28Z",
-  "duration": "PT13M52S",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://19-12.b.cdn13.com/hls/005/660/667/,144p,240p,480p,720p,.h264.mp4/urlset/master.m3u8?cdn_creation_time=1620172800&cdn_ttl=14400&cdn_cv_data=[...]&cdn_hash=e643f0dc33401a0e8da6c0ad1643d37a"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "256x144@60fps",
-      "bitrate": "126kbps",
-      "url": "https://19-12.b.cdn13.com/hls/005/660/667/144p.h264.mp4/index-v1-a1.m3u8?cdn_hash=74fa6f92d2ad4dacc93ab85260659a84&cdn_creation_time=1620174467&cdn_ttl=14400&cdn_cv_data=[...]"
-    [...]
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720@60fps",
-      "bitrate": "1478kbps",
-      "url": "https://19-12.b.cdn13.com/hls/005/660/667/720p.h264.mp4/index-v1-a1.m3u8?cdn_hash=1d984e4475728a43c7aeca6e741ef722&cdn_creation_time=1620174467&cdn_ttl=14400&cdn_cv_data=[...]"
+      "resolution": "1280x720",
+      "bitrate": "1279kbps",
+      "url": "https://video-lmo.xhcdn.com/[...]/720p.h264.mp4.m3u8"
     }
   ]
 }
@@ -8996,9 +9020,18 @@ declare function xivid:xhamster($url as string) as object()? {
     "name":"xHamster: "||videoModel/title,
     "date":videoModel/created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "duration":videoModel/duration * duration("PT1S"),
-    "formats":xivid:m3u8-to-json(
-      xplayerSettings/sources/hls/(url,fallback)[contains(.,"master.m3u8")]
-    )
+    "formats":xplayerSettings/sources/standard/mp4/array{
+      .()[label != "auto"]/{
+        "id":"pg-"||position(),
+        "format":"mp4[h264+aac]",
+        "resolution":{
+          "144p":"256x144","240p":"426x240","480p":"854x480",
+          "720p":"1280x720","1080p":"1920x1080","2160p":"3840x2160"
+        }(quality),
+        "url":url
+      },
+      xivid:m3u8-to-json(.()[label = "auto"]/url)()
+    }
   }
 };
 
