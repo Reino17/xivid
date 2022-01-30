@@ -874,22 +874,30 @@ declare function xivid:ad($url as string) as object()? {
 };
 
 declare function xivid:lc($url as string) as object()? {
-  let $src:=x:request({
-        "headers":"Cookie: ndc_consent="||uri-encode(
-          serialize-json({"permissions":{"functional":true}})
-        ),
-        "url":$url
-      })/doc,
-      $id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
-  return
-  $src/xivid:bbvms(
-    substring-before(
-      parse-json(//script/tokenize(.,",")[contains(.,$id)]),
-      "html"
-    )||"json",
-    //meta[@property="og:site_name"]/@content,
-    ()
-  )
+  doc($url)/map:merge((
+    parse-json(//script[@type="application/ld+json"])/{
+      "name":x"{.(3)/name}: {.(2)/name}",
+      "date":replace(.(1)/datePublished,"\+0000","Z")
+    },
+    json-doc(
+      x"https://content.tmgvideo.nl/playlist/item={
+        //div[@class="video-player"]/substring-after(@id,"videoplayer-")
+      }/playlist.json"
+    )/(items)()/{
+      "duration":duration * duration("PT1S"),
+      "formats":locations/array{
+        reverse((progressive)())/{
+          "id":"pg-"||position(),
+          "format":"mp4[h264+aac]",
+          "resolution":x"{width}x{height}",
+          "url":(sources)()/src
+        },
+        xivid:m3u8-to-json(
+          (adaptive)()[type="application/x-mpegURL"]/src
+        )()
+      }
+    }
+  ))
 };
 
 declare function xivid:youtube($url as string) as object()? {

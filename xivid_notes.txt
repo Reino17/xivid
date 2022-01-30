@@ -7793,65 +7793,134 @@ declare function xivid:ad($url as string) as object()? {
 
 $ url=https://www.lc.nl/friesland/heerenveen/Alle-gratis-perenbomen-weggegeven-in-Friesland-25949273.html
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])'
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "newsArticle",
+    [...]
+    "articleSection": "Heerenveen",
+    "headline": "Alle gratis perenbomen weggegeven in Friesland",
+    "inLanguage": "nl",
+    "image": "https://afbeelding.lc.nl/lc/incoming/syatva-Omrin.jpg/alternates/LANDSCAPE_1920/Omrin.jpg",
+    "datePublished": "2020-08-22T07:06:19+0000",
+    "dateModified": "2020-08-22T07:06:19+0000",
+    [...]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "description": "",
+    "name": "Enorme belangstelling voor gratis perenbomen in Heerenveen",
+    "thumbnailUrl": "https://afbeelding.lc.nl/lc/incoming/syatva-Omrin.jpg/alternates/LANDSCAPE_1920/Omrin.jpg",
+    "uploadDate": "2021-12-09T09:10:56.000Z",
+    "height": 1280,
+    "width": 720
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    "name": "Leeuwarder Courant",
+    "url": "lc.nl",
+    [...]
+  },
+  [...]
+]
 
-De door internet browser gegenereerde cookie:
+$ xidel -se 'doc("'$url'")/x"https://content.tmgvideo.nl/playlist/item={//div/substring-after(@id,"videoplayer-")[.]}/playlist.json"'
+https://content.tmgvideo.nl/playlist/item=-hsFY74Lp_WA/playlist.json
 
-Cookie: ndc_consent=%7B%22createdAt%22%3A%222020-09-11T14%3A43%3A51.315Z%22%2C%22validTill%22%3A%222020-09-12T02%3A43%3A51.315Z%22%2C%22ID%22%3A%22c0c45272-9fcf-4ea5-9ee7-a24ab45f999a%22%2C%22templateID%22%3A%22lc%22%2C%22userID%22%3A%226d4c2b2f-9927-4fba-bac4-e6a9f56235e1%22%2C%22permissions%22%3A%7B%22analytics%22%3Afalse%2C%22personalization%22%3Afalse%2C%22functional%22%3Atrue%2C%22advertising%22%3Afalse%2C%22socialMedia%22%3Afalse%7D%7D
+$ xidel -se 'doc("'$url'")/json-doc(x"https://content.tmgvideo.nl/playlist/item={//div/substring-after(@id,"videoplayer-")[.]}/playlist.json")'
+{
+  "items": [
+    {
+      "id": "-hsFY74Lp_WA",
+      "account": "4KxghZrDrKUU",
+      "audioonly": false,
+      "live": false,
+      "title": "Enorme belangstelling voor gratis perenbomen in Heerenveen",
+      "poster": "//content.tmgvideo.nl/img/account=4KxghZrDrKUU/item=-hsFY74Lp_WA/thumbid=2/image.jpg?v=20211027000142",
+      "datecreated": "2021-08-21 12:07:51",
+      "duration": 102,
+      "locations": {
+        "progressive": [
+          {
+            "label": "1080p",
+            "height": 1080,
+            "width": 1920,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=4KxghZrDrKUU/item=-hsFY74Lp_WA/file=7plER7cbpmaE/-hsFY74Lp_WA.mp4"
+              }
+            ]
+          },
+          [...]
+          {
+            "label": "270p",
+            "height": 270,
+            "width": 480,
+            "sources": [
+              {
+                "type": "video/mp4",
+                "src": "https://media.tmgvideo.nl/progressive/account=4KxghZrDrKUU/item=-hsFY74Lp_WA/file=bIsFZ_KbrGSk/-hsFY74Lp_WA.mp4"
+              }
+            ]
+          }
+        ],
+        "adaptive": [
+          {
+            "type": "application/dash+xml",
+            "src": "https://media.tmgvideo.nl/dash/account=4KxghZrDrKUU/item=-hsFY74Lp_WA/-hsFY74Lp_WA.mpd?v=20211027000142_5"
+          },
+          {
+            "type": "application/x-mpegURL",
+            "src": "https://media.tmgvideo.nl/hls/account=4KxghZrDrKUU/item=-hsFY74Lp_WA/-hsFY74Lp_WA.m3u8?v=20211027000142_5"
+          }
+        ]
+      },
+      [...]
+    }
+  ]
+}
 
-Url-decoded:
-
-Cookie: ndc_consent={"createdAt":"2020-09-11T14:43:51.315Z","validTill":"2020-09-12T02:43:51.315Z","ID":"c0c45272-9fcf-4ea5-9ee7-a24ab45f999a","templateID":"lc","userID":"6d4c2b2f-9927-4fba-bac4-e6a9f56235e1","permissions":{"analytics":false,"personalization":false,"functional":true,"advertising":false,"socialMedia":false}}
-
-Minimale wat voor mij (en hopelijk iedereen) werkt:
-
-Cookie: ndc_consent={"permissions":{"functional":true}}
-
-$ xidel -se '"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}}))'
-Cookie: ndc_consent=%7B%22permissions%22%3A%20%7B%22functional%22%3A%20true%7D%7D
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc ! (//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-"),//meta[@property="og:site_name"]/@content)'
-3892522
-Leeuwarder Courant
-
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return //script/tokenize(.,",")[contains(.,$id)])'
-"https:\u002F\u002Fndc.bbvms.com\u002Fp\u002Flc_videoplayer_v2\u002Fc\u002F3892522.html?inheritDimensions=true"
-
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return parse-json(//script/tokenize(.,",")[contains(.,$id)]))'
-https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.html?inheritDimensions=true
-
-$ xidel -se 'x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc/(let $id:=//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return substring-before(parse-json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json")'
-https://ndc.bbvms.com/p/lc_videoplayer_v2/c/3892522.json   # Blue Billywig
-
-$ xidel -s --module=xivid.xqm -e 'let $src:=x:request({"headers":"Cookie: ndc_consent="||uri-encode(serialize-json({"permissions":{"functional":true}})),"url":"'$url'"})/doc,$id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-") return $src/xivid:bbvms(substring-before(parse-json(//script/tokenize(.,",")[contains(.,$id)]),"html")||"json",//meta[@property="og:site_name"]/@content,())'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/map:merge((parse-json(//script[@type="application/ld+json"])/{"name":x"{.(3)/name}: {.(2)/name}","date":replace(.(1)/datePublished,"\+0000","Z")},json-doc(x"https://content.tmgvideo.nl/playlist/item={//div[@class="video-player"]/substring-after(@id,"videoplayer-")}/playlist.json")/(items)()/{"duration":duration * duration("PT1S"),"formats":locations/array{reverse((progressive)())/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":x"{width}x{height}","url":(sources)()/src},xivid:m3u8-to-json((adaptive)()[type="application/x-mpegURL"]/src)()}}))'
 {
   "name": "Leeuwarder Courant: Enorme belangstelling voor gratis perenbomen in Heerenveen",
-  "date": "2020-08-22T10:03:48Z",
+  "date": "2020-08-22T07:06:19Z",
   "duration": "PT1M42S",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "resolution": "512x288",
-      "bitrate": "400kbps",
-      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2020/08/22/asset-3892522-1598093329299560.mp4"
+      "resolution": "480x270",
+      "url": "https://media.tmgvideo.nl/progressive/[...]/file=bIsFZ_KbrGSk/-hsFY74Lp_WA.mp4"
     },
     [...]
     {
-      "id": "pg-6",
+      "id": "pg-5",
       "format": "mp4[h264+aac]",
       "resolution": "1920x1080",
-      "bitrate": "3000kbps",
-      "url": "https://d3jbi46382yahz.cloudfront.net/ndc/media/2020/08/22/asset-3892522-1598093329696575.mp4"
+      "url": "https://media.tmgvideo.nl/progressive/[...]/file=7plER7cbpmaE/-hsFY74Lp_WA.mp4"
     },
     {
-      "id": "pg-7",
-      "format": "mp4[h264+aac]",
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://media.tmgvideo.nl/hls/[...]/-hsFY74Lp_WA.m3u8?[...]"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "bitrate": "64kbps",
+      "url": "https://media.tmgvideo.nl/hls/[...]/-hsFY74Lp_WA-20211027000142_5-audio=64000.m3u8?[...]"
+    },
+    [...]
+    {
+      "id": "hls-7",
+      "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
-      "bitrate": "10296kbps",
-      "url": "https://s3.eu-west-1.amazonaws.com/mm.ndc.bbvms.com/upload/ndc/2020/08/22/58d8c9860156bf19f0bf4ae6160297fc/58d8c9860156bf19f0bf4ae6160297fc.mp4"
+      "bitrate": "3600|128kbps",
+      "url": "https://media.tmgvideo.nl/hls/[...]/-hsFY74Lp_WA-20211027000142_5-audio=128000-video=3600000.m3u8?[...]"
     }
   ]
 }
@@ -7859,22 +7928,30 @@ $ xidel -s --module=xivid.xqm -e 'let $src:=x:request({"headers":"Cookie: ndc_co
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:lc($url as string) as object()? {
-  let $src:=x:request({
-        "headers":"Cookie: ndc_consent="||uri-encode(
-          serialize-json({"permissions":{"functional":true}})
-        ),
-        "url":$url
-      })/doc,
-      $id:=$src//div[@class="article-page__video-wrapper"]/div/substring-after(@id,"video-")
-  return
-  $src/xivid:bbvms(
-    substring-before(
-      parse-json(//script/tokenize(.,",")[contains(.,$id)]),
-      "html"
-    )||"json",
-    //meta[@property="og:site_name"]/@content,
-    ()
-  )
+  doc($url)/map:merge((
+    parse-json(//script[@type="application/ld+json"])/{
+      "name":x"{.(3)/name}: {.(2)/name}",
+      "date":replace(.(1)/datePublished,"\+0000","Z")
+    },
+    json-doc(
+      x"https://content.tmgvideo.nl/playlist/item={
+        //div[@class="video-player"]/substring-after(@id,"videoplayer-")
+      }/playlist.json"
+    )/(items)()/{
+      "duration":duration * duration("PT1S"),
+      "formats":locations/array{
+        reverse((progressive)())/{
+          "id":"pg-"||position(),
+          "format":"mp4[h264+aac]",
+          "resolution":x"{width}x{height}",
+          "url":(sources)()/src
+        },
+        xivid:m3u8-to-json(
+          (adaptive)()[type="application/x-mpegURL"]/src
+        )()
+      }
+    }
+  ))
 };
 
 ================================================================================================
