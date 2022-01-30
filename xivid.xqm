@@ -76,10 +76,9 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
     }[url],
     for $x at $i in $streams
     group by $path:=x:lines($x)[last()] ! (
-      if (contains(.,"URI=")) then
-        extract($x,"URI=&quot;(.+)&quot;",1)
-      else
-        replace(.,"#.+","")
+      if (contains(.,"URI="))
+      then extract($x,"URI=&quot;(.+)&quot;",1)
+      else replace(.,"#.+","")
     )
     let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
         $br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],
@@ -88,21 +87,19 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then
-        "m3u8[h264+aac]"
-      else
-        "m3u8[aac]",
+      "format":if (contains($x,"avc1") or contains($x,"RESOLUTION"))
+        then "m3u8[h264+aac]"
+        else "m3u8[aac]",
       "resolution"?:concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
         extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] !
-          concat("@",round-half-to-even(.,3),"fps")
+          x"@{round-half-to-even(.,3)}fps"
       )[.],
       "bitrate"?:(
-        if ($br3[1]) then
-          join((round($br3[2] div 1000),round($br3[1] div 1000)),"|")
-        else 
-          ($br2,round($br[.] div 1000))[1]
-      ) ! concat(.,"kbps"),
+        if ($br3[1])
+        then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|")
+        else ($br2,round($br[.] div 1000))[1]
+      ) ! x"{.}kbps",
       "url":resolve-uri($path,$m3u8Url)
     }
   }
@@ -122,20 +119,17 @@ declare function xivid:mpd-to-json($mpd) as array() {
     count $i
     return {
       "id":"dash-"||$i,
-      "format":concat(
-        substring-after($x/(.,..)/@mimeType,"/"),
-        "[",
+      "format":x"{substring-after($x/(.,..)/@mimeType,"/")}[{
         tokenize($x/@codecs,"\.")[1] ! (
           if (.="mp4a") then "aac" else
           if (.="avc1") then "h264" else .
-        ),
-        "]"
-      ),
-      "resolution"?:$x/@width ! concat(
-        .,"x",$x/@height,"@",eval(replace($x/@frameRate,"/"," div ")),"fps"
-      ),
-      "samplerate"?:$x/@audioSamplingRate ! concat(. div 1000,"kHz"),
-      "bitrate":round($x/@bandwidth div 1000)||"kbps",
+        )
+      }]",
+      "resolution"?:$x/@width ! x"{.}x{$x/@height}@{
+        eval(replace($x/@frameRate,"/"," div "))
+      }fps",
+      "samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz",
+      "bitrate":x"{round($x/@bandwidth div 1000)}kbps",
       "url":$x/BaseUrl
     }
   }
@@ -143,23 +137,17 @@ declare function xivid:mpd-to-json($mpd) as array() {
 
 declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime {
   let $is-summertime:=function($arg as dateTime) as boolean {
-        let $year:=year-from-dateTime($arg),
-            $dst:=for $x in ("-03-","-10-") return
-            dateTime(
-              concat(
-                $year,
-                $x,
-                (25 to 31)[
-                  days-from-duration(
-                    date(concat($year,$x,.)) - date("0000-01-01")
-                  ) mod 7 eq 0
-                ],
-                "T01:00:00Z"
-              )
-            )
-        return
-        $dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]
-      }
+    let $dst:=
+      for $month in ("03","10")
+      let $day:=(25 to 31)[
+        days-from-duration(
+          date(x"{year-from-dateTime($arg)}-{$month}-{.}") - date("0000-01-01")
+        ) mod 7 eq 0
+      ] return
+      dateTime(x"{year-from-dateTime($arg)}-{$month}-{$day}T01:00:00Z")
+    return
+    $dst[1] le dateTime($arg) and dateTime($arg) lt $dst[2]
+  }
   return
   adjust-dateTime-to-timezone(
     dateTime($arg),
@@ -168,11 +156,10 @@ declare function xivid:adjust-dateTime-to-dst($arg as anyAtomicType) as dateTime
         implicit-timezone()
       else
         implicit-timezone() - duration("PT1H")
+    else if ($is-summertime(dateTime($arg))) then
+      implicit-timezone() + duration("PT1H")
     else
-      if ($is-summertime(dateTime($arg))) then
-        implicit-timezone() + duration("PT1H")
-      else
-        implicit-timezone()
+      implicit-timezone()
   )
 };
 
@@ -190,17 +177,17 @@ declare function xivid:string-to-utc-dateTime($arg as string) as dateTime {
           join(
             (
               $i[3],
-              if ($i[2] castable as integer) then
-                $i[2]
-              else
-                ($month($i[2]),$month(substring($i[2],1,3))),
+              if ($i[2] castable as integer)
+              then $i[2]
+              else ($month($i[2]),$month(substring($i[2],1,3))),
               format-integer($i[1],"00")
-            ),
-            "-"
+            ),"-"
           ),
           "T",
           substring(
-            join(tokenize($i[4],":") ! format-integer(.,"00"),":")||":00",
+            join(
+              tokenize($i[4],":") ! format-integer(.,"00"),":"
+            )||":00",
             1,8
           )
         )
@@ -214,20 +201,13 @@ declare function xivid:string-to-utc-dateTime($arg as string) as dateTime {
 declare function xivid:bin-xor($a as integer,$b as integer) as integer {
   let $bin:=($a,$b) ! x:integer-to-base(.,2),
       $len:=max($bin ! string-length()),
-      $val:=$bin ! concat(
-        string-join((1 to $len - string-length()) ! 0),
-        .
-      ),
-      $v1:=$val[1],
-      $v2:=$val[2]
+      $val:=$bin ! format-integer(.,string-join((1 to $len) ! 0))
   return
-  x:integer(
-    string-join(
-      for $x in 1 to $len return
-      if (substring($v1,$x,1) eq substring($v2,$x,1)) then 0 else 1
-    ),
-    2
-  )
+  string-join(
+    (1 to $len) ! (
+      if (substring($val[1],.,1) eq substring($val[2],.,1)) then 0 else 1
+    )
+  ) ! x:integer(.,2)
 };
 
 declare function xivid:info($json as object()) as string* {
@@ -264,14 +244,12 @@ declare function xivid:info($json as object()) as string* {
         join(
           $fmts() ! string-join(
             for $x at $i in $f_lbl return (
-              if (position() eq count($fmts()) and $i eq count($f_lbl)) then
-                .($x)||" (best)"
-              else
-                .($x),
+              if (position() eq count($fmts()) and $i eq count($f_lbl))
+              then .($x)||" (best)"
+              else .($x),
               (1 to $f_len[$i] - string-length(.($x)) + 2) ! " "
             )
-          ),
-          "&#10;"||(1 to max($len) + 1) ! " "
+          ),"&#10;"||(1 to max($len) + 1) ! " "
         )
       else if ($x=("date","expdate")) then
         format-dateTime(
@@ -298,8 +276,7 @@ declare function xivid:bbvms(
 ) as object()? {
   let $json:=json-doc($url),
       $host:=$json/resolve-uri(
-        publicationData/defaultMediaAssetPath,
-        protocol
+        publicationData/defaultMediaAssetPath,protocol
       ),
       $orig:=parse-json($json/clipData/s3Info)
   return
@@ -309,8 +286,7 @@ declare function xivid:bbvms(
         (
           if ($publ) then $publ else $json/publicationData/label,
           if ($title) then $title else .[title]/title
-        ),
-        ": "
+        ),": "
       )
     },
     if (
@@ -320,18 +296,15 @@ declare function xivid:bbvms(
     ) then {
       "date":substring(
         adjust-dateTime-to-timezone(
-          current-dateTime() + duration("PT0.5S"),
-          duration("PT0S")
-        ),
-        1,19
+          current-dateTime() + duration("PT0.5S"),duration("PT0S")
+        ),1,19
       )||"Z"
     } else {
       "date":if (ends-with(publisheddate,"Z")) then
         publisheddate
       else
         adjust-dateTime-to-timezone(
-          xivid:adjust-dateTime-to-dst(publisheddate),
-          duration("PT0S")
+          xivid:adjust-dateTime-to-dst(publisheddate),duration("PT0S")
         ),
       "duration"?:length * duration("PT1S")
     },
@@ -342,7 +315,7 @@ declare function xivid:bbvms(
           "format":"srt",
           "language":isocode,
           "label":languagename,
-          "url":concat($json/publicationData/baseurl,"/subtitle/",id,".srt")
+          "url":x"{$json/publicationData/baseurl}/subtitle/{id}.srt"
         },
         xivid:m3u8-to-json(
           (assets)()[ends-with(src,"m3u8")][1]/resolve-uri(src,$host)
@@ -354,8 +327,8 @@ declare function xivid:bbvms(
         $x/{
           "id":"pg-"||$i,
           "format":"mp4[h264+aac]",
-          "resolution"?:.[width]/concat(width,"x",height),
-          "bitrate"?:.[bandwidth]/concat(bandwidth,"kbps"),
+          "resolution"?:.[width]/x"{width}x{height}",
+          "bitrate"?:.[bandwidth]/x"{bandwidth}kbps",
           "url":resolve-uri(src,$host) ! (
             if (ends-with(.,"mp4")) then .
             else x:request({"method":"HEAD","url":.})/url
@@ -369,8 +342,8 @@ declare function xivid:bbvms(
             else if (.="mkv") then "[h264+opus]"
             else "[h264+aac]"
           ),
-          "resolution":concat(originalWidth,"x",originalHeight),
-          "bitrate":$orig/format/concat(round(tokenize(bit_rate)[1] * 1024),"kbps"),
+          "resolution":x"{originalWidth}x{originalHeight}",
+          "bitrate":$orig/format/x"{round(tokenize(bit_rate)[1] * 1024)}kbps",
           "url":if (exists($orig)) then
             $orig/format/filename
           else
@@ -406,21 +379,21 @@ declare function xivid:npo($url as string) as object()? {
   return
   map:merge((
     if (exists($info)) then $info/{
-      "name":if (type="livetv") then
-        concat(title,": Livestream")
-      else
-        concat(
-          franchiseTitle,
-          if (contains(franchiseTitle,title)) then () else ": "||title
-        ),
+      "name":if (type="livetv") then x"{title}: Livestream"
+      else concat(
+        franchiseTitle,
+        if (contains(franchiseTitle,title)) then () else ": "||title
+      ),
       "date":broadcastDate,
       "duration"?:duration * duration("PT1S"),
       "start"?:startAt * duration("PT1S"),
       "end"?:(startAt + duration) * duration("PT1S")
     } else
       doc("https://www.npostart.nl/"||$prid)/(
-        let $info:=parse-json((//script[@type="application/ld+json"])[1]) return {
-          "name"://npo-player-header/concat(@main-title,": ",@share-title),
+        let $info:=parse-json(
+          (//script[@type="application/ld+json"])[1]
+        ) return {
+          "name"://npo-player-header/x"{@main-title}: {@share-title}",
           "date":adjust-dateTime-to-timezone(
             dateTime($info/uploadDate),duration("PT0S")
           ),
@@ -527,9 +500,10 @@ declare function xivid:kijk($url as string) as object()? {
         "query":concat(
           "query{programs(guid:&quot;",
           extract($url,"\w+$"),
-          "&quot;){items{__typename,type,guid,title,duration,tvSeasonEpisodeNumber,",
-          "seriesEpisodeNumber,seasonNumber,media{mediaContent{assetTypes,sourceUrl,",
-          "type},availableDate,expirationDate,availabilityState},series{guid,title}}}}"
+          "&quot;){items{__typename,type,guid,title,duration,",
+          "tvSeasonEpisodeNumber,seriesEpisodeNumber,seasonNumber,",
+          "media{mediaContent{assetTypes,sourceUrl,type},availableDate,",
+          "expirationDate,availabilityState},series{guid,title}}}}"
         )
       }
     )/url
@@ -562,7 +536,9 @@ declare function xivid:kijk($url as string) as object()? {
         "url":sourceUrl
       },
       xivid:m3u8-to-json(
-        (.//mediaContent)()[type="m3u8" and ends-with((assetTypes)(),"public")]/sourceUrl
+        (.//mediaContent)()[
+          type="m3u8" and ends-with((assetTypes)(),"public")
+        ]/sourceUrl
       )()
     }
   }
@@ -663,10 +639,9 @@ declare function xivid:nhnieuws($url as string) as object()? {
         //script/substring-after(.,"INITIAL_PROPS__ = ")[.]
       )/pageData/{
         "name":let $info:=(blocks)()[type=("video","headerVideo")]/video return
-        if ($info/caption) then
-          $info/concat(author,": ",caption)
-        else
-          concat(media//author,": ",title),
+        if ($info/caption)
+        then $info/x"{author}: {caption}"
+        else x"{media//author}: {title}",
         "date":updated * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
         "formats":xivid:m3u8-to-json(.//stream/url)
       }
@@ -676,8 +651,7 @@ declare function xivid:nhnieuws($url as string) as object()? {
         adjust-dateTime-to-timezone(
           current-dateTime() + duration("PT0.5S"),
           duration("PT0S")
-        ),
-        1,19
+        ),1,19
       )||"Z",
       "formats":xivid:m3u8-to-json(
         parse-json(
@@ -697,17 +671,15 @@ declare function xivid:ofl($url as string) as object()? {
         adjust-dateTime-to-timezone(
           current-dateTime() + duration("PT0.5S"),
           duration("PT0S")
-        ),
-        1,19
+        ),1,19
       )||"Z",
       "formats":xivid:m3u8-to-json($info/@data-file)
     } else {
       "name":concat(
         "Omroep Flevoland: ",
-        if ($info/normalize-space(@data-title)) then
-          $info/@data-title
-        else
-          normalize-space(//h2)
+        if ($info/normalize-space(@data-title))
+        then $info/@data-title
+        else normalize-space(//h2)
       ),
       "date":xivid:string-to-utc-dateTime(
         //div[@class="card__info t--xsm"]/join(
@@ -718,7 +690,7 @@ declare function xivid:ofl($url as string) as object()? {
             )
           else
             span/extract(.,"[\d:-]+",0,"*")
-          )
+        )
       ),
       "formats":array{
         {
@@ -737,7 +709,10 @@ declare function xivid:dumpert($url as string) as object()? {
         doc($url)//script/extract(.,"JSON\.parse\((.+)\)",1)[.]
       ))/items/item/item[media_type="VIDEO"],
       $fmts:=$json//variants,
-      $host:={"youtube":"https://youtu.be/","twitter":"https://twitter.com/i/status/"}
+      $host:={
+        "youtube":"https://youtu.be/",
+        "twitter":"https://twitter.com/i/status/"
+      }
   return
   if ($fmts()/version="embed" and not($fmts()/version="stream")) then
     let $uri:=tokenize($fmts()/uri,":") return
@@ -786,35 +761,35 @@ declare function xivid:autojunk($url as string) as object()? {
 };
 
 declare function xivid:abhd($url as string) as object()? {
-  let $src:=doc($url)//div[@id="playerObject"],
-      $info:=$src/script/parse-json(
-        replace(
-          extract(.,"clipData.assets = (.+\]);",1,"s"),
-          " //.+",""
-        ),
-        {"liberal":true()}
-      )
-  return {
-    "name":"ABHD: "||$src/h1/a,
-    "date":dateTime(
-      join(
-        extract($info(1)/src,"(\d{4})/?(\d{2})(\d{2})",1 to 3),
-        "-"
-      )||"T00:00:00Z"
-    ),
-    "formats":array{
-      for $x at $i in $info()/src return {
-        "id":"pg-"||$i,
-        "format":"mp4[h264+aac]",
-        "resolution":if (ends-with($x,"hq.mp4")) then "852x480" else "1280x720",
-        "bitrate":if (ends-with($x,"hq.mp4")) then "1200kbps" else "2000kbps",
-        "url":if (matches($x,"\d{14}")) then
-          replace($x,"(.+?\d{4})(\d{4})(.+)","$1/$2/$3")
-        else
-          $x
+  doc($url)//div[@id="playerObject"]/map:merge((
+    {
+      "name":"ABHD: "||h1/a
+    },
+    parse-json(
+      replace(
+        extract(script,"clipData.assets = (.+\]);",1,"s")," //.+",""
+      ),
+      {"liberal":true()}
+    )/{
+      "date":dateTime(
+        join(
+          extract(.(1)/src,"(\d{4})/?(\d{2})(\d{2})",1 to 3),"-"
+        )||"T00:00:00Z"
+      ),
+      "formats":array{
+        for $x at $i in .()/src return {
+          "id":"pg-"||$i,
+          "format":"mp4[h264+aac]",
+          "resolution":if (ends-with($x,"hq.mp4")) then "852x480" else "1280x720",
+          "bitrate":if (ends-with($x,"hq.mp4")) then "1200kbps" else "2000kbps",
+          "url":if (matches($x,"\d{14}")) then
+            replace($x,"(.+?\d{4})(\d{4})(.+)","$1/$2/$3")
+          else
+            $x
+        }
       }
     }
-  }
+  ))
 };
 
 declare function xivid:autoblog($url as string) as object()? {
@@ -825,13 +800,11 @@ declare function xivid:autoblog($url as string) as object()? {
 
 declare function xivid:telegraaf($url as string) as object()? {
   json-doc(
-    concat(
-      "https://content.tmgvideo.nl/playlist/item=",
+    x"https://content.tmgvideo.nl/playlist/item={
       parse-json(
         doc($url)//script/extract(.,"APOLLO_STATE__=(.+);",1)[.]
-      )/(.//videoId)[1],
-      "/playlist.json"
-    )
+      )/(.//videoId)[1]
+    }/playlist.json"
   )/(items)()/{
     "name":"Telegraaf: "||title,
     "date":xivid:string-to-utc-dateTime(
@@ -845,7 +818,7 @@ declare function xivid:telegraaf($url as string) as object()? {
       locations/reverse((progressive)())/{
         "id":"pg-"||position(),
         "format":"mp4[h264+aac]",
-        "resolution":concat(width,"x",height),
+        "resolution":x"{width}x{height}",
         "url":.//src
       },
       xivid:m3u8-to-json(
@@ -858,32 +831,22 @@ declare function xivid:telegraaf($url as string) as object()? {
 declare function xivid:ad($url as string) as object()? {
   let $id:=extract($url,"~p(\d+)",1),
       $json:=json-doc(
-        concat(
-          "https://embed.mychannels.video/sdk/production/",
-          if ($id) then
-            $id
-          else
-            x:request({
-              "headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5",
-              "url":$url
-            })/doc/(
-              if (//*[@class="mc-embed"]) then
-                //*[@class="mc-embed"]/extract(@src,"\d+")
-              else
-                //div[@data-mychannels-type="video"]/@data-mychannels-id
-            ),
-          "?options=FUTFU_default"
-        )
+        x"https://embed.mychannels.video/sdk/production/{
+          if ($id) then $id
+          else x:request({
+            "headers":"Cookie: authId=8ac8ac9f-3782-4ba2-a449-9dc1fcdacbd5",
+            "url":$url
+          })/doc/(
+            if (//*[@class="mc-embed"])
+            then //*[@class="mc-embed"]/extract(@src,"\d+")
+            else //div[@data-mychannels-type="video"]/@data-mychannels-id
+          )
+        }?options=FUTFU_default"
       )
   return
   $json/map:merge((
     {
-      "name":concat(
-        "AD: ",
-        (shows)()/title,
-        " - ",
-        (productions)()/title
-      )
+      "name":x"AD: {(shows)()/title} - {(productions)()/title}"
     },
     (productions)()/{
       "date":xivid:string-to-utc-dateTime(
@@ -990,7 +953,7 @@ declare function xivid:vimeo($url as string) as object()? {
   parse-json(
     doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.]
   )/{
-    "name":video/concat(owner/name,": ",title),
+    "name":video/x"{owner/name}: {title}",
     "date"?:if (contains($url,"player.vimeo.com")) then
       ()
     else
@@ -1009,7 +972,7 @@ declare function xivid:vimeo($url as string) as object()? {
       $x/{
         "id":"pg-"||$i,
         "format":"mp4[h264+aac]",
-        "resolution":concat(width,"x",height,"@",fps,"fps"),
+        "resolution":x"{width}x{height}@{fps}fps",
         "url":url
       },
       xivid:m3u8-to-json((hls//url)[1])()
@@ -1058,9 +1021,9 @@ declare function xivid:twitch($url as string) as object()? {
     }
   )/{
     "name":"Twitch: "||(
-      .[__typename="Video"]/concat(owner/displayName," - ",title),
-      .[__typename="Clip"]/concat(broadcaster/displayName," - ",title),
-      .[__typename="User"]/concat(displayName,": ",broadcastSettings/title)
+      .[__typename="Video"]/x"{owner/displayName} - {title}",
+      .[__typename="Clip"]/x"{broadcaster/displayName} - {title}",
+      .[__typename="User"]/x"{displayName}: {broadcastSettings/title}"
     ),
     "date":.//createdAt,
     "duration"?:(lengthSeconds,durationSeconds) * duration("PT1S"),
@@ -1092,19 +1055,17 @@ declare function xivid:twitch($url as string) as object()? {
       request-combine(
         concat(
           "https://usher.ttvnw.net/",
-          if ($path=("video","videos")) then
-            "vod/"
-          else
-            "api/channel/hls/",
+          if ($path=("video","videos"))
+          then "vod/"
+          else "api/channel/hls/",
           $path[last()],
           ".m3u8"
         ),
         $call_api({
           "query":concat(
-            if ($path=("video","videos")) then
-              "{videoPlaybackAccessToken(id:&quot;"
-            else
-              "{streamPlaybackAccessToken(channelName:&quot;",
+            if ($path=("video","videos"))
+            then "{videoPlaybackAccessToken(id:&quot;"
+            else "{streamPlaybackAccessToken(channelName:&quot;",
             $path[last()],
             "&quot;,params:{platform:&quot;web&quot;,playerBackend:&quot;",
             "mediaplayer&quot;,playerType:&quot;site&quot;}){value,signature}}"
@@ -1125,18 +1086,22 @@ declare function xivid:twitch($url as string) as object()? {
 };
 
 declare function xivid:mixcloud($url as string) as object()? {
-  let $key:=x:cps("IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"),
-      $decrypt:=function($arg as string) as string {
+  let $decrypt:=function($arg as string) as string {
+        let $key:=x:cps(
+          "IFYOUWANTTHEARTISTSTOGETPAIDDONOTDOWNLOADFROMMIXCLOUD"
+        ) return
         string-join(
           x:cps(
-            for $x at $i in x:cps(binary-to-string(base64Binary($arg))) return
+            for $x at $i in x:cps(
+              binary-to-string(base64Binary($arg))
+            ) return
             xivid:bin-xor($x,$key[($i - 1) mod count($key) + 1])
           )
         )
       },
-      $csrf:=x:request(
-        {"method":"HEAD","url":$url}
-      )/substring-before(substring-after(headers[contains(.,"csrftoken")],"="),";"),
+      $csrf:=x:request({"method":"HEAD","url":$url})/substring-before(
+        substring-after(headers[contains(.,"csrftoken")],"="),";"
+      ),
       $us:=tokenize(substring-after($url,"mixcloud.com/"),"/")
   return
   x:request({
@@ -1146,19 +1111,20 @@ declare function xivid:mixcloud($url as string) as object()? {
       "X-CSRFToken: "||$csrf,
       "Cookie: csrftoken="||$csrf
     ),
-    "post":serialize-json({
-      "query":concat(
-        "{cloudcastLookup(lookup:{username:&quot;",
-        $us[1],
-        "&quot;,slug:&quot;",
-        $us[2],
-        "&quot;}){name,owner{displayName,url,username},",
-        "publishDate,audioLength,streamInfo{hlsUrl,url}}}"
-      )
-    }),
+    "post":serialize(
+      {
+        "query":concat(
+          "{cloudcastLookup(lookup:{username:&quot;",
+          $us[1],"&quot;,slug:&quot;",$us[2],
+          "&quot;}){name,owner{displayName,url,username},",
+          "publishDate,audioLength,streamInfo{hlsUrl,url}}}"
+        )
+      },
+      {"method":"json"}
+    ),
     "url":"https://www.mixcloud.com/graphql"
   })/json//cloudcastLookup/{
-    "name":concat(owner/displayName," - ",name),
+    "name":x"{owner/displayName} - {name}",
     "date":dateTime(publishDate),
     "duration":audioLength * duration("PT1S"),
     "formats":array{
@@ -1167,9 +1133,7 @@ declare function xivid:mixcloud($url as string) as object()? {
         "format":"m4a[aac]",
         "url":$decrypt(streamInfo/url)
       },
-      xivid:m3u8-to-json(
-        $decrypt(streamInfo/hlsUrl)
-      )()
+      xivid:m3u8-to-json($decrypt(streamInfo/hlsUrl))()
     }
   }
 };
@@ -1180,19 +1144,18 @@ declare function xivid:soundcloud($url as string) as object()? {
         substring-after(
           unparsed-text($src//script[@crossorigin][last()]/@src),
           "client_id:"
-        ),
-        2,32
+        ),2,32
       ),
       $json:=parse-json($src//script/extract(.,"(\[\{.+)\)",1)[.])()[last()]/(data)(),
       $fmts:=($json//transcodings)()
   return
   $json/{
-    "name":concat(user/(full_name,username)[.][1]," - ",title),
+    "name":x"{user/(full_name,username)[.][1]} - {title}",
     "date":created_at,
     "duration":round(duration div 1000) * duration("PT1S"),
     "formats":array{
       $fmts[format/protocol="progressive"]/(
-        let $url:=json-doc(concat(url,"?client_id=",$cid))/url return {
+        let $url:=json-doc(x"{url}?client_id={$cid}")/url return {
           "id":"pg-1",
           "format":substring-before(preset,"_"),
           "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
@@ -1202,10 +1165,10 @@ declare function xivid:soundcloud($url as string) as object()? {
       for $x at $i in $fmts[format/protocol="hls"]
       order by $x/preset descending
       count $i
-      let $url:=json-doc(concat($x/url,"?client_id=",$cid))/url
+      let $url:=json-doc(x"{url}?client_id={$cid}")/url
       return {
         "id":"hls-"||$i,
-        "format":concat("m3u8[",substring-before($x/preset,"_"),"]"),
+        "format":x"m3u8[{substring-before($x/preset,"_")}]",
         "bitrate":extract($url,"\.(\d+)\.",1)||"kbps",
         "url":$url
       }
@@ -1265,7 +1228,7 @@ declare function xivid:twitter($url as string) as object()? {
             "x-guest-token: "||$guest_token
           ),
           "url":if (empty($query)) then
-            concat("https://api.twitter.com/1.1/",$path)
+            "https://api.twitter.com/1.1/"||$path
           else
             request-combine("https://api.twitter.com/1.1/"||$path,$query)/url
         })/json
@@ -1307,7 +1270,7 @@ declare function xivid:twitter($url as string) as object()? {
         {
           "id":"hls-1",
           "format":"m3u8[h264+aac]",
-          "resolution":concat(width,"x",height),
+          "resolution":x"{width}x{height}",
           "url":$call_api("live_video_stream/status/"||media_key,())//location
         }
       }
@@ -1386,26 +1349,25 @@ declare function xivid:xhamster($url as string) as object()? {
 };
 
 declare function xivid:youporn($url as string) as object()? {
-  doc($url)/map:merge((
+  doc($url)/map:put(
     parse-json((//script[@type="application/ld+json"])[1])/{
       "name":"YouPorn: "||name,
       "date":dateTime(uploadDate||"T00:00:00Z"),
       "duration":duration(duration)
     },
-    {
-      "formats":array{
-        for $x at $i in parse-json(
-          extract(//script,"mediaDefinition: (.+),",1)
-        )(1)/json-doc(resolve-uri(videoUrl,$url))()[format="mp4"]
-        order by $x/quality
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
-          "url":$x/videoUrl
-        }
+    "formats",
+    array{
+      for $x at $i in parse-json(
+        extract(//script,"mediaDefinition: (.+),",1)
+      )(1)/json-doc(resolve-uri(videoUrl,$url))()[format="mp4"]
+      order by $x/quality
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":("426x240","854x480","1280x720","1920x1080")[$i],
+        "url":$x/videoUrl
       }
     }
-  ))
+  )
 };
