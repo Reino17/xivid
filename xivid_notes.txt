@@ -8209,14 +8209,16 @@ declare function xivid:facebook($url as string) as object()? {
 $ url=https://twitter.com/themandalorian/status/1188986316194635777   # https://github.com/ytdl-org/youtube-dl/issues/14977#issuecomment-551283708
 
 $ xidel -se '(doc("'$url'")//script/@src)[last()]'
-https://abs.twimg.com/responsive-web/client-web-legacy/main.94494ea5.js
+https://abs.twimg.com/responsive-web/client-web-legacy/main.1ca9fd65.js
 
-$ xidel -se 'extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1)'
+$ xidel -se 'extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"s=&quot;([A-Za-z0-9%]{96,})&quot;",1)'
 AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA
 
-$ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1) return x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json'
+Deze token lijkt altijd hetzelfde te zijn, dus kan ik 'm net zo goed als string toevoegen.
+
+$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA" return x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json'
 {
-  "guest_token": "1391371369762496514"
+  "guest_token": "1504964898748518410"
 }
 
 $ xidel -se 'request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
@@ -8224,7 +8226,7 @@ $ xidel -se 'request-combine("https://api.twitter.com/1.1/statuses/show.json",{"
   "url": "https://api.twitter.com/1.1/statuses/show.json?id=1188986316194635777&tweet_mode=extended"
 }
 
-$ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})/url})/json'
+$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})/url})/json'
 {
   "created_at": "Tue Oct 29 01:10:02 +0000 2019",
   [...]
@@ -8272,7 +8274,7 @@ $ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@sr
   [...]
 }
 
-$ xidel -s --module=xivid.xqm -e 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})/url})/json/{"name":"Twitter: "||.//title,"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (.//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}}'
+$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})/url})/json/{"name":"Twitter: "||.//title,"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (.//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}}'
 {
   "name": "Twitter: The Mandalorian | Official Trailer 2 | Disney+ | Streaming Nov. 12",
   "date": "2019-10-29T01:10:02Z",
@@ -8328,7 +8330,7 @@ $ url=https://twitter.com/ViviEducation/status/1136534865145286656
 
 Creëer een interne $call_api functie om de nodige api-urls makkelijker aan te spreken:
 
-$ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()) as object() {x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json} return $call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
+$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json} return $call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
 {
   "created_at": "Thu Jun 06 07:26:42 +0000 2019",
   [...]
@@ -8346,7 +8348,7 @@ $ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@sr
   [...]
 }
 
-$ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/(.,$call_api("live_video_stream/status/"||media_key,()))'
+$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/(.,$call_api("live_video_stream/status/"||media_key,()))'
 {
   "id": "1vOGwqejwoWxB",
   "broadcast_id": "1vOGwqejwoWxB",
@@ -8372,7 +8374,7 @@ $ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@sr
   [...]
 }
 
-$ xidel -s --module=xivid.xqm -e 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses/{"name":"Twitter: "||.//title,"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (.//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}} else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{"name":"Twitter: "||status,"date":round(start_ms div 1000) * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),"formats":array{{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat(width,"x",height),"url":$call_api("live_video_stream/status/"||media_key,())//location}}}'
+$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses/{"name":"Twitter: "||.//title,"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (.//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}} else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{"name":"Twitter: "||status,"date":round(start_ms div 1000) * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),"formats":array{{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat(width,"x",height),"url":$call_api("live_video_stream/status/"||media_key,())//location}}}'
 {
   "name": "Twitter: Vivi founder @lior_rauchy announcing our new student feedback tool live at @EduTECH_AU #EduTECH2019",
   "date": "2019-06-06T07:26:42Z",
@@ -8391,7 +8393,7 @@ $ xidel -s --module=xivid.xqm -e 'let $bearer_token:=extract(unparsed-text((doc(
 
 $ url=https://twitter.com/I_Leak_VN/status/1369649839546400776
 
-$ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()) as object() {x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json} return $call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
+$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json} return $call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
 {
   "created_at": "Wed Mar 10 14:02:23 +0000 2021",
   [...]
@@ -8449,7 +8451,7 @@ $ xidel -se 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@sr
   [...]
 }
 
-$ xidel -s --module=xivid.xqm -e 'let $bearer_token:=extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"c=&quot;([A-Za-z0-9%]{96,})&quot;",1),$guest_token:=x:request({"method":"POST","headers":"Authorization: Bearer "||$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":("Authorization: Bearer "||$bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses/extended_entities/{"name":"Twitter: "||(.//title,$statuses/full_text)[1],"date":parse-ietf-date($statuses/created_at),"duration":round(video_info/duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in video_info/(variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}} else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{"name":"Twitter: "||status,"date":round(start_ms div 1000) * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),"formats":array{{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat(width,"x",height),"url":$call_api("live_video_stream/status/"||media_key,())//location}}}'
+$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses/{"name":"Twitter: "||(.//title,full_text)[1],"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (extended_entities//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((extended_entities//variants)()[content_type="application/x-mpegURL"]/url)()}} else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{"name":"Twitter: "||status,"date":round(start_ms div 1000) * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),"formats":array{{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat(width,"x",height),"url":$call_api("live_video_stream/status/"||media_key,())//location}}}'
 {
   "name": "Twitter: ... with oil cooling = the craziest mining ever in the world\n\nhttps://t.co/beYwz9pAux\n\n@elchapuzas @hms1193 @harukaze5719 @hardwareluxx_de @nbc_net @VideoCardz https://t.co/QSSaUxOPwG https://t.co/WVW3dNmo7C",
   "date": "2021-03-10T14:02:23Z",
@@ -8480,21 +8482,18 @@ $ xidel -s --module=xivid.xqm -e 'let $bearer_token:=extract(unparsed-text((doc(
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:twitter($url as string) as object()? {
-  let $bearer_token:=extract(
-        unparsed-text((doc($url)//script/@src)[last()]),
-        "c=&quot;([A-Za-z0-9%]{96,})&quot;",1
+  let $bearer_token:=concat(
+        "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejR",
+        "COuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
       ),
       $guest_token:=x:request({
         "method":"POST",
-        "headers":"Authorization: Bearer "||$bearer_token,
+        "headers":$bearer_token,
         "url":"https://api.twitter.com/1.1/guest/activate.json"
       })/json/guest_token,
       $call_api:=function($path as string,$query as object()?) as object() {
         x:request({
-          "headers":(
-            "Authorization: Bearer "||$bearer_token,
-            "x-guest-token: "||$guest_token
-          ),
+          "headers":($bearer_token,"x-guest-token: "||$guest_token),
           "url":if (empty($query)) then
             "https://api.twitter.com/1.1/"||$path
           else
@@ -8507,12 +8506,12 @@ declare function xivid:twitter($url as string) as object()? {
       )
   return
   if (exists($statuses/extended_entities)) then
-    $statuses/extended_entities/(media)()/{
-      "name":"Twitter: "||(.//title,$statuses/full_text)[1],
-      "date":parse-ietf-date($statuses/created_at),
+    $statuses/{
+      "name":"Twitter: "||(.//title,full_text)[1],
+      "date":parse-ietf-date(created_at),
       "duration":round(.//duration_millis div 1000) * duration("PT1S"),
       "formats":array{
-        for $x at $i in (.//variants)()[content_type="video/mp4"]
+        for $x at $i in (extended_entities//variants)()[content_type="video/mp4"]
         order by $x/bitrate
         count $i
         return {
@@ -8523,7 +8522,7 @@ declare function xivid:twitter($url as string) as object()? {
           "url":$x/url
         },
         xivid:m3u8-to-json(
-          (.//variants)()[content_type="application/x-mpegURL"]/url
+          (extended_entities//variants)()[content_type="application/x-mpegURL"]/url
         )()
       }
     }

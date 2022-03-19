@@ -1205,21 +1205,18 @@ declare function xivid:facebook($url as string) as object()? {
 };
 
 declare function xivid:twitter($url as string) as object()? {
-  let $bearer_token:=extract(
-        unparsed-text((doc($url)//script/@src)[last()]),
-        "c=&quot;([A-Za-z0-9%]{96,})&quot;",1
+  let $bearer_token:=concat(
+        "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejR",
+        "COuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
       ),
       $guest_token:=x:request({
         "method":"POST",
-        "headers":"Authorization: Bearer "||$bearer_token,
+        "headers":$bearer_token,
         "url":"https://api.twitter.com/1.1/guest/activate.json"
       })/json/guest_token,
       $call_api:=function($path as string,$query as object()?) as object() {
         x:request({
-          "headers":(
-            "Authorization: Bearer "||$bearer_token,
-            "x-guest-token: "||$guest_token
-          ),
+          "headers":($bearer_token,"x-guest-token: "||$guest_token),
           "url":if (empty($query)) then
             "https://api.twitter.com/1.1/"||$path
           else
@@ -1232,12 +1229,12 @@ declare function xivid:twitter($url as string) as object()? {
       )
   return
   if (exists($statuses/extended_entities)) then
-    $statuses/extended_entities/(media)()/{
-      "name":"Twitter: "||(.//title,$statuses/full_text)[1],
-      "date":parse-ietf-date($statuses/created_at),
+    $statuses/{
+      "name":"Twitter: "||(.//title,full_text)[1],
+      "date":parse-ietf-date(created_at),
       "duration":round(.//duration_millis div 1000) * duration("PT1S"),
       "formats":array{
-        for $x at $i in (.//variants)()[content_type="video/mp4"]
+        for $x at $i in (extended_entities//variants)()[content_type="video/mp4"]
         order by $x/bitrate
         count $i
         return {
@@ -1248,7 +1245,7 @@ declare function xivid:twitter($url as string) as object()? {
           "url":$x/url
         },
         xivid:m3u8-to-json(
-          (.//variants)()[content_type="application/x-mpegURL"]/url
+          (extended_entities//variants)()[content_type="application/x-mpegURL"]/url
         )()
       }
     }
