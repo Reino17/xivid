@@ -39,17 +39,17 @@ ECHO   npostart.nl             rtvoost.nl             youtube.com
 ECHO   gemi.st                 omroepwest.nl          youtu.be
 ECHO   nos.nl                  rijnmond.nl            vimeo.com
 ECHO   tvblik.nl               rtvutrecht.nl          dailymotion.com
-ECHO   uitzendinggemist.net    omroepgelderland.nl    twitch.tv
-ECHO   rtl.nl                  omroepzeeland.nl       mixcloud.com
-ECHO   rtlxl.nl                omroepbrabant.nl       soundcloud.com
-ECHO   rtlnieuws.nl            l1.nl                  facebook.com
-ECHO   kijk.nl                 dumpert.nl             fb.watch
-ECHO   omropfryslan.nl         autojunk.nl            instagram.com
-ECHO   rtvnoord.nl             abhd.nl                twitter.com
-ECHO   rtvdrenthe.nl           autoblog.nl            pornhub.com
-ECHO   nhnieuws.nl             telegraaf.nl           xhamster.com
-ECHO   at5.nl                  ad.nl                  youporn.com
-ECHO   omroepflevoland.nl      lc.nl
+ECHO   uitzendinggemist.net    omroepgelderland.nl    rumble.com
+ECHO   rtl.nl                  omroepzeeland.nl       twitch.tv
+ECHO   rtlxl.nl                omroepbrabant.nl       mixcloud.com
+ECHO   rtlnieuws.nl            l1.nl                  soundcloud.com
+ECHO   kijk.nl                 dumpert.nl             facebook.com
+ECHO   omropfryslan.nl         autojunk.nl            fb.watch
+ECHO   rtvnoord.nl             abhd.nl                instagram.com
+ECHO   rtvdrenthe.nl           autoblog.nl            twitter.com
+ECHO   nhnieuws.nl             telegraaf.nl           pornhub.com
+ECHO   at5.nl                  ad.nl                  xhamster.com
+ECHO   omroepflevoland.nl      lc.nl                  youporn.com
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -166,6 +166,7 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
         'lc':array{'lc.nl'}^,
         'vimeo':array{'vimeo.com'}^,
         'dailymotion':array{'dailymotion.com'}^,
+        'rumble':array{'rumble.com'}^,
         'twitch':array{'twitch.tv'}^,
         'mixcloud':array{'mixcloud.com'}^,
         'soundcloud':array{'soundcloud.com'}^,

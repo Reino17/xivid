@@ -40,17 +40,17 @@ Ondersteunde websites:
   gemi.st                 omroepwest.nl          youtu.be
   nos.nl                  rijnmond.nl            vimeo.com
   tvblik.nl               rtvutrecht.nl          dailymotion.com
-  uitzendinggemist.net    omroepgelderland.nl    twitch.tv
-  rtl.nl                  omroepzeeland.nl       mixcloud.com
-  rtlxl.nl                omroepbrabant.nl       soundcloud.com
-  rtlnieuws.nl            l1.nl                  facebook.com
-  kijk.nl                 dumpert.nl             fb.watch
-  omropfryslan.nl         autojunk.nl            instagram.com
-  rtvnoord.nl             abhd.nl                twitter.com
-  rtvdrenthe.nl           autoblog.nl            pornhub.com
-  nhnieuws.nl             telegraaf.nl           xhamster.com
-  at5.nl                  ad.nl                  youporn.com
-  omroepflevoland.nl      lc.nl
+  uitzendinggemist.net    omroepgelderland.nl    rumble.com
+  rtl.nl                  omroepzeeland.nl       twitch.tv
+  rtlxl.nl                omroepbrabant.nl       mixcloud.com
+  rtlnieuws.nl            l1.nl                  soundcloud.com
+  kijk.nl                 dumpert.nl             facebook.com
+  omropfryslan.nl         autojunk.nl            fb.watch
+  rtvnoord.nl             abhd.nl                instagram.com
+  rtvdrenthe.nl           autoblog.nl            twitter.com
+  nhnieuws.nl             telegraaf.nl           pornhub.com
+  at5.nl                  ad.nl                  xhamster.com
+  omroepflevoland.nl      lc.nl                  youporn.com
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -168,6 +168,7 @@ eval "$(xidel -e '
         "youtube":array{"youtube.com","youtu.be"},
         "vimeo":array{"vimeo.com"},
         "dailymotion":array{"dailymotion.com"},
+        "rumble":array{"rumble.com"},
         "twitch":array{"twitch.tv"},
         "mixcloud":array{"mixcloud.com"},
         "soundcloud":array{"soundcloud.com"},

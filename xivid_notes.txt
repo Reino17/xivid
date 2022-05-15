@@ -6093,6 +6093,316 @@ declare function xivid:vimeo($url as string) as object()? {
 
 ================================================================================================
 
+[dailymotion]
+
+$ url=https://www.dailymotion.com/video/x5aa1uc
+
+$ xidel -se 'replace("'$url'","video","player/metadata/video")'
+https://www.dailymotion.com/player/metadata/video/x5aa1uc
+
+$ xidel -s --module=xivid.xqm -e 'json-doc(replace("'$url'","video","player/metadata/video"))/{"name":"Dailymotion: "||title,"date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json(qualities//url)}'
+{
+  "name": "Dailymotion: PENOZA Seizoen 3 aflevering 9 (S03E09) [HD]",
+  "date": "2017-02-01T11:16:39Z",
+  "duration": "PT43M44S"
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "192x112",
+      "bitrate": "105kbps",
+      "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4"
+    },
+    [...]
+    {
+      "id": "pg-8",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "836kbps",
+      "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?sec=eyMNx4dh_i1GpAS8KZdvuLpv_OYPeXseQRrYAtoqvsjKaTEW2g4-03MeQmu4oIC1"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "192x112",
+      "bitrate": "105kbps",
+      "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-8",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "836kbps",
+      "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:dailymotion($url as string) as object()? {
+  json-doc(replace($url,"video","player/metadata/video"))/{
+    "name":"Dailymotion: "||title,
+    "date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+    "duration":duration * duration("PT1S"),
+    "formats":xivid:m3u8-to-json(qualities//url)
+  }
+};
+
+================================================================================================
+
+[rumble]
+
+$ url=https://rumble.com/v140n0y-pandamned-documentary.html
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)'
+{
+  "@context": "http://schema.org",
+  "@type": "VideoObject",
+  "name": "PANDAMNED [documentary]",
+  "playerType": "HTML5",
+  "description": "2020 / 2022 - For the past two years, the world population has been under the spell of the coronavirus. Emergency regimes have been established, civil liberties have been dismantled, surveillance prog",
+  "thumbnailUrl": "https://sp.rmbl.ws/s8/1/s/Y/z/a/sYzae.qR4e-small-PANDAMNED-documentary.jpg",
+  "uploadDate": "2022-05-10T09:41:02+00:00",
+  "duration": "PT02H10M36S",
+  "embedUrl": "https://rumble.com/embed/v11eh22/",
+  "url": "https://rumble.com/v140n0y-pandamned-documentary.html",
+  "interactionStatistic": {
+    "@type": "InteractionCounter",
+    "interactionType": {
+      "@type": "http://schema.org/WatchAction"
+    },
+    "userInteractionCount": 34269
+  },
+  "width": 2048,
+  "height": 858,
+  "videoQuality": "Full HD"
+}
+
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})'
+{
+  "url": "https://rumble.com/embedJS/u3/?request=video&ver=2&v=v11eh22"
+}
+
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})/json-doc(url)"
+{
+  "fps": 50,
+  "w": 2048,
+  "h": 858,
+  "u": {
+    "mp4": {
+      "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.caa.mp4",
+      "meta": {
+        "bitrate": 814,
+        "size": 797874019,
+        "w": 854,
+        "h": 358
+      }
+    },
+    "webm": {
+      "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.daa.webm",
+      "meta": {
+        "bitrate": 802,
+        "size": 785610836,
+        "w": 854,
+        "h": 358
+      }
+    }
+  },
+  "ua": {
+    "mp4": {
+      "360": {
+        "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.baa.mp4",
+        "meta": {
+          "bitrate": 636,
+          "size": 623679253,
+          "w": 640,
+          "h": 268
+        }
+      },
+      "480": {
+        "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.caa.mp4",
+        "meta": {
+          "bitrate": 814,
+          "size": 797874019,
+          "w": 854,
+          "h": 358
+        }
+      },
+      "240": {
+        "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.oaa.mp4",
+        "meta": {
+          "bitrate": 203,
+          "size": 199063770,
+          "w": 640,
+          "h": 268
+        }
+      }
+    },
+    "webm": {
+      "480": {
+        "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.daa.webm",
+        "meta": {
+          "bitrate": 802,
+          "size": 785610836,
+          "w": 854,
+          "h": 358
+        }
+      }
+    }
+  },
+  "i": "https://sp.rmbl.ws/s8/1/s/Y/z/a/sYzae.OvCc-small-PANDAMNED-documentary.jpg",
+  "t": [
+    {
+      "i": "https://sp.rmbl.ws/s8/1/s/Y/z/a/sYzae.OvCc-small-PANDAMNED-documentary.jpg",
+      "w": 640,
+      "h": 360
+    },
+    {
+      "i": "https://sp.rmbl.ws/s8/1/s/Y/z/a/sYzae.adyb-small-PANDAMNED-documentary.jpg",
+      "w": 360,
+      "h": 640
+    }
+  ],
+  "evt": {
+    "v": "/l/view...11eh22.dcrmyu",
+    "e": "/l/pte...11eh22.644b8h",
+    "wt": 0,
+    "t": "/l/timeline...11eh22.61o.lg8ilk"
+  },
+  "cc": {
+    "de": {
+      "language": "German",
+      "path": "https://sp.rmbl.ws/s8/11/s/Y/z/a/sYzae.lMcK9b.vtt"
+    },
+    "en": {
+      "language": "English",
+      "path": "https://sp.rmbl.ws/s8/11/s/Y/z/a/sYzae.cfCwZd.vtt"
+    },
+    "nl": {
+      "language": "Dutch",
+      "path": "https://sp.rmbl.ws/s8/11/s/Y/z/a/sYzae.LM3O-d.1.vtt"
+    }
+  },
+  "l": "/v140n0y-pandamned-documentary.html",
+  "r": 1,
+  "title": "PANDAMNED [documentary]",
+  "author": {
+    "name": "MPMedia",
+    "url": "https://rumble.com/user/MPMedia"
+  },
+  "player": false,
+  "duration": 7836,
+  "pubDate": "2022-05-10T09:41:02+00:00",
+  [...]
+}
+
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})/json-doc(url)/{"name":x"{author/name}: {title}","date":dateTime(pubDate),"duration":duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/*/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url}}}'
+{
+  "name": "MPMedia: PANDAMNED [documentary]",
+  "date": "2022-05-10T09:41:02Z",
+  "duration": "PT2H10M36S",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Dutch",
+      "url": "https://sp.rmbl.ws/s8/11/s/Y/z/a/sYzae.LM3O-d.1.vtt"
+    },
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x268",
+      "bitrate": "203kbps",
+      "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.oaa.mp4"
+    },
+    {
+      "id": "pg-2",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x268",
+      "bitrate": "636kbps",
+      "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.baa.mp4"
+    },
+    {
+      "id": "pg-3",
+      "format": "webm[vp8+vorbis]",
+      "resolution": "854x358",
+      "bitrate": "802kbps",
+      "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.daa.webm"
+    },
+    {
+      "id": "pg-4",
+      "format": "mp4[h264+aac]",
+      "resolution": "854x358",
+      "bitrate": "814kbps",
+      "url": "https://sp.rmbl.ws/s8/2/s/Y/z/a/sYzae.caa.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://rumble.com/embed/v11eh22/
+
+$ xidel -se '(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)'
+v11eh22
+
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)})/[...]'
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:rumble($url as string) as object()? {
+  request-combine(
+    "https://rumble.com/embedJS/u3/",
+    {
+      "request":"video",
+      "ver":"2",
+      "v":(
+        if (contains($url,"/embed/"))
+        then $url
+        else parse-json(
+          doc($url)//script[@type="application/ld+json"]
+        )(1)/embedUrl
+      ) ! extract(.,"embed/(.+)/",1)
+    }
+  )/json-doc(url)/{
+    "name":x"{author/name}: {title}",
+    "date":dateTime(pubDate),
+    "duration":duration * duration("PT1S"),
+    "formats":array{
+      cc/nl/{
+        "id":"sub-1",
+        "format":"vtt",
+        "language":"nl",
+        "label":language,
+        "url":path
+      },
+      for $x at $i in ua/*/*
+      order by $x/meta/bitrate
+      count $i
+      return
+      $x/{
+        "id":"pg-"||$i,
+        "format":if (ends-with(url,"webm"))
+          then "webm[vp8+vorbis]"
+          else "mp4[h264+aac]",
+        "resolution":meta/x"{w}x{h}",
+        "bitrate":meta/bitrate||"kbps",
+        "url":url
+      }
+    }
+  }
+};
+
+================================================================================================
+
 [nos]
 
 $ url=https://nos.nl/collectie/13781/video/2385546-bekijk-de-samenvatting-van-nederland-oostenrijk-2-0
@@ -10409,70 +10719,6 @@ declare function xivid:autoblog($url as string) as object()? {
       substring-before(@data-lazy-src,"?")
     )
   )
-};
-
-================================================================================================
-
-[dailymotion]
-
-$ url=https://www.dailymotion.com/video/x5aa1uc
-
-$ xidel -se 'replace("'$url'","video","player/metadata/video")'
-https://www.dailymotion.com/player/metadata/video/x5aa1uc
-
-$ xidel -s --module=xivid.xqm -e 'json-doc(replace("'$url'","video","player/metadata/video"))/{"name":"Dailymotion: "||title,"date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json(qualities//url)}'
-{
-  "name": "Dailymotion: PENOZA Seizoen 3 aflevering 9 (S03E09) [HD]",
-  "date": "2017-02-01T11:16:39Z",
-  "duration": "PT43M44S"
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "192x112",
-      "bitrate": "105kbps",
-      "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4"
-    },
-    [...]
-    {
-      "id": "pg-8",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "836kbps",
-      "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4"
-    },
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?sec=eyMNx4dh_i1GpAS8KZdvuLpv_OYPeXseQRrYAtoqvsjKaTEW2g4-03MeQmu4oIC1"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "192x112",
-      "bitrate": "105kbps",
-      "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-8",
-      "format": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "836kbps",
-      "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-declare function xivid:dailymotion($url as string) as object()? {
-  json-doc(replace($url,"video","player/metadata/video"))/{
-    "name":"Dailymotion: "||title,
-    "date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-    "duration":duration * duration("PT1S"),
-    "formats":xivid:m3u8-to-json(qualities//url)
-  }
 };
 
 ================================================================================================

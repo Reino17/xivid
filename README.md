@@ -69,17 +69,17 @@ npostart.nl             rtvoost.nl             youtube.com
 gemi.st                 omroepwest.nl          youtu.be
 nos.nl                  rijnmond.nl            vimeo.com
 tvblik.nl               rtvutrecht.nl          dailymotion.com
-uitzendinggemist.net    omroepgelderland.nl    twitch.tv
-rtl.nl                  omroepzeeland.nl       mixcloud.com
-rtlxl.nl                omroepbrabant.nl       soundcloud.com
-rtlnieuws.nl            l1.nl                  facebook.com
-kijk.nl                 dumpert.nl             fb.watch
-omropfryslan.nl         autojunk.nl            instagram.com
-rtvnoord.nl             abhd.nl                twitter.com
-rtvdrenthe.nl           autoblog.nl            pornhub.com
-nhnieuws.nl             telegraaf.nl           xhamster.com
-at5.nl                  ad.nl                  youporn.com
-omroepflevoland.nl      lc.nl
+uitzendinggemist.net    omroepgelderland.nl    rumble.com
+rtl.nl                  omroepzeeland.nl       twitch.tv
+rtlxl.nl                omroepbrabant.nl       mixcloud.com
+rtlnieuws.nl            l1.nl                  soundcloud.com
+kijk.nl                 dumpert.nl             facebook.com
+omropfryslan.nl         autojunk.nl            fb.watch
+rtvnoord.nl             abhd.nl                instagram.com
+rtvdrenthe.nl           autoblog.nl            twitter.com
+nhnieuws.nl             telegraaf.nl           pornhub.com
+at5.nl                  ad.nl                  xhamster.com
+omroepflevoland.nl      lc.nl                  youporn.com
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.

@@ -983,6 +983,49 @@ declare function xivid:dailymotion($url as string) as object()? {
   }
 };
 
+declare function xivid:rumble($url as string) as object()? {
+  request-combine(
+    "https://rumble.com/embedJS/u3/",
+    {
+      "request":"video",
+      "ver":"2",
+      "v":(
+        if (contains($url,"/embed/"))
+        then $url
+        else parse-json(
+          doc($url)//script[@type="application/ld+json"]
+        )(1)/embedUrl
+      ) ! extract(.,"embed/(.+)/",1)
+    }
+  )/json-doc(url)/{
+    "name":x"{author/name}: {title}",
+    "date":dateTime(pubDate),
+    "duration":duration * duration("PT1S"),
+    "formats":array{
+      cc/nl/{
+        "id":"sub-1",
+        "format":"vtt",
+        "language":"nl",
+        "label":language,
+        "url":path
+      },
+      for $x at $i in ua/*/*
+      order by $x/meta/bitrate
+      count $i
+      return
+      $x/{
+        "id":"pg-"||$i,
+        "format":if (ends-with(url,"webm"))
+          then "webm[vp8+vorbis]"
+          else "mp4[h264+aac]",
+        "resolution":meta/x"{w}x{h}",
+        "bitrate":meta/bitrate||"kbps",
+        "url":url
+      }
+    }
+  }
+};
+
 declare function xivid:twitch($url as string) as object()? {
   let $call_api:=function($query as object()) as object() {
         x:request({
