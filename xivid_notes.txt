@@ -6190,7 +6190,7 @@ $ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video"
   "url": "https://rumble.com/embedJS/u3/?request=video&ver=2&v=v11eh22"
 }
 
-$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})/json-doc(url)"
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})/json-doc(url)'
 {
   "fps": 50,
   "w": 2048,
@@ -6354,7 +6354,63 @@ $ url=https://rumble.com/embed/v11eh22/
 $ xidel -se '(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)'
 v11eh22
 
+$ url=https://rumble.com/embed/v11eh22
+
+$ xidel -se '(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/?",1)'
+v11eh22
+
 $ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)})/[...]'
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s "https://www.blckbx.tv/gezondheid/angst-voor-ziektekiemen-george-carlin" -e '
+  extract(//div[@class="w-full h-full"]/@x-data,"&apos;(.+)&apos;",1),
+  substring-after(//div[@class="w-full h-full"]/div/@id,"rumble_"),
+  substring-after((//@id)[1],"rumble_")
+'
+vjmcuf
+vjmcuf
+vjmcuf
+
+$ url=vjmcuf
+
+$ xidel -se 'if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)'
+vjmcuf
+
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)})/json-doc(url) ! (title,parse-html(title))'
+&quot;Een neurotische populatie die leeft in angst voor ziektekiemen&quot;
+"Een neurotische populatie die leeft in angst voor ziektekiemen"
+
+$ xidel -s --module=xivid.xqm -e 'xivid:rumble("vjmcuf")'
+{
+  "name": "BLCKBX: \"Een neurotische populatie die leeft in angst voor ziektekiemen\"",
+  "date": "2021-12-31T14:18:00Z",
+  "duration": "PT5M54S",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "vtt",
+      "language": "nl",
+      "label": "Dutch",
+      "url": "https://sp.rmbl.ws/s8/11/B/G/E/o/BGEoc.LM3O-d.vtt"
+    },
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "625kbps",
+      "url": "https://sp.rmbl.ws/s8/2/B/G/E/o/BGEoc.baa.mp4"
+    },
+    [...]
+    {
+      "id": "pg-5",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "2695kbps",
+      "url": "https://sp.rmbl.ws/s8/2/B/G/E/o/BGEoc.haa.mp4"
+    }
+  ]
+}
 
 ------------------------------------------------------------------------------------------------
 
@@ -6364,16 +6420,16 @@ declare function xivid:rumble($url as string) as object()? {
     {
       "request":"video",
       "ver":"2",
-      "v":(
+      "v":if (matches($url,"^v[0-9a-z]+")) then $url else (
         if (contains($url,"/embed/"))
         then $url
         else parse-json(
           doc($url)//script[@type="application/ld+json"]
         )(1)/embedUrl
-      ) ! extract(.,"embed/(.+)/",1)
+      ) ! extract(.,"embed/(.+)/?",1)
     }
   )/json-doc(url)/{
-    "name":x"{author/name}: {title}",
+    "name":x"{author/name}: {parse-html(title)}",
     "date":dateTime(pubDate),
     "duration":duration * duration("PT1S"),
     "formats":array{

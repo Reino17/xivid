@@ -989,16 +989,16 @@ declare function xivid:rumble($url as string) as object()? {
     {
       "request":"video",
       "ver":"2",
-      "v":(
+      "v":if (matches($url,"^v[0-9a-z]+")) then $url else (
         if (contains($url,"/embed/"))
         then $url
         else parse-json(
           doc($url)//script[@type="application/ld+json"]
         )(1)/embedUrl
-      ) ! extract(.,"embed/(.+)/",1)
+      ) ! extract(.,"embed/(.+)/?",1)
     }
   )/json-doc(url)/{
-    "name":x"{author/name}: {title}",
+    "name":x"{author/name}: {parse-html(title)}",
     "date":dateTime(pubDate),
     "duration":duration * duration("PT1S"),
     "formats":array{
