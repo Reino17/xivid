@@ -355,28 +355,35 @@ declare function xivid:bbvms(
  :)
 
 declare function xivid:npo($url as string) as object()? {
-  let $prid:=if (contains($url,"/live/")) then
-        doc($url)//npo-player/@media-id
-      else
-        extract($url,"[A-Z\d_]+$"),
-      $token:=x:request({
+  let $prid:=if (contains($url,"/live/"))
+        then doc($url)//npo-player/@media-id
+        else extract($url,"[A-Z\d_]+$"),
+      $api_token:=x:request({
         "header":"X-Requested-With: XMLHttpRequest",
         "url":"https://www.npostart.nl/api/token"
       })/json/token,
-      $token2:=x:request({
-        "post":"_token="||$token,
+      $player_token:=x:request({
+        "post":"_token="||$api_token,
         "url":"https://www.npostart.nl/player/"||$prid
       })/json,
       $info:=parse-json(
-        doc($token2/embedUrl)//script/extract(.,"var video =(.+);",1)[.]
+        doc($player_token/embedUrl)//script/extract(.,"var video =(.+);",1)[.]
       )
   return
   map:merge((
     if (exists($info)) then $info/{
-      "name":if (type="livetv") then x"{title}: Livestream"
+      "name":if (type=("livetv","liveradio")) then
+        x"NPO: {title} Livestream"
       else concat(
-        franchiseTitle,
-        if (contains(franchiseTitle,title)) then () else ": "||title
+        "NPO: ",franchiseTitle,
+        if (exists(seasonNumber))
+        then concat(
+          " S",format-integer(seasonNumber,"00"),
+          "E",format-integer(episodeNumber,"00")
+        )
+        else if (franchiseTitle = title)
+        then ": "||playerTitle
+        else ": "||title
       ),
       "date":broadcastDate,
       "duration"?:duration * duration("PT1S"),
@@ -397,17 +404,16 @@ declare function xivid:npo($url as string) as object()? {
     {
       "formats"?:array{
         (
-          if (not(exists($info/(subtitles)())) and $info/parentId) then
-            parse-json(
-              doc(
-                x:request({
-                  "post":"_token="||$token,
-                  "url":"https://www.npostart.nl/player/"||$info/parentId
-                })/json/embedUrl
-              )//script/extract(.,"var video =(.+);",1)[.]
-            )
-          else
-            $info
+          if (not(exists($info/(subtitles)())) and $info/parentId)
+          then parse-json(
+            doc(
+              x:request({
+                "post":"_token="||$api_token,
+                "url":"https://www.npostart.nl/player/"||$info/parentId
+              })/json/embedUrl
+            )//script/extract(.,"var video =(.+);",1)[.]
+          )
+          else $info
         )/(subtitles)()/{
           "id":"sub-1",
           "format":"vtt",
@@ -416,12 +422,10 @@ declare function xivid:npo($url as string) as object()? {
           "url":src
         },
         xivid:m3u8-to-json(
-          json-doc(
-            request-combine(
-              x"https://start-player.npo.nl/video/{$prid}/streams",
-              {"profile":"hls","quality":"npo","tokenId":$token2/token}
-            )/url
-          )/stream[not(exists(protection))]/src
+          request-combine(
+            x"https://start-player.npo.nl/video/{$prid}/streams",
+            {"profile":"hls","quality":"npo","tokenId":$player_token/token}
+          )/json-doc(url)/stream[not(exists(protection))]/src
         )()
       }[exists(.())]
     }
@@ -945,7 +949,9 @@ declare function xivid:youtube($url as string) as object()? {
 declare function xivid:vimeo($url as string) as object()? {
   let $id:=extract($url,"\d+$") return
   parse-json(
-    doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.]
+    doc(
+      "https://player.vimeo.com/video/"||$id
+    )//script/extract(.,"config = (.+?);",1)[.]
   )/{
     "name":video/x"{owner/name}: {title}",
     "date"?:if (contains($url,"player.vimeo.com")) then
