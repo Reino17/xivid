@@ -1733,185 +1733,49 @@ declare function xivid:info($json as object()) as string* {
 
 [HLS master playlist ontleding]
 
-'rtl_6beababa-dadb-3506-ac9c-c9ee2701f05c.m3u8':
-
+$ xidel -s npo_AT_300001444.m3u8 -e '$raw'
 #EXTM3U
 #EXT-X-VERSION:1
-## Created with Unified Streaming Platform(version=1.6.6)
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1245963,CODECS="mp4a.40.2,avc1.77.31",RESOLUTION=711x400
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=1050000.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2489343,CODECS="mp4a.40.2,avc1.100.41",RESOLUTION=912x512
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=2223000.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=4386743,CODECS="mp4a.40.2,avc1.100.41",RESOLUTION=1280x720
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=4013000.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=132963,CODECS="mp4a.40.2"
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437.m3u8
+## Created with Unified Streaming Platform(version=1.9.6)
 
-$ xidel -s rtl_6beababa-dadb-3506-ac9c-c9ee2701f05c.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8",0,"s*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
+# variants
+#EXT-X-STREAM-INF:BANDWIDTH=762000,CODECS="mp4a.40.2,avc1.66.30",RESOLUTION=640x360
+AT_300001444_v1635798734-audio=128000-video=590000.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2159000,CODECS="mp4a.40.2,avc1.77.31",RESOLUTION=960x540
+AT_300001444_v1635798734-audio=128000-video=1908000.m3u8
+
+# variants
+#EXT-X-STREAM-INF:BANDWIDTH=136000,CODECS="mp4a.40.2"
+AT_300001444_v1635798734-audio=128000.m3u8
+
+$ xidel -s npo_AT_300001444.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+\n.+",0,"*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
 1
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=132963,CODECS="mp4a.40.2"
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=136000,CODECS="mp4a.40.2"
+AT_300001444_v1635798734-audio=128000.m3u8
 2
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1245963,CODECS="mp4a.40.2,avc1.77.31",RESOLUTION=711x400
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=1050000.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=762000,CODECS="mp4a.40.2,avc1.66.30",RESOLUTION=640x360
+AT_300001444_v1635798734-audio=128000-video=590000.m3u8
 3
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2489343,CODECS="mp4a.40.2,avc1.100.41",RESOLUTION=912x512
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=2223000.m3u8
-4
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=4386743,CODECS="mp4a.40.2,avc1.100.41",RESOLUTION=1280x720
-http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=4013000.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2159000,CODECS="mp4a.40.2,avc1.77.31",RESOLUTION=960x540
+AT_300001444_v1635798734-audio=128000-video=1908000.m3u8
 
-$ xidel -s rtl_6beababa-dadb-3506-ac9c-c9ee2701f05c.m3u8 -e 'let $url:="http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c.m3u8" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8",0,"s*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"audio.+?(\d+)(?:-video.+?(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:extract($x,"RESOLUTION=([\dx]+)",1)[.],"bitrate":(if ($br2[1]) then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|") else round($br div 1000)) ! x"{.}kbps","url":extract($x,".+m3u8")}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c.m3u8"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[aac]",
-    "bitrate": "125kbps",
-    "url": "http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-4",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1280x720",
-    "bitrate": "4013|125kbps",
-    "url": "http://manifest.us.rtl.nl/[...]/6beababa-dadb-3506-ac9c-c9ee2701f05c-audio=125437-video=4013000.m3u8"
+$ xidel -s npo_AT_300001444.m3u8 -e '
+  let $url:="https://npo.prd.cdn.bcms.kpn.com/[...]/playlist.m3u8" return
+  array{
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+\n.+",0,"*")
+    let $br:=extract($x,"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by extract($x,"BANDWIDTH=(\d+)",1)
+    count $i
+    return {
+      "id":"hls-"||$i,
+      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "resolution"?:extract($x,"RESOLUTION=([\dx]+)",1)[.],
+      "bitrate":join((round($br[2] div 1000),round($br[1] div 1000)),"|")||"kbps",
+      "url":resolve-uri(x:lines($x)[last()],$url)
+    }
   }
-]
-
-------------------------------------------------------------------------------------------------
-
-'kijk_zCoXEMbeJeD.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:1
-## Created with Unified Streaming Platform (version=1.10.18-20255)
-
-# variants
-#EXT-X-STREAM-INF:BANDWIDTH=563000,CODECS="mp4a.40.2,avc1.77.30",RESOLUTION=448x252,FRAME-RATE=25,VIDEO-RANGE=SDR
-zCoXEMbeJeD-index-audio=160000-video=370236.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=955000,CODECS="mp4a.40.2,avc1.77.30",RESOLUTION=640x360,FRAME-RATE=25,VIDEO-RANGE=SDR
-zCoXEMbeJeD-index-audio=160000-video=740168.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1782000,CODECS="mp4a.40.2,avc1.77.30",RESOLUTION=768x432,FRAME-RATE=25,VIDEO-RANGE=SDR
-zCoXEMbeJeD-index-audio=160000-video=1520499.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=3392000,CODECS="mp4a.40.2,avc1.77.31",RESOLUTION=1280x720,FRAME-RATE=25,VIDEO-RANGE=SDR
-zCoXEMbeJeD-index-audio=160000-video=3039252.m3u8
-
-# variants
-#EXT-X-STREAM-INF:BANDWIDTH=170000,CODECS="mp4a.40.2"
-zCoXEMbeJeD-index-audio=160000.m3u8
-
-$ xidel -s kijk_zCoXEMbeJeD.m3u8 -e 'let $url:="https://vod-kijk2-prod.talpatvcdn.nl/[...]/zCoXEMbeJeD.m3u8?filter=(systemBitrate%3C3500000)" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8",0,"s*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"audio.+?(\d+)(?:-video.+?(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"FRAME-RATE=(\d+)",1)[.] ! x"@{.}fps")[.],"bitrate":(if ($br2[1]) then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|") else round($br div 1000)) ! x"{.}kbps","url":resolve-uri(extract($x,".+m3u8"),$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://vod-kijk2-prod.talpatvcdn.nl/[...]/zCoXEMbeJeD.m3u8?filter=(systemBitrate%3C3500000)"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[aac]",
-    "bitrate": "160kbps",
-    "url": "https://vod-kijk2-prod.talpatvcdn.nl/[...]/zCoXEMbeJeD-index-audio=160000.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-5",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1280x720@25fps",
-    "bitrate": "3039|160kbps",
-    "url": "https://vod-kijk2-prod.talpatvcdn.nl/[...]/zCoXEMbeJeD-index-audio=160000-video=3039252.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'ofr-live_01082020.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:3
-
-
-#EXT-X-STREAM-INF:BANDWIDTH=2418592,CODECS="avc1.64001f,mp4a.40.2",RESOLUTION=1280x720,FRAME-RATE=25.000
-720p/prog_index.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1526776,CODECS="avc1.64001e,mp4a.40.2",RESOLUTION=854x480,FRAME-RATE=25.000
-540p/prog_index.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=636608,CODECS="avc1.640015,mp4a.40.2",RESOLUTION=426x240,FRAME-RATE=25.000
-270p/prog_index.m3u8
-
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=2000000,CODECS="avc1.64001f",RESOLUTION=1280x720,URI="720p/iframe_prog_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1200000,CODECS="avc1.64001e",RESOLUTION=854x480,URI="540p/iframe_prog_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=400000,CODECS="avc1.640015",RESOLUTION=426x240,URI="270p/iframe_prog_index.m3u8"
-
-$ xidel -se '(25,23.976,25.000) ! round-half-to-even(.,3)'
-25
-23.976
-25
-
-$ xidel -s ofr-live_01082020.m3u8 -e 'let $url:="https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8",0,"s*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"audio.+?(\d+)(?:-video.+?(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br2[1]) then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|") else round($br div 1000)) ! x"{.}kbps","url":resolve-uri(extract($x,".+m3u8"),$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/index.m3u8"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[h264+aac]",
-    "resolution": "426x240@25fps",
-    "bitrate": "637kbps",
-    "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/270p/prog_index.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-3",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1280x720@25fps",
-    "bitrate": "2419kbps",
-    "url": "https://d3pvma9xb2775h.cloudfront.net/live/omropfryslan/stream04/720p/prog_index.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'npo_POW_03373320.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:4
-## Created with Unified Streaming Platform(version=1.7.25)
-
-# AUDIO groups
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-aacl-64",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2"
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-aacl-128",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2"
-
-# variants
-#EXT-X-STREAM-INF:BANDWIDTH=290000,CODECS="mp4a.40.2,avc1.42C01E",RESOLUTION=480x270,AUDIO="audio-aacl-64",CLOSED-CAPTIONS=NONE
-POW_03373320_v4-audio=64000-video=209000.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=684000,CODECS="mp4a.40.2,avc1.42C01E",RESOLUTION=640x360,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-POW_03373320_v4-audio=128000-video=517000.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=900000,CODECS="mp4a.40.2,avc1.42C01F",RESOLUTION=768x432,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-POW_03373320_v4-audio=128000-video=721000.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1225000,CODECS="mp4a.40.2,avc1.42C029",RESOLUTION=1024x576,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-POW_03373320_v4-audio=128000-video=1027000.m3u8
-
-# variants
-#EXT-X-STREAM-INF:BANDWIDTH=68000,CODECS="mp4a.40.2",AUDIO="audio-aacl-64"
-POW_03373320_v4-audio=64000.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=136000,CODECS="mp4a.40.2",AUDIO="audio-aacl-128"
-POW_03373320_v4-audio=128000.m3u8
-
-# keyframes
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=28000,CODECS="avc1.42C01E",RESOLUTION=480x270,URI="keyframes/POW_03373320_v4-video=209000.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=69000,CODECS="avc1.42C01E",RESOLUTION=640x360,URI="keyframes/POW_03373320_v4-video=517000.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=96000,CODECS="avc1.42C01F",RESOLUTION=768x432,URI="keyframes/POW_03373320_v4-video=721000.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=137000,CODECS="avc1.42C029",RESOLUTION=1024x576,URI="keyframes/POW_03373320_v4-video=1027000.m3u8"
-
-$ xidel -s npo_POW_03373320.m3u8 -e 'let $url:="https://npo.prd.cdn.bcms.kpn.com/[...]/playlist.m3u8" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8",0,"s*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br2[1]) then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|") else round($br div 1000)) ! x"{.}kbps","url":resolve-uri(extract($x,".+m3u8"),$url)}}'
+'
 [
   {
     "id": "hls-0",
@@ -1921,243 +1785,101 @@ $ xidel -s npo_POW_03373320.m3u8 -e 'let $url:="https://npo.prd.cdn.bcms.kpn.com
   {
     "id": "hls-1",
     "format": "m3u8[aac]",
-    "bitrate": "64kbps",
-    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03373320_v4-audio=64000.m3u8"
+    "bitrate": "128kbps",
+    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/AT_300001444_v1635798734-audio=128000.m3u8"
+  },
+  {
+    "id": "hls-2",
+    "format": "m3u8[h264+aac]",
+    "resolution": "640x360",
+    "bitrate": "590|128kbps",
+    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/AT_300001444_v1635798734-audio=128000-video=590000.m3u8"
+  },
+  {
+    "id": "hls-3",
+    "format": "m3u8[h264+aac]",
+    "resolution": "960x540",
+    "bitrate": "1908|128kbps",
+    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/AT_300001444_v1635798734-audio=128000-video=1908000.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s kijk_Y0123rst7u9.m3u8 -e '$raw'
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-STREAM-INF:BANDWIDTH=6776321,AVERAGE-BANDWIDTH=6776321,RESOLUTION=1920x1080,FRAME-RATE=25.000,CODECS="avc1.640028,mp4a.40.2"
+15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_1.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=5126286,AVERAGE-BANDWIDTH=5126286,RESOLUTION=1920x1080,FRAME-RATE=25.000,CODECS="avc1.640028,mp4a.40.2"
+15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_2.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=3476321,AVERAGE-BANDWIDTH=3476321,RESOLUTION=1280x720,FRAME-RATE=25.000,CODECS="avc1.64001F,mp4a.40.2"
+15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_3.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=1826286,AVERAGE-BANDWIDTH=1826286,RESOLUTION=768x432,FRAME-RATE=25.000,CODECS="avc1.64001E,mp4a.40.2"
+15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_4.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=944082,AVERAGE-BANDWIDTH=944082,RESOLUTION=640x360,FRAME-RATE=25.000,CODECS="avc1.64001E,mp4a.40.2"
+15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_5.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=507389,AVERAGE-BANDWIDTH=507389,RESOLUTION=448x252,FRAME-RATE=25.000,CODECS="avc1.640015,mp4a.40.2"
+15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_6.m3u8
+
+$ xidel -se '(25,23.976,25.000) ! round-half-to-even(.,3)'
+25
+23.976
+25
+
+$ xidel -s kijk_Y0123rst7u9.m3u8 -e '
+  let $url:="https://vod-nl.prd.talpatvcdn.nl/[...]/index.m3u8" return
+  array{
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+\n.+",0,"*")
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x,"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i,
+      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x,"RESOLUTION=([\dx]+)",1)[.],
+        extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate":if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri(x:lines($x)[last()],$url)
+    }
+  }
+'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://vod-nl.prd.talpatvcdn.nl/[...]/index.m3u8"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[h264+aac]",
+    "resolution": "448x252@25fps",
+    "bitrate": "507kbps",
+    "url": "https://vod-nl.prd.talpatvcdn.nl/[...]/15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_6.m3u8"
   },
   [...]
   {
     "id": "hls-6",
     "format": "m3u8[h264+aac]",
-    "resolution": "1024x576",
-    "bitrate": "1027|128kbps",
-    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/POW_03373320_v4-audio=128000-video=1027000.m3u8"
+    "resolution": "1920x1080@25fps",
+    "bitrate": "6776kbps",
+    "url": "https://vod-nl.prd.talpatvcdn.nl/[...]/15cb26764f994155878f0e97aa533275/9b83a77875d2492c869b1584e4999b77/index_1.m3u8"
   }
 ]
 
 ------------------------------------------------------------------------------------------------
 
-'ad_10065499.m3u8':
-
+$ xidel -s tw_1188986316194635777.m3u8 -e '$raw'
 #EXTM3U
 #EXT-X-INDEPENDENT-SEGMENTS
-#EXT-X-STREAM-INF:BANDWIDTH=2510000,FRAME-RATE=30,RESOLUTION=1280x720,AVERAGE-BANDWIDTH=2360000,CODECS="mp4a.40.2, avc1.64001f"
-https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-#EXT-X-STREAM-INF:BANDWIDTH=1775000,FRAME-RATE=30,RESOLUTION=1280x720,AVERAGE-BANDWIDTH=1660000,CODECS="mp4a.40.2, avc1.64001f"
-https://dcs-vod.apis.anvato.net/vod/p/1775000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-#EXT-X-STREAM-INF:BANDWIDTH=1145000,FRAME-RATE=30,RESOLUTION=640x360,AVERAGE-BANDWIDTH=1060000,CODECS="mp4a.40.2, avc1.64001e"
-https://dcs-vod.apis.anvato.net/vod/p/1145000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-#EXT-X-STREAM-INF:BANDWIDTH=796400,FRAME-RATE=30,RESOLUTION=640x360,AVERAGE-BANDWIDTH=728000,CODECS="mp4a.40.2, avc1.64001e"
-https://dcs-vod.apis.anvato.net/vod/p/796400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-#EXT-X-STREAM-INF:BANDWIDTH=481400,FRAME-RATE=30,RESOLUTION=320x180,AVERAGE-BANDWIDTH=428000,CODECS="mp4a.40.2, avc1.64000d"
-https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=2360000,RESOLUTION=1280x720,CODECS="avc1.64001f",URI="https://dcs-vod.apis.anvato.net/vod/p/2360000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1660000,RESOLUTION=1280x720,CODECS="avc1.64001f",URI="https://dcs-vod.apis.anvato.net/vod/p/1660000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1060000,RESOLUTION=640x360,CODECS="avc1.64001e",URI="https://dcs-vod.apis.anvato.net/vod/p/1060000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=728000,RESOLUTION=640x360,CODECS="avc1.64001e",URI="https://dcs-vod.apis.anvato.net/vod/p/728000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=428000,RESOLUTION=320x180,CODECS="avc1.64000d",URI="https://dcs-vod.apis.anvato.net/vod/p/428000/iframes.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0"
-
-$ xidel -s ad_10065499.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8.*?$",0,"ms*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
-1
-#EXT-X-STREAM-INF:BANDWIDTH=481400,FRAME-RATE=30,RESOLUTION=320x180,AVERAGE-BANDWIDTH=428000,CODECS="mp4a.40.2, avc1.64000d"
-https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-2
-#EXT-X-STREAM-INF:BANDWIDTH=796400,FRAME-RATE=30,RESOLUTION=640x360,AVERAGE-BANDWIDTH=728000,CODECS="mp4a.40.2, avc1.64001e"
-https://dcs-vod.apis.anvato.net/vod/p/796400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-3
-#EXT-X-STREAM-INF:BANDWIDTH=1145000,FRAME-RATE=30,RESOLUTION=640x360,AVERAGE-BANDWIDTH=1060000,CODECS="mp4a.40.2, avc1.64001e"
-https://dcs-vod.apis.anvato.net/vod/p/1145000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-4
-#EXT-X-STREAM-INF:BANDWIDTH=1775000,FRAME-RATE=30,RESOLUTION=1280x720,AVERAGE-BANDWIDTH=1660000,CODECS="mp4a.40.2, avc1.64001f"
-https://dcs-vod.apis.anvato.net/vod/p/1775000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-5
-#EXT-X-STREAM-INF:BANDWIDTH=2510000,FRAME-RATE=30,RESOLUTION=1280x720,AVERAGE-BANDWIDTH=2360000,CODECS="mp4a.40.2, avc1.64001f"
-https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3
-
-$ xidel -s ad_10065499.m3u8 -e 'let $url:="https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+?m3u8.*?$",0,"ms*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br2[1]) then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|") else round($br div 1000)) ! x"{.}kbps","url":resolve-uri(extract($x,".+m3u8.*?$","m"),$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[h264+aac]",
-    "resolution": "320x180@30fps",
-    "bitrate": "481kbps",
-    "url": "https://dcs-vod.apis.anvato.net/vod/p/481400/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3"
-  },
-  [...]
-  {
-    "id": "hls-5",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1280x720@30fps",
-    "bitrate": "2510kbps",
-    "url": "https://dcs-vod.apis.anvato.net/vod/p/2510000/prog.m3u8?i=i177995803-n1a98e8e5-00aa-4252-9c7e-c3e23ea87ea0&anvtrid=97c39460bebcfff373ceade45edacbe3"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'npo_POW_04059460.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:4
-## Created with Unified Streaming Platform(version=1.7.18) - generated by HMG
-
-# AUDIO groups
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-aacl-128",LANGUAGE="en",NAME="English",DEFAULT=YES,AUTOSELECT=YES,URI="a1/a1.m3u8"
-
-# variants
-#EXT-X-STREAM-INF:BANDWIDTH=1526000,AVERAGE-BANDWIDTH=1398000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=768x432,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v4/v4.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=707000,AVERAGE-BANDWIDTH=658000,CODECS="avc1.4D401F,mp4a.40.2",RESOLUTION=480x270,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v5/v5.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=882000,AVERAGE-BANDWIDTH=815000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=480x270,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v6/v6.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=446000,AVERAGE-BANDWIDTH=412000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=320x180,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v7/v7.m3u8
-
-# keyframes
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=439000,AVERAGE-BANDWIDTH=197000,CODECS="avc1.42C01E",RESOLUTION=768x432,URI="v4/iframe_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=227000,AVERAGE-BANDWIDTH=102000,CODECS="avc1.4D401F",RESOLUTION=480x270,URI="v5/iframe_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=312000,AVERAGE-BANDWIDTH=106000,CODECS="avc1.42C01E",RESOLUTION=480x270,URI="v6/iframe_index.m3u8"
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=134000,AVERAGE-BANDWIDTH=48000,CODECS="avc1.42C01E",RESOLUTION=320x180,URI="v7/iframe_index.m3u8"
-
-$ xidel -s npo_POW_04059460.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=AUDIO|STREAM-INF).+?m3u8.*?$",0,"ms*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
-1
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-aacl-128",LANGUAGE="en",NAME="English",DEFAULT=YES,AUTOSELECT=YES,URI="a1/a1.m3u8"
-2
-#EXT-X-STREAM-INF:BANDWIDTH=446000,AVERAGE-BANDWIDTH=412000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=320x180,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v7/v7.m3u8
-3
-#EXT-X-STREAM-INF:BANDWIDTH=707000,AVERAGE-BANDWIDTH=658000,CODECS="avc1.4D401F,mp4a.40.2",RESOLUTION=480x270,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v5/v5.m3u8
-4
-#EXT-X-STREAM-INF:BANDWIDTH=882000,AVERAGE-BANDWIDTH=815000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=480x270,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v6/v6.m3u8
-5
-#EXT-X-STREAM-INF:BANDWIDTH=1526000,AVERAGE-BANDWIDTH=1398000,CODECS="avc1.42C01E,mp4a.40.2",RESOLUTION=768x432,AUDIO="audio-aacl-128",CLOSED-CAPTIONS=NONE
-v4/v4.m3u8
-
-$ xidel -s npo_POW_04059460.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=AUDIO|STREAM-INF).+?m3u8.*?$",0,"ms*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return join(((if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br div 1000))[1]) ! x"{.}kbps",if (contains($x,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else x:lines($x)[last()]))'
-128kbps a1/a1.m3u8
-446kbps v7/v7.m3u8
-707kbps v5/v5.m3u8
-882kbps v6/v6.m3u8
-1526kbps v4/v4.m3u8
-
-$ xidel -s npo_POW_04059460.m3u8 -e 'let $url:="https://nl-ams-p22-am3.cdn.streamgate.nl/[...]/POW_04059460_v1563215505/playlist.m3u8" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=AUDIO|STREAM-INF).+?m3u8.*?$",0,"ms*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br div 1000))[1]) ! x"{.}kbps","url":resolve-uri(if (contains($x,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else x:lines($x)[last()],$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://nl-ams-p22-am3.cdn.streamgate.nl/[...]/POW_04059460_v1563215505/playlist.m3u8"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[aac]",
-    "bitrate": "128kbps",
-    "url": "https://nl-ams-p22-am3.cdn.streamgate.nl/[...]/POW_04059460_v1563215505/a1/a1.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-5",
-    "format": "m3u8[h264+aac]",
-    "resolution": "768x432",
-    "bitrate": "1526kbps",
-    "url": "https://nl-ams-p22-am3.cdn.streamgate.nl/[...]/POW_04059460_v1563215505/v4/v4.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'twitch_esl_csgo.m3u8':
-
-#EXTM3U
-#EXT-X-TWITCH-INFO:NODE="video-edge-c55efc.ams02",MANIFEST-NODE-TYPE="weaver_cluster",MANIFEST-NODE="video-weaver.ams02",SUPPRESS="true",SERVER-TIME="1573922640.92",TRANSCODESTACK="2017TranscodeEvent_V2",USER-IP="x.x.x.x",SERVING-ID="c1a092ae8e644510873ee3fac41e41e2",CLUSTER="ams02",ABS="false",VIDEO-SESSION-ID="3757567538117581635",BROADCAST-ID="178058097",STREAM-TIME="2064.919954",B="false",USER-COUNTRY="NL",MANIFEST-CLUSTER="ams02"
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="chunked",NAME="1080p60 (source)",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6964137,RESOLUTION=1920x1080,CODECS="avc1.4D402A,mp4a.40.2",VIDEO="chunked"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="720p60",NAME="720p60",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3459825,RESOLUTION=1280x720,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="720p60"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="720p30",NAME="720p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2409825,RESOLUTION=1280x720,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="720p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="480p30",NAME="480p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1464825,RESOLUTION=852x480,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="480p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="360p30",NAME="360p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=630000,RESOLUTION=640x360,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="360p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="160p30",NAME="160p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=230000,RESOLUTION=284x160,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="160p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="audio_only",NAME="audio_only",AUTOSELECT=NO,DEFAULT=NO
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=195072,CODECS="mp4a.40.2",VIDEO="audio_only"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-
-$ xidel -s twitch_esl_csgo.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
-1
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="audio_only",NAME="audio_only",AUTOSELECT=NO,DEFAULT=NO
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=195072,CODECS="mp4a.40.2",VIDEO="audio_only"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-2
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="160p30",NAME="160p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=230000,RESOLUTION=284x160,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="160p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-3
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="360p30",NAME="360p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=630000,RESOLUTION=640x360,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="360p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-4
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="480p30",NAME="480p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1464825,RESOLUTION=852x480,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="480p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-5
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="720p30",NAME="720p",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2409825,RESOLUTION=1280x720,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="720p30"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-6
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="720p60",NAME="720p60",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3459825,RESOLUTION=1280x720,CODECS="avc1.4D401F,mp4a.40.2",VIDEO="720p60"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-7
-#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID="chunked",NAME="1080p60 (source)",AUTOSELECT=YES,DEFAULT=YES
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6964137,RESOLUTION=1920x1080,CODECS="avc1.4D402A,mp4a.40.2",VIDEO="chunked"
-https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8
-
-$ xidel -s twitch_esl_csgo.m3u8 -e 'let $url:="https://usher.ttvnw.net/api/channel/hls/esl_csgo.m3u8?[...]" return array{{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-(?:MEDIA|STREAM-INF).+?m3u8.*?$",0,"ms*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br div 1000))[1]) ! x"{.}kbps","url":resolve-uri(if (contains($x,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else x:lines($x)[last()],$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://usher.ttvnw.net/api/channel/hls/esl_csgo.m3u8?[...]"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[aac]",
-    "bitrate": "195kbps",
-    "url": "https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8"
-  },
-  [...]
-  {
-    "id": "hls-7",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1920x1080@60fps",
-    "bitrate": "6964kbps",
-    "url": "https://video-weaver.ams02.hls.ttvnw.net/v1/playlist/[...].m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'tw_1188986316194635777.m3u8':
-
-#EXTM3U
-#EXT-X-INDEPENDENT-SEGMENTS
-#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="en",DEFAULT=NO,FORCED=NO,URI="/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8",LANGUAGE="en",AUTOSELECT=YES,CHARACTERISTICS="twitter.show-text-when-muted"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=NO,FORCED=NO,URI="/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8",LANGUAGE="en",AUTOSELECT=YES,CHARACTERISTICS="twitter.show-text-when-muted"
 #EXT-X-STREAM-INF:BANDWIDTH=288000,RESOLUTION=648x270,CODECS="mp4a.40.2,avc1.4d001f",SUBTITLES="subs"
 /amplify_video/1188974444523315201/pl/648x270/O7Yd4NsLa4hRURCX.m3u8
 #EXT-X-STREAM-INF:BANDWIDTH=832000,RESOLUTION=866x360,CODECS="mp4a.40.2,avc1.4d001f",SUBTITLES="subs"
@@ -2166,31 +1888,50 @@ $ xidel -s twitch_esl_csgo.m3u8 -e 'let $url:="https://usher.ttvnw.net/api/chann
 /amplify_video/1188974444523315201/pl/1732x720/yG0_asM0v9yBC-Xd.m3u8
 
 $ xidel -s tw_1188986316194635777.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")'
-#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="en",DEFAULT=NO,FORCED=NO,URI="/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8",LANGUAGE="en",AUTOSELECT=YES,CHARACTERISTICS="twitter.show-text-when-muted"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=NO,FORCED=NO,URI="/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8",LANGUAGE="en",AUTOSELECT=YES,CHARACTERISTICS="twitter.show-text-when-muted"
 
-$ xidel -s tw_1188986316194635777.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
-1
-#EXT-X-STREAM-INF:BANDWIDTH=288000,RESOLUTION=648x270,CODECS="mp4a.40.2,avc1.4d001f",SUBTITLES="subs"
-/amplify_video/1188974444523315201/pl/648x270/O7Yd4NsLa4hRURCX.m3u8
-2
-#EXT-X-STREAM-INF:BANDWIDTH=832000,RESOLUTION=866x360,CODECS="mp4a.40.2,avc1.4d001f",SUBTITLES="subs"
-/amplify_video/1188974444523315201/pl/866x360/ExSrz_uR9F_iO7O_.m3u8
-3
-#EXT-X-STREAM-INF:BANDWIDTH=2176000,RESOLUTION=1732x720,CODECS="mp4a.40.2,avc1.64002a",SUBTITLES="subs"
-/amplify_video/1188974444523315201/pl/1732x720/yG0_asM0v9yBC-Xd.m3u8
-
-$ xidel -s tw_1188986316194635777.m3u8 -e 'let $url:="https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13" return array{extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br div 1000))[1]) ! x"{.}kbps","url":resolve-uri(if (contains($x,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else x:lines($x)[last()],$url)}}'
+$ xidel -s tw_1188986316194635777.m3u8 -e '
+  let $url:="https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13&v=6b4" return
+  array{
+    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x,"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i,
+      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x,"RESOLUTION=([\dx]+)",1)[.],
+        extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate":if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri(x:lines($x)[last()],$url)
+    }
+  }
+'
 [
   {
     "id": "sub-1",
     "format": "m3u8[vtt]",
     "language": "en",
+    "label": "English",
     "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8"
   },
   {
     "id": "hls-0",
     "format": "m3u8[manifest]",
-    "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13"
+    "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13&v=6b4"
   },
   {
     "id": "hls-1",
@@ -2211,336 +1952,36 @@ $ xidel -s tw_1188986316194635777.m3u8 -e 'let $url:="https://video.twimg.com/am
 
 ------------------------------------------------------------------------------------------------
 
-'dm_x5aa1uc.m3u8':
-
+$ xidel -s dm_x5aa1uc.m3u8 -e '$raw'
 #EXTM3U
-#EXT-X-STREAM-INF:BANDWIDTH=246440,CODECS="mp4a.40.5,avc1.42000d",RESOLUTION=320x184,NAME="240",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=246440,CODECS="mp4a.40.5,avc1.42000d",RESOLUTION=320x184,NAME="240",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=105040,CODECS="mp4a.40.5,avc1.42000b",RESOLUTION=192x112,NAME="144",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=105040,CODECS="mp4a.40.5,avc1.42000b",RESOLUTION=192x112,NAME="144",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=460560,CODECS="mp4a.40.5,avc1.420016",RESOLUTION=512x288,NAME="380",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=460560,CODECS="mp4a.40.5,avc1.420016",RESOLUTION=512x288,NAME="380",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=836280,CODECS="mp4a.40.2,avc1.64001f",RESOLUTION=640x360,NAME="480",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8#cell=core&qos_part=1&qos_stail=1
-#EXT-X-STREAM-INF:BANDWIDTH=836280,CODECS="mp4a.40.2,avc1.64001f",RESOLUTION=640x360,NAME="480",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4#cell=core&qos_part=1&qos_stail=1"
-https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8#cell=core&qos_part=1&qos_stail=1
+#EXT-X-STREAM-INF:BANDWIDTH=460560,CODECS="mp4a.40.5,avc1.420016",RESOLUTION=512x288,NAME="380",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.mp4#cell=core"
+https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=460560,CODECS="mp4a.40.5,avc1.420016",RESOLUTION=512x288,NAME="380",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.mp4#cell=core"
+https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=105040,CODECS="mp4a.40.5,avc1.42000b",RESOLUTION=192x112,NAME="144",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4#cell=core"
+https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=105040,CODECS="mp4a.40.5,avc1.42000b",RESOLUTION=192x112,NAME="144",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4#cell=core"
+https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=246440,CODECS="mp4a.40.5,avc1.42000d",RESOLUTION=320x184,NAME="240",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.mp4#cell=core"
+https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=246440,CODECS="mp4a.40.5,avc1.42000d",RESOLUTION=320x184,NAME="240",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.mp4#cell=core"
+https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_ld_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=836280,CODECS="mp4a.40.2,avc1.64001f",RESOLUTION=640x360,NAME="480",PROGRESSIVE-URI="https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4#cell=core"
+https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8#cell=core
+#EXT-X-STREAM-INF:BANDWIDTH=836280,CODECS="mp4a.40.2,avc1.64001f",RESOLUTION=640x360,NAME="480",PROGRESSIVE-URI="https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4#cell=core"
+https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8#cell=core
 
-$ xidel -s dm_x5aa1uc.m3u8 -e 'let $streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return array{for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)}}'
-[
-  {
-    "id": "pg-1",
-    "format": "mp4[h264+aac]",
-    "resolution": "192x112",
-    "bitrate": "105kbps",
-    "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4"
-  },
-  [...]
-  {
-    "id": "pg-8",
-    "format": "mp4[h264+aac]",
-    "resolution": "640x360",
-    "bitrate": "836kbps",
-    "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4"
-  }
-]
-
-$ xidel -s dm_x5aa1uc.m3u8 -e 'let $url:="https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?sec=eyMNx4dh_i1GpAS8KZdvuLpv_OYPeXseQRrYAtoqvsjKaTEW2g4-03MeQmu4oIC1",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return array{extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate":(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br div 1000))[1]) ! x"{.}kbps","url":resolve-uri(x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")),$url)}}'
-[
-  {
-    "id": "pg-1",
-    "format": "mp4[h264+aac]",
-    "resolution": "192x112",
-    "bitrate": "105kbps",
-    "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4"
-  },
-  [...]
-  {
-    "id": "pg-8",
-    "format": "mp4[h264+aac]",
-    "resolution": "640x360",
-    "bitrate": "836kbps",
-    "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4"
-  },
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?sec=eyMNx4dh_i1GpAS8KZdvuLpv_OYPeXseQRrYAtoqvsjKaTEW2g4-03MeQmu4oIC1"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[h264+aac]",
-    "resolution": "192x112",
-    "bitrate": "105kbps",
-    "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-8",
-    "format": "m3u8[h264+aac]",
-    "resolution": "640x360",
-    "bitrate": "836kbps",
-    "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'vimeo_238924796.m3u8':
-
-#EXTM3U
-#EXT-X-INDEPENDENT-SEGMENTS
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-medium",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/853938837/playlist.m3u8"
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-high",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/853938829/playlist.m3u8"
-
-#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=657686,AVERAGE-BANDWIDTH=485000,RESOLUTION=640x360,FRAME-RATE=25.000,CODECS="avc1.64001E,mp4a.40.2",AUDIO="audio-medium"
-../853938837/playlist.m3u8
-#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=996877,AVERAGE-BANDWIDTH=624000,RESOLUTION=704x396,FRAME-RATE=25.000,CODECS="avc1.64001F,mp4a.40.2",AUDIO="audio-medium"
-../853938829/playlist.m3u8
-
-$ xidel -s vimeo_238924796.m3u8 -e 'let $streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return (if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! x"{.}kbps"'
-658kbps
-997kbps
-
-$ xidel -s vimeo_238924796.m3u8 -e 'let $url:="https://197vod-adaptive.akamaized.net/exp=1606676297~acl=%2F238924796%2F%2A~hmac=02b379efe1250180b199bb4d6270271972a767a81e976b9442d92c76d178aa06/238924796/sep/video/853938837,853938829/master.m3u8",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return array{extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate"?:(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! x"{.}kbps","url":resolve-uri(x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")),$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://197vod-adaptive.akamaized.net/[...]/853938837,853938829/master.m3u8"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[aac]",
-    "url": "https://197vod-adaptive.akamaized.net/[...]/853938837/playlist.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-4",
-    "format": "m3u8[h264+aac]",
-    "resolution": "704x396@25fps",
-    "bitrate": "997kbps",
-    "url": "https://197vod-adaptive.akamaized.net/[...]/853938829/playlist.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'nhnieuws_live.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-STREAM-INF:BANDWIDTH=1153433,RESOLUTION=640x360
-https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/chunklist_b1048576.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=2306867,RESOLUTION=1280x720
-https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/chunklist_b2097152.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=3487334,RESOLUTION=1920x1080
-https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/chunklist_b3170304.m3u8
-
-$ xidel -s nhnieuws_live.m3u8 -e 'let $url:="https://ngx.cr2.streamzilla.xlcdn.com/session/5f846bc4dafa168ea170d645fd5c892e/sz/nhnieuws/wowza4/live/live.smil/playlist.m3u8?token=UgzahPavoxmi-u_WRJaG9g&amp;time=1606692116",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return array{extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in $streams let $br:=extract($x,"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate"?:(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! x"{.}kbps","url":resolve-uri(x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")),$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://ngx.cr2.streamzilla.xlcdn.com/[...]/playlist.m3u8?token=UgzahPavoxmi-u_WRJaG9g&time=1606692116"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[h264+aac]",
-    "resolution": "640x360",
-    "bitrate": "1153kbps",
-    "url": "https://ngx.cr2.streamzilla.xlcdn.com/[...]/chunklist_b1048576.m3u8"
-  },
-  [...]
-  {
-    "id": "hls-3",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1920x1080",
-    "bitrate": "3487kbps",
-    "url": "https://ngx.cr2.streamzilla.xlcdn.com/[...]/chunklist_b3170304.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'rtl_37f2e7ec-5a27-3084-981b-1f77bd06732d.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:4
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="audioname",DEFAULT=YES,URI="QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
-#EXT-X-STREAM-INF:BANDWIDTH=517546,RESOLUTION=336x192,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(365000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=517546,RESOLUTION=336x192,CODECS="avc1.4d401f",URI="QualityLevels(365000)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
-#EXT-X-STREAM-INF:BANDWIDTH=737276,RESOLUTION=512x288,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(580000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=737276,RESOLUTION=512x288,CODECS="avc1.4d401f",URI="QualityLevels(580000)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
-#EXT-X-STREAM-INF:BANDWIDTH=1140966,RESOLUTION=704x400,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(975000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1140966,RESOLUTION=704x400,CODECS="avc1.4d401f",URI="QualityLevels(975000)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
-#EXT-X-STREAM-INF:BANDWIDTH=2435840,RESOLUTION=912x512,CODECS="avc1.640029,mp4a.40.2",AUDIO="audio"
-QualityLevels(2242000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=2435840,RESOLUTION=912x512,CODECS="avc1.640029",URI="QualityLevels(2242000)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
-#EXT-X-STREAM-INF:BANDWIDTH=4356178,RESOLUTION=1280x720,CODECS="avc1.640029,mp4a.40.2",AUDIO="audio"
-QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=4356178,RESOLUTION=1280x720,CODECS="avc1.640029",URI="QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
-#EXT-X-STREAM-INF:BANDWIDTH=136356,CODECS="mp4a.40.2",AUDIO="audio"
-QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
-
-$ xidel -s rtl_37f2e7ec-5a27-3084-981b-1f77bd06732d.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") order by extract($x,"BANDWIDTH=(\d+)",1) count $i return ($i,$x)'
-1
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="audioname",DEFAULT=YES,URI="QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
-2
-#EXT-X-STREAM-INF:BANDWIDTH=136356,CODECS="mp4a.40.2",AUDIO="audio"
-QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)   # Twee keer dezelfde audiostream.
-3
-#EXT-X-STREAM-INF:BANDWIDTH=517546,RESOLUTION=336x192,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(365000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-4
-#EXT-X-STREAM-INF:BANDWIDTH=737276,RESOLUTION=512x288,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(580000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-5
-#EXT-X-STREAM-INF:BANDWIDTH=1140966,RESOLUTION=704x400,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(975000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-6
-#EXT-X-STREAM-INF:BANDWIDTH=2435840,RESOLUTION=912x512,CODECS="avc1.640029,mp4a.40.2",AUDIO="audio"
-QualityLevels(2242000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-7
-#EXT-X-STREAM-INF:BANDWIDTH=4356178,RESOLUTION=1280x720,CODECS="avc1.640029,mp4a.40.2",AUDIO="audio"
-QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-
-$ xidel -s rtl_37f2e7ec-5a27-3084-981b-1f77bd06732d.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") group by $path:=x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else .) let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return ($i,$x[last()])'
-1
-#EXT-X-STREAM-INF:BANDWIDTH=136356,CODECS="mp4a.40.2",AUDIO="audio"
-QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
-2
-#EXT-X-STREAM-INF:BANDWIDTH=517546,RESOLUTION=336x192,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(365000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-3
-#EXT-X-STREAM-INF:BANDWIDTH=737276,RESOLUTION=512x288,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(580000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-4
-#EXT-X-STREAM-INF:BANDWIDTH=1140966,RESOLUTION=704x400,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
-QualityLevels(975000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-5
-#EXT-X-STREAM-INF:BANDWIDTH=2435840,RESOLUTION=912x512,CODECS="avc1.640029,mp4a.40.2",AUDIO="audio"
-QualityLevels(2242000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-6
-#EXT-X-STREAM-INF:BANDWIDTH=4356178,RESOLUTION=1280x720,CODECS="avc1.640029,mp4a.40.2",AUDIO="audio"
-QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
-
-$ xidel -s rtl_37f2e7ec-5a27-3084-981b-1f77bd06732d.m3u8 -e 'let $url:="https://cdn-rtlvod-h9.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return array{extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$url},for $x at $i in $streams group by $path:=x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")) let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate"?:(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! x"{.}kbps","url":resolve-uri($path,$url)}}'
-[
-  {
-    "id": "hls-0",
-    "format": "m3u8[manifest]",
-    "url": "https://cdn-rtlvod-h9.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8"
-  },
-  {
-    "id": "hls-1",
-    "format": "m3u8[aac]",
-    "bitrate": "136kbps",
-    "url": "https://cdn-rtlvod-h9.akamaized.net/[...]/QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
-  },
-  [...]
-  {
-    "id": "hls-6",
-    "format": "m3u8[h264+aac]",
-    "resolution": "1280x720",
-    "bitrate": "4356kbps",
-    "url": "https://cdn-rtlvod-h9.akamaized.net/[...]/QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-'ogl_live.m3u8':
-
-#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-MEDIA-SEQUENCE:10141
-#EXT-X-TARGETDURATION:8
-#EXTINF:5.000,
-5476820400.ts
-#EXTINF:6.720,
-5477270400.ts
-#EXTINF:8.360,
-5477875200.ts
-#EXTINF:2.440,
-5478627600.ts
-#EXTINF:6.040,
-5478847200.ts
-
-$ xidel -s ogl_live.m3u8 -e 'let $url:="https://d2od87akyl46nm.cloudfront.net/live/omroepgelderland/tvlive/index.m3u8",$streams:=extract($raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (not(exists($streams))) then array{{"id":"hls-1","format":"m3u8[h264+aac]","url":$url}} else ()'
-[
-  {
-    "id": "hls-1",
-    "format": "m3u8[h264+aac]",
-    "url": "https://d2od87akyl46nm.cloudfront.net/live/omroepgelderland/tvlive/index.m3u8"
-  }
-]
-
-------------------------------------------------------------------------------------------------
-
-$ xidel -se 'x:request({"url":"https://streams.rtvoost.nl/video/tv/hls.m3u8","error-handling":"4xx=accept"})/url'
-https://mediacdn.rtvoost.nl/live/rtvoost/tv-oost/index.m3u8
-
-$ xidel -se 'x:request({"url":"https://tkx.apis.anvato.net/rest/v2/mcp/video/10065499~~syv8ed1JI0T0eA/master.m3u8?anvack=yjqOEWaqi37WK2u26oMesa6LMGiJNeZl","error-handling":"4xx=accept"})/url'
-https://dcs-vod.apis.anvato.net/vod/p/master.m3u8?encp=i57yUPHvLu2RUlFLg_QKoA:2VA_PSLbbNUp302PxtXXfQENkIA4s9mOL2qycWG-NZbrTMfVlwL05yCZg3q5VcghXoYLrAHSl9xn0eHZBymWIjmtnJpc005GKCimwfnYHEoEJFeuwBPwdMe5Qmb-OvhlSoUTRA6xZt2HSmFnt8wb8ayty9Wt2XQb9mL_arnk0OEQ7XOn7dUNXsLRg1RIjWVf18vhZOSNhMBrN3-hEIcJKb75fwIYhqdAD9w85IexSrYAJqcYmenrqAoyUZGeuCN3Hlc3PJgs6jV_qw_-wOen6neNGZBT8CFmNma85Vfdw7bt8y3-DtDkx70xjb8bhOmOESzetf7Aels7NghNP-WhI0iYyc7pL14p2pyJYoyW_QV_CxpktikfJ8GJ5BOghLBueYwcSiGwIkkt2z2TCTghCnHuRimM03xi292D4mp62uqM_7-iRlRHhztQVPlCu3jV4aSKNUNCo40I3c-mB2A2Nyr-hIJMmbThTIe-Hp1hMq2EX5BDKKGCdaqfjg4KYa7X_ERbjJNGcQ1cMmyMswvXY-uY8H9wBcEPQvuoEPXy5gRzFdORfgJiYRZJBk_DOjufq1Dxiy_55Bhmw-Bw2hRnMoHFz2j1eZ_UyIolJ76Xz1nsOjOt_AxY0eineGSHmmSF-kEUKGLRetXgEhuvR0UoX31Y3vtMG0v8PI-XPvgKATdBHc7jj9di2fZyQhukmjnQC1sEu9MM3nnHOqrSmbkvQtADsfFcuyTcfdJlnhcufU9QgdzjWsS3-EKq9-kcvf3TtqNQX1yWDLQPSfSjHEzkdZDAccx6FmXESQkfMeRluufUitGistOucgu89xRLty9--SlGxMpvvZs_uw_4hVC6ba7-vUsLO0bB4cP66tKb809uM9uqy2dVHwoBLSnYKGKti0RvRVkotgPpo1SsYBA49fq9IBTnFiBqKQMlm2IsNQthun1fM4WdI3MhePl68upVzm61qcCpwKIYEF55Bb3bzA&anvtrid=2c422506e010d9c092ad6564d06c7c9a&anvauth=tb=0~te=1570918109~sgn=422231fded672998b6d2cc3f7031c8a08349df211a8c303c79b28d44a3c441a4&t=1570918019
-
-- Creëer de JSON met de redirected-url door 'x:request()' toe te voegen, maar gebruik de initiële url als de redirected-url vreselijk lang is, bijv. door een lang token.
-
-'kijk_4KH25s3dZRH.m3u8'   # Met de nieuwe "theplatform" api wordt het helaas bij de HLS playlist pas duidelijk dat de video beveiligd is met DRM.
-
-#EXTM3U
-#EXT-X-VERSION:4
-## Created with Unified Streaming Platform (version=1.10.18-20255)
-#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
-[...]
-
-- Filter deze in de 'x:request()' er al uit met 'not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))'.
-
-- Creëer een m3u8-to-json functie van deze query.
-
-$ xidel -se 'declare function local:m3u8-to-json($url as string?) as array() {let $m3u8:=x:request({"url":$url,"error-handling":"4xx=accept"}[url])[raw[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],$m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,$streams:=extract($m3u8/raw,"#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",0,"ms*") return if (exists($m3u8) and not(exists($streams))) then array{{"id":"hls-1","format":"m3u8[h264+aac]","url":$m3u8Url}} else array{extract($m3u8/raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {"id":"sub-1","format":"m3u8[vtt]","language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),"url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$m3u8Url)},for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")] let $br:=extract($x,"BANDWIDTH=(\d+)",1) order by $br count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x,"RESOLUTION=([\dx]+)",1),"bitrate":round($br div 1000)||"kbps","url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)},{"id":"hls-0","format":"m3u8[manifest]","url":$m3u8Url}[url],for $x at $i in $streams group by $path:=x:lines($x)[last()] ! (if (contains(.,"URI=")) then extract($x,"URI=&quot;(.+)&quot;",1) else replace(.,"#.+","")) let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),$br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],$br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.] order by $br count $i return {"id":"hls-"||$i,"format":if (contains($x,"avc1") or contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]","resolution"?:concat(extract($x,"RESOLUTION=([\dx]+)",1)[.],extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps")[.],"bitrate"?:(if ($br3[1]) then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|") else ($br2,round($br[.] div 1000))[1]) ! x"{.}kbps","url":resolve-uri($path,$m3u8Url)}}}; local:m3u8-to-json(<url>)'
-
-string    # Een string.
-string+   # Eén of meerdere strings.
-string*   # Nul of meerdere strings.
-string?   # Nul of één string.
-
-------------------------------------------------------------------------------------------------
-
-declare function xivid:m3u8-to-json($url as string?) as array() {
-  let $m3u8:=x:request(
-        {"url":$url,"error-handling":"4xx=accept"}[url]
-      )[raw[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
-      $m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,
-      $streams:=extract(
-        $m3u8/raw,
-        "#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",
-        0,"ms*"
-      )
+$ xidel -s dm_x5aa1uc.m3u8 -e '
+  let $url:="https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?[...]",
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
-  if (exists($m3u8) and not(exists($streams))) then array{
-    {
-      "id":"hls-1",
-      "format":"m3u8[h264+aac]",
-      "url":$m3u8Url
-    }
-  } else array{
-    extract($m3u8/raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+  array{
+    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
-      "url":resolve-uri(
-        extract(.,"URI=&quot;(.+?)&quot;",1),
-        $m3u8Url
-      )
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
     for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
@@ -2551,40 +1992,525 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
       "format":"mp4[h264+aac]",
       "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
       "bitrate":round($br div 1000)||"kbps",
-      "url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
-    {
-      "id":"hls-0",
-      "format":"m3u8[manifest]",
-      "url":$m3u8Url
-    }[url],
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
     for $x at $i in $streams
-    group by $path:=x:lines($x)[last()] ! (
-      if (contains(.,"URI="))
-      then extract($x,"URI=&quot;(.+)&quot;",1)
-      else replace(.,"#.+","")
-    )
-    let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
-        $br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],
-        $br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.]
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x,"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
     order by $br
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1") or contains($x,"RESOLUTION"))
-        then "m3u8[h264+aac]"
-        else "m3u8[aac]",
+      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
       "resolution"?:concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
-        extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] !
-          x"@{round-half-to-even(.,3)}fps"
+        extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
       )[.],
-      "bitrate"?:(
-        if ($br3[1])
-        then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|")
-        else ($br2,round($br[.] div 1000))[1]
-      ) ! x"{.}kbps",
-      "url":resolve-uri($path,$m3u8Url)
+      "bitrate":if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri(x:lines($x)[last()],$url)
+    }
+  }
+'
+[
+  {
+    "id": "pg-1",
+    "format": "mp4[h264+aac]",
+    "resolution": "192x112",
+    "bitrate": "105kbps",
+    "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.mp4#cell=core"
+  },
+  [...]
+  {
+    "id": "pg-8",
+    "format": "mp4[h264+aac]",
+    "resolution": "640x360",
+    "bitrate": "836kbps",
+    "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.mp4#cell=core"
+  },
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://www.dailymotion.com/cdn/manifest/video/x5aa1uc.m3u8?[...]"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[h264+aac]",
+    "resolution": "192x112",
+    "bitrate": "105kbps",
+    "url": "https://proxy-019.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_l2_1.m3u8#cell=core"
+  },
+  [...]
+  {
+    "id": "hls-8",
+    "format": "m3u8[h264+aac]",
+    "resolution": "640x360",
+    "bitrate": "836kbps",
+    "url": "https://proxy-022.dc3.dailymotion.com/[...]/319595988_mp4_h264_aac_hq_1.m3u8#cell=core"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s vimeo_224661084.m3u8 -e '$raw'
+#EXTM3U
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-medium",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/ed897e25/playlist.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-high",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/cf52b380/playlist.m3u8"
+
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=3242378,AVERAGE-BANDWIDTH=2608000,RESOLUTION=1366x572,FRAME-RATE=25.000,CODECS="avc1.640020,mp4a.40.2",AUDIO="audio-high"
+../cf52b380/playlist.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=6369755,AVERAGE-BANDWIDTH=4953000,RESOLUTION=1920x804,FRAME-RATE=25.000,CODECS="avc1.640028,mp4a.40.2",AUDIO="audio-high"
+../ea48eb10/playlist.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=696885,AVERAGE-BANDWIDTH=622000,RESOLUTION=640x268,FRAME-RATE=25.000,CODECS="avc1.64001E,mp4a.40.2",AUDIO="audio-medium"
+../ed897e25/playlist.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1775555,AVERAGE-BANDWIDTH=1401000,RESOLUTION=960x402,FRAME-RATE=25.000,CODECS="avc1.64001F,mp4a.40.2",AUDIO="audio-medium"
+../a3055808/playlist.m3u8
+
+$ xidel -s vimeo_224661084.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:TYPE=AUDIO.+",0,"*") ! (position(),.)'
+1
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-medium",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/ed897e25/playlist.m3u8"
+2
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-high",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/cf52b380/playlist.m3u8"
+
+$ xidel -s vimeo_224661084.m3u8 -e '
+  let $url:="https://87vod-adaptive.akamaized.net/[...]/video/a3055808,cf52b380,ea48eb10,ed897e25/master.m3u8",
+      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($raw,"#EXT-X-MEDIA:TYPE=AUDIO.+",0,"*")
+  return
+  array{
+    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
+    count $i
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
+      "bitrate":round($br div 1000)||"kbps",
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
+    },
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    $a_strms ! {
+      "id":"hls-"||position(),
+      "format":"m3u8[aac]",
+      "url":resolve-uri(extract(.,"URI=&quot;(.+)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x,"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i + count($a_strms),
+      "format":if (contains($x,"avc1")) then
+        if (matches($x,"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
+      else
+        "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x,"RESOLUTION=([\dx]+)",1)[.],
+        extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate"?:if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri(x:lines($x)[last()],$url)
+    }
+  }
+'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://87vod-adaptive.akamaized.net/[...]/video/a3055808,cf52b380,ea48eb10,ed897e25/master.m3u8"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[aac]",
+    "url": "https://87vod-adaptive.akamaized.net/[...]/audio/ed897e25/playlist.m3u8"
+  },
+  {
+    "id": "hls-2",
+    "format": "m3u8[aac]",
+    "url": "https://87vod-adaptive.akamaized.net/[...]/audio/cf52b380/playlist.m3u8"
+  },
+  [...]
+  {
+    "id": "hls-6",
+    "format": "m3u8[h264]",
+    "resolution": "1920x804@25fps",
+    "bitrate": "6370kbps",
+    "url": "https://87vod-adaptive.akamaized.net/[...]/video/ea48eb10/playlist.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s reddit.com_v61h9j.m3u8 -e '$raw'
+#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:URI="HLS_AUDIO_64_K.m3u8",TYPE=AUDIO,GROUP-ID="0",NAME="audio 0",DEFAULT=YES,AUTOSELECT=YES
+#EXT-X-MEDIA:URI="HLS_AUDIO_160_K.m3u8",TYPE=AUDIO,GROUP-ID="1",NAME="audio 0",DEFAULT=YES,AUTOSELECT=YES
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=382000,AVERAGE-BANDWIDTH=353000,RESOLUTION=400x226,CODECS="avc1.42001e,mp4a.40.2",AUDIO="0"
+HLS_224.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=665000,AVERAGE-BANDWIDTH=557000,RESOLUTION=480x270,CODECS="avc1.42001e,mp4a.40.2",AUDIO="0"
+HLS_270.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1042000,AVERAGE-BANDWIDTH=965000,RESOLUTION=640x360,CODECS="avc1.4d001e,mp4a.40.2",AUDIO="0"
+HLS_360.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1603000,AVERAGE-BANDWIDTH=1472000,RESOLUTION=960x540,CODECS="avc1.4d001f,mp4a.40.2",AUDIO="0"
+HLS_540.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=479000,AVERAGE-BANDWIDTH=450000,RESOLUTION=400x226,CODECS="avc1.42001e,mp4a.40.2",AUDIO="1"
+HLS_224.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=762000,AVERAGE-BANDWIDTH=654000,RESOLUTION=480x270,CODECS="avc1.42001e,mp4a.40.2",AUDIO="1"
+HLS_270.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1139000,AVERAGE-BANDWIDTH=1062000,RESOLUTION=640x360,CODECS="avc1.4d001e,mp4a.40.2",AUDIO="1"
+HLS_360.m3u8
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1700000,AVERAGE-BANDWIDTH=1569000,RESOLUTION=960x540,CODECS="avc1.4d001f,mp4a.40.2",AUDIO="1"
+HLS_540.m3u8
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=56400,RESOLUTION=400x226,CODECS="avc1.42001e",URI="HLS_224-iframe.m3u8"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=104026,RESOLUTION=480x270,CODECS="avc1.42001e",URI="HLS_270-iframe.m3u8"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=126336,RESOLUTION=640x360,CODECS="avc1.4d001e",URI="HLS_360-iframe.m3u8"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=257183,RESOLUTION=960x540,CODECS="avc1.4d001f",URI="HLS_540-iframe.m3u8"
+
+$ xidel -s reddit.com_v61h9j.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*") ! (position(),.)'
+1
+#EXT-X-MEDIA:URI="HLS_AUDIO_64_K.m3u8",TYPE=AUDIO,GROUP-ID="0",NAME="audio 0",DEFAULT=YES,AUTOSELECT=YES
+2
+#EXT-X-MEDIA:URI="HLS_AUDIO_160_K.m3u8",TYPE=AUDIO,GROUP-ID="1",NAME="audio 0",DEFAULT=YES,AUTOSELECT=YES
+
+$ xidel -s reddit.com_v61h9j.m3u8 -e 'for $x at $i in extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*") group by $file:=x:lines($x)[last()] order by extract($x[last()],"BANDWIDTH=(\d+)",1) count $i return ($i,$x[last()])'
+1
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=479000,AVERAGE-BANDWIDTH=450000,RESOLUTION=400x226,CODECS="avc1.42001e,mp4a.40.2",AUDIO="1"
+HLS_224.m3u8
+2
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=762000,AVERAGE-BANDWIDTH=654000,RESOLUTION=480x270,CODECS="avc1.42001e,mp4a.40.2",AUDIO="1"
+HLS_270.m3u8
+3
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1139000,AVERAGE-BANDWIDTH=1062000,RESOLUTION=640x360,CODECS="avc1.4d001e,mp4a.40.2",AUDIO="1"
+HLS_360.m3u8
+4
+#EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1700000,AVERAGE-BANDWIDTH=1569000,RESOLUTION=960x540,CODECS="avc1.4d001f,mp4a.40.2",AUDIO="1"
+HLS_540.m3u8
+
+$ xidel -s reddit.com_v61h9j.m3u8 -e '
+  let $url:="https://v.redd.it/rz0au4l9mz391/HLSPlaylist.m3u8?[...]",
+      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")
+  return
+  array{
+    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
+    count $i
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
+      "bitrate":round($br div 1000)||"kbps",
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
+    },
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    $a_strms ! {
+      "id":"hls-"||position(),
+      "format":"m3u8[aac]",
+      "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms
+    group by $file:=x:lines($x)[last()]
+    let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i + count($a_strms),
+      "format":if (contains($x[last()],"avc1")) then
+        if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
+      else
+        "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
+        extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate"?:if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri($file,$url)
+    }
+  }
+'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://v.redd.it/rz0au4l9mz391/HLSPlaylist.m3u8?[...]"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[aac]",
+    "bitrate": "64kbps",
+    "url": "https://v.redd.it/rz0au4l9mz391/HLS_AUDIO_64_K.m3u8"
+  },
+  {
+    "id": "hls-2",
+    "format": "m3u8[aac]",
+    "bitrate": "160kbps",
+    "url": "https://v.redd.it/rz0au4l9mz391/HLS_AUDIO_160_K.m3u8"
+  },
+  [...]
+  {
+    "id": "hls-6",
+    "format": "m3u8[h264]",
+    "resolution": "960x540",
+    "bitrate": "1700kbps",
+    "url": "https://v.redd.it/rz0au4l9mz391/HLS_540.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '$raw'
+#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="audioname",DEFAULT=YES,URI="QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=879705,RESOLUTION=512x288,CODECS="avc1.640015,mp4a.40.2",AUDIO="audio"
+QualityLevels(719424)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=879705,RESOLUTION=512x288,CODECS="avc1.640015",URI="QualityLevels(719424)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=1385791,RESOLUTION=712x400,CODECS="avc1.64001e,mp4a.40.2",AUDIO="audio"
+QualityLevels(1214616)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=1385791,RESOLUTION=712x400,CODECS="avc1.64001e",URI="QualityLevels(1214616)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=2498013,RESOLUTION=910x512,CODECS="avc1.64001f,mp4a.40.2",AUDIO="audio"
+QualityLevels(2302896)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=2498013,RESOLUTION=910x512,CODECS="avc1.64001f",URI="QualityLevels(2302896)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=4341799,RESOLUTION=1280x720,CODECS="avc1.64001f,mp4a.40.2",AUDIO="audio"
+QualityLevels(4106992)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=4341799,RESOLUTION=1280x720,CODECS="avc1.64001f",URI="QualityLevels(4106992)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=6092526,RESOLUTION=1920x1080,CODECS="avc1.640028,mp4a.40.2",AUDIO="audio"
+QualityLevels(5820032)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=6092526,RESOLUTION=1920x1080,CODECS="avc1.640028",URI="QualityLevels(5820032)/Manifest(video,format=m3u8-aapl,filter=Quality,type=keyframes,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=136294,CODECS="mp4a.40.2",AUDIO="audio"
+QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
+
+$ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
+  let $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")
+  return (
+    extract($a_strms,"URI=&quot;(.+?)&quot;",1),
+    x:lines(
+      (
+        for $x in $v_strms
+        group by $file:=x:lines($x)[last()]
+        order by extract($x[last()],"BANDWIDTH=(\d+)",1)
+        return
+        $x[last()]
+      )[1]
+    )[last()]
+  )
+'
+QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
+QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
+
+$ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e 'let $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*") return extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))]'
+
+$ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
+  let $url:="https://cdn-rtlvod-hb.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8",
+      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
+        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
+      ]
+  return
+  array{
+    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
+    count $i
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
+      "bitrate":round($br div 1000)||"kbps",
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
+    },
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    $a_strms ! {
+      "id":"hls-"||position(),
+      "format":"m3u8[aac]",
+      "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms
+    group by $file:=x:lines($x)[last()]
+    let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i + count($a_strms),
+      "format":if (contains($x[last()],"avc1")) then
+        if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
+      else
+        "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
+        extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate"?:if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri($file,$url)
+    }
+  }
+'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://cdn-rtlvod-hb.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[aac]",
+    "bitrate": "136kbps",
+    "url": "https://cdn-rtlvod-hb.akamaized.net/[...]/QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+  },
+  {
+    "id": "hls-2",
+    "format": "m3u8[h264]",
+    "resolution": "512x288",
+    "bitrate": "880kbps",
+    "url": "https://cdn-rtlvod-hb.akamaized.net/[...]/QualityLevels(719424)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+  },
+  [...]
+  {
+    "id": "hls-6",
+    "format": "m3u8[h264]",
+    "resolution": "1920x1080",
+    "bitrate": "6093kbps",
+    "url": "https://cdn-rtlvod-hb.akamaized.net/[...]/QualityLevels(5820032)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+$ xidel -s ogl_live.m3u8 -e '$raw'
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:165406
+#EXT-X-TARGETDURATION:10
+#EXTINF:10.000,
+89319816000.ts
+#EXTINF:5.000,
+89320716000.ts
+#EXTINF:5.000,
+89321166000.ts
+#EXTINF:5.000,
+89321616000.ts
+#EXTINF:5.000,
+89322066000.ts
+
+$ xidel -s ogl_live.m3u8 -e '
+  let $url:="https://d2od87akyl46nm.cloudfront.net/live/omroepgelderland/tvlive/index.m3u8",
+      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
+        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
+      ]
+  return
+  if (not(exists($v_strms))) then array{
+    {"id":"hls-1","format":"m3u8[h264+aac]","url":$url}
+  } else array{
+    [...]
+  }
+'
+[
+  {
+    "id": "hls-1",
+    "format": "m3u8[h264+aac]",
+    "url": "https://d2od87akyl46nm.cloudfront.net/live/omroepgelderland/tvlive/index.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:m3u8-to-json($url as string?) as array()? {
+  let $src:=unparsed-text($url)[$url],
+      $v_strms:=extract($src,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($src,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
+        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
+      ]
+  return
+  if (not(exists($v_strms)))
+  then array{
+    {"id":"hls-1","format":"m3u8[h264+aac]","url":$url}[url]
+  }[exists(.())]
+  else array{
+    extract($src,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
+    count $i
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
+      "bitrate":round($br div 1000)||"kbps",
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
+    },
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    $a_strms ! {
+      "id":"hls-"||position(),
+      "format":"m3u8[aac]",
+      "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms
+    group by $file:=x:lines($x)[last()]
+    let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
+        $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i + count($a_strms),
+      "format":if (contains($x[last()],"avc1")) then
+        if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
+      else
+        "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
+        extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate"?:if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri($file,$url)
     }
   }
 };
@@ -4471,7 +4397,7 @@ $ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script[@type="applic
     [...]
     {
       "id": "hls-7",
-      "format": "m3u8[h264+aac]",
+      "format": "m3u8[h264]",
       "resolution": "1280x720",
       "bitrate": "4356kbps",
       "url": "https://cdn-rtlvod-h3.akamaized.net/[...]/QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
@@ -4521,7 +4447,7 @@ $ xidel -s --module=xivid.xqm -e 'parse-json(doc(if (contains("'$url'","rtlnieuw
     [...]
     {
       "id": "hls-6",
-      "format": "m3u8[h264+aac]",
+      "format": "m3u8[h264]",
       "resolution": "1280x720",
       "bitrate": "4407kbps",
       "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/QualityLevels(4171000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
@@ -5784,7 +5710,7 @@ $ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script/extract(.,"cl
     [...]
     {
       "id": "hls-6",
-      "format": "m3u8[h264+aac]",
+      "format": "m3u8[h264]",
       "resolution": "1920x804@25fps",
       "bitrate": "6370kbps",
       "url": "https://85vod-adaptive.akamaized.net/[...]/787433685/playlist.m3u8"
@@ -5887,7 +5813,7 @@ $ xidel -s --module=xivid.xqm -e 'let $id:=extract("'$url'","\d+$") return parse
     [...]
     {
       "id": "hls-3",
-      "format": "m3u8[h264+aac]",
+      "format": "m3u8[h264]",
       "resolution": "704x396@25fps",
       "bitrate": "997kbps",
       "url": "https://197vod-adaptive.akamaized.net/[...]/853938829/playlist.m3u8"

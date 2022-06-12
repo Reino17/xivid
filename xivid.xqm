@@ -31,34 +31,26 @@ module namespace xivid = "https://github.com/Reino17/xivid/";
  : --------------------------------
  :)
 
-declare function xivid:m3u8-to-json($url as string?) as array() {
-  let $m3u8:=x:request(
-        {"url":$url,"error-handling":"4xx=accept"}[url]
-      )[raw[not(contains(.,"#EXT-X-SESSION-KEY:METHOD=SAMPLE-AES"))]],
-      $m3u8Url:=if (string-length($m3u8/url) lt 512) then $m3u8/url else $url,
-      $streams:=extract(
-        $m3u8/raw,
-        "#EXT-X-(?:MEDIA:TYPE=(?:AUDIO|VIDEO)|STREAM-INF).+?m3u8.*?$",
-        0,"ms*"
-      )
+declare function xivid:m3u8-to-json($url as string?) as array()? {
+  let $src:=unparsed-text($url)[$url],
+      $v_strms:=extract($src,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
+      $a_strms:=extract($src,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
+        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
+      ]
   return
-  if (exists($m3u8) and not(exists($streams))) then array{
-    {
-      "id":"hls-1",
-      "format":"m3u8[h264+aac]",
-      "url":$m3u8Url
-    }
-  } else array{
-    extract($m3u8/raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+  if (not(exists($v_strms)))
+  then array{
+    {"id":"hls-1","format":"m3u8[h264+aac]","url":$url}[url]
+  }[exists(.())]
+  else array{
+    extract($src,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
-      "url":resolve-uri(
-        extract(.,"URI=&quot;(.+?)&quot;",1),
-        $m3u8Url
-      )
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
+    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
     order by $br
     count $i
@@ -67,40 +59,35 @@ declare function xivid:m3u8-to-json($url as string?) as array() {
       "format":"mp4[h264+aac]",
       "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
       "bitrate":round($br div 1000)||"kbps",
-      "url":extract($x,"URI=&quot;(.+mp4)(?:#.+)?&quot;",1)
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
-    {
-      "id":"hls-0",
-      "format":"m3u8[manifest]",
-      "url":$m3u8Url
-    }[url],
-    for $x at $i in $streams
-    group by $path:=x:lines($x)[last()] ! (
-      if (contains(.,"URI="))
-      then extract($x,"URI=&quot;(.+)&quot;",1)
-      else replace(.,"#.+","")
-    )
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    $a_strms ! {
+      "id":"hls-"||position(),
+      "format":"m3u8[aac]",
+      "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $v_strms
+    group by $file:=x:lines($x)[last()]
     let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
-        $br2:=extract($x,"GROUP-ID=.+?-(\d+)",1)[.],
-        $br3:=extract($x,"audio.*?=(\d+)(?:-video.*?=(\d+))?",(1,2))[.]
+        $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
     order by $br
     count $i
     return {
-      "id":"hls-"||$i,
-      "format":if (contains($x,"avc1") or contains($x,"RESOLUTION"))
-        then "m3u8[h264+aac]"
-        else "m3u8[aac]",
+      "id":"hls-"||$i + count($a_strms),
+      "format":if (contains($x[last()],"avc1")) then
+        if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
+      else
+        "m3u8[aac]",
       "resolution"?:concat(
-        extract($x,"RESOLUTION=([\dx]+)",1)[.],
-        extract($x,"(?:FRAME-RATE=|GROUP-ID.+?\d{3}p)([\d\.]+)",1)[.] !
-          x"@{round-half-to-even(.,3)}fps"
+        extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
+        extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
       )[.],
-      "bitrate"?:(
-        if ($br3[1])
-        then join((round($br3[2] div 1000),round($br3[1] div 1000)),"|")
-        else ($br2,round($br[.] div 1000))[1]
-      ) ! x"{.}kbps",
-      "url":resolve-uri($path,$m3u8Url)
+      "bitrate"?:if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri($file,$url)
     }
   }
 };
