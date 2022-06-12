@@ -2525,12 +2525,11 @@ $ xidel -se 'x:request({"headers":"Content-Type: application/json","post":serial
 <?xml version="1.0" encoding="UTF-8"?>
 <MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:DASH:schema:MPD:2011" xmlns:yt="http://youtube.com/yt/2012/10/10" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd" minBufferTime="PT1.500S" profiles="urn:mpeg:dash:profile:isoff-main:2011" type="static" mediaPresentationDuration="PT1092.684S"><Period><AdaptationSet id="0" mimeType="audio/mp4" subsegmentAlignment="true"><Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/><SegmentList startNumber="0" timescale="1000"><SegmentTimeline><S d="9985"/><S d="9984"/>[...]</SegmentTimeline></SegmentList><Representation id="139" codecs="mp4a.40.5" audioSamplingRate="22050" startWithSAP="1" bandwidth="50954"><AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/><BaseURL>https://rr6---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/[...]/itag/139/[...]</BaseURL><SegmentList><Initialization sourceURL="range/0-664"/><SegmentURL media="range/2017-63597"/><SegmentURL media="range/63598-124537"/>[...]</SegmentList></Representation><Representation id="140" codecs="mp4a.40.2" audioSamplingRate="44100" startWithSAP="1" bandwidth="131421"><AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/><BaseURL>https://rr6---sn-mn4vg5aa-5hns.googlevideo.com/videoplayback/[...]/itag/140/[...]</BaseURL><SegmentList><Initialization sourceURL="range/0-655"/><SegmentURL media="range/2008-164030"/><SegmentURL media="range/164031-325634"/>[...]</SegmentList></Representation></AdaptationSet><AdaptationSet id="1" mimeType="video/mp4" subsegmentAlignment="true">[...]</AdaptationSet><AdaptationSet id="3" mimeType="video/webm" subsegmentAlignment="true">[...]</AdaptationSet></Period></MPD>
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 XML prettification:
 
 $ xidel -se '[...]/streamingData/doc(dashManifestUrl)' --output-format=xml --output-declaration='<?xml version="1.0" encoding="UTF-8"?>' --output-node-indent
 $ xidel -se '[...]/streamingData/serialize(doc(dashManifestUrl),{"indent":true(),"omit-xml-declaration":false()})'
+$ xidel -se '[...]/streamingData/file:write("yt-nG_LtCRRZ20_pretty.mpd",doc(dashManifestUrl),{"indent":true(),"omit-xml-declaration":false()})'
 <?xml version="1.0" encoding="UTF-8"?>
 <MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:DASH:schema:MPD:2011" xmlns:yt="http://youtube.com/yt/2012/10/10" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd" minBufferTime="PT1.500S" profiles="urn:mpeg:dash:profile:isoff-main:2011" type="static" mediaPresentationDuration="PT1092.684S">
   <Period>
@@ -2558,10 +2557,6 @@ $ xidel -se '[...]/streamingData/serialize(doc(dashManifestUrl),{"indent":true()
     [...]
   </Period>
 </MPD>
-
-$ xidel -se '[...]/streamingData/file:write("yt-nG_LtCRRZ20_pretty.mpd",doc(dashManifestUrl),{"indent":true(),"omit-xml-declaration":false()})'
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 $ xidel -s --xmlns:xivid="https://github.com/Reino17/xivid/" -e 'declare function xivid:mpd-to-json($mpd) as array() {array{{"id":"dash-0","format":"mpd[manifest]","url":$mpd},for $x at $i in doc($mpd)//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":x"{substring-after($x/(.,..)/@mimeType,"/")}[{tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .)}]","resolution"?:$x/@width ! x"{.}x{$x/@height}@{$x/@frameRate}fps","samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz","bitrate":x"{round($x/@bandwidth div 1000)}kbps","url":$x/BaseUrl}}}; xivid:mpd-to-json("https://manifest.googlevideo.com/api/manifest/dash/[...]")'
 [
@@ -2595,12 +2590,7 @@ $ xidel -se 'doc("https://www.facebook.com/AFV/videos/3868462086560598")//script
 <?xml version="1.0"?>
 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500S" type="static" mediaPresentationDuration="PT0H3M3.253S" maxSegmentDuration="PT0H0M5.005S" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011,http://dashif.org/guidelines/dash264" FBTagsetUsed="v4_5secgop"><Period duration="PT0H3M3.253S"><AdaptationSet segmentAlignment="true" maxWidth="1080" maxHeight="1080" maxFrameRate="11988/400" par="1:1" lang="und" subsegmentAlignment="true" subsegmentStartsWithSAP="1"><Representation id="672942427398947v" mimeType="video/mp4" codecs="avc1.4D401E" width="256" height="256" frameRate="11988/400" sar="1:1" startWithSAP="1" bandwidth="187410" [...]><BaseURL>https://video-ams4-1.xx.fbcdn.net/v/t39.25447-2/259096021_216241843979308_8612580570021908228_n.mp4?[...]</BaseURL><SegmentBase indexRangeExact="true" indexRange="912-1387" FBFirstSegmentRange="1388-134973"><Initialization range="0-911"/></SegmentBase></Representation>[...]</AdaptationSet><AdaptationSet segmentAlignment="true" lang="eng" subsegmentAlignment="true" subsegmentStartsWithSAP="1"><Representation id="3072634246177607a" mimeType="audio/mp4" codecs="mp4a.40.5" audioSamplingRate="48000" startWithSAP="1" bandwidth="65367" [...]><AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/><BaseURL>https://video-amt2-1.xx.fbcdn.net/v/t42.1790-2/101540421_3072634259510939_7405909952142770176_n.mp4?[...]</BaseURL><SegmentBase indexRangeExact="true" indexRange="932-2067" FBFirstSegmentRange="2068-18473"><Initialization range="0-931"/></SegmentBase></Representation></AdaptationSet></Period></MPD>
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-XML prettification:
-
-$ xidel -se '[...]//media/parse-xml(dash_manifest)' --output-format=xml --output-declaration='<?xml version="1.0"?>' --output-node-indent
-$ xidel -se '[...]//media/serialize(parse-xml(dash_manifest),{"indent":true(),"omit-xml-declaration":false()})'
+$ xidel -se '[...]//media/parse-xml(dash_manifest)' --output-format=xml --output-node-indent --output-declaration='<?xml version="1.0"?>'
 <?xml version="1.0"?>
 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500S" type="static" mediaPresentationDuration="PT0H3M3.253S" maxSegmentDuration="PT0H0M5.005S" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011,http://dashif.org/guidelines/dash264" FBTagsetUsed="v4_5secgop">
   <Period duration="PT0H3M3.253S">
@@ -2625,10 +2615,6 @@ $ xidel -se '[...]//media/serialize(parse-xml(dash_manifest),{"indent":true(),"o
   </Period>
 </MPD>
 
-$ xidel -se '[...]//media/file:write("fb-3868462086560598_pretty.mpd",parse-xml(dash_manifest),{"indent":true(),"omit-xml-declaration":false()})'
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 $ xidel -se 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as array() {array{{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":x"{substring-after($x/(.,..)/@mimeType,"/")}[{tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .)}]","resolution"?:$x/@width ! x"{.}x{$x/@height}@{eval(replace($x/@frameRate,"/"," div "))}fps","samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz","bitrate":x"{round($x/@bandwidth div 1000)}kbps","url":$x/BaseUrl}}}; xivid:mpd-to-json([...]/parse-xml(dash_manifest))'
 [
   {
@@ -2645,6 +2631,53 @@ $ xidel -se 'declare namespace xivid = "https://github.com/Reino17/xivid/"; decl
     "resolution": "1080x1080@29.97fps",
     "bitrate": "3264kbps",
     "url": "https://video-ams4-1.xx.fbcdn.net/v/t39.25447-2/253675270_615863069764495_4586228729139861673_n.mp4?[...]"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+'https://v.redd.it/rz0au4l9mz391/DASHPlaylist.mpd?[...]&v=1&f=sd'   # DASH manifest met relatieve base-urls.
+
+<MPD [...]>
+  <Period duration="PT2M27.677S">
+    <AdaptationSet contentType="audio" group="1" mimeType="audio/mp4" [...]>
+      <Representation [...]>
+        <AudioChannelConfiguration [...] />
+        <BaseURL>DASH_audio.mp4</BaseURL>
+        [...]
+      </Representation>
+    </AdaptationSet>
+    <AdaptationSet contentType="video" group="2" [...] mimeType="video/mp4" [...]>
+      [...]
+      <Representation [...]>
+        <BaseURL>DASH_720.mp4</BaseURL>
+        [...]
+      </Representation>
+    </AdaptationSet>
+  </Period>
+</MPD>
+
+$ xidel -se 'declare namespace xivid = "https://github.com/Reino17/xivid/"; declare function xivid:mpd-to-json($mpd) as array() {array{{"id":"dash-0","format":"mpd[manifest]","url":$mpd[. instance of string]}[url],for $x at $i in (if ($mpd instance of node()) then $mpd else doc($mpd))//Representation order by boolean($x/@width),$x/@bandwidth count $i return {"id":"dash-"||$i,"format":x"{substring-after($x/(.,..)/@mimeType,"/")}[{tokenize($x/@codecs,"\.")[1] ! (if (.="mp4a") then "aac" else if (.="avc1") then "h264" else .)}]","resolution"?:$x/@width ! x"{.}x{$x/@height}@{eval(replace($x/@frameRate,"/"," div "))}fps","samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz","bitrate":x"{round($x/@bandwidth div 1000)}kbps","url":if ($mpd instance of string) then resolve-uri($x/BaseUrl,$mpd) else $x/BaseUrl}}}; xivid:mpd-to-json(string(parse-html("https://v.redd.it/rz0au4l9mz391/DASHPlaylist.mpd?a=1657180106%2CMjQwNjY4NmFjOTU2NWRkNmY4MGViYzA3ODA2ZjhhYmUwMzYwMDUyNTUwODkzMjM3MGYzNjZlMTQ2ZTE2ZGEwOA%3D%3D&v=1&f=sd")))'
+[
+  {
+    "id": "dash-0",
+    "format": "mpd[manifest]",
+    "url": "https://v.redd.it/rz0au4l9mz391/DASHPlaylist.mpd?a=1657180106%2CMjQwNjY4NmFjOTU2NWRkNmY4MGViYzA3ODA2ZjhhYmUwMzYwMDUyNTUwODkzMjM3MGYzNjZlMTQ2ZTE2ZGEwOA%3D%3D&v=1&f=sd"
+  },
+  {
+    "id": "dash-1",
+    "format": "mp4[aac]",
+    "samplerate": "48kHz",
+    "bitrate": "132kbps",
+    "url": "https://v.redd.it/rz0au4l9mz391/DASH_audio.mp4"
+  },
+  [...]
+  {
+    "id": "dash-6",
+    "format": "mp4[h264]",
+    "resolution": "1280x720@30fps",
+    "bitrate": "2364kbps",
+    "url": "https://v.redd.it/rz0au4l9mz391/DASH_720.mp4"
   }
 ]
 
@@ -2675,7 +2708,9 @@ declare function xivid:mpd-to-json($mpd) as array() {
       }fps",
       "samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz",
       "bitrate":x"{round($x/@bandwidth div 1000)}kbps",
-      "url":$x/BaseUrl
+      "url":if ($mpd instance of string)
+        then resolve-uri($x/BaseUrl,$mpd)
+        else $x/BaseUrl
     }
   }
 };

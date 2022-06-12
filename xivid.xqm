@@ -117,7 +117,9 @@ declare function xivid:mpd-to-json($mpd) as array() {
       }fps",
       "samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz",
       "bitrate":x"{round($x/@bandwidth div 1000)}kbps",
-      "url":$x/BaseUrl
+      "url":if ($mpd instance of string)
+        then resolve-uri($x/BaseUrl,$mpd)
+        else $x/BaseUrl
     }
   }
 };
