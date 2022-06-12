@@ -35,21 +35,22 @@ ECHO                 beschikbare formaten.
 ECHO   -j            Toon video informatie als JSON.
 ECHO.
 ECHO Ondersteunde websites:
-ECHO   npostart.nl             rtvoost.nl             youtube.com
-ECHO   gemi.st                 omroepwest.nl          youtu.be
-ECHO   nos.nl                  rijnmond.nl            vimeo.com
-ECHO   tvblik.nl               rtvutrecht.nl          dailymotion.com
-ECHO   uitzendinggemist.net    omroepgelderland.nl    rumble.com
-ECHO   rtl.nl                  omroepzeeland.nl       twitch.tv
-ECHO   rtlxl.nl                omroepbrabant.nl       mixcloud.com
-ECHO   rtlnieuws.nl            l1.nl                  soundcloud.com
-ECHO   kijk.nl                 dumpert.nl             facebook.com
-ECHO   omropfryslan.nl         autojunk.nl            fb.watch
-ECHO   rtvnoord.nl             abhd.nl                instagram.com
-ECHO   rtvdrenthe.nl           autoblog.nl            twitter.com
-ECHO   nhnieuws.nl             telegraaf.nl           pornhub.com
-ECHO   at5.nl                  ad.nl                  xhamster.com
-ECHO   omroepflevoland.nl      lc.nl                  youporn.com
+ECHO   npostart.nl             omroepwest.nl          vimeo.com
+ECHO   gemi.st                 rijnmond.nl            dailymotion.com
+ECHO   nos.nl                  rtvutrecht.nl          rumble.com
+ECHO   tvblik.nl               omroepgelderland.nl    reddit.com
+ECHO   uitzendinggemist.net    omroepzeeland.nl       redd.it
+ECHO   rtl.nl                  omroepbrabant.nl       twitch.tv
+ECHO   rtlxl.nl                l1.nl                  mixcloud.com
+ECHO   rtlnieuws.nl            dumpert.nl             soundcloud.com
+ECHO   kijk.nl                 autojunk.nl            facebook.com
+ECHO   omropfryslan.nl         abhd.nl                fb.watch
+ECHO   rtvnoord.nl             autoblog.nl            instagram.com
+ECHO   rtvdrenthe.nl           telegraaf.nl           twitter.com
+ECHO   nhnieuws.nl             ad.nl                  pornhub.com
+ECHO   at5.nl                  lc.nl                  xhamster.com
+ECHO   omroepflevoland.nl      youtube.com            youporn.com
+ECHO   rtvoost.nl              youtu.be
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -167,6 +168,7 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
         'vimeo':array{'vimeo.com'}^,
         'dailymotion':array{'dailymotion.com'}^,
         'rumble':array{'rumble.com'}^,
+        'reddit':array{'reddit.com'^,'redd.it'}^,
         'twitch':array{'twitch.tv'}^,
         'mixcloud':array{'mixcloud.com'}^,
         'soundcloud':array{'soundcloud.com'}^,

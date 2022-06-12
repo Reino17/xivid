@@ -6260,6 +6260,278 @@ declare function xivid:rumble($url as string) as object()? {
 
 ================================================================================================
 
+[reddit]
+
+$ url=https://www.reddit.com/r/therewasanattempt/comments/v61h9j/to_push_past_armed_courtroom_guards/
+
+$ xidel -se 'json-doc("'$url'.json")(1)/data/(children)()/data'
+{
+  [...]
+  "subreddit": "therewasanattempt",
+  [...]
+  "title": "to push past armed courtroom guards",
+  [...]
+  "media_embed": {},
+  [...]
+  "secure_media": {
+    "reddit_video": {
+      "bitrate_kbps": 2400,
+      "fallback_url": "https://v.redd.it/rz0au4l9mz391/DASH_720.mp4?source=fallback",
+      "height": 720,
+      "width": 1280,
+      "scrubber_media_url": "https://v.redd.it/rz0au4l9mz391/DASH_96.mp4",
+      "dash_url": "https://v.redd.it/rz0au4l9mz391/DASHPlaylist.mpd?[...]&amp;v=1&amp;f=sd",
+      "duration": 147,
+      "hls_url": "https://v.redd.it/rz0au4l9mz391/HLSPlaylist.m3u8?[...]&amp;v=1&amp;f=sd",
+      "is_gif": false,
+      "transcoding_status": "completed"
+    }
+  },
+  "is_reddit_media_domain": true,
+  [...]
+  "created": 1654515500,
+  [...]
+  "domain": "v.redd.it",
+  [...]
+  "media": {
+    "reddit_video": {
+      "bitrate_kbps": 2400,
+      "fallback_url": "https://v.redd.it/rz0au4l9mz391/DASH_720.mp4?source=fallback",
+      "height": 720,
+      "width": 1280,
+      "scrubber_media_url": "https://v.redd.it/rz0au4l9mz391/DASH_96.mp4",
+      "dash_url": "https://v.redd.it/rz0au4l9mz391/DASHPlaylist.mpd?[...]&amp;v=1&amp;f=sd",
+      "duration": 147,
+      "hls_url": "https://v.redd.it/rz0au4l9mz391/HLSPlaylist.m3u8?[...]&amp;v=1&amp;f=sd",
+      "is_gif": false,
+      "transcoding_status": "completed"
+    }
+  },
+  [...]
+  "url": "https://v.redd.it/rz0au4l9mz391",
+  [...]
+  "is_video": true
+}
+
+$ xidel -s --module=xivid.xqm -e 'json-doc("'$url'.json")(1)/data/(children)()/data/{"name":x"{subreddit}: {title}","date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":media/reddit_video/duration * duration("PT1S"),"formats":media/reddit_video/array{xivid:m3u8-to-json(string(parse-html(hls_url)))(),xivid:mpd-to-json(string(parse-html(dash_url)))()}}'
+{
+  "name": "therewasanattempt: to push past armed courtroom guards",
+  "date": "2022-06-06T11:38:20Z",
+  "duration": "PT2M27S",
+  "formats": [
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://v.redd.it/rz0au4l9mz391/HLSPlaylist.m3u8?[...]&v=1&f=sd"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[aac]",
+      "bitrate": "64kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/HLS_AUDIO_64_K.m3u8"
+    },
+    {
+      "id": "hls-2",
+      "format": "m3u8[aac]",
+      "bitrate": "160kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/HLS_AUDIO_160_K.m3u8"
+    },
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264]",
+      "resolution": "400x226",
+      "bitrate": "479kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/HLS_224.m3u8"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264]",
+      "resolution": "960x540",
+      "bitrate": "1700kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/HLS_540.m3u8"
+    },
+    {
+      "id": "dash-0",
+      "format": "mpd[manifest]",
+      "url": "https://v.redd.it/rz0au4l9mz391/DASHPlaylist.mpd?[...]&v=1&f=sd"
+    },
+    {
+      "id": "dash-1",
+      "format": "mp4[aac]",
+      "samplerate": "48kHz",
+      "bitrate": "132kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/DASH_audio.mp4"
+    },
+    {
+      "id": "dash-2",
+      "format": "mp4[h264]",
+      "resolution": "392x220@30fps",
+      "bitrate": "252kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/DASH_220.mp4"
+    },
+    [...]
+    {
+      "id": "dash-6",
+      "format": "mp4[h264]",
+      "resolution": "1280x720@30fps",
+      "bitrate": "2364kbps",
+      "url": "https://v.redd.it/rz0au4l9mz391/DASH_720.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+$ url=https://v.redd.it/rz0au4l9mz391
+
+$ xidel -se 'request-decode("'$url'")'
+{
+  "url": "https://v.redd.it/rz0au4l9mz391",
+  "protocol": "https",
+  "host": "v.redd.it"
+}
+
+$ xidel -se 'x:request({"method":"HEAD","url":"'$url'"})/url'
+https://www.reddit.com/r/therewasanattempt/comments/v61h9j/to_push_past_armed_courtroom_guards
+
+$ xidel -s --module=xivid.xqm -e 'json-doc(if (request-decode("'$url'")/host = "v.redd.it") then x:request({"method":"HEAD","url":"'$url'"})/url||".json" else "'$url'.json")(1)/data/(children)()/data/{"name":x"{subreddit}: {title}","date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":media/reddit_video/duration * duration("PT1S"),"formats":media/reddit_video/array{xivid:m3u8-to-json(string(parse-html(hls_url)))(),xivid:mpd-to-json(string(parse-html(dash_url)))()}}'
+{
+  "name": "therewasanattempt: to push past armed courtroom guards",
+  "date": "2022-06-06T11:38:20Z",
+  "duration": "PT2M27S",
+  "formats": [...]
+}
+------------------------------------------------------------------------------------------------
+
+$ url=https://www.reddit.com/r/techtalktutorials/comments/tn4gxu/how_to_create_a_responsive_4_column_website/
+
+$ xidel -se 'json-doc("'$url'.json")(1)/data/(children)()/data'
+{
+  [...]
+  "subreddit": "techtalktutorials",
+  [...]
+  "title": "How To Create A Responsive 4 Column Website Layout Using html And CSS *2...",
+  [...]
+  "media_embed": {
+    "content": "&lt;iframe width=\"356\" height=\"200\" src=\"https://www.youtube.com/embed/x3647PWMtGY?feature=oembed&amp;enablejsapi=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen&gt;&lt;/iframe&gt;",
+    "width": 356,
+    "scrolling": false,
+    "height": 200
+  },
+  [...]
+  "secure_media": {
+    "oembed": {
+      "provider_url": "https://www.youtube.com/",
+      "title": "How To Create A Responsive 4 Column Website Layout Using html And CSS *2022*",
+      "html": "&lt;iframe width=\"356\" height=\"200\" src=\"https://www.youtube.com/embed/x3647PWMtGY?feature=oembed&amp;enablejsapi=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen&gt;&lt;/iframe&gt;",
+      [...]
+    },
+    "type": "youtube.com"
+  },
+  "is_reddit_media_domain": false,
+  [...]
+  "created": 1648155699,
+  [...]
+  "domain": "youtube.com",
+  [...]
+  "media": {
+    "oembed": {
+      "provider_url": "https://www.youtube.com/",
+      "title": "How To Create A Responsive 4 Column Website Layout Using html And CSS *2022*",
+      "html": "&lt;iframe width=\"356\" height=\"200\" src=\"https://www.youtube.com/embed/x3647PWMtGY?feature=oembed&amp;enablejsapi=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen&gt;&lt;/iframe&gt;",
+      [...]
+    },
+    "type": "youtube.com"
+  },
+  [...]
+  "url": "https://youtube.com/watch?v=x3647PWMtGY&amp;feature=share",
+  [...]
+  "is_video": false
+}
+
+$ xidel -s --module=xivid.xqm -e 'json-doc("'$url'.json")(1)/data/(children)()/data/request-decode(parse-html(url))'
+{
+  "url": "https://youtube.com/watch?v=x3647PWMtGY&feature=share",
+  "protocol": "https",
+  "host": "youtube.com",
+  "path": "watch",
+  "query": "v=x3647PWMtGY&feature=share",
+  "params": {
+    "v": "x3647PWMtGY",
+    "feature": "share"
+  }
+}
+
+$ xidel -s --module=xivid.xqm -e 'json-doc(if (request-decode("'$url'")/host = "v.redd.it") then x:request({"method":"HEAD","url":"'$url'"})/url||".json" else "'$url'.json")(1)/data/(children)()/data/(if (is_reddit_media_domain) then {"name":x"{subreddit}: {title}","date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":media/reddit_video/duration * duration("PT1S"),"formats":media/reddit_video/array{xivid:m3u8-to-json(string(parse-html(hls_url)))(),xivid:mpd-to-json(string(parse-html(dash_url)))()}} else xivid:youtube(request-decode(parse-html(url))/params/v))'
+{
+  "name": "How To Create A Responsive 4 Column Website Layout Using html And CSS *2022*",
+  "duration": "PT17M37S",
+  "formats": [
+    {
+      "id": "sub-1",
+      "format": "ttml",
+      "language": "en",
+      "label": "English (auto-generated)",
+      "url": "https://www.youtube.com/api/timedtext?v=x3647PWMtGY[...]&lang=en[...]"
+    },
+    {
+      "id": "pg-1",
+      "format": "3gpp[mp4v+aac]",
+      "resolution": "176x144@8fps",
+      "bitrate": "44kbps",
+      "url": "https://rr3---sn-32o-bg9e.googlevideo.com/videoplayback?[...]&itag=17[...]"
+    },
+    [...]
+    {
+      "id": "pg-3",
+      "format": "mp4[h264+aac]",
+      "resolution": "1280x720@30fps",
+      "bitrate": "343kbps",
+      "url": "https://rr3---sn-32o-bg9e.googlevideo.com/videoplayback?[...]&itag=22[...]"
+    },
+    {
+      "id": "dash-1",
+      "format": "mp4[aac]",
+      "samplerate": "22.05kHz",
+      "bitrate": "51kbps",
+      "url": "https://rr3---sn-32o-bg9e.googlevideo.com/videoplayback?[...]&itag=139[...]"
+    },
+    [...]
+    {
+      "id": "dash-9",
+      "format": "mp4[h264]",
+      "resolution": "1920x1080@30fps",
+      "bitrate": "3312kbps",
+      "url": "https://rr3---sn-32o-bg9e.googlevideo.com/videoplayback?[...]&itag=137[...]"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:reddit($url as string) as object()? {
+  json-doc(
+    if (request-decode($url)/host = "v.redd.it")
+    then x:request({"method":"HEAD","url":$url})/url||".json"
+    else $url||".json"
+  )(1)/data/(children)()/data/(
+    if (is_reddit_media_domain) then {
+      "name":x"{subreddit}: {title}",
+      "date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+      "duration":media/reddit_video/duration * duration("PT1S"),
+      "formats":media/reddit_video/array{
+        xivid:m3u8-to-json(string(parse-html(hls_url)))(),
+        xivid:mpd-to-json(string(parse-html(dash_url)))()
+      }
+    }
+    else
+      xivid:youtube(request-decode(parse-html(url))/params/v)
+  )
+};
+
+================================================================================================
+
 [nos]
 
 $ url=https://nos.nl/collectie/13781/video/2385546-bekijk-de-samenvatting-van-nederland-oostenrijk-2-0

@@ -36,21 +36,22 @@ Gebruik: ./xivid.sh [optie] url
   -j            Toon video informatie als JSON.
 
 Ondersteunde websites:
-  npostart.nl             rtvoost.nl             youtube.com
-  gemi.st                 omroepwest.nl          youtu.be
-  nos.nl                  rijnmond.nl            vimeo.com
-  tvblik.nl               rtvutrecht.nl          dailymotion.com
-  uitzendinggemist.net    omroepgelderland.nl    rumble.com
-  rtl.nl                  omroepzeeland.nl       twitch.tv
-  rtlxl.nl                omroepbrabant.nl       mixcloud.com
-  rtlnieuws.nl            l1.nl                  soundcloud.com
-  kijk.nl                 dumpert.nl             facebook.com
-  omropfryslan.nl         autojunk.nl            fb.watch
-  rtvnoord.nl             abhd.nl                instagram.com
-  rtvdrenthe.nl           autoblog.nl            twitter.com
-  nhnieuws.nl             telegraaf.nl           pornhub.com
-  at5.nl                  ad.nl                  xhamster.com
-  omroepflevoland.nl      lc.nl                  youporn.com
+  npostart.nl             omroepwest.nl          vimeo.com
+  gemi.st                 rijnmond.nl            dailymotion.com
+  nos.nl                  rtvutrecht.nl          rumble.com
+  tvblik.nl               omroepgelderland.nl    reddit.com
+  uitzendinggemist.net    omroepzeeland.nl       redd.it
+  rtl.nl                  omroepbrabant.nl       twitch.tv
+  rtlxl.nl                l1.nl                  mixcloud.com
+  rtlnieuws.nl            dumpert.nl             soundcloud.com
+  kijk.nl                 autojunk.nl            facebook.com
+  omropfryslan.nl         abhd.nl                fb.watch
+  rtvnoord.nl             autoblog.nl            instagram.com
+  rtvdrenthe.nl           telegraaf.nl           twitter.com
+  nhnieuws.nl             ad.nl                  pornhub.com
+  at5.nl                  lc.nl                  xhamster.com
+  omroepflevoland.nl      youtube.com            youporn.com
+  rtvoost.nl              youtu.be
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -169,6 +170,7 @@ eval "$(xidel -e '
         "vimeo":array{"vimeo.com"},
         "dailymotion":array{"dailymotion.com"},
         "rumble":array{"rumble.com"},
+        "reddit":array{"reddit.com","redd.it"},
         "twitch":array{"twitch.tv"},
         "mixcloud":array{"mixcloud.com"},
         "soundcloud":array{"soundcloud.com"},

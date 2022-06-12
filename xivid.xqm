@@ -1021,6 +1021,26 @@ declare function xivid:rumble($url as string) as object()? {
   }
 };
 
+declare function xivid:reddit($url as string) as object()? {
+  json-doc(
+    if (request-decode($url)/host = "v.redd.it")
+    then x:request({"method":"HEAD","url":$url})/url||".json"
+    else $url||".json"
+  )(1)/data/(children)()/data/(
+    if (is_reddit_media_domain) then {
+      "name":x"{subreddit}: {title}",
+      "date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+      "duration":media/reddit_video/duration * duration("PT1S"),
+      "formats":media/reddit_video/array{
+        xivid:m3u8-to-json(string(parse-html(hls_url)))(),
+        xivid:mpd-to-json(string(parse-html(dash_url)))()
+      }
+    }
+    else
+      xivid:youtube(request-decode(parse-html(url))/params/v)
+  )
+};
+
 declare function xivid:twitch($url as string) as object()? {
   let $call_api:=function($query as object()) as object() {
         x:request({
