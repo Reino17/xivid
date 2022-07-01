@@ -673,45 +673,37 @@ declare function xivid:nhnieuws($url as string) as object()? {
 };
 
 declare function xivid:ofl($url as string) as object()? {
-  doc($url)/(
-    let $info:=//div[@class="fn-jw-player fn-videoplayer"] return
-    if ($info/@data-has-streams) then {
-      "name":"Omroep Flevoland: Livestream",
-      "date":substring(
-        adjust-dateTime-to-timezone(
-          current-dateTime() + duration("PT0.5S"),
-          duration("PT0S")
-        ),1,19
-      )||"Z",
-      "formats":xivid:m3u8-to-json($info/@data-file)
-    } else {
-      "name":concat(
-        "Omroep Flevoland: ",
-        if ($info/normalize-space(@data-title))
-        then $info/@data-title
-        else normalize-space(//h2)
-      ),
-      "date":xivid:string-to-utc-dateTime(
-        //div[@class="card__info t--xsm"]/join(
-          if (.//span[@class="d--block--sm"]) then
-            extract(
-              .//span[@class="d--block--sm"],
-              "(\d+ \w+ \d+) \| ([\d:]+)",(1,2)
-            )
-          else
-            span/extract(.,"[\d:-]+",0,"*")
+  let $src:=doc($url),
+      $info:=$src//div[@class="fn-jw-player fn-videoplayer"]
+  return
+  if ($info/@data-page-type="home") then {
+    "name":"Omroep Flevoland: Livestream",
+    "date":adjust-dateTime-to-timezone(
+      current-dateTime() + duration("PT0.5S"),
+      duration("PT0S")
+    ) ! substring(.,1,19)||"Z",
+    "formats":xivid:m3u8-to-json($info/@data-file)
+  } else {
+    "name":"Omroep Flevoland: "||normalize-space($src//h2),
+    "date":xivid:string-to-utc-dateTime(
+      $src//header[@class="header"]/div/join(
+        if (span/span[@class="d--block--sm"])
+        then extract(
+          span/span[@class="d--block--sm"],
+          "(\d+ \w+ \d+) \| ([\d:]+)",(1,2)
         )
-      ),
-      "formats":array{
-        {
-          "id":"pg-1",
-          "format":"mp4[h264+aac]",
-          "resolution":"960x540",
-          "url":$info/@data-file
-        }
+        else extract(span,"[\d:-]+",0,"*")
+      )
+    ),
+    "formats":array{
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "resolution":"960x540",
+        "url":$info/@data-file
       }
     }
-  )
+  }
 };
 
 declare function xivid:dumpert($url as string) as object()? {
