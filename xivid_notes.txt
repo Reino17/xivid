@@ -7605,30 +7605,22 @@ declare function xivid:l1($url as string) as object()? {
 
 $ url=https://www.nhnieuws.nl/media
 
-$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/{"name":substring-after(//title,"Media - ")||": Livestream","date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z","formats":xivid:m3u8-to-json(parse-json(//script/substring-after(.,"INIT_DATA__ = ")[.])/videoStream)}'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/{"name":substring-after(//head/title,"Media - ")||": Livestream","date":adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")) ! substring(.,1,19)||"Z","formats":xivid:m3u8-to-json(parse-json(//script/substring-after(.,"INIT_DATA__ = "))/videoStream)}'
 {
   "name": "NH Nieuws: Livestream",
-  "date": "2020-09-15T14:43:47Z",
+  "date": "2022-06-26T19:09:33Z",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/b698f6a49ad321c97d82cbdcc113c215/sz/nhnieuws/wowza4/live/live.smil/playlist.m3u8?token=zdtc3K3vbDbL2JQjfGuHtg&time=1600212413"
+      "url": "https://takeoff.jetstre.am/?account=nhnieuws&file=live&type=live&service=wowza&protocol=https&output=playlist.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "1153kbps",
-      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/b698f6a49ad321c97d82cbdcc113c215/sz/nhnieuws/wowza4/live/live.smil/chunklist_b1048576.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
-      "bitrate": "3487kbps",
-      "url": "https://ngx.cr2.streamzilla.xlcdn.com/session/b698f6a49ad321c97d82cbdcc113c215/sz/nhnieuws/wowza4/live/live.smil/chunklist_b3170304.m3u8"
+      "bitrate": "6929kbps",
+      "url": "https://n2.cdn.jetstre.am/session/301bd38cff3db47f87e9370239b810c3/sz/nhnieuws/wowza4/live/live/chunklist_w1617530139.m3u8"
     }
   ]
 }
@@ -7638,57 +7630,43 @@ $ url=https://www.at5.nl/media
 $ xidel -s --module=xivid.xqm -e '[...]'
 {
   "name": "AT5: Livestream",
-  "date": "2020-09-15T14:44:38Z",
+  "date": "2022-06-26T19:10:31Z",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/playlist.m3u8?token=Rv1VyO3DDzV0Iv4qcroKGQ&time=1600213524"
+      "url": "https://takeoff.jetstre.am/?account=atvijf&file=live&type=live&service=wowza&protocol=https&output=playlist.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "640x512",
-      "bitrate": "1153kbps",
-      "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/chunklist_b1048576.m3u8"
-    },
-    {
-      "id": "hls-2",
-      "format": "m3u8[h264+aac]",
-      "resolution": "768x608",
-      "bitrate": "2307kbps",
-      "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/chunklist_b2097152.m3u8"
-    },
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1920x1536",
-      "bitrate": "3460kbps",
-      "url": "https://ngx.cr1.streamzilla.xlcdn.com/session/6a5316f25c9c3bd8071b45ab1ccb62d4/sz/atvijf/wowza4/live/live.smil/chunklist_b3145728.m3u8"
+      "resolution": "1920x1080",
+      "bitrate": "6846kbps",
+      "url": "https://n1.cdn.jetstre.am/session/670c1534298389112cb5a4a8d58b8112/sz/atvijf/wowza4/live/live/chunklist_w603023627.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-$ url=https://www.nhnieuws.nl/nieuws/273051/overval-op-cafe-in-enkhuizen-de-barvrouw-rende-gillend-de-straat-op
+$ url=https://www.nhnieuws.nl/nieuws/305591/open-dagen-op-de-wallen-moeten-iets-aan-imagoprobleem-doen-leuk-om-een-keer-te-zien
 
-$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then parse-json(//script/substring-after(.,"INITIAL_PROPS__ = ")[.])/pageData/{"name":(blocks)()[type="video"]/video/x"{author}: {caption}","date":updated * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":xivid:m3u8-to-json(.//stream/url)} else {"name":substring-after(//title,"Media - ")||": Livestream","date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z","formats":xivid:m3u8-to-json(parse-json(//script/substring-after(.,"INIT_DATA__ = ")[.])/videoStream)})'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then parse-json(//script/substring-after(.,"INITIAL_PROPS__ = "))/pageData/{"name":"NH Nieuws: "||title,"date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":xivid:m3u8-to-json((blocks)()[type=("video","headerVideo")]/video/stream/url)} else {"name":substring-after(//head/title,"Media - ")||": Livestream","date":adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")) ! substring(.,1,19)||"Z","formats":xivid:m3u8-to-json(parse-json(//script/substring-after(.,"INIT_DATA__ = "))/videoStream)})'
 {
-  "name": "NH Nieuws: Overval op café de Vriendschap in Enkhuizen",
-  "date": "2020-09-15T21:23:50Z",
+  "name": "NH Nieuws: Open dagen op de Wallen moeten iets aan imagoprobleem doen: \"Leuk om een keer te zien\"",
+  "date": "2022-06-26T16:35:00Z",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/8ec1ff7f8b2ca8e2c4126e3de4a5bdcf/vod/_definst_/sz/nhnieuws/2020/09/15/5f61304eb80485f61304eb8083.smil/playlist.m3u8?token=1Ap_J1m9OXzue2kBVtcv6w&time=1600216187"
+      "url": "https://rrr.sz.xlcdn.com/?account=nhnieuws&file=2022%2F06%2F26%2F62b87accd061662b87accd0618.smil&type=streaming&service=wowza&output=playlist.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
       "resolution": "568x320",
       "bitrate": "649kbps",
-      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/8ec1ff7f8b2ca8e2c4126e3de4a5bdcf/vod/_definst_/sz/nhnieuws/2020/09/15/5f61304eb80485f61304eb8083.smil/chunklist_b589824.m3u8"
+      "url": "https://w2.cdn.jetstre.am/session/448265fee2f254a2ed75e924ae420637/vod/_definst_/sz/nhnieuws/2022/06/26/62b87accd061662b87accd0618.smil/chunklist_b589926.m3u8"
     },
     [...]
     {
@@ -7696,37 +7674,37 @@ $ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then parse-json(
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
       "bitrate": "4794kbps",
-      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/8ec1ff7f8b2ca8e2c4126e3de4a5bdcf/vod/_definst_/sz/nhnieuws/2020/09/15/5f61304eb80485f61304eb8083.smil/chunklist_b4358144.m3u8"
+      "url": "https://w2.cdn.jetstre.am/session/448265fee2f254a2ed75e924ae420637/vod/_definst_/sz/nhnieuws/2022/06/26/62b87accd061662b87accd0618.smil/chunklist_b4358144.m3u8"
     }
   ]
 }
 
-$ url=https://www.at5.nl/artikelen/e28238/inbrekers-gefilmd-terwijl-ze-een-woning-in-amstelveen-overhoop-halen
+$ url=https://www.at5.nl/artikelen/215709/gewelddadige-woningoverval-op-ijburg-bewoner-heeft-gevochten-voor-zijn-leven
 
-$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then parse-json(//script/substring-after(.,"INITIAL_PROPS__ = ")[.])/pageData/{"name":let $info:=(blocks)()[type=("video","headerVideo")]/video return if ($info/caption) then $info/x"{author}: {caption}" else x"{media//author}: {title}","date":updated * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":xivid:m3u8-to-json(.//stream/url)} else {"name":substring-after(//title,"Media - ")||": Livestream","date":substring(adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")),1,19)||"Z","formats":xivid:m3u8-to-json(parse-json(//script/substring-after(.,"INIT_DATA__ = ")[.])/videoStream)})'
+$ xidel -s --module=xivid.xqm -e 'doc("'$url'")/(if (//article) then parse-json(//script/substring-after(.,"INITIAL_PROPS__ = "))/pageData/{"name":if (contains("'$url'","nhnieuws.nl")) then "NH Nieuws: "||title else "AT5: "||title,"date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"formats":xivid:m3u8-to-json((blocks)()[type=("video","headerVideo")]/video/stream/url)} else {"name":substring-after(//head/title,"Media - ")||": Livestream","date":adjust-dateTime-to-timezone(current-dateTime() + duration("PT0.5S"),duration("PT0S")) ! substring(.,1,19)||"Z","formats":xivid:m3u8-to-json(parse-json(//script/substring-after(.,"INIT_DATA__ = "))/videoStream)})'
 {
-  "name": "AT5: Inbrekers gefilmd terwijl ze een woning in Amstelveen overhoop halen",
-  "date": "2020-04-05T11:13:35Z",
+  "name": "AT5: Gewelddadige woningoverval op IJburg: \"Bewoner heeft gevochten voor zijn leven\"",
+  "date": "2022-06-26T11:00:00Z",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/84999fac2f88ccc249d84f3d1ba508b7/vod/_definst_/sz/atvijf/2020/04/01/5e847e53d70f55e847e53d712f.smil/playlist.m3u8?token=SiKAx0WbOt0yBatLKnfpEw&time=1600217812"
+      "url": "https://rrr.sz.xlcdn.com/?account=atvijf&file=2022%2F06%2F22%2F62b2f729d9a9062b2f729d9a91.smil&type=streaming&service=wowza&output=playlist.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
       "resolution": "568x320",
       "bitrate": "649kbps",
-      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/84999fac2f88ccc249d84f3d1ba508b7/vod/_definst_/sz/atvijf/2020/04/01/5e847e53d70f55e847e53d712f.smil/chunklist_b589926.m3u8"
+      "url": "https://w1.cdn.jetstre.am/session/5ab5dbfb01905021e96dd45d0c391907/vod/_definst_/sz/atvijf/2022/06/22/62b2f729d9a9062b2f729d9a91.smil/chunklist_b589824.m3u8"
     },
     [...]
     {
       "id": "hls-4",
       "format": "m3u8[h264+aac]",
       "resolution": "1920x1080",
-      "bitrate": "5924kbps",
-      "url": "https://wos.cr2.streamzilla.xlcdn.com/session/84999fac2f88ccc249d84f3d1ba508b7/vod/_definst_/sz/atvijf/2020/04/01/5e847e53d70f55e847e53d712f.smil/chunklist_b5385216.m3u8"
+      "bitrate": "4794kbps",
+      "url": "https://w1.cdn.jetstre.am/session/5ab5dbfb01905021e96dd45d0c391907/vod/_definst_/sz/atvijf/2022/06/22/62b2f729d9a9062b2f729d9a91.smil/chunklist_b4358144.m3u8"
     }
   ]
 }
@@ -7737,26 +7715,25 @@ declare function xivid:nhnieuws($url as string) as object()? {
   doc($url)/(
     if (//article) then
       parse-json(
-        //script/substring-after(.,"INITIAL_PROPS__ = ")[.]
+        //script/substring-after(.,"INITIAL_PROPS__ = ")
       )/pageData/{
-        "name":let $info:=(blocks)()[type=("video","headerVideo")]/video return
-        if ($info/caption)
-        then $info/x"{author}: {caption}"
-        else x"{media//author}: {title}",
-        "date":updated * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-        "formats":xivid:m3u8-to-json(.//stream/url)
+        "name":if (contains($url,"nhnieuws.nl"))
+          then "NH Nieuws: "||title
+          else "AT5: "||title,
+        "date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+        "formats":xivid:m3u8-to-json(
+          (blocks)()[type=("video","headerVideo")]/video/stream/url
+        )
       }
     else {
-      "name":substring-after(//title,"Media - ")||": Livestream",
-      "date":substring(
-        adjust-dateTime-to-timezone(
-          current-dateTime() + duration("PT0.5S"),
-          duration("PT0S")
-        ),1,19
-      )||"Z",
+      "name":substring-after(//head/title,"Media - ")||": Livestream",
+      "date":adjust-dateTime-to-timezone(
+        current-dateTime() + duration("PT0.5S"),
+        duration("PT0S")
+      ) ! substring(.,1,19)||"Z",
       "formats":xivid:m3u8-to-json(
         parse-json(
-          //script/substring-after(.,"INIT_DATA__ = ")[.]
+          //script/substring-after(.,"INIT_DATA__ = ")
         )/videoStream
       )
     }

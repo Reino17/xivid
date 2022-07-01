@@ -647,26 +647,25 @@ declare function xivid:nhnieuws($url as string) as object()? {
   doc($url)/(
     if (//article) then
       parse-json(
-        //script/substring-after(.,"INITIAL_PROPS__ = ")[.]
+        //script/substring-after(.,"INITIAL_PROPS__ = ")
       )/pageData/{
-        "name":let $info:=(blocks)()[type=("video","headerVideo")]/video return
-        if ($info/caption)
-        then $info/x"{author}: {caption}"
-        else x"{media//author}: {title}",
-        "date":updated * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-        "formats":xivid:m3u8-to-json(.//stream/url)
+        "name":if (contains($url,"nhnieuws.nl"))
+          then "NH Nieuws: "||title
+          else "AT5: "||title,
+        "date":created * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
+        "formats":xivid:m3u8-to-json(
+          (blocks)()[type=("video","headerVideo")]/video/stream/url
+        )
       }
     else {
-      "name":substring-after(//title,"Media - ")||": Livestream",
-      "date":substring(
-        adjust-dateTime-to-timezone(
-          current-dateTime() + duration("PT0.5S"),
-          duration("PT0S")
-        ),1,19
-      )||"Z",
+      "name":substring-after(//head/title,"Media - ")||": Livestream",
+      "date":adjust-dateTime-to-timezone(
+        current-dateTime() + duration("PT0.5S"),
+        duration("PT0S")
+      ) ! substring(.,1,19)||"Z",
       "formats":xivid:m3u8-to-json(
         parse-json(
-          //script/substring-after(.,"INIT_DATA__ = ")[.]
+          //script/substring-after(.,"INIT_DATA__ = ")
         )/videoStream
       )
     }
