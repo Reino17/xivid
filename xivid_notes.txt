@@ -1769,7 +1769,7 @@ $ xidel -s npo_AT_300001444.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "format":if (contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]",
       "resolution"?:extract($x,"RESOLUTION=([\dx]+)",1)[.],
       "bitrate":join((round($br[2] div 1000),round($br[1] div 1000)),"|")||"kbps",
       "url":resolve-uri(x:lines($x)[last()],$url)
@@ -1839,7 +1839,7 @@ $ xidel -s kijk_Y0123rst7u9.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "format":if (contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]",
       "resolution"?:concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
         extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
@@ -1908,7 +1908,7 @@ $ xidel -s tw_1188986316194635777.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "format":if (contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]",
       "resolution"?:concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
         extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
@@ -2002,7 +2002,7 @@ $ xidel -s dm_x5aa1uc.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i,
-      "format":if (contains($x,"avc1")) then "m3u8[h264+aac]" else "m3u8[aac]",
+      "format":if (contains($x,"RESOLUTION")) then "m3u8[h264+aac]" else "m3u8[aac]",
       "resolution"?:concat(
         extract($x,"RESOLUTION=([\dx]+)",1)[.],
         extract($x,"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
@@ -2112,7 +2112,7 @@ $ xidel -s vimeo_224661084.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x,"avc1")) then
+      "format":if (contains($x,"RESOLUTION")) then
         if (matches($x,"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
         "m3u8[aac]",
@@ -2240,7 +2240,7 @@ $ xidel -s reddit.com_v61h9j.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x[last()],"avc1")) then
+      "format":if (contains($x[last()],"RESOLUTION")) then
         if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
         "m3u8[aac]",
@@ -2369,7 +2369,7 @@ $ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
     count $i
     return {
       "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x[last()],"avc1")) then
+      "format":if (contains($x[last()],"RESOLUTION")) then
         if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
         "m3u8[aac]",
@@ -2499,7 +2499,7 @@ declare function xivid:m3u8-to-json($url as string?) as array()? {
     count $i
     return {
       "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x[last()],"avc1")) then
+      "format":if (contains($x[last()],"RESOLUTION")) then
         if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
         "m3u8[aac]",

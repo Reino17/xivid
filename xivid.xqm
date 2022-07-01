@@ -76,7 +76,7 @@ declare function xivid:m3u8-to-json($url as string?) as array()? {
     count $i
     return {
       "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x[last()],"avc1")) then
+      "format":if (contains($x[last()],"RESOLUTION")) then
         if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
         "m3u8[aac]",
