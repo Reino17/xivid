@@ -68,7 +68,7 @@ Deze websites worden op dit moment ondersteund:
 npostart.nl             omroepwest.nl          vimeo.com
 gemi.st                 rijnmond.nl            dailymotion.com
 nos.nl                  rtvutrecht.nl          rumble.com
-tvblik.nl               omroepgelderland.nl    reddit.com
+tvblik.nl               gld.nl                 reddit.com
 uitzendinggemist.net    omroepzeeland.nl       redd.it
 rtl.nl                  omroepbrabant.nl       twitch.tv
 rtlxl.nl                l1.nl                  mixcloud.com

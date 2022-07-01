@@ -3,7 +3,7 @@
  : Xivid function module
  : --------------------------------
  :
- : Copyright (C) 2020 Reino Wijnsma
+ : Copyright (C) 2022 Reino Wijnsma
  :
  : This program is free software: you can redistribute it and/or modify
  : it under the terms of the GNU General Public License as published by
@@ -541,59 +541,105 @@ declare function xivid:tvblik($url as string) as object()? {
     xivid:kijk("https://kijk.nl/video/"||$host[2])
 };
 
-declare function xivid:regio($url as string) as object()? {
-  let $bbvms:={
-        "rtvnoord":"https://rtvnoord.bbvms.com/p/regiogroei_web_videoplayer/c/",
-        "omroepwest":"https://omroepwest.bbvms.com/p/regiogroei_west_web_videoplayer/c/",
-        "rijnmond":"https://rijnmond.bbvms.com/p/regiogroei_rijnmond_web_videoplayer/c/",
-        "rtvutrecht":"https://rtvutrecht.bbvms.com/p/regiogroei_utrecht_web_videoplayer/c/",
-        "gld":"https://omroepgelderland.bbvms.com/p/regiogroei_gelderland_web_videoplayer/c/",
-        "omroepzeeland":"https://omroepzeeland.bbvms.com/p/regiogroei_zeeland_web_videoplayer/c/",
-        "omroepbrabant":"https://omroepbrabant.bbvms.com/p/default/c/",
-        "l1":"https://limburg.bbvms.com/p/L1_video/c/"
+declare function xivid:regiogroei($url as string) as object()? {
+  let $omroep:={
+        "omropfryslan":{
+          "livestreamId":3748627,
+          "headerId":"friesland.fryslan",
+          "bbvms":"https://omropfryslan.bbvms.com/p/regiogroei_fryslan_web_videoplayer/c"
+        },
+        "rtvnoord":{
+          "livestreamId":3977713,
+          "headerId":"groningen",
+          "bbvms":"https://rtvnoord.bbvms.com/p/regiogroei_web_videoplayer/c"
+        },
+        "rtvdrenthe":{
+          "livestreamId":3230738,
+          "headerId":"drenthe",
+          "bbvms":"https://rtvdrenthe.bbvms.com/p/regiogroei_drenthe_web_videoplayer/c"
+        },
+        "rtvoost":{
+          "livestreamId":4198331,
+          "headerId":"overijssel",
+          "bbvms":"https://rtvoost.bbvms.com/p/regiogroei_oost_web_videoplayer/c"
+        },
+        "omroepwest":{
+          "livestreamId":2054317,
+          "headerId":"zh-west",
+          "bbvms":"https://omroepwest.bbvms.com/p/regiogroei_west_web_videoplayer/c"
+        },
+        "rijnmond":{
+          "livestreamId":1227908,
+          "headerId":"zh-rijnmond",
+          "bbvms":"https://rijnmond.bbvms.com/p/regiogroei_rijnmond_web_videoplayer/c"
+        },
+        "rtvutrecht":{
+          "livestreamId":3742011,
+          "headerId":"utrecht",
+          "bbvms":"https://rtvutrecht.bbvms.com/p/regiogroei_utrecht_web_videoplayer/c"
+        },
+        "gld":{
+          "livestreamId":3651657,
+          "headerId":"gelderland",
+          "bbvms":"https://omroepgelderland.bbvms.com/p/regiogroei_gelderland_web_videoplayer/c"
+        },
+        "omroepzeeland":{
+          "livestreamId":3745936,
+          "headerId":"zeeland",
+          "bbvms":"https://omroepzeeland.bbvms.com/p/regiogroei_zeeland_web_videoplayer/c"
+        }
       },
-      $host:=extract($url,"(\w+)\.nl",1)
+      $host:=extract($url,"www\.(.+)\.nl",1),
+      $path:=tokenize($url,"/")
   return
-  doc($url)/xivid:bbvms(
-    if ($host = "omropfryslan") then
-      replace(
-        //div[starts-with(@class,"bluebillywig")]/(script/@src,iframe/@data-src),
-        "(.+\.).+","https:$1json"
-      )
-    else if (
-      $host = ("rtvnoord","omroepwest","rijnmond","rtvutrecht","gld","omroepzeeland")
-    ) then
-      x"{$bbvms($host)}{
-        if (ends-with($url,"live")) then
-          extract(//body/script[1],"&quot;(\d{7})&quot;",1)
-        else if ($host = "rtvutrecht") then
-          extract(//body/script[1],"&quot;(\d{7})&quot;",1,"*")[2]
-        else
-          extract(//body/script[1],"&quot;(sourceid_string.+?)&quot;",1)
-      }.json"
-    else if ($host = ("rtvdrenthe","rtvoost")) then
-      resolve-uri(//@data-media-url,$url)
-    else if ($host = "omroepbrabant") then
-      x"{$bbvms($host)}{
-        parse-json(//script[@type="application/json"])/props/pageProps/props/(
-          if (clip) then integer(clip) else "sourceid_string:"||programId
-        )
-      }.json"
-    else (
-      //div[@class="bbwLive-player"]/script/x"{@src}on",
-      //div[@class="bbw bbwVideo"]/x"https://limburg.bbvms.com/p/L1_video/c/{@data-id}.json"
-    ),
+  map:get($omroep,$host)/xivid:bbvms(
+    x"{bbvms}/{
+      if (ends-with($url,"live"))
+      then livestreamId
+      else x:request(
+        map:merge((
+          {
+            "headers":(
+              x"Accept: application/vnd.groei.{headerId}+json;v=3.0",
+              "X-Groei-Platform: web","X-Groei-Layout: wide"
+            )
+          },
+          request-combine(
+            "https://api.regiogroei.cloud/page/episode/"||$path[last()],
+            {"slug":$path[last() - 1],"origin":$path[last()]}
+          )
+        ))
+      )/json/(components)(1)/sourceId
+    }.json",
     if ($host = "omropfryslan") then "Omrop Frysl&#226;n" else (),
-    if ($host = "omropfryslan") then
-      //div[@class="node-content-wrapper"]/header/normalize-space(h3)
-    else if ($host = ("rtvnoord","rijnmond")) then
-      //h1[@class="program-header_title"]/normalize-space()
-    else if ($host = ("rtvdrenthe","rtvoost")) then
-      //div[@class="media-details"]/h3
-    else if ($host = ("omroepwest","rtvutrecht","gld","omroepzeeland","omroepbrabant")) then
+    if (ends-with($url,"live")) then ()
+    else normalize-space(doc($url)//h1[@class="program-header_title"])
+  )
+};
+
+declare function xivid:obr($url as string) as object()? {
+  if ($url = "https://www.omroepbrabant.nl/tv")
+  then xivid:bbvms("https://omroepbrabant.bbvms.com/p/default/c/1080520.json",(),())
+  else xivid:bbvms(
+    x"https://omroepbrabant.bbvms.com/p/default/c/sourceid_string:{
+      extract("'$url'","\d+",0,"*")[last()]
+    }.json",
+    (),
+    doc($url)//meta[@property="og:title"]/normalize-space(@content)
+  )
+};
+
+declare function xivid:l1($url as string) as object()? {
+  doc($url)/(
+    if ($url = "https://l1.nl/live-l1-tv")
+    then xivid:bbvms(//div[@class="bbwLive-player"]/script/@src||"on",(),())
+    else xivid:bbvms(
+      x"https://limburg.bbvms.com/p/L1_video/c/{
+        //div[@class="bbw bbwVideo"]/@data-id
+      }.json",
+      (),
       //meta[@property="og:title"]/@content
-    else
-      //div[@class="editorTxt"]/h2
+    )
   )
 };
 

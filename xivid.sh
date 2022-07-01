@@ -3,7 +3,7 @@
 # Xivid bash script
 # --------------------------------
 #
-# Copyright (C) 2020 Reino Wijnsma
+# Copyright (C) 2022 Reino Wijnsma
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ Ondersteunde websites:
   npostart.nl             omroepwest.nl          vimeo.com
   gemi.st                 rijnmond.nl            dailymotion.com
   nos.nl                  rtvutrecht.nl          rumble.com
-  tvblik.nl               omroepgelderland.nl    reddit.com
+  tvblik.nl               gld.nl                 reddit.com
   uitzendinggemist.net    omroepzeeland.nl       redd.it
   rtl.nl                  omroepbrabant.nl       twitch.tv
   rtlxl.nl                l1.nl                  mixcloud.com
@@ -152,11 +152,13 @@ eval "$(xidel -e '
         "rtl":array{"rtl.nl","rtlxl.nl","rtlnieuws.nl"},
         "kijk":array{"kijk.nl"},
         "tvblik":array{"tvblik.nl","uitzendinggemist.net"},
-        "regio":array{
-          "omropfryslan.nl","rtvnoord.nl","rtvdrenthe.nl","rtvoost.nl",
-          "omroepwest.nl","rijnmond.nl","rtvutrecht.nl","omroepgelderland.nl",
-          "omroepzeeland.nl","omroepbrabant.nl","l1.nl"
+        "regiogroei":array{
+          "omropfryslan.nl","rtvnoord.nl","rtvdrenthe.nl",
+          "rtvoost.nl","omroepwest.nl","rijnmond.nl",
+          "rtvutrecht.nl","gld.nl","omroepzeeland.nl"
         },
+        "obr":array{"omroepbrabant.nl"},
+        "l1":array{"l1.nl"},
         "nhnieuws":array{"nhnieuws.nl","at5.nl"},
         "ofl":array{"omroepflevoland.nl"},
         "dumpert":array{"dumpert.nl"},
