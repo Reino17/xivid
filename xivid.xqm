@@ -264,23 +264,13 @@ declare function xivid:bbvms(
   $url as string?,$publ as string?,$title as string?
 ) as object()? {
   json-doc($url)/(
-    let $host:=publicationData return
-    if (
-      sourcetype="live" or
-      contains((assets)(1)/src,"/live/") or
-      ends-with((assets)(1)/src,"hls.m3u8")
-    ) then {
+    if (clipData/sourcetype="live") then {
       "name":x"{if ($publ) then $publ else publicationData/label}: Livestream",
       "date":adjust-dateTime-to-timezone(
-        format-dateTime(
-          current-dateTime() + duration("PT0.5S"),
-          "[Y]-[M01]-[D01]T[H01]:[m01]:[s01][Z]"
-        ) ! dateTime(.),
+        current-dateTime() + duration("PT0.5S"),
         duration("PT0S")
-      ),
-      "formats":xivid:m3u8-to-json(
-        resolve-uri(clipData/(assets)()/src,$host/defaultMediaAssetPath)
-      )
+      ) ! substring(.,1,19)||"Z",
+      "formats":xivid:m3u8-to-json(clipData/(assets)()/src)
     } else {
       "name":join(
         (
@@ -288,9 +278,13 @@ declare function xivid:bbvms(
           if ($title) then $title else clipData/title
         ),": "
       ),
-      "date": clipData/publisheddate,
+      "date":adjust-dateTime-to-timezone(
+        dateTime(clipData/publisheddate) + duration("PT0.5S"),
+        duration("PT0S")
+      ) ! substring(.,1,19)||"Z",
       "duration"?:clipData/length * duration("PT1S"),
-      "formats"?:clipData/array{
+      "formats"?:let $host:=publicationData return
+      clipData/array{
         (subtitles)()/{
           "id":"sub-1",
           "format":"srt",
@@ -301,13 +295,12 @@ declare function xivid:bbvms(
         for $x at $i in (assets)()[not(ends-with(src,"m3u8"))]
         order by exists($x/isSource),$x/bandwidth
         count $i
-        return
-        $x/{
+        return {
           "id":"pg-"||$i,
           "format":"mp4[h264+aac]",
-          "resolution":x"{width}x{height}",
-          "bitrate":bandwidth||"kbps",
-          "url":resolve-uri(src,$host/defaultMediaAssetPath)
+          "resolution":x"{$x/width}x{$x/height}",
+          "bitrate":$x/bandwidth||"kbps",
+          "url":resolve-uri($x/src,$host/defaultMediaAssetPath)
         },
         xivid:m3u8-to-json(
           resolve-uri(
@@ -317,20 +310,20 @@ declare function xivid:bbvms(
         )(),
         let $org:=parse-json(s3Info) return {
           "id":"pg-"||count((assets)()[not(ends-with(src,"m3u8"))]) + 1,
-          "format":extract(src,".+\.(.+)",1) ! x"{.}[{
-            if (.="mkv") then "h264+opus"
-            else if ($org//format_name="mxf") then "mpeg2+pcm"
-            else "h264+aac"
-          }]",
+          "format":($org/format/filename,src)[1] ! (
+            if (ends-with(.,"mkv")) then "mkv[h264+opus]"
+            else if (ends-with(.,"mxf")) then "mxf[mpeg2+pcm]"
+            else "mp4[h264+aac]"
+          ),
           "resolution":x"{originalWidth}x{originalHeight}",
           "bitrate"?:$org/format/x"{round(tokenize(bit_rate)[1] * 1024)}kbps",
-          "url":if (exists($org)) then
-            $org/format/filename
-          else
+          "url":(
+            $org/format/filename,
             resolve-uri(
-              .[src and not(src = (assets)()/src)]/src,
+              .[not(src = (assets)()/src)]/src[.],
               $host/defaultMediaAssetPath
             )
+          )[1]
         }[url]
       }[exists(.())]
     }
