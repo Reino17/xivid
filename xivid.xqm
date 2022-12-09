@@ -1013,12 +1013,12 @@ declare function xivid:rumble($url as string) as object()? {
         else parse-json(
           doc($url)//script[@type="application/ld+json"]
         )(1)/embedUrl
-      ) ! extract(.,"embed/(.+)/?",1)
+      ) ! extract(.,"embed/(v[0-9a-z]+)",1)
     }
   )/json-doc(url)/{
     "name":x"{author/name}: {parse-html(title)}",
     "date":dateTime(pubDate),
-    "duration":duration * duration("PT1S"),
+    "duration"?:.[live=0]/duration * duration("PT1S"),
     "formats":array{
       cc/nl/{
         "id":"sub-1",
@@ -1027,7 +1027,7 @@ declare function xivid:rumble($url as string) as object()? {
         "label":language,
         "url":path
       },
-      for $x at $i in ua/*/*
+      for $x at $i in ua/(mp4,webm)/*
       order by $x/meta/bitrate
       count $i
       return
@@ -1039,7 +1039,8 @@ declare function xivid:rumble($url as string) as object()? {
         "resolution":meta/x"{w}x{h}",
         "bitrate":meta/bitrate||"kbps",
         "url":url
-      }
+      },
+      xivid:m3u8-to-json(ua/hls/auto/url)
     }
   }
 };

@@ -5602,12 +5602,12 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)'
   "videoQuality": "Full HD"
 }
 
-$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})'
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(v[0-9a-z]+)",1)})'
 {
   "url": "https://rumble.com/embedJS/u3/?request=video&ver=2&v=v11eh22"
 }
 
-$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})/json-doc(url)'
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(v[0-9a-z]+)",1)})/json-doc(url)'
 {
   "fps": 50,
   "w": 2048,
@@ -5718,9 +5718,12 @@ $ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video"
   "duration": 7836,
   "pubDate": "2022-05-10T09:41:02+00:00",
   [...]
+  "live": 0,
+  "live_placeholder": false,
+  "livestream_has_dvr": null
 }
 
-$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(.+)/",1)})/json-doc(url)/{"name":x"{author/name}: {title}","date":dateTime(pubDate),"duration":duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/*/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url}}}'
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/extract(embedUrl,"embed/(v[0-9a-z]+)",1)})/json-doc(url)/{"name":x"{author/name}: {title}","date":dateTime(pubDate),"duration":duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/*/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url}}}'
 {
   "name": "MPMedia: PANDAMNED [documentary]",
   "date": "2022-05-10T09:41:02Z",
@@ -5768,15 +5771,10 @@ $ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video"
 
 $ url=https://rumble.com/embed/v11eh22/
 
-$ xidel -se '(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)'
+$ xidel -se '(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)'
 v11eh22
 
-$ url=https://rumble.com/embed/v11eh22
-
-$ xidel -se '(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/?",1)'
-v11eh22
-
-$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)})/[...]'
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":(if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/[...]'
 
 ------------------------------------------------------------------------------------------------
 
@@ -5791,14 +5789,14 @@ vjmcuf
 
 $ url=vjmcuf
 
-$ xidel -se 'if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)'
+$ xidel -se 'if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)'
 vjmcuf
 
-$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(.+)/",1)})/json-doc(url) ! (title,parse-html(title))'
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/json-doc(url) ! (title,parse-html(title))'
 &quot;Een neurotische populatie die leeft in angst voor ziektekiemen&quot;
 "Een neurotische populatie die leeft in angst voor ziektekiemen"
 
-$ xidel -s --module=xivid.xqm -e 'xivid:rumble("vjmcuf")'
+$ xidel -s --module=xivid.xqm -e 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/json-doc(url)/{"name":x"{author/name}: {parse-html(title)}","date":dateTime(pubDate),"duration":duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/*/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url}}}'
 {
   "name": "BLCKBX: \"Een neurotische populatie die leeft in angst voor ziektekiemen\"",
   "date": "2021-12-31T14:18:00Z",
@@ -5831,6 +5829,119 @@ $ xidel -s --module=xivid.xqm -e 'xivid:rumble("vjmcuf")'
 
 ------------------------------------------------------------------------------------------------
 
+$ xidel -s "https://www.blckbx.tv/livestreams/blckbx-today-2022-12-02" -e '//div[@class="w-full h-full blckbx-video"]/iframe/@src'
+https://rumble.com/embed/v1vvaum/?pub=f37b9
+
+$ url=https://rumble.com/embed/v1vvaum/?pub=f37b9   # Tijdens de livestream.
+
+$ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/json-doc(url)'
+{
+  "fps": 23.98,
+  "w": 640,
+  "h": 360,
+  "u": {
+    "hls": {
+      "url": "https://rumble.com/live-hls-dvr/1vvaum/playlist.m3u8",
+      "meta": {
+        "live": true
+      }
+    }
+  },
+  "ua": {
+    "mp4": [],
+    "webm": [],
+    "hls": {
+      "auto": {
+        "url": "https://rumble.com/live-hls-dvr/1vvaum/playlist.m3u8",
+        "meta": {
+          "live": true
+        }
+      }
+    }
+  },
+  [...]
+  "cc": [],
+  "l": "/v1yhg34-blckbx-today-nieuwe-tegenwind-docu-boeren-illegaal-door-opgeheven-pas-wolf-.html",
+  "r": 1,
+  "title": "blckbx today: Nieuwe Tegenwind docu | Boeren &apos;illegaal&apos; door opgeheven PAS | Wolf verdrukt landbouw",
+  "author": {
+    "name": "BLCKBX",
+    "url": "https://rumble.com/user/BLCKBX"
+  },
+  "player": false,
+  "duration": 59,
+  "pubDate": "2022-12-02T16:09:23+00:00",
+  [...]
+  "live": 2,
+  "live_placeholder": false,
+  "livestream_has_dvr": true,
+  [...]
+}
+
+$ xidel -s --module=xivid.xqm -e 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/json-doc(url)/{"name":x"{author/name}: {parse-html(title)}","date":dateTime(pubDate),"duration"?:.[live=0]/duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/(mp4,webm)/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url},xivid:m3u8-to-json(ua/hls/auto/url)}}'
+{
+  "name": "BLCKBX: blckbx today: Nieuwe Tegenwind docu | Boeren 'illegaal' door opgeheven PAS | Wolf verdrukt landbouw",
+  "date": "2022-12-02T16:09:23Z",
+  "formats": [
+    [
+      {
+        "id": "hls-0",
+        "format": "m3u8[manifest]",
+        "url": "https://rumble.com/live-hls-dvr/1vvaum/playlist.m3u8"
+      },
+      {
+        "id": "hls-1",
+        "format": "m3u8[h264+aac]",
+        "resolution": "640x360",
+        "bitrate": "1200kbps",
+        "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_360p/chunklist_DVR.m3u8"
+      },
+      {
+        "id": "hls-2",
+        "format": "m3u8[h264+aac]",
+        "resolution": "1280x720",
+        "bitrate": "2800kbps",
+        "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_720p/chunklist_DVR.m3u8"
+      },
+      {
+        "id": "hls-3",
+        "format": "m3u8[h264+aac]",
+        "resolution": "1920x1080",
+        "bitrate": "4500kbps",
+        "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_1080p/chunklist_DVR.m3u8"
+      }
+    ]
+  ]
+}
+
+$ url=https://rumble.com/embed/v1vvaum/?pub=f37b9   # Een aantal uren later.
+
+$ xidel -s --module=xivid.xqm -e '[...]'
+{
+  "name": "BLCKBX: blckbx today: Nieuwe Tegenwind docu | Boeren 'illegaal' door opgeheven PAS | Wolf verdrukt landbouw",
+  "date": "2022-12-02T16:09:23Z",
+  "duration": "PT1H17M5S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "203kbps",
+      "url": "https://sp.rmbl.ws/s8/2/W/g/N/d/WgNdh.oaa.rec.mp4"
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "2694kbps",
+      "url": "https://sp.rmbl.ws/s8/2/W/g/N/d/WgNdh.haa.rec.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:rumble($url as string) as object()? {
   request-combine(
     "https://rumble.com/embedJS/u3/",
@@ -5843,12 +5954,12 @@ declare function xivid:rumble($url as string) as object()? {
         else parse-json(
           doc($url)//script[@type="application/ld+json"]
         )(1)/embedUrl
-      ) ! extract(.,"embed/(.+)/?",1)
+      ) ! extract(.,"embed/(v[0-9a-z]+)",1)
     }
   )/json-doc(url)/{
     "name":x"{author/name}: {parse-html(title)}",
     "date":dateTime(pubDate),
-    "duration":duration * duration("PT1S"),
+    "duration"?:.[live=0]/duration * duration("PT1S"),
     "formats":array{
       cc/nl/{
         "id":"sub-1",
@@ -5857,7 +5968,7 @@ declare function xivid:rumble($url as string) as object()? {
         "label":language,
         "url":path
       },
-      for $x at $i in ua/*/*
+      for $x at $i in ua/(mp4,webm)/*
       order by $x/meta/bitrate
       count $i
       return
@@ -5869,7 +5980,8 @@ declare function xivid:rumble($url as string) as object()? {
         "resolution":meta/x"{w}x{h}",
         "bitrate":meta/bitrate||"kbps",
         "url":url
-      }
+      },
+      xivid:m3u8-to-json(ua/hls/auto/url)
     }
   }
 };
