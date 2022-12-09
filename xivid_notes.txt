@@ -6262,330 +6262,175 @@ declare function xivid:reddit($url as string) as object()? {
 
 [nos]
 
-$ url=https://nos.nl/collectie/13781/video/2385546-bekijk-de-samenvatting-van-nederland-oostenrijk-2-0
+$ url=https://nos.nl/video/2455009-bekijk-hier-de-samenvatting-van-nederland-verenigde-staten
 
-$ xidel -se 'parse-json(doc("'$url'")//main/script)/item'
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])'
 {
-  "id": 2385546,
-  "title": "Bekijk de samenvatting van Nederland-Oostenrijk (2-0)",
-  "description": "Een samenvatting van de tweede groepswedstrijd van het Nederlands elftal op het EK voetbal, tegen Oostenrijk.",
-  "geoprotection": true,
-  [...]
-  "formats": [
-    {
-      "width": 640,
-      "height": 360,
-      "name": "360p",
-      "label": "Laag - 360p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
-      }
-    },
-    {
-      "width": 960,
-      "height": 540,
-      "name": "540p",
-      "label": "Hoog - 540p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
-      }
-    },
-    {
-      "width": 1280,
-      "height": 720,
-      "name": "720p",
-      "label": "HD - 720p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
-      }
-    },
-    {
-      "width": 848,
-      "height": 480,
-      "name": "480p",
-      "label": "Normaal - 480p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
-      }
-    }
-  ],
-  "aspect_ratios": {
-    "ratio": "16:9",
-    "profiles": [
-      {
-        "name": "hls_unencrypted",
-        "mimetype": "application/vnd.apple.mpegurl",
-        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=hls_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
+  "props": {
+    [...]
+    "pageProps": {
+      [...]
+      "data": {
+        "id": 2455009,
+        "type": "video",
+        "title": "Bekijk hier de samenvatting van Nederland - Verenigde Staten",
+        "description": "De hoogtepunten van de wedstrijd tussen Nederland en Verenigde Staten in de achtste finales van het WK 2022.",
+        "publishedAt": "2022-12-03T18:48:22+0100",
+        "keywords": ["samenvattingen", "WK Qatar", "WK 2022", "samenvatting", "Voetbal"],
+        "modifiedAt": "2022-12-03T18:48:22+0100",
+        "owner": "sport",
+        "supplyChannelName": "NOS Voetbal",
+        [...]
+        "video": {
+          "id": 2455009,
+          "hasCoreId": true,
+          "type": "video",
+          "title": "Bekijk hier de samenvatting van Nederland - Verenigde Staten",
+          "geoprotection": true,
+          "description": "De hoogtepunten van de wedstrijd tussen Nederland en Verenigde Staten in de achtste finales van het WK 2022.",
+          [...]
+          "source": {
+            "aspectRatio": "16:9",
+            "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_abd5c91c_9c1a_44d4_809a_91f85376dc23&profile=hls_unencrypted&policy=[...]",
+            "mimetype": "application/vnd.apple.mpegurl"
+          },
+          [...]
+          "duration": "6:23"
+        },
+        [...]
+        "url": "https://nos.nl/l/2455009"
       },
-      {
-        "name": "smooth_unencrypted",
-        "mimetype": "application/vnd.ms-sstr+xml",
-        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=smooth_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
-      },
-      {
-        "name": "dash_unencrypted",
-        "mimetype": "application/dash+xml",
-        "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d&profile=dash_unencrypted&policy=eyJ0eXA[...]7qnoHQg"
-      }
-    ]
+      "queryParams": {}
+    },
+    "__N_SSP": true
   },
   [...]
-  "published_at": "2021-06-17T23:06:27+0200",
-  "duration": 307,
-  [...]
-  "modified_at": "2021-06-17T23:06:27+0200",
-  [...]
 }
 
-Alle urls in (formats)()/url/mp4 zijn precies dezelfde als aspect_ratios/(profiles)()[name="hls_unencrypted"]/url.
-
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/item/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":aspect_ratios/profiles/array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":.()[name="dash_unencrypted"]/url})/url},xivid:m3u8-to-json(.()[name="hls_unencrypted"]/url)()}}'
+$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script[@type="application/json"])//data/{"name":x"{supplyChannelName}: {video/title}","date":adjust-dateTime-to-timezone(dateTime(replace(publishedAt,"(.{22})(.{2})","$1:$2")),duration("PT0S")),"duration":video/time(substring("00:00:00",1,8 - string-length(duration))||duration) - time("00:00:00"),"formats":xivid:m3u8-to-json(x:request({"method":"HEAD","url":video/source/url})/url)}'
 {
-  "name": "NOS: Bekijk de samenvatting van Nederland-Oostenrijk (2-0)",
-  "date": "2021-06-17T21:06:27Z",
-  "duration": "PT5M7S",
+  "name": "NOS Voetbal: Bekijk hier de samenvatting van Nederland - Verenigde Staten",
+  "date": "2022-12-03T17:48:22Z",
+  "duration": "PT6M23S",
   "formats": [
-    {
-      "id": "dash-0",
-      "format": "mpd[manifest]",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/dash_unencrypted/[...]/stream.mpd"
-    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/playlist.m3u8"
+      "url": "https://npo.prd.cdn.bcms.kpn.com/2bbac82b55fac5dbcce6d01b410d225f_1670198415/vod/npo/usp/nos/hls_unencrypted/[...]/playlist.m3u8"
     },
     {
       "id": "hls-1",
-      "format": "m3u8[h264+aac]",
+      "format": "m3u8[h264]",
       "resolution": "640x360@25fps",
-      "bitrate": "355|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=355156.m3u8"
-    },
-    {
-      "id": "hls-2",
-      "format": "m3u8[h264+aac]",
-      "resolution": "960x540@25fps",
-      "bitrate": "1170|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=1170001.m3u8"
-    },
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720@25fps",
-      "bitrate": "1635|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=1634927.m3u8"
-    },
-    {
-      "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "848x480@25fps",   # Och, och, och, NOS toch!
-      "bitrate": "8413|128kbps",       # Een nul te veel in de bitrate?
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_9c340c66_2cb2_4bc3_8731_96152a38823d_v1623964114-audio=128000-video=8412720.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://nos.nl/artikel/2378116-persvrijheid-in-eu-landen-in-gevaar-het-zijn-kleine-stapjes-die-je-niet-doorhebt.html
-
-$ xidel -se 'parse-json(doc("'$url'")//main/script)/(item,.//video)'
-{
-  "id": 2341766,
-  "title": "Protest tegen ontslag Hongaarse hoofdredacteur: 'Grootste nieuwssite geruïneerd'",
-  "description": "In Boedapest zijn enkele duizenden betogers de straat opgegaan om te demonstreren tegen het ontslag van de hoofdredacteur van de nieuwssite index.hu, en om de medewerkers van de site die hierop zelf ontslag namen te steunen.",
-  [...]
-  "formats": [
-    {
-      "width": 848,
-      "height": 480,
-      "name": "480p",
-      "label": "Normaal - 480p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
-      }
-    },
-    {
-      "width": 1280,
-      "height": 720,
-      "name": "720p",
-      "label": "HD - 720p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
-      }
-    },
-    {
-      "width": 960,
-      "height": 540,
-      "name": "540p",
-      "label": "Hoog - 540p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
-      }
-    },
-    {
-      "width": 640,
-      "height": 360,
-      "name": "360p",
-      "label": "Laag - 360p",
-      "mimetype": "application/vnd.apple.mpegurl",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/adaptive?legacy=resolve.php&url=%2Fcontent%2Fvideo%2F2020%2F07%2F24%2F258706-1031d20fe5090b5bafa95a7f38c02153%2F258706-1031d20fe5090b5bafa95a7f38c02153.ism%2F258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
-      }
-    }
-  ],
-  [...]
-  "published_at": "2020-07-24T22:01:35+0200",
-  "duration": 97,
-  [...]
-}
-
-Geen "aspect_ratios"-object en ook hier weer zijn alle urls hetzelfde.
-
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.//video)/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,(formats)(1)/url/mp4)[1])()}}'
-{
-  "name": "NOS: Protest tegen ontslag Hongaarse hoofdredacteur: 'Grootste nieuwssite geruïneerd'",
-  "date": "2020-07-24T20:01:35Z",
-  "duration": "PT1M37S",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://adaptive-e05c1c.npostreaming.nl/urishieldv2/[...]/258706-1031d20fe5090b5bafa95a7f38c02153.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "640x360",
-      "bitrate": "400|128kbps",
-      "url": "https://adaptive-e05c1c.npostreaming.nl/urishieldv2/[...]/258706-1031d20fe5090b5bafa95a7f38c02153-audio_eng=128000-video_eng=400000.m3u8"
+      "bitrate": "508|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/2bbac82b55fac5dbcce6d01b410d225f_1670198415/vod/npo/usp/nos/hls_unencrypted/[...]/NOSC_abd5c91c_9c1a_44d4_809a_91f85376dc23_v1670089732-audio=128000-video=508428.m3u8"
     },
     [...]
     {
       "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "1280x720",
-      "bitrate": "1799|128kbps",
-      "url": "https://adaptive-e05c1c.npostreaming.nl/urishieldv2/[...]/258706-1031d20fe5090b5bafa95a7f38c02153-audio_eng=128000-video_eng=1799000.m3u8"
+      "format": "m3u8[h264]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "3519|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/2bbac82b55fac5dbcce6d01b410d225f_1670198415/vod/npo/usp/nos/hls_unencrypted/[...]/NOSC_abd5c91c_9c1a_44d4_809a_91f85376dc23_v1670089732-audio=128000-video=3519288.m3u8"
     }
   ]
 }
 
 ------------------------------------------------------------------------------------------------
 
-$ url=https://nos.nl/l/2011289
+$ url=https://nos.nl/artikel/2449519-keen-stunt-op-51-jarige-leeftijd-en-is-weer-nederlands-kampioen-tafeltennis   # Artikel met meerdere video's.
 
-$ xidel -se 'parse-json(doc("'$url'")//main/script)/(item,.//video)'
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])'
 {
-  "id": 2011289,
-  "title": "Samenvatting Spanje-Nederland WK 2014",
-  "description": "Samenvatting van de inmiddels historische wedstrijd tussen Nederland en Spanje op het WK van 2014.",
-  "geoprotection": true,
-  [...]
-  "formats": [
-    {
-      "width": 640,
-      "height": 360,
-      "name": "360p",
-      "label": "Laag - 360p",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fvod01.mp4"
-      }
+  "props": {
+    [...]
+    "pageProps": {
+      [...]
+      "data": {
+        "id": 2449519,
+        "bios": [],
+        "type": "article",
+        "keywords": ["nk tafeltennis", "trinko keen"],
+        "title": "Keen stunt op 51-jarige leeftijd en is weer Nederlands kampioen tafeltennis",
+        "description": "Vijftien jaar geleden werd hij voor het laatste nationaal kampioen. Door zijn stunt van nu komt de teller op zeven Nederlandse titels.",
+        "pills": [],
+        "publishedAt": "2022-10-23T18:22:10+0200",
+        "modifiedAt": "2022-10-23T18:22:10+0200",
+        "shareImageSrc": "https://cdn.nos.nl/image/2022/10/23/908485/1024x576a.jpg",
+        "items": [
+          [...]
+          {
+            "id": "2449535",
+            "hasCoreId": true,
+            "type": "video",
+            "title": "Keen verrast: op 51-jarige leeftijd Nederlands kampioen tafeltennis",
+            "geoprotection": false,
+            "description": "Tijdens de NK tafeltennis in Zwolle heeft Trinko Keen vijftien jaar na zijn laatste nationale titel weer een NK gewonnen.",
+            [...]
+            "source": {
+              "aspectRatio": "16:9",
+              "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_3f677cb8_b4d6_4d44_ac2a_21a535ce5be5&profile=hls_unencrypted&policy=[...]",
+              "mimetype": "application/vnd.apple.mpegurl"
+            },
+            [...]
+            "duration": "2:45"
+          },
+          [...]
+          {
+            "id": "2449533",
+            "hasCoreId": true,
+            "type": "video",
+            "title": "Keen pakt na vijftien jaar weer nationale titel: 'Het voelt als de eerste'",
+            "geoprotection": false,
+            "description": "De reactie van tafeltennisicoon Trinko Keen, die na vijftien jaar op 51-jarige leeftijd zijn zevende nationale titel veroverde.",
+            [...]
+            "source": {
+              "aspectRatio": "16:9",
+              "url": "https://resolver.streaming.api.nos.nl/stream?stream=NOSC_699563bc_001a_4c81_8561_86ed353a322c&profile=hls_unencrypted&policy=[...]",
+              "mimetype": "application/vnd.apple.mpegurl"
+            },
+            [...]
+            "duration": "2:47"
+          },
+          [...]
+        ],
+        [...]
+        "supplyChannelName": "NOS Sport",
+        [...]
+        "url": "https://nos.nl/l/2449519"
+      },
+      "queryParams": {}
     },
-    {
-      "width": 848,
-      "height": 480,
-      "name": "480p",
-      "label": "Normaal - 480p",
-      "url": {
-        "mp4": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fweb03.mp4"
-      }
-    }
-  ],
-  [...]
-  "published_at": "2014-12-30T21:47:07+0100",
-  "duration": 573,
+    "__N_SSP": true
+  },
   [...]
 }
 
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.//video)/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{(formats)()[ends-with(url/mp4,"mp4")]/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":x"{width}x{height}","url":url/mp4},{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,(formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4)[1])()}}'
+$ xidel -s --module=xivid.xqm -e 'let $src:=parse-json(doc("'$url'")//script[@type="application/json"])//data return $src/(video,(items)()[type="video"][1])/{"name":x"{$src/supplyChannelName}: {title}","date":adjust-dateTime-to-timezone(dateTime(replace($src/publishedAt,"(.{22})(.{2})","$1:$2")),duration("PT0S")),"duration":time(substring("00:00:00",1,8 - string-length(duration))||duration) - time("00:00:00"),"formats":xivid:m3u8-to-json(x:request({"method":"HEAD","url":source/url})/url)}'
 {
-  "name": "NOS: Samenvatting Spanje-Nederland WK 2014",
-  "date": "2014-12-30T20:47:07Z",
-  "duration": "PT9M33S",
+  "name": "NOS Sport: Keen verrast: op 51-jarige leeftijd Nederlands kampioen tafeltennis",
+  "date": "2022-10-23T16:22:10Z",
+  "duration": "PT2M45S",
   "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360",
-      "url": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fvod01.mp4"
-    },
-    {
-      "id": "pg-2",
-      "format": "mp4[h264+aac]",
-      "resolution": "848x480",
-      "url": "https://resolver.streaming.api.nos.nl/video?legacy=resolve.php&url=https%3A%2F%2Fdownload.omroep.nl%2Fnos%2Fcontent%2Fvideo%2F2014%2F12%2F30%2F33641%2Fweb03.mp4"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://nos.nl/artikel/2372728-eerland-pakt-olympische-nominatie-voor-tokio-maar-hikt-tegen-eis-noc-nsf-aan
-
-$ xidel -se 'parse-json(doc("'$url'")//main/script)/(item,.//video)'
-{
-  "id": 2372784,
-  "title": "Eerland pakt olympische nominatie: 'Goed spelen op OKT was altijd challenge voor mij' ",
-  [...]
-}
-{
-  "id": 2373574,
-  "title": "Eerland hoopt op NOC*NSF: 'Want voor mijn gevoel heb ik de Spelen al gehaald'",
-  [...]
-}
-
-Meerdere video's. Vooralsnog pik ik alleen de eerste. Ondersteuning voor meerdere video's moet ik over nadenken.
-
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.//video)[1]/{"name":"NOS: "||title,"date":adjust-dateTime-to-timezone(dateTime(substring(published_at,1,22)||":00"),duration("PT0S")),"duration":duration * duration("PT1S"),"formats":array{(formats)()[ends-with(url/mp4,"mp4")]/{"id":"pg-"||position(),"format":"mp4[h264+aac]","resolution":x"{width}x{height}","url":url/mp4},{"id":"dash-0","format":"mpd[manifest]","url":x:request({"method":"HEAD","url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url}[url])/url}[url],xivid:m3u8-to-json((aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,(formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4)[1])()}}'
-{
-  "name": "NOS: Eerland pakt olympische nominatie: 'Goed spelen op OKT was altijd challenge voor mij
-' ",
-  "date": "2021-03-15T18:32:27Z",
-  "duration": "PT1M18S",
-  "formats": [
-    {
-      "id": "dash-0",
-      "format": "mpd[manifest]",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/dash_unencrypted/[...]/stream.mpd"
-    },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/playlist.m3u8"
+      "url": "https://npo.prd.cdn.bcms.kpn.com/682e1c38792e2dd0bf992ff92b9966b8_1670283369/vod/npo/usp/nos/hls_unencrypted/[...]/playlist.m3u8"
     },
     {
       "id": "hls-1",
-      "format": "m3u8[h264+aac]",
+      "format": "m3u8[h264]",
       "resolution": "640x360@25fps",
-      "bitrate": "370|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_21f98521_e69d_4068_af2d_f16c46e0a138_v1615879196-audio=128000-video=370018.m3u8"
+      "bitrate": "502|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/682e1c38792e2dd0bf992ff92b9966b8_1670283369/vod/npo/usp/nos/hls_unencrypted/[...]/NOSC_3f677cb8_b4d6_4d44_ac2a_21a535ce5be5_v1666547175-audio=128000-video=501721.m3u8"
     },
     [...]
     {
       "id": "hls-4",
-      "format": "m3u8[h264+aac]",
-      "resolution": "848x480@25fps",
-      "bitrate": "8861|128kbps",
-      "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/hls_unencrypted/[...]/NOSC_21f98521_e69d_4068_af2d_f16c46e0a138_v1615879196-audio=128000-video=8860784.m3u8"
+      "format": "m3u8[h264]",
+      "resolution": "1920x1080@25fps",
+      "bitrate": "3466|128kbps",
+      "url": "https://npo.prd.cdn.bcms.kpn.com/682e1c38792e2dd0bf992ff92b9966b8_1670283369/vod/npo/usp/nos/hls_unencrypted/[...]/NOSC_3f677cb8_b4d6_4d44_ac2a_21a535ce5be5_v1666547175-audio=128000-video=3465571.m3u8"
     }
   ]
 }
@@ -6593,35 +6438,19 @@ $ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//main/script)/(item,.
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:nos($url as string) as object()? {
-  parse-json(doc($url)//main/script)/(item,.//video)[1]/{
-    "name":"NOS: "||title,
+  let $src:=parse-json(doc($url)//script[@type="application/json"])//data return
+  $src/(video,(items)()[type="video"][1])/{
+    "name":x"{$src/supplyChannelName}: {title}",
     "date":adjust-dateTime-to-timezone(
-      dateTime(substring(published_at,1,22)||":00"),
+      dateTime(replace($src/publishedAt,"(.{22})(.{2})","$1:$2")),
       duration("PT0S")
     ),
-    "duration":duration * duration("PT1S"),
-    "formats":array{
-      (formats)()[ends-with(url/mp4,"mp4")]/{
-        "id":"pg-"||position(),
-        "format":"mp4[h264+aac]",
-        "resolution":x"{width}x{height}",
-        "url":url/mp4
-      },
-      {
-        "id":"dash-0",
-        "format":"mpd[manifest]",
-        "url":x:request({
-          "method":"HEAD",
-          "url":aspect_ratios/(profiles)()[name="dash_unencrypted"]/url
-        }[url])/url
-      }[url],
-      xivid:m3u8-to-json(
-        (
-          aspect_ratios/(profiles)()[name="hls_unencrypted"]/url,
-          (formats)(1)[mimetype="application/vnd.apple.mpegurl"]/url/mp4
-        )[1]
-      )()
-    }
+    "duration":time(
+      substring("00:00:00",1,8 - string-length(duration))||duration
+    ) - time("00:00:00"),
+    "formats":xivid:m3u8-to-json(
+      x:request({"method":"HEAD","url":source/url})/url
+    )
   }
 };
 
