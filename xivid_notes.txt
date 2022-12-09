@@ -5293,53 +5293,10 @@ declare function xivid:youtube($url as string) as object()? {
 
 $ url=https://vimeo.com/224661084
 
-$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])'
-{
-  "clip": {
-    "id": 224661084,
-    "title": "The Uncertainty has Settled-Now on demand",
-    "description": "<p class=\"first\">The full length documentary [...] Are we doing the right thing?</p>",
-    "uploaded_on": "2017-07-07 11:14:30",
-    "uploaded_on_relative": "3 years ago",
-    "uploaded_on_full": "Friday, July 7, 2017 at 11:14 AM EST",
-    "is_spatial": false,
-    "is_hdr": false,
-    "privacy": {
-      "is_public": true,
-      "type": "anybody",
-      "description": "Public"
-    },
-    "duration": {
-      "raw": 117,
-      "formatted": "01:57"
-    },
-    "is_liked": false,
-    "is_unavailable": false,
-    "likes_url": "/224661084/likes",
-    "is_live": false,
-    "unlisted_hash": null
-  },
-  "owner": {
-    "id": 11716486,
-    "display_name": "Marijn Poels",
-    [...]
-  },
-  [...]
-  "player": {
-    "config_url": "https://player.vimeo.com/video/224661084/config?[...]",
-    "player_url": "player.vimeo.com",
-    "dimensions": {
-      "height": 540,
-      "width": 1290
-    },
-    "poster": {
-      "url": "https://i.vimeocdn.com/video/660399389.jpg?mw=2000&mh=1080&q=70"
-    }
-  },
-  [...]
-}
+$ xidel -se 'x"https://player.vimeo.com/video/{extract("'$url'","\d+")}/config"'
+https://player.vimeo.com/video/224661084/config
 
-$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/player/json-doc(config_url)'
+$ xidel -se 'json-doc(x"https://player.vimeo.com/video/{extract("'$url'","\d+")}/config")'
 {
   "cdn_url": "https://f.vimeocdn.com",
   "vimeo_api_url": "api.vimeo.com",
@@ -5353,12 +5310,12 @@ $ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+)
         "default_cdn": "akfire_interconnect_quic",
         "cdns": {
           "akfire_interconnect_quic": {
-            "url": "https://85vod-adaptive.akamaized.net/[...]/787433688,787433686,787433685,787433684/master.m3u8",
+            "url": "https://87vod-adaptive.akamaized.net/[...]/a3055808,cf52b380,ea48eb10,ed897e25/master.m3u8",
             "origin": "gcs",
             "avc_url": [...]
           },
           "fastly_skyfire": {
-            "url": "https://skyfire.vimeocdn.com/[...]/787433688,787433686,787433685,787433684/master.m3u8",
+            "url": "https://skyfire.vimeocdn.com/[...]/a3055808,cf52b380,ea48eb10,ed897e25/master.m3u8",
             "origin": "gcs",
             "avc_url": [...]
           }
@@ -5366,43 +5323,63 @@ $ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+)
       },
       "progressive": [
         {
-          "profile": 174,
-          "width": 1366,
-          "mime": "video/mp4",
-          "fps": 25,
-          "url": "https://vod-progressive.akamaized.net/[...]/787433688.mp4",
-          "cdn": "akamai_interconnect",
-          "quality": "720p",
-          "id": 787433688,
-          "origin": "gcs",
-          "height": 572
-        },
-        [...]
-        {
-          "profile": 165,
+          "profile": "165",
           "width": 960,
           "mime": "video/mp4",
           "fps": 25,
           "url": "https://vod-progressive.akamaized.net/[...]/787433684.mp4",
           "cdn": "akamai_interconnect",
           "quality": "540p",
-          "id": 787433684,
+          "id": "a3055808-7a8d-48ff-aa92-e90b5ce60294",
           "origin": "gcs",
           "height": 402
+        },
+        [...]
+        {
+          "profile": "164",
+          "width": 640,
+          "mime": "video/mp4",
+          "fps": 25,
+          "url": "https://vod-progressive.akamaized.net/[...]/787433686.mp4",
+          "cdn": "akamai_interconnect",
+          "quality": "360p",
+          "id": "ed897e25-353c-49e0-96f3-7806fd129ea2",
+          "origin": "gcs",
+          "height": 268
         }
       ]
     },
+    [...]
+  },
+  "player_url": "player.vimeo.com",
+  "video": {
+    [...]
+    "duration": 117,
+    [...]
+    "owner": {
+      [...]
+      "name": "Marijn Poels",
+      [...]
+    },
+    [...]
+    "title": "The Uncertainty has Settled-Now on demand",
+    [...]
+  },
+  [...]
+  "seo": {
+    [...]
+    "upload_date": "2017-07-07 11:14:30",
     [...]
   },
   [...]
 }
 
 $ xidel -se '
-  parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/clip/(
-    uploaded_on,
-    replace(uploaded_on,"\s","T"),
-    dateTime(replace(uploaded_on,"\s","T")||"-05:00"),
-    adjust-dateTime-to-timezone(dateTime(replace(uploaded_on,"\s","T")||"-05:00"),duration("PT0S"))
+  json-doc(x"https://player.vimeo.com/video/{extract("'$url'","\d+")}/config")/seo/(
+    upload_date,
+    replace(upload_date,"\s","T"),
+    dateTime(replace(upload_date,"\s","T")||"-05:00"),
+    adjust-dateTime-to-timezone(dateTime(replace(upload_date,"\s","T")||"-05:00"),duration("PT0S"))
   )
 '
 2017-07-07 11:14:30
@@ -5410,7 +5387,7 @@ $ xidel -se '
 2017-07-07T11:14:30-05:00   # Vimeo specificeert dateTime altijd als lokale tijd; Eastern Standard Time (EST), oftewel UTC-5.
 2017-07-07T16:14:30Z
 
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/{"name":x"{owner/display_name}: {clip/title}","date":adjust-dateTime-to-timezone(dateTime(replace(clip/uploaded_on,"\s","T")||"-05:00"),duration("PT0S")),"duration":clip/duration/raw * duration("PT1S"),"formats":player/json-doc(config_url)//files/array{for $x at $i in (progressive)() order by $x/width count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":x"{width}x{height}@{fps}fps","url":url},xivid:m3u8-to-json((hls//url)[1])()}}'
+$ xidel -s --module=xivid.xqm -e 'json-doc(x"https://player.vimeo.com/video/{extract("'$url'","\d+")}/config")/{"name":x"{video/owner/name}: {video/title}","date":adjust-dateTime-to-timezone(dateTime(replace(seo/upload_date,"\s","T")||"-05:00"),duration("PT0S")),"duration":video/duration * duration("PT1S"),"formats":request/files/array{for $x at $i in (progressive)() order by $x/width count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":x"{width}x{height}@{fps}fps","url":url},xivid:m3u8-to-json((hls//url)[1])()}}'
 {
   "name": "Marijn Poels: The Uncertainty has Settled-Now on demand",
   "date": "2017-07-07T16:14:30Z",
@@ -5432,12 +5409,12 @@ $ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script/extract(.,"cl
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://85vod-adaptive.akamaized.net/[...]/787433688,787433686,787433685,787433684/master.m3u8"
+      "url": "https://87vod-adaptive.akamaized.net/[...]/a3055808,cf52b380,ea48eb10,ed897e25/master.m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
-      "url": "https://85vod-adaptive.akamaized.net/[...]/787433686/playlist.m3u8"
+      "url": "https://87vod-adaptive.akamaized.net/[...]/audio/ed897e25/playlist.m3u8"
     },
     [...]
     {
@@ -5445,110 +5422,7 @@ $ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script/extract(.,"cl
       "format": "m3u8[h264]",
       "resolution": "1920x804@25fps",
       "bitrate": "6370kbps",
-      "url": "https://85vod-adaptive.akamaized.net/[...]/787433685/playlist.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://player.vimeo.com/video/238924796
-
-$ xidel -se 'parse-json(doc("'$url'")//script/extract(.,"config = (.+?);",1)[.])'
-{
-  "cdn_url": "https://f.vimeocdn.com",
-  "vimeo_api_url": "api.vimeo.com",
-  "request": {
-    "files": {
-      "dash": {
-        [...]
-      },
-      "hls": {
-        "separate_av": true,
-        "default_cdn": "akfire_interconnect_quic",
-        "cdns": {
-          "akfire_interconnect_quic": {
-            "url": "https://197vod-adaptive.akamaized.net/[...]/853938837,853938829/master.m3u8",
-            "origin": "gcs",
-            "avc_url": [...]
-          },
-          "fastly_skyfire": {
-            "url": "https://skyfire.vimeocdn.com/[...]/853938837,853938829/master.m3u8",
-            "origin": "gcs",
-            "avc_url": [...]
-          }
-        }
-      },
-      "progressive": [
-        {
-          "profile": 164,
-          "width": 640,
-          "mime": "video/mp4",
-          "fps": 25,
-          "url": "https://vod-progressive.akamaized.net/[...]/853938837.mp4",
-          "cdn": "akamai_interconnect",
-          "quality": "360p",
-          "id": 853938837,
-          "origin": "gcs",
-          "height": 360
-        }
-      ]
-    },
-    [...]
-  },
-  "player_url": "player.vimeo.com",
-  "video": {
-    [...]
-    "duration": 85,
-    [...]
-    "owner": {
-      "account_type": "pro",
-      "name": "NTR internet & innovatie",
-      "img": "https://i.vimeocdn.com/portrait/defaults-blue_60x60.png",
-      "url": "https://vimeo.com/user60209025",
-      "img_2x": "https://i.vimeocdn.com/portrait/defaults-blue_120x120.png",
-      "id": 60209025
-    },
-    "id": 238924796,
-    "embed_code": "<iframe title=\"vimeo-player\" src=\"https://player.vimeo.com/video/238924796\" width=\"640\" height=\"360\" frameborder=\"0\" allowfullscreen></iframe>",
-    "title": "Waarom is zeewater zout?",
-    "share_url": "https://vimeo.com/238924796",
-    "width": 704,
-    "embed_permission": "public",
-    "fps": 25,
-    [...]
-  },
-  [...]
-}
-
-$ xidel -s --module=xivid.xqm -e 'let $id:=extract("'$url'","\d+$") return parse-json(doc("https://player.vimeo.com/video/"||$id)//script/extract(.,"config = (.+?);",1)[.])/{"name":video/x"{owner/name}: {title}","date"?:if (contains("'$url'","player.vimeo.com")) then () else parse-json(doc("'$url'")//script/extract(.,"clip_page_config = (.+);",1)[.])/adjust-dateTime-to-timezone(dateTime(replace(clip/uploaded_on,"\s","T")||"-05:00"),duration("PT0S")),"duration":video/duration * duration("PT1S"),"formats":request/files/array{for $x at $i in (progressive)() order by $x/width count $i return $x/{"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":x"{width}x{height}@{fps}fps","url":url},xivid:m3u8-to-json((hls//url)[1])()}}'
-{
-  "name": "NTR internet & innovatie - Waarom is zeewater zout?",
-  "duration": "PT1M25S",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "640x360@25fps",
-      "url": "https://vod-progressive.akamaized.net/[...]/853938837.mp4"
-    },
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://197vod-adaptive.akamaized.net/[...]/853938837,853938829/master.m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "url": "https://197vod-adaptive.akamaized.net/[...]/853938837/playlist.m3u8"
-    },
-    [...]
-    {
-      "id": "hls-3",
-      "format": "m3u8[h264]",
-      "resolution": "704x396@25fps",
-      "bitrate": "997kbps",
-      "url": "https://197vod-adaptive.akamaized.net/[...]/853938829/playlist.m3u8"
+      "url": "https://87vod-adaptive.akamaized.net/[...]/video/ea48eb10/playlist.m3u8"
     }
   ]
 }
@@ -5556,22 +5430,12 @@ $ xidel -s --module=xivid.xqm -e 'let $id:=extract("'$url'","\d+$") return parse
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:vimeo($url as string) as object()? {
-  let $id:=extract($url,"\d+$") return
-  parse-json(
-    doc(
-      "https://player.vimeo.com/video/"||$id
-    )//script/extract(.,"config = (.+?);",1)[.]
-  )/{
+  json-doc(x"https://player.vimeo.com/video/{extract($url,"\d+")}/config")/{
     "name":video/x"{owner/name}: {title}",
-    "date"?:if (contains($url,"player.vimeo.com")) then
-      ()
-    else
-      parse-json(
-        doc($url)//script/extract(.,"clip_page_config = (.+);",1)[.]
-      )/adjust-dateTime-to-timezone(
-        dateTime(replace(clip/uploaded_on,"\s","T")||"-05:00"),
-        duration("PT0S")
-      ),
+    "date":adjust-dateTime-to-timezone(
+      dateTime(replace(seo/upload_date,"\s","T")||"-05:00"),
+      duration("PT0S")
+    ),
     "duration":video/duration * duration("PT1S"),
     "formats":request/files/array{
       for $x at $i in (progressive)()

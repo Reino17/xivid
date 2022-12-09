@@ -966,22 +966,12 @@ declare function xivid:youtube($url as string) as object()? {
 };
 
 declare function xivid:vimeo($url as string) as object()? {
-  let $id:=extract($url,"\d+$") return
-  parse-json(
-    doc(
-      "https://player.vimeo.com/video/"||$id
-    )//script/extract(.,"config = (.+?);",1)[.]
-  )/{
+  json-doc(x"https://player.vimeo.com/video/{extract($url,"\d+")}/config")/{
     "name":video/x"{owner/name}: {title}",
-    "date"?:if (contains($url,"player.vimeo.com")) then
-      ()
-    else
-      parse-json(
-        doc($url)//script/extract(.,"clip_page_config = (.+);",1)[.]
-      )/adjust-dateTime-to-timezone(
-        dateTime(replace(clip/uploaded_on,"\s","T")||"-05:00"),
-        duration("PT0S")
-      ),
+    "date":adjust-dateTime-to-timezone(
+      dateTime(replace(seo/upload_date,"\s","T")||"-05:00"),
+      duration("PT0S")
+    ),
     "duration":video/duration * duration("PT1S"),
     "formats":request/files/array{
       for $x at $i in (progressive)()
