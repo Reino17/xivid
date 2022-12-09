@@ -5508,8 +5508,63 @@ $ xidel -s --module=xivid.xqm -e 'json-doc(replace("'$url'","video","player/meta
 
 ------------------------------------------------------------------------------------------------
 
+$ url=https://www.dailymotion.com/embed/video/x2zuhks   # via https://msfn.org/board/topic/182647-my-browser-builds-part-3/?do=findComment&comment=1223458
+
+$ xidel -se '"https://www.dailymotion.com/player/metadata/video/"||extract("'$url'","video/(x[0-9a-z]+)",1)'
+https://www.dailymotion.com/player/metadata/video/x2zuhks
+
+$ xidel -s --module=xivid.xqm -e 'json-doc("https://www.dailymotion.com/player/metadata/video/"||extract("'$url'","video/(x[0-9a-z]+)",1))/{"name":"Dailymotion: "||title,"date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json(qualities//url)}'
+{
+  "name": "Dailymotion: Cowspiracy: The Sustainability Secret",
+  "date": "2015-08-03T11:14:43Z",
+  "duration": "PT1H30M39S",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "192x80",
+      "bitrate": "105kbps",
+      "url": "https://proxy-017.ix7.dailymotion.com/[...]/video/273/141/181141372_mp4_h264_aac_l2_1.mp4#cell=core"
+
+    },
+    [...]
+    {
+      "id": "pg-6",
+      "format": "mp4[h264+aac]",
+      "resolution": "512x216",
+      "bitrate": "461kbps",
+      "url": "https://proxy-047.dc3.dailymotion.com/[...]/video/273/141/181141372_mp4_h264_aac_1.mp4#cell=core"
+    },
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://www.dailymotion.com/cdn/manifest/video/x2zuhks.m3u8?[...]"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "192x80",
+      "bitrate": "105kbps",
+      "url": "https://proxy-017.ix7.dailymotion.com/[...]/video/273/141/181141372_mp4_h264_aac_l2_1.m3u8#cell=core"
+    },
+    [...]
+    {
+      "id": "hls-6",
+      "format": "m3u8[h264+aac]",
+      "resolution": "512x216",
+      "bitrate": "461kbps",
+      "url": "https://proxy-047.dc3.dailymotion.com/[...]/video/273/141/181141372_mp4_h264_aac_1.m3u8#cell=core"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:dailymotion($url as string) as object()? {
-  json-doc(replace($url,"video","player/metadata/video"))/{
+  json-doc(
+    "https://www.dailymotion.com/player/metadata/video/"||
+    extract($url,"video/(x[0-9a-z]+)",1)
+  )/{
     "name":"Dailymotion: "||title,
     "date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "duration":duration * duration("PT1S"),

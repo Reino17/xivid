@@ -990,7 +990,10 @@ declare function xivid:vimeo($url as string) as object()? {
 };
 
 declare function xivid:dailymotion($url as string) as object()? {
-  json-doc(replace($url,"video","player/metadata/video"))/{
+  json-doc(
+    "https://www.dailymotion.com/player/metadata/video/"||
+    extract($url,"video/(x[0-9a-z]+)",1)
+  )/{
     "name":"Dailymotion: "||title,
     "date":created_time * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
     "duration":duration * duration("PT1S"),
