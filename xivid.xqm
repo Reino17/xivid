@@ -1024,7 +1024,7 @@ declare function xivid:rumble($url as string) as object()? {
         "bitrate":meta/bitrate||"kbps",
         "url":url
       },
-      xivid:m3u8-to-json(ua/hls/auto/url)
+      xivid:m3u8-to-json(ua/hls/auto/url)()
     }
   }
 };

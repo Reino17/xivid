@@ -5878,39 +5878,37 @@ $ xidel -se 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video"
   [...]
 }
 
-$ xidel -s --module=xivid.xqm -e 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/json-doc(url)/{"name":x"{author/name}: {parse-html(title)}","date":dateTime(pubDate),"duration"?:.[live=0]/duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/(mp4,webm)/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url},xivid:m3u8-to-json(ua/hls/auto/url)}}'
+$ xidel -s --module=xivid.xqm -e 'request-combine("https://rumble.com/embedJS/u3/",{"request":"video","ver":"2","v":if (matches("'$url'","^v[0-9a-z]+")) then "'$url'" else (if (contains("'$url'","/embed/")) then "'$url'" else parse-json(doc("'$url'")//script[@type="application/ld+json"])(1)/embedUrl) ! extract(.,"embed/(v[0-9a-z]+)",1)})/json-doc(url)/{"name":x"{author/name}: {parse-html(title)}","date":dateTime(pubDate),"duration"?:.[live=0]/duration * duration("PT1S"),"formats":array{cc/nl/{"id":"sub-1","format":"vtt","language":"nl","label":language,"url":path},for $x at $i in ua/(mp4,webm)/* order by $x/meta/bitrate count $i return $x/{"id":"pg-"||$i,"format":if (ends-with(url,"webm")) then "webm[vp8+vorbis]" else "mp4[h264+aac]","resolution":meta/x"{w}x{h}","bitrate":meta/bitrate||"kbps","url":url},xivid:m3u8-to-json(ua/hls/auto/url)()}}'
 {
   "name": "BLCKBX: blckbx today: Nieuwe Tegenwind docu | Boeren 'illegaal' door opgeheven PAS | Wolf verdrukt landbouw",
   "date": "2022-12-02T16:09:23Z",
   "formats": [
-    [
-      {
-        "id": "hls-0",
-        "format": "m3u8[manifest]",
-        "url": "https://rumble.com/live-hls-dvr/1vvaum/playlist.m3u8"
-      },
-      {
-        "id": "hls-1",
-        "format": "m3u8[h264+aac]",
-        "resolution": "640x360",
-        "bitrate": "1200kbps",
-        "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_360p/chunklist_DVR.m3u8"
-      },
-      {
-        "id": "hls-2",
-        "format": "m3u8[h264+aac]",
-        "resolution": "1280x720",
-        "bitrate": "2800kbps",
-        "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_720p/chunklist_DVR.m3u8"
-      },
-      {
-        "id": "hls-3",
-        "format": "m3u8[h264+aac]",
-        "resolution": "1920x1080",
-        "bitrate": "4500kbps",
-        "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_1080p/chunklist_DVR.m3u8"
-      }
-    ]
+    {
+      "id": "hls-0",
+      "format": "m3u8[manifest]",
+      "url": "https://rumble.com/live-hls-dvr/1vvaum/playlist.m3u8"
+    },
+    {
+      "id": "hls-1",
+      "format": "m3u8[h264+aac]",
+      "resolution": "640x360",
+      "bitrate": "1200kbps",
+      "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_360p/chunklist_DVR.m3u8"
+    },
+    {
+      "id": "hls-2",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1280x720",
+      "bitrate": "2800kbps",
+      "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_720p/chunklist_DVR.m3u8"
+    },
+    {
+      "id": "hls-3",
+      "format": "m3u8[h264+aac]",
+      "resolution": "1920x1080",
+      "bitrate": "4500kbps",
+      "url": "https://live-k5e12sb4.rmbl.ws/slot-62/kl6h-m7ck_1080p/chunklist_DVR.m3u8"
+    }
   ]
 }
 
@@ -5981,7 +5979,7 @@ declare function xivid:rumble($url as string) as object()? {
         "bitrate":meta/bitrate||"kbps",
         "url":url
       },
-      xivid:m3u8-to-json(ua/hls/auto/url)
+      xivid:m3u8-to-json(ua/hls/auto/url)()
     }
   }
 };
