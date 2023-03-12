@@ -1887,13 +1887,13 @@ $ xidel -s tw_1188986316194635777.m3u8 -e '$raw'
 #EXT-X-STREAM-INF:BANDWIDTH=2176000,RESOLUTION=1732x720,CODECS="mp4a.40.2,avc1.64002a",SUBTITLES="subs"
 /amplify_video/1188974444523315201/pl/1732x720/yG0_asM0v9yBC-Xd.m3u8
 
-$ xidel -s tw_1188986316194635777.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")'
+$ xidel -s tw_1188986316194635777.m3u8 -e 'extract($raw,"#EXT-X-MEDIA.+")'
 #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=NO,FORCED=NO,URI="/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8",LANGUAGE="en",AUTOSELECT=YES,CHARACTERISTICS="twitter.show-text-when-muted"
 
 $ xidel -s tw_1188986316194635777.m3u8 -e '
   let $url:="https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13&v=6b4" return
   array{
-    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    extract($raw,"#EXT-X-MEDIA.+") ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
@@ -1976,7 +1976,7 @@ $ xidel -s dm_x5aa1uc.m3u8 -e '
       $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
   array{
-    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    extract($raw,"#EXT-X-MEDIA.+")[contains(.,"TYPE=SUBTITLES")] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
@@ -2069,7 +2069,7 @@ $ xidel -s vimeo_224661084.m3u8 -e '$raw'
 #EXT-X-STREAM-INF:CLOSED-CAPTIONS=NONE,BANDWIDTH=1775555,AVERAGE-BANDWIDTH=1401000,RESOLUTION=960x402,FRAME-RATE=25.000,CODECS="avc1.64001F,mp4a.40.2",AUDIO="audio-medium"
 ../a3055808/playlist.m3u8
 
-$ xidel -s vimeo_224661084.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:TYPE=AUDIO.+",0,"*") ! (position(),.)'
+$ xidel -s vimeo_224661084.m3u8 -e 'extract($raw,"#EXT-X-MEDIA.+",0,"*")[contains(.,"TYPE=AUDIO"] ! (position(),.)'
 1
 #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-medium",NAME="audio",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2",URI="../../audio/ed897e25/playlist.m3u8"
 2
@@ -2077,18 +2077,18 @@ $ xidel -s vimeo_224661084.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:TYPE=AUDIO.+",0,"
 
 $ xidel -s vimeo_224661084.m3u8 -e '
   let $url:="https://87vod-adaptive.akamaized.net/[...]/video/a3055808,cf52b380,ea48eb10,ed897e25/master.m3u8",
-      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($raw,"#EXT-X-MEDIA:TYPE=AUDIO.+",0,"*")
+      $media:=extract($raw,"#EXT-X-MEDIA.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
   array{
-    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    $media[contains(.,"TYPE=SUBTITLES")] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
       "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
     order by $br
     count $i
@@ -2100,18 +2100,18 @@ $ xidel -s vimeo_224661084.m3u8 -e '
       "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
     {"id":"hls-0","format":"m3u8[manifest]","url":$url},
-    $a_strms ! {
+    $media[contains(.,"TYPE=AUDIO")] ! {
       "id":"hls-"||position(),
       "format":"m3u8[aac]",
       "url":resolve-uri(extract(.,"URI=&quot;(.+)&quot;",1),$url)
     },
-    for $x at $i in $v_strms
+    for $x at $i in $streams
     let $br:=extract($x,"BANDWIDTH=(\d+)",1),
         $br2:=extract($x,"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
     order by $br
     count $i
     return {
-      "id":"hls-"||$i + count($a_strms),
+      "id":"hls-"||$i + count($media[contains(.,"TYPE=AUDIO")]),
       "format":if (contains($x,"RESOLUTION")) then
         if (matches($x,"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
@@ -2181,7 +2181,7 @@ HLS_540.m3u8
 #EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=126336,RESOLUTION=640x360,CODECS="avc1.4d001e",URI="HLS_360-iframe.m3u8"
 #EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=257183,RESOLUTION=960x540,CODECS="avc1.4d001f",URI="HLS_540-iframe.m3u8"
 
-$ xidel -s reddit.com_v61h9j.m3u8 -e 'extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*") ! (position(),.)'
+$ xidel -s reddit.com_v61h9j.m3u8 -e 'extract($raw,"#EXT-X-MEDIA.+",0,"*")[contains(.,"TYPE=AUDIO"] ! (position(),.)'
 1
 #EXT-X-MEDIA:URI="HLS_AUDIO_64_K.m3u8",TYPE=AUDIO,GROUP-ID="0",NAME="audio 0",DEFAULT=YES,AUTOSELECT=YES
 2
@@ -2203,18 +2203,18 @@ HLS_540.m3u8
 
 $ xidel -s reddit.com_v61h9j.m3u8 -e '
   let $url:="https://v.redd.it/rz0au4l9mz391/HLSPlaylist.m3u8?[...]",
-      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")
+      $media:=extract($raw,"#EXT-X-MEDIA.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
   array{
-    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    $media[contains(.,"TYPE=SUBTITLES")] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
       "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
     order by $br
     count $i
@@ -2226,20 +2226,20 @@ $ xidel -s reddit.com_v61h9j.m3u8 -e '
       "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
     {"id":"hls-0","format":"m3u8[manifest]","url":$url},
-    $a_strms ! {
+    $media[contains(.,"TYPE=AUDIO")] ! {
       "id":"hls-"||position(),
       "format":"m3u8[aac]",
       "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms
+    for $x at $i in $streams
     group by $file:=x:lines($x)[last()]
     let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
         $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
     order by $br
     count $i
     return {
-      "id":"hls-"||$i + count($a_strms),
+      "id":"hls-"||$i + count($media[contains(.,"TYPE=AUDIO")]),
       "format":if (contains($x[last()],"RESOLUTION")) then
         if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
@@ -2308,42 +2308,58 @@ QualityLevels(5820032)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption
 QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
 
 $ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
-  let $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")
+  let $media:=extract($raw,"#EXT-X-MEDIA.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return (
-    extract($a_strms,"URI=&quot;(.+?)&quot;",1),
-    x:lines(
-      (
-        for $x in $v_strms
-        group by $file:=x:lines($x)[last()]
-        order by extract($x[last()],"BANDWIDTH=(\d+)",1)
-        return
-        $x[last()]
-      )[1]
-    )[last()]
+    $media[contains(.,"TYPE=AUDIO")],
+    (
+      for $x in $streams
+      group by $file:=x:lines($x)[last()]
+      order by extract($x[last()],"BANDWIDTH=(\d+)",1)
+      return
+      $x
+    )[1]
   )
 '
-QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="audioname",DEFAULT=YES,URI="QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=136294,CODECS="mp4a.40.2",AUDIO="audio"
 QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)
 
-$ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e 'let $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*") return extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))]'
+$ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
+  let $media:=extract($raw,"#EXT-X-MEDIA.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
+  return (
+    $media[contains(.,"TYPE=AUDIO")],
+    (
+      for $x in $streams
+      where if ($media[contains(.,"TYPE=AUDIO")])
+            then contains($x,"RESOLUTION")
+            else $x
+      group by $file:=x:lines($x)[last()]
+      order by extract($x[last()],"BANDWIDTH=(\d+)",1)
+      return
+      $x
+    )[1]
+  )
+'
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="audioname",DEFAULT=YES,URI="QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+#EXT-X-STREAM-INF:BANDWIDTH=879705,RESOLUTION=512x288,CODECS="avc1.640015,mp4a.40.2",AUDIO="audio"
+QualityLevels(719424)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)
 
 $ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
   let $url:="https://cdn-rtlvod-hb.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8",
-      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
-        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
-      ]
+      $media:=extract($raw,"#EXT-X-MEDIA.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
   array{
-    extract($raw,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    $media[contains(.,"TYPE=SUBTITLES")] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
       "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
     order by $br
     count $i
@@ -2355,20 +2371,23 @@ $ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
       "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
     {"id":"hls-0","format":"m3u8[manifest]","url":$url},
-    $a_strms ! {
+    $media[contains(.,"TYPE=AUDIO")] ! {
       "id":"hls-"||position(),
       "format":"m3u8[aac]",
       "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms
+    for $x at $i in $streams
+    where if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then contains($x,"RESOLUTION")
+          else $x
     group by $file:=x:lines($x)[last()]
     let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
         $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
     order by $br
     count $i
     return {
-      "id":"hls-"||$i + count($a_strms),
+      "id":"hls-"||$i + count($media[contains(.,"TYPE=AUDIO")]),
       "format":if (contains($x[last()],"RESOLUTION")) then
         if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
       else
@@ -2415,6 +2434,152 @@ $ xidel -s rtl_bfca59e7-8fc6-42a8-8735-9733928712b2.m3u8 -e '
 
 ------------------------------------------------------------------------------------------------
 
+$ xidel -s npo_LI_RADIO1_300877.m3u8 -e '$raw'
+#EXTM3U
+#EXT-X-VERSION:4
+## Created with Unified Streaming Platform(version=1.9.6)
+
+# AUDIO groups
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio-aacl-192",NAME="English",LANGUAGE="en",AUTOSELECT=YES,DEFAULT=YES,CHANNELS="2"
+
+# variants
+#EXT-X-STREAM-INF:BANDWIDTH=924000,AVERAGE-BANDWIDTH=840000,CODECS="mp4a.40.2,avc1.42C01E",RESOLUTION=640x360,FRAME-RATE=25,AUDIO="audio-aacl-192",CLOSED-CAPTIONS=NONE
+npo-vsr-1-audionl=192000-video=600000.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=1624000,AVERAGE-BANDWIDTH=1476000,CODECS="mp4a.40.2,avc1.4D401F",RESOLUTION=768x432,FRAME-RATE=25,AUDIO="audio-aacl-192",CLOSED-CAPTIONS=NONE
+npo-vsr-1-audionl=192000-video=1200000.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2556000,AVERAGE-BANDWIDTH=2324000,CODECS="mp4a.40.2,avc1.4D401F",RESOLUTION=1024x576,FRAME-RATE=25,AUDIO="audio-aacl-192",CLOSED-CAPTIONS=NONE
+npo-vsr-1-audionl=192000-video=2000000.m3u8
+
+# variants
+#EXT-X-STREAM-INF:BANDWIDTH=224000,AVERAGE-BANDWIDTH=204000,CODECS="mp4a.40.2",AUDIO="audio-aacl-192"
+npo-vsr-1-audionl=192000.m3u8
+
+# keyframes
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=88000,CODECS="avc1.42C01E",RESOLUTION=640x360,URI="keyframes/npo-vsr-1-video=600000.m3u8"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=175000,CODECS="avc1.4D401F",RESOLUTION=768x432,URI="keyframes/npo-vsr-1-video=1200000.m3u8"
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=292000,CODECS="avc1.4D401F",RESOLUTION=1024x576,URI="keyframes/npo-vsr-1-video=2000000.m3u8"
+
+
+$ xidel -s npo_LI_RADIO1_300877.m3u8 -e '
+  let $media:=extract($raw,"#EXT-X-MEDIA.*URI=.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
+  return
+  for $x in $streams
+  group by $file:=x:lines($x)[last()]
+  order by extract($x[last()],"BANDWIDTH=(\d+)",1)
+  return
+  join(extract($file,"=(\d+)",1,"*"))
+'
+192000
+192000 600000
+192000 1200000
+192000 2000000
+
+xidel -s npo_LI_RADIO1_300877.m3u8 -e '
+  let $media:=extract($raw,"#EXT-X-MEDIA.*URI=.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
+  return
+  for $x at $i in $streams
+  group by $file:=x:lines($x)[last()]
+  order by extract($x[last()],"BANDWIDTH=(\d+)",1)
+  count $i
+  return
+  join((
+    "hls-"||$i,
+    if (contains($x[last()],"RESOLUTION"))
+    then if ($media[contains(.,"TYPE=AUDIO")])
+      then "m3u8[h264]"
+      else "m3u8[h264+aac]"
+    else "m3u8[aac]"
+  ))
+'
+hls-1 m3u8[aac]
+hls-2 m3u8[h264+aac]
+hls-3 m3u8[h264+aac]
+hls-4 m3u8[h264+aac]
+
+$ xidel -s npo_LI_RADIO1_300877.m3u8 -e '
+  let $url:="https://npo.prd.cdn.bcms.kpn.com/[...]/nodrm/hls_unencrypted/[...]/playlist.m3u8",
+      $media:=extract($raw,"#EXT-X-MEDIA.*URI=.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
+  return
+  array{
+    $media[contains(.,"TYPE=SUBTITLES")] ! {
+      "id":"sub-1",
+      "format":"m3u8[vtt]",
+      "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
+      "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
+    let $br:=extract($x,"BANDWIDTH=(\d+)",1)
+    order by $br
+    count $i
+    return {
+      "id":"pg-"||$i,
+      "format":"mp4[h264+aac]",
+      "resolution":extract($x,"RESOLUTION=([\dx]+)",1),
+      "bitrate":round($br div 1000)||"kbps",
+      "url":extract($x,"URI=&quot;(.+?)&quot;",1)
+    },
+    {"id":"hls-0","format":"m3u8[manifest]","url":$url},
+    $media[contains(.,"TYPE=AUDIO")] ! {
+      "id":"hls-"||position(),
+      "format":"m3u8[aac]",
+      "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
+      "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
+    },
+    for $x at $i in $streams
+    where if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then contains($x,"RESOLUTION")
+          else $x
+    group by $file:=x:lines($x)[last()]
+    let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
+        $br2:=extract($file,"=(\d+)",1,"*")
+    order by $br
+    count $i
+    return {
+      "id":"hls-"||$i + count($media[contains(.,"TYPE=AUDIO")]),
+      "format":if (contains($x[last()],"RESOLUTION"))
+        then if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then "m3u8[h264]"
+          else "m3u8[h264+aac]"
+        else "m3u8[aac]",
+      "resolution"?:concat(
+        extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
+        extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
+      )[.],
+      "bitrate"?:if ($br2[1])
+        then join((round($br2[2] div 1000),round($br2[1] div 1000)),"|")||"kbps"
+        else round($br div 1000)||"kbps",
+      "url":resolve-uri($file,$url)
+    }
+  }
+'
+[
+  {
+    "id": "hls-0",
+    "format": "m3u8[manifest]",
+    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/nodrm/hls_unencrypted/[...]/playlist.m3u8"
+  },
+  {
+    "id": "hls-1",
+    "format": "m3u8[aac]",
+    "bitrate": "192kbps",
+    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/nodrm/hls_unencrypted/[...]/npo-vsr-1-audionl=192000.m3u8"
+  },
+  [...]
+  {
+    "id": "hls-4",
+    "format": "m3u8[h264+aac]",
+    "resolution": "1024x576@25fps",
+    "bitrate": "2000|192kbps",
+    "url": "https://npo.prd.cdn.bcms.kpn.com/[...]/nodrm/hls_unencrypted/[...]/npo-vsr-1-audionl=192000-video=2000000.m3u8"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
 $ xidel -s ogl_live.m3u8 -e '$raw'
 #EXTM3U
 #EXT-X-VERSION:3
@@ -2433,12 +2598,10 @@ $ xidel -s ogl_live.m3u8 -e '$raw'
 
 $ xidel -s ogl_live.m3u8 -e '
   let $url:="https://d2od87akyl46nm.cloudfront.net/live/omroepgelderland/tvlive/index.m3u8",
-      $v_strms:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($raw,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
-        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
-      ]
+      $media:=extract($raw,"#EXT-X-MEDIA.*URI=.+",0,"*"),
+      $streams:=extract($raw,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
-  if (not(exists($v_strms))) then array{
+  if (not(exists($streams))) then array{
     {"id":"hls-1","format":"m3u8[h264+aac]","url":$url}
   } else array{
     [...]
@@ -2456,24 +2619,22 @@ $ xidel -s ogl_live.m3u8 -e '
 
 declare function xivid:m3u8-to-json($url as string?) as array()? {
   let $src:=unparsed-text($url)[$url],
-      $v_strms:=extract($src,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($src,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
-        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
-      ]
+      $media:=extract($src,"#EXT-X-MEDIA.*URI=.+",0,"*"),
+      $streams:=extract($src,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
-  if (not(exists($v_strms)))
+  if (not(exists($streams)))
   then array{
     {"id":"hls-1","format":"m3u8[h264+aac]","url":$url}[url]
   }[exists(.())]
   else array{
-    extract($src,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    $media[contains(.,"TYPE=SUBTITLES")] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
       "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
     order by $br
     count $i
@@ -2485,24 +2646,28 @@ declare function xivid:m3u8-to-json($url as string?) as array()? {
       "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
     {"id":"hls-0","format":"m3u8[manifest]","url":$url},
-    $a_strms ! {
+    $media[contains(.,"TYPE=AUDIO")] ! {
       "id":"hls-"||position(),
       "format":"m3u8[aac]",
       "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms
+    for $x at $i in $streams
+    where if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then contains($x,"RESOLUTION")
+          else $x
     group by $file:=x:lines($x)[last()]
     let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
-        $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+        $br2:=extract($file,"=(\d+)",1,"*")
     order by $br
     count $i
     return {
-      "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x[last()],"RESOLUTION")) then
-        if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
-      else
-        "m3u8[aac]",
+      "id":"hls-"||$i + count($media[contains(.,"TYPE=AUDIO")]),
+      "format":if (contains($x[last()],"RESOLUTION"))
+        then if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then "m3u8[h264]"
+          else "m3u8[h264+aac]"
+        else "m3u8[aac]",
       "resolution"?:concat(
         extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
         extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"

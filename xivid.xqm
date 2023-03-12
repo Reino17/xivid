@@ -3,7 +3,7 @@
  : Xivid function module
  : --------------------------------
  :
- : Copyright (C) 2022 Reino Wijnsma
+ : Copyright (C) 2023 Reino Wijnsma
  :
  : This program is free software: you can redistribute it and/or modify
  : it under the terms of the GNU General Public License as published by
@@ -33,24 +33,22 @@ module namespace xivid = "https://github.com/Reino17/xivid/";
 
 declare function xivid:m3u8-to-json($url as string?) as array()? {
   let $src:=unparsed-text($url)[$url],
-      $v_strms:=extract($src,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*"),
-      $a_strms:=extract($src,"#EXT-X-MEDIA:.*TYPE=AUDIO.+",0,"*")[
-        not(contains($v_strms,extract(.,"URI=&quot;(.+?)&quot;",1)))
-      ]
+      $media:=extract($src,"#EXT-X-MEDIA.*URI=.+",0,"*"),
+      $streams:=extract($src,"#EXT-X-STREAM-INF.+\r?\n.+",0,"*")
   return
-  if (not(exists($v_strms)))
+  if (not(exists($streams)))
   then array{
     {"id":"hls-1","format":"m3u8[h264+aac]","url":$url}[url]
   }[exists(.())]
   else array{
-    extract($src,"#EXT-X-MEDIA:TYPE=SUBTITLES.+")[.] ! {
+    $media[contains(.,"TYPE=SUBTITLES")] ! {
       "id":"sub-1",
       "format":"m3u8[vtt]",
       "language":extract(.,"LANGUAGE=&quot;(.+?)&quot;",1),
       "label":extract(.,"NAME=&quot;(.+?)&quot;",1),
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms[contains(.,"PROGRESSIVE-URI")]
+    for $x at $i in $streams[contains(.,"PROGRESSIVE-URI")]
     let $br:=extract($x,"BANDWIDTH=(\d+)",1)
     order by $br
     count $i
@@ -62,24 +60,28 @@ declare function xivid:m3u8-to-json($url as string?) as array()? {
       "url":extract($x,"URI=&quot;(.+?)&quot;",1)
     },
     {"id":"hls-0","format":"m3u8[manifest]","url":$url},
-    $a_strms ! {
+    $media[contains(.,"TYPE=AUDIO")] ! {
       "id":"hls-"||position(),
       "format":"m3u8[aac]",
       "bitrate"?:extract(.,"URI=&quot;.+?(\d+)_K.+?&quot;",1)[.] ! x"{.}kbps",
       "url":resolve-uri(extract(.,"URI=&quot;(.+?)&quot;",1),$url)
     },
-    for $x at $i in $v_strms
+    for $x at $i in $streams
+    where if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then contains($x,"RESOLUTION")
+          else $x
     group by $file:=x:lines($x)[last()]
     let $br:=extract($x[last()],"BANDWIDTH=(\d+)",1),
-        $br2:=extract($x[last()],"audio=(\d+)(?:-video=(\d+))?",(1,2))[.]
+        $br2:=extract($file,"=(\d+)",1,"*")
     order by $br
     count $i
     return {
-      "id":"hls-"||$i + count($a_strms),
-      "format":if (contains($x[last()],"RESOLUTION")) then
-        if (matches($x[last()],"AUDIO=")) then "m3u8[h264]" else "m3u8[h264+aac]"
-      else
-        "m3u8[aac]",
+      "id":"hls-"||$i + count($media[contains(.,"TYPE=AUDIO")]),
+      "format":if (contains($x[last()],"RESOLUTION"))
+        then if (exists($media[contains(.,"TYPE=AUDIO")]))
+          then "m3u8[h264]"
+          else "m3u8[h264+aac]"
+        else "m3u8[aac]",
       "resolution"?:concat(
         extract($x[last()],"RESOLUTION=([\dx]+)",1)[.],
         extract($x[last()],"FRAME-RATE=([\d\.]+)",1)[.] ! x"@{round-half-to-even(.,3)}fps"
