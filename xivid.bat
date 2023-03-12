@@ -3,7 +3,7 @@
 :: Xivid batch script
 :: --------------------------------
 ::
-:: Copyright (C) 2022 Reino Wijnsma
+:: Copyright (C) 2023 Reino Wijnsma
 ::
 :: This program is free software: you can redistribute it and/or modify
 :: it under the terms of the GNU General Public License as published by
@@ -181,16 +181,15 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
         'xhamster':array{'xhamster.com'}^,
         'youporn':array{'youporn.com'}
       }^,
-      $temp:^=tokenize^(request-decode^(environment-variable^('url'^)^)/host^,'\.'^)^,
-      $host:^=join^(subsequence^($temp^,count^($temp^) - 1^,count^($temp^)^)^,'.'^)
+      $host:^=request-decode^(environment-variable^('url'^)^)/host
   for $x in $extractors^(^) return
-  if ^($extractors^($x^)^=$host^) then ^(
+  if ^(matches^($host^,join^($extractors^($x^)^(^)^,'^|'^)^)^)
+  then ^(
     json:^=eval^(x'xivid:{$x}^(''{environment-variable^('url'^)}''^)'^)^,
     extractor:^=$x^,
     fmts:^=join^($json/^(formats^)^(^)/id^)
   ^)
-  else
-    ^(^)
+  else ^(^)
 ^" --output-format^=cmd') DO %%A
 
 IF NOT "%url:youtube.com=%"=="%url%" SET extractor=youtube

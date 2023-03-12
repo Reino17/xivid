@@ -3,7 +3,7 @@
 # Xivid bash script
 # --------------------------------
 #
-# Copyright (C) 2022 Reino Wijnsma
+# Copyright (C) 2023 Reino Wijnsma
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -183,16 +183,15 @@ eval "$(xidel -e '
         "xhamster":array{"xhamster.com"},
         "youporn":array{"youporn.com"}
       },
-      $temp:=tokenize(request-decode("'$url'")/host,"\."),
-      $host:=join(subsequence($temp,count($temp) - 1,count($temp)),".")
+      $host:=request-decode("'$url'")/host
   for $x in $extractors() return
-  if ($extractors($x)=$host) then (
+  if (matches($host,join($extractors($x)(),"|")))
+  then (
     json:=eval(x"xivid:{$x}(""'$url'"")"),
     extractor:=$x,
     fmts:=$json/(formats)()/id
   )
-  else
-    ()
+  else ()
 ' --output-format=bash)"
 
 if [[ ! $extractor ]]; then
