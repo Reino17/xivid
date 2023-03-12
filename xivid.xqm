@@ -115,7 +115,9 @@ declare function xivid:mpd-to-json($mpd) as array() {
         )
       }]",
       "resolution"?:$x/@width ! x"{.}x{$x/@height}@{
-        eval(replace($x/@frameRate,"/"," div "))
+        round-half-to-even(
+          eval(replace($x/@frameRate,"/"," div ")),3
+        )
       }fps",
       "samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz",
       "bitrate":x"{round($x/@bandwidth div 1000)}kbps",

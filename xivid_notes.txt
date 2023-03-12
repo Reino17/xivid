@@ -2848,6 +2848,28 @@ $ xidel -se 'declare namespace xivid = "https://github.com/Reino17/xivid/"; decl
 
 ------------------------------------------------------------------------------------------------
 
+DASH manifest met framerate als (grote) breuk.
+
+<MPD [...]>
+  <Period duration="PT3H11M20.86S">
+    <AdaptationSet [...]>
+      <Representation [...] frameRate="16000/556" [...]>
+        [...]
+      </Representation>
+      [...]
+    </AdaptationSet>
+  </Period>
+</MPD>
+
+$ xidel -se '
+  eval(replace("16000/556","/"," div "))
+  round-half-to-even(eval(replace("16000/556","/"," div ")),3)
+'
+28.77697841726618705
+28.777
+
+------------------------------------------------------------------------------------------------
+
 declare function xivid:mpd-to-json($mpd) as array() {
   array{
     {
@@ -2869,7 +2891,9 @@ declare function xivid:mpd-to-json($mpd) as array() {
         )
       }]",
       "resolution"?:$x/@width ! x"{.}x{$x/@height}@{
-        eval(replace($x/@frameRate,"/"," div "))
+        round-half-to-even(
+          eval(replace($x/@frameRate,"/"," div ")),3
+        )
       }fps",
       "samplerate"?:$x/@audioSamplingRate ! x"{. div 1000}kHz",
       "bitrate":x"{round($x/@bandwidth div 1000)}kbps",
