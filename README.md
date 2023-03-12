@@ -65,22 +65,22 @@ Gebruik (Linux):  ./xivid.sh [optie] url
 ```
 Deze websites worden op dit moment ondersteund:
 ```
-npostart.nl             omroepwest.nl          vimeo.com
-gemi.st                 rijnmond.nl            dailymotion.com
-nos.nl                  rtvutrecht.nl          rumble.com
-tvblik.nl               gld.nl                 reddit.com
-uitzendinggemist.net    omroepzeeland.nl       redd.it
-rtl.nl                  omroepbrabant.nl       twitch.tv
-rtlxl.nl                l1.nl                  mixcloud.com
-rtlnieuws.nl            dumpert.nl             soundcloud.com
-kijk.nl                 autojunk.nl            facebook.com
-omropfryslan.nl         abhd.nl                fb.watch
-rtvnoord.nl             autoblog.nl            instagram.com
-rtvdrenthe.nl           telegraaf.nl           twitter.com
-nhnieuws.nl             ad.nl                  pornhub.com
-at5.nl                  lc.nl                  xhamster.com
-omroepflevoland.nl      youtube.com            youporn.com
-rtvoost.nl              youtu.be
+npostart.nl             rtvoost.nl          youtu.be
+gemi.st                 omroepwest.nl       vimeo.com
+radioplayer.npo.nl      rijnmond.nl         dailymotion.com
+nos.nl                  rtvutrecht.nl       rumble.com
+tvblik.nl               gld.nl              reddit.com
+uitzendinggemist.net    omroepzeeland.nl    redd.it
+rtl.nl                  omroepbrabant.nl    twitch.tv
+rtlxl.nl                l1.nl               mixcloud.com
+rtlnieuws.nl            dumpert.nl          soundcloud.com
+kijk.nl                 autojunk.nl         facebook.com
+omropfryslan.nl         abhd.nl             fb.watch
+rtvnoord.nl             autoblog.nl         instagram.com
+rtvdrenthe.nl           telegraaf.nl        twitter.com
+nhnieuws.nl             ad.nl               pornhub.com
+at5.nl                  lc.nl               xhamster.com
+omroepflevoland.nl      youtube.com         youporn.com
 ```
 Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd worden ondersteund.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.

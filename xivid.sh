@@ -36,22 +36,22 @@ Gebruik: ./xivid.sh [optie] url
   -j            Toon video informatie als JSON.
 
 Ondersteunde websites:
-  npostart.nl             omroepwest.nl          vimeo.com
-  gemi.st                 rijnmond.nl            dailymotion.com
-  nos.nl                  rtvutrecht.nl          rumble.com
-  tvblik.nl               gld.nl                 reddit.com
-  uitzendinggemist.net    omroepzeeland.nl       redd.it
-  rtl.nl                  omroepbrabant.nl       twitch.tv
-  rtlxl.nl                l1.nl                  mixcloud.com
-  rtlnieuws.nl            dumpert.nl             soundcloud.com
-  kijk.nl                 autojunk.nl            facebook.com
-  omropfryslan.nl         abhd.nl                fb.watch
-  rtvnoord.nl             autoblog.nl            instagram.com
-  rtvdrenthe.nl           telegraaf.nl           twitter.com
-  nhnieuws.nl             ad.nl                  pornhub.com
-  at5.nl                  lc.nl                  xhamster.com
-  omroepflevoland.nl      youtube.com            youporn.com
-  rtvoost.nl              youtu.be
+  npostart.nl             rtvoost.nl          youtu.be
+  gemi.st                 omroepwest.nl       vimeo.com
+  radioplayer.npo.nl      rijnmond.nl         dailymotion.com
+  nos.nl                  rtvutrecht.nl       rumble.com
+  tvblik.nl               gld.nl              reddit.com
+  uitzendinggemist.net    omroepzeeland.nl    redd.it
+  rtl.nl                  omroepbrabant.nl    twitch.tv
+  rtlxl.nl                l1.nl               mixcloud.com
+  rtlnieuws.nl            dumpert.nl          soundcloud.com
+  kijk.nl                 autojunk.nl         facebook.com
+  omropfryslan.nl         abhd.nl             fb.watch
+  rtvnoord.nl             autoblog.nl         instagram.com
+  rtvdrenthe.nl           telegraaf.nl        twitter.com
+  nhnieuws.nl             ad.nl               pornhub.com
+  at5.nl                  lc.nl               xhamster.com
+  omroepflevoland.nl      youtube.com         youporn.com
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -147,7 +147,7 @@ done
 
 eval "$(xidel -e '
   let $extractors:={
-        "npo":array{"npostart.nl","gemi.st"},
+        "npo":array{"npostart.nl","gemi.st","radioplayer.npo.nl"},
         "nos":array{"nos.nl"},
         "rtl":array{"rtl.nl","rtlxl.nl","rtlnieuws.nl"},
         "kijk":array{"kijk.nl"},

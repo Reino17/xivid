@@ -341,81 +341,82 @@ declare function xivid:bbvms(
  :)
 
 declare function xivid:npo($url as string) as object()? {
-  let $prid:=if (contains($url,"/live/"))
+  let $prid:=if (matches($url,"https://www.npostart.nl/live/"))
         then doc($url)//npo-player/@media-id
+        else if (matches($url,"https://radioplayer.npo.nl/"))
+        then parse-json(
+          doc($url)//script/substring-after(.,"window.config=")
+        )/request-decode(embedVideoUrl)/params/mid
         else extract($url,"[A-Z\d_]+$"),
-      $api_token:=x:request({
-        "header":"X-Requested-With: XMLHttpRequest",
+      $cookies:=x:request({
+        "headers":"X-Requested-With: XMLHttpRequest",
         "url":"https://www.npostart.nl/api/token"
-      })/json/token,
-      $player_token:=x:request({
-        "post":"_token="||$api_token,
+      })/extract(headers,"Set-Cookie: (.+?);",1,"*"),
+      $token:=x:request({
+        "method":"POST",
+        "headers":(
+          "X-Requested-With: XMLHttpRequest",
+          replace(uri-decode($cookies[1]),"XSRF-TOKEN=","X-XSRF-TOKEN: "),
+          "Cookie: "||$cookies[2]
+        ),
         "url":"https://www.npostart.nl/player/"||$prid
-      })/json,
-      $info:=parse-json(
-        doc($player_token/embedUrl)//script/extract(.,"var video =(.+);",1)[.]
-      )
+      })/json
   return
-  map:merge((
-    if (exists($info)) then $info/{
-      "name":if (type=("livetv","liveradio")) then
-        x"NPO: {title} Livestream"
+  parse-json(
+    extract(doc($token/embedUrl)[.//video]//script,"var video =(.+);",1)
+  )/{
+    "name":if (type="liveradio")
+      then x"NPO: {title} Livestream"
       else concat(
         "NPO: ",franchiseTitle,
-        if (exists(seasonNumber))
+        if (exists(episodeNumber))
         then concat(
           " S",format-integer(seasonNumber,"00"),
           "E",format-integer(episodeNumber,"00")
         )
-        else if (franchiseTitle = title)
-        then ": "||playerTitle
         else ": "||title
       ),
-      "date":broadcastDate,
-      "duration"?:duration * duration("PT1S"),
-      "start"?:startAt * duration("PT1S"),
-      "end"?:(startAt + duration) * duration("PT1S")
-    } else
-      doc("https://www.npostart.nl/"||$prid)/(
-        let $info:=parse-json(
-          (//script[@type="application/ld+json"])[1]
-        ) return {
-          "name"://npo-player-header/x"{@main-title}: {@share-title}",
-          "date":adjust-dateTime-to-timezone(
-            dateTime($info/uploadDate),duration("PT0S")
+    "date":broadcastDate,
+    "duration"?:duration * duration("PT1S"),
+    "start"?:startAt * duration("PT1S"),
+    "end"?:(startAt + duration) * duration("PT1S"),
+    "formats":array{
+      (
+        if (not(exists((subtitles)())) and parentId)
+        then x:request({
+          "method":"POST",
+          "headers":(
+            "X-Requested-With: XMLHttpRequest",
+            replace(uri-decode($cookies[1]),"XSRF-TOKEN=","X-XSRF-TOKEN: "),
+            "Cookie: "||$cookies[2]
           ),
-          "duration":$info/duration
-        }
-      ),
-    {
-      "formats"?:array{
-        (
-          if (not(exists($info/(subtitles)())) and $info/parentId)
-          then parse-json(
-            doc(
-              x:request({
-                "post":"_token="||$api_token,
-                "url":"https://www.npostart.nl/player/"||$info/parentId
-              })/json/embedUrl
-            )//script/extract(.,"var video =(.+);",1)[.]
-          )
-          else $info
-        )/(subtitles)()/{
-          "id":"sub-1",
-          "format":"vtt",
-          "language":language,
-          "label":label,
-          "url":src
-        },
-        xivid:m3u8-to-json(
-          request-combine(
-            x"https://start-player.npo.nl/video/{$prid}/streams",
-            {"profile":"hls","quality":"npo","tokenId":$player_token/token}
-          )/json-doc(url)/stream[not(exists(protection))]/src
-        )()
-      }[exists(.())]
+          "url":"https://www.npostart.nl/player/"||parentId
+        })/parse-json(
+          extract(doc(json/embedUrl)[.//video]//script,"var video =(.+);",1)
+        )
+        else .
+      )/(subtitles)()/{
+        "id":"sub-1",
+        "format":"vtt",
+        "language":language,
+        "label":label,
+        "url":src
+      },
+      xivid:m3u8-to-json(
+        x:request({
+          "method":"POST",
+          "url":request-combine(
+            x"https://start-player.npo.nl/video/{
+              if (not(exists((subtitles)())) and parentId)
+              then parentId
+              else $prid
+            }/streams",
+            {"profile":"hls","quality":"npo","tokenId":$token/token}
+          )/url
+        })/json/stream[not(exists(protection))]/src
+      )()
     }
-  ))
+  }[exists((formats)())]
 };
 
 declare function xivid:nos($url as string) as object()? {
