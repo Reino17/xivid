@@ -437,18 +437,13 @@ declare function xivid:nos($url as string) as object()? {
 };
 
 declare function xivid:rtl($url as string) as object()? {
-  parse-json(
-    doc(
-      if (contains($url,"rtlnieuws.nl")) then
-        doc($url)//div[@class="rtl-player__fallback-overlay"]/a/@href
-      else if (contains($url,"rtl.nl")) then
-        "https://www.rtlxl.nl/video/"||parse-json(
-          doc($url)//script/substring-after(.,"APOLLO_STATE__ = ")
-        )/*[__typename="Video"]/uuid
-      else
-        $url
-    )//script[@type="application/json"]
-  )//video/{
+  json-doc(
+    "https://api.rtl.nl/rtlxl/metadata/api/metadata/"||(
+      if (contains($url,"rtlnieuws.nl"))
+      then doc($url)//@data-uuid
+      else extract($url,"[0-9a-z-]+$")
+    )
+  )/{
     "name":x"RTL: {series/title} - {title}",
     "date":broadcastDateTime,
     "duration":duration * duration("PT1S"),

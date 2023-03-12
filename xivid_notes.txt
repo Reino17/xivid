@@ -4199,9 +4199,30 @@ declare function xivid:npo($url as string) as object()? {
 
 [rtl]
 
-$ url=https://www.rtlxl.nl/programma/rtl-nieuws/37f2e7ec-5a27-3084-981b-1f77bd06732d   # RTL Nieuws van 15-01-2020 19:30.
+https://www.rtlxl.nl/programma/rtl-nieuws/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a                 # Allemaal
+https://www.rtlxl.nl/video/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a                                # programma-urls
+https://www.rtl.nl/programma/5258719/rtl-nieuws?videoId=9a9ee11c-0ecb-48be-8dc2-7bcc2851649a   # van het
+https://www.rtl.nl/gemist?videoId=9a9ee11c-0ecb-48be-8dc2-7bcc2851649a                         # RTL Nieuws van
+https://www.rtlnieuws.nl/video/uitzendingen/video/5371036/rtl-nieuws-1930-uur                  # 11-03-2023 19:30.
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
+$ xidel -se '
+  (
+    "https://www.rtlxl.nl/programma/rtl-nieuws/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+    "https://www.rtlxl.nl/video/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+    "https://www.rtl.nl/programma/5258719/rtl-nieuws?videoId=9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+    "https://www.rtl.nl/gemist?videoId=9a9ee11c-0ecb-48be-8dc2-7bcc2851649a"
+  ) ! extract(.,"[0-9a-z-]+$"),
+  doc("https://www.rtlnieuws.nl/video/uitzendingen/video/5371036/rtl-nieuws-1930-uur")//@data-uuid
+'
+9a9ee11c-0ecb-48be-8dc2-7bcc2851649a
+9a9ee11c-0ecb-48be-8dc2-7bcc2851649a
+9a9ee11c-0ecb-48be-8dc2-7bcc2851649a
+9a9ee11c-0ecb-48be-8dc2-7bcc2851649a
+9a9ee11c-0ecb-48be-8dc2-7bcc2851649a
+
+$ url=https://www.rtlxl.nl/programma/rtl-nieuws/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a
+
+$ xidel -se 'json-doc("https://api.rtl.nl/rtlxl/metadata/api/metadata/"||(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//@data-uuid else extract("'$url'","[0-9a-z-]+$")))'
 {
   "series": {
     "slug": "rtl-nieuws",
@@ -4210,9 +4231,18 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
     "title": "RTL Nieuws",
     "type": "Series"
   },
-  "broadcastDateTime": "2021-01-15T18:30:00Z",
-  "scheduleDate": "2021-01-15",
-  "duration": 1227,
+  "season": {
+    "id": "573737",
+    "synopsis": "Dagelijks het nieuws uit binnen- en buitenland. Altijd op de hoogte zijn van het laatste nieuws? Download dan de mobiele app van RTL Nieuws.",
+    "type": "Season"
+  },
+  "episodeIdentifiers": {
+    "episodeKey": "573807",
+    "productCode": "1074207"
+  },
+  "broadcastDateTime": "2023-03-11T18:30:00Z",
+  "scheduleDate": "2023-03-11",
+  "duration": 1157,
   "channel": {
     "name": "RTL4"
   },
@@ -4220,147 +4250,89 @@ $ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video'
     "model": "AVOD",
     "audience": "DRM"
   },
-  "rating": {
-    "nicam": {
-      "ageRecommendation": "AllAges",
-      "reasons": []
-    }
-  },
-  "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
+  "rating": {},
+  "id": "9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
   "title": "RTL Nieuws - 19:30 uur",
-  "synopsis": "Dagelijks het laatste nieuws uit binnen- en buitenland. Voor nog meer nieuws kunt u ook gebruikmaken van onze mobiele apps.",
+  "synopsis": "Dagelijks het nieuws uit binnen- en buitenland. Altijd op de hoogte zijn van het laatste nieuws? Download dan de mobiele app van RTL Nieuws.",
   "assets": [
     {
-      "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
-      "url": "https://api.rtl.nl/watch/play/api/play/xl/37f2e7ec-5a27-3084-981b-1f77bd06732d",
+      "id": "9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+      "url": "https://api.rtl.nl/watch/play/api/play/xl/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
       "type": "Video"
     },
     {
-      "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
-      "url": "https://covers.rtl.nl/cover/p/pc/37f2e7ec-5a27-3084-981b-1f77bd06732d",
+      "id": "9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+      "url": "https://covers.rtl.nl/cover/p/pc/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
       "type": "Cover"
     },
     {
-      "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
-      "url": "https://covers.rtl.nl/cover/l/pc/37f2e7ec-5a27-3084-981b-1f77bd06732d",
+      "id": "9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+      "url": "https://covers.rtl.nl/cover/l/pc/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
       "type": "Poster"
     },
     {
-      "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
-      "url": "https://screenshots.rtl.nl/screenshot/l/720x404/37f2e7ec-5a27-3084-981b-1f77bd06732d.jpg",
+      "id": "9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
+      "url": "https://screenshots.rtl.nl/screenshot/l/720x404/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a.jpg",
       "type": "Still"
     }
   ],
   "type": "Episode"
 }
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video/(assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/url'
-https://api.rtl.nl/watch/play/api/play/xl/37f2e7ec-5a27-3084-981b-1f77bd06732d?device=web&format=hls
+$ xidel -se 'json-doc("https://api.rtl.nl/rtlxl/metadata/api/metadata/"||(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//@data-uuid else extract("'$url'","[0-9a-z-]+$")))/(assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/url'
+https://api.rtl.nl/watch/play/api/play/xl/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a?device=web&format=hls
 
-$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/json"])//video/(assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)'
+$ xidel -se 'json-doc("https://api.rtl.nl/rtlxl/metadata/api/metadata/"||(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//@data-uuid else extract("'$url'","[0-9a-z-]+$")))/(assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)'
 {
-  "id": "37f2e7ec-5a27-3084-981b-1f77bd06732d",
+  "id": "9a9ee11c-0ecb-48be-8dc2-7bcc2851649a",
   "canPlay": false,
-  "manifest": "https://cdn-rtlvod-h3.akamaized.net/7c21a9b6-2905-480f-bf4c-43421b20b5ca/37f2e7ec-5a27-3084-981b-1f77bd06732d.ism/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8",
-  "kid": "3de697d6-0e4c-415b-bc16-46549df7853f",
-  "licenseUrl": "https://api.rtl.nl/watch/license/aes/?kid=3de697d6-0e4c-415b-bc16-46549df7853f",
+  "manifest": "https://cdn-rtlvod-h9.akamaized.net/e30780dd-7fb5-4941-ad77-2b1384cd5172/9a9ee11c-0ecb-48be-8dc2-7bcc2851649a.ism/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8",
+  "kid": "7154f652-090d-4615-9318-8baeddc1e307",
+  "licenseUrl": "https://api.rtl.nl/watch/license/aes/?kid=7154f652-090d-4615-9318-8baeddc1e307",
   "error": {
     "code": "Entitlement",
     "description": "Only authorized users can access entitlement service (Unauthorized): Unauthorized"
-  }
+  },
+  "streamId": "0513313158cdaae2f5fc3b8c2e3c146e"
 }
 
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc("'$url'")//script[@type="application/json"])//video/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
+$ xidel -s --module=xivid.xqm -e 'json-doc("https://api.rtl.nl/rtlxl/metadata/api/metadata/"||(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//@data-uuid else extract("'$url'","[0-9a-z-]+$")))/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
 {
   "name": "RTL: RTL Nieuws - RTL Nieuws - 19:30 uur",
-  "date": "2021-01-15T18:30:00Z",
-  "duration": "PT20M27S",
+  "date": "2023-03-11T18:30:00Z",
+  "duration": "PT19M17S",
   "formats": [
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://cdn-rtlvod-h3.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8"
+      "url": "https://cdn-rtlvod-h9.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8"
     },
     {
       "id": "hls-1",
       "format": "m3u8[aac]",
-      "url": "https://cdn-rtlvod-h3.akamaized.net/[...]/QualityLevels(125437)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
-    },
-    [...]
-    {
-      "id": "hls-7",
-      "format": "m3u8[h264]",
-      "resolution": "1280x720",
-      "bitrate": "4356kbps",
-      "url": "https://cdn-rtlvod-h3.akamaized.net/[...]/QualityLevels(4121000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://www.rtlnieuws.nl/video/uitzendingen/video/5208952/rtl-nieuws-1930-uur   # Hetzelfde RTL Nieuws van 15-01-2020 19:30.
-
-$ xidel -se 'doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href'
-https://www.rtlxl.nl/video/37f2e7ec-5a27-3084-981b-1f77bd06732d
-
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href else "'$url'")//script[@type="application/json"])//video/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
-{
-  "name": "RTL: RTL Nieuws - RTL Nieuws - 19:30 uur",
-  "date": "2021-01-15T18:30:00Z",
-  "duration": "PT20M27S",
-  "formats": [...]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://www.rtl.nl/gemist?nodeId=5250814
-
-$ xidel -se 'parse-json(doc("'$url'")//script/substring-after(.,"APOLLO_STATE__ = "))/*[__typename="Video"]/uuid'
-52f257a9-0e61-3f33-b011-7fc1c338f77f
-
-$ xidel -s --module=xivid.xqm -e 'parse-json(doc(if (contains("'$url'","rtlnieuws.nl")) then doc("'$url'")//div[@class="rtl-player__fallback-overlay"]/a/@href else if (contains("'$url'","rtl.nl")) then "https://www.rtlxl.nl/video/"||parse-json(doc("'$url'")//script/substring-after(.,"APOLLO_STATE__ = "))/*[__typename="Video"]/uuid else "'$url'")//script[@type="application/json"])//video/{"name":x"RTL: {series/title} - {title}","date":broadcastDateTime,"duration":duration * duration("PT1S"),"formats":xivid:m3u8-to-json((assets)()[type="Video"]/request-combine(url,{"device":"web","format":"hls"})/json-doc(url)/manifest)}'
-{
-  "name": "RTL: Ninja Warrior Australië - Afl. 6",
-  "date": "2021-08-28T16:25:00Z",
-  "duration": "PT1H12M24S",
-  "formats": [
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/manifest(format=m3u8-aapl,encryption=cbc,Filter=Quality).m3u8"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[aac]",
-      "bitrate": "136kbps",
-      "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/QualityLevels(125436)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+      "url": "https://cdn-rtlvod-h9.akamaized.net/[...]/QualityLevels(125376)/Manifest(audioname,format=m3u8-aapl,filter=Quality,encryption=cbc)"
     },
     [...]
     {
       "id": "hls-6",
       "format": "m3u8[h264]",
-      "resolution": "1280x720",
-      "bitrate": "4407kbps",
-      "url": "https://cdn-rtlvod-h5.akamaized.net/[...]/QualityLevels(4171000)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
+      "resolution": "1920x1080",
+      "bitrate": "6073kbps",
+      "url": "https://cdn-rtlvod-h9.akamaized.net/[...]/QualityLevels(5801008)/Manifest(video,format=m3u8-aapl,filter=Quality,encryption=cbc)"
     }
   ]
 }
+
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:rtl($url as string) as object()? {
-  parse-json(
-    doc(
-      if (contains($url,"rtlnieuws.nl")) then
-        doc($url)//div[@class="rtl-player__fallback-overlay"]/a/@href
-      else if (contains($url,"rtl.nl")) then
-        "https://www.rtlxl.nl/video/"||parse-json(
-          doc($url)//script/substring-after(.,"APOLLO_STATE__ = ")
-        )/*[__typename="Video"]/uuid
-      else
-        $url
-    )//script[@type="application/json"]
-  )//video/{
+  json-doc(
+    "https://api.rtl.nl/rtlxl/metadata/api/metadata/"||(
+      if (contains($url,"rtlnieuws.nl"))
+      then doc($url)//@data-uuid
+      else extract($url,"[0-9a-z-]+$")
+    )
+  )/{
     "name":x"RTL: {series/title} - {title}",
     "date":broadcastDateTime,
     "duration":duration * duration("PT1S"),
