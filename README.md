@@ -31,12 +31,12 @@ mklink -s X:\<andere-map>\xidel.exe C:\Windows\system32\xidel.exe
 
 Ondersteuning voor het [TLS encryptie-protocol](https://nl.wikipedia.org/wiki/Transport_Layer_Security) gaat in Windows XP niet verder dan versie 1.0, terwijl bijna alle websites tegenwoordig minimaal gebruik maken van TLS 1.2. Hierdoor gaat het openen van http**s**-urls met de standaard Xidel Windows binary in Windows XP niet lukken.
 
-Er is ook een speciale Xidel Windows binary die voor https-urls, net als de Linux binary, gebruik maakt van de [OpenSSL](https://www.openssl.org) beveiligingsbibliotheek, welke wel de nieuwste TLS encryptie-protocollen ondersteund. Ideaal voor Windows XP gebruikers.  
+Er is ook een speciale Xidel Windows binary die voor https-urls, net als de Linux binary, gebruik maakt van de [OpenSSL](https://www.openssl.org) beveiligingsbibliotheek, welke wel de nieuwste TLS encryptie-protocollen ondersteunt. Ideaal voor Windows XP gebruikers.  
 Deze Xidel Windows OpenSSL binary kan echter ook uitkomst bieden voor gebruikers van nieuwere Windows versies. Op Windows 7 heb ik al eens ondervonden dat de gewone Xidel Windows binary (gebruik makend van de Windows [SChannel](https://docs.microsoft.com/en-us/windows/win32/secauthn/secure-channel) beveiligingsbibliotheek) bepaalde urls niet kon openen, maar de OpenSSL variant wel.
 
 Deze `xidel.exe` heeft OpenSSL niet geïntegreerd en vereist daarom een aantal OpenSSL dll-bestanden in dezelfde map, `C:\Windows\system32`, of ergens in `%PATH%`:
-- `libcrypto-1_1.dll` en `libssl-1_1.dll` uit de OpenSSL 1.1.1 reeks.
-- of `libeay32.dll` en `ssleay32.dll` uit de verouderde OpenSSL 1.0.2 reeks.
+- `libcrypto-3.dll` en `libssl-3.dll` uit de OpenSSL 3.0 reeks.
+- of `libcrypto-1_1.dll` en `libssl-1_1.dll` uit de verouderde OpenSSL 1.1.1 reeks.
 
 Je kunt deze OpenSSL dll-bestanden [hier](https://wiki.openssl.org/index.php/Binaries) vinden, of op [mijn website](https://rwijnsma.home.xs4all.nl/files/openssl) (zelf gecompileerd).
 
@@ -82,7 +82,7 @@ at5.nl                  lc.nl                  xhamster.com
 omroepflevoland.nl      youtube.com            youporn.com
 rtvoost.nl              youtu.be
 ```
-Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd ondersteund worden.  
+Xivid is een hobbyproject en is constant in ontwikkeling. Houd er daarom rekening mee dat per website niet alle type urls altijd worden ondersteund.  
 De video-urls van beveiligde video's (met DRM (Digital Rights Manangement), of anderzijds) worden niet weergegeven.
 
 Voor bug reports en verzoeken ga naar https://github.com/Reino17/xivid/issues. Geen garanties.
