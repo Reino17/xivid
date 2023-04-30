@@ -888,23 +888,24 @@ declare function xivid:lc($url as string) as object()? {
 
 declare function xivid:youtube($url as string) as object()? {
   x:request({
-    "headers":"Content-Type: application/json",
+    "headers":(
+      "Content-Type: application/json",
+      "User-Agent: com.google.android.youtube/18.16.34"
+    ),
     "post":serialize(
       {
         "context":{
           "client":{
             "clientName":"ANDROID",
-            "clientVersion":"16.43.34"
+            "clientVersion":"18.16.34",
+            "androidSdkVersion":33
           }
         },
         "videoId":extract($url,"[A-Za-z0-9_-]+$")
       },
       {"method":"json"}
     ),
-    "url":request-combine(
-      "https://www.youtube.com/youtubei/v1/player",
-      {"key":"AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"}
-    )/url
+    "url":"https://www.youtube.com/youtubei/v1/player"
   })/json/{
     "name":videoDetails/title,
     "duration"?:videoDetails[not(isLive)]/lengthSeconds * duration("PT1S"),
