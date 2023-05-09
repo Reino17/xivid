@@ -448,9 +448,14 @@ declare function xivid:rtl($url as string) as object()? {
     "date":broadcastDateTime,
     "duration":duration * duration("PT1S"),
     "formats":xivid:m3u8-to-json(
-      (assets)()[type="Video"]/request-combine(
-        url,{"device":"web","format":"hls"}
-      )/json-doc(url)/manifest
+      x:request({
+        "headers":"authorization: Bearer "||json-doc(
+          "https://api.rtl.nl/rtlxl/token/api/2/token"
+        )/accessToken,
+        "url":(assets)()[type="Video"]/request-combine(
+          url,{"device":"web","format":"hls"}
+        )/url
+      })/json/manifest
     )
   }
 };
