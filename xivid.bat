@@ -96,7 +96,7 @@ IF NOT "%~1"=="" (
         EXIT /B 1
       )
     ) ELSE IF NOT "%~2"=="" (
-      FOR /F "delims=" %%A IN ('xidel -e "matches('%~2','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')"') DO (
+      FOR /F "delims=" %%A IN ('xidel -e "matches('%~2','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')" 2^>NUL') DO (
         IF "%%A"=="true" (
           ECHO xivid: formaat id ontbreekt.
           EXIT /B 1
@@ -127,7 +127,7 @@ IF NOT "%~1"=="" (
     ECHO xivid: optie '%~1' ongeldig.
     EXIT /B 1
   ) ELSE (
-    FOR /F "delims=" %%A IN ('xidel -e "matches('%~1','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')"') DO (
+    FOR /F "delims=" %%A IN ('xidel -e "matches('%~1','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')" 2^>NUL') DO (
       IF "%%A"=="true" (
         SET "url=%~1"
       ) ELSE (
@@ -190,13 +190,13 @@ FOR /F "delims=" %%A IN ('xidel -e ^"
     fmts:^=join^($json/^(formats^)^(^)/id^)
   ^)
   else ^(^)
-^" --output-format^=cmd') DO %%A
+^" --output-format^=cmd 2^>NUL') DO %%A
 
 IF NOT "%url:youtube.com=%"=="%url%" SET extractor=youtube
 IF NOT "%url:youtu.be=%"=="%url%" SET extractor=youtube
 IF "%extractor%"=="youtube" (
-  xidel -e "file:write('xivid_yt.json',xivid:youtube('%url%'),{'method':'json'})"
-  FOR /F "delims=" %%A IN ('xidel xivid_yt.json -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd') DO %%A
+  xidel -e "file:write('xivid_yt.json',xivid:youtube('%url%'),{'method':'json'})" 2>NUL
+  FOR /F "delims=" %%A IN ('xidel xivid_yt.json -e "fmts:=join($json/(formats)()/id)" --output-format^=cmd 2^>NUL') DO %%A
 )
 
 IF NOT DEFINED extractor (
@@ -229,24 +229,24 @@ IF DEFINED f (
         )
       )
     )
-    (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO !json!^)) | xidel -e ^"^
+    (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e ^"^
       for $x in tokenize^('%f%'^,'\+'^) return^
       if ^(ends-with^($x^,'$'^)^) then^
         $json/^(formats^)^(^)[starts-with^(id^,substring^($x^,1^,string-length^($x^) - 1^)^)][last^(^)]/url^
       else^
         $json/^(formats^)^(^)[id^=$x]/url^
-    "
+    ^" 2>NUL
   ) ELSE (
     ECHO xivid: geen video beschikbaar.
     IF EXIST xivid_yt.json DEL xivid_yt.json
     EXIT /B 1
   )
 ) ELSE IF DEFINED i (
-  (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e "xivid:info($json)"
+  (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e "xivid:info($json)" 2>NUL
 ) ELSE IF DEFINED j (
-  (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e "$json"
+  (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e "$json" 2>NUL
 ) ELSE IF DEFINED fmts (
-  (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e "$json/(formats)()[last()]/url"
+  (^ IF EXIST xivid_yt.json (TYPE xivid_yt.json^) ELSE (ECHO %json%^)) | xidel -e "$json/(formats)()[last()]/url" 2>NUL
 ) ELSE (
   ECHO xivid: geen video beschikbaar.
   IF EXIST xivid_yt.json DEL xivid_yt.json

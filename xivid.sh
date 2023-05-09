@@ -192,7 +192,7 @@ eval "$(xidel -e '
     fmts:=$json/(formats)()/id
   )
   else ()
-' --output-format=bash)"
+' --output-format=bash 2>/dev/null)"
 
 if [[ ! $extractor ]]; then
   echo "xivid: url wordt niet ondersteund." 1>&2
@@ -224,17 +224,17 @@ if [[ $f ]]; then
         $json/(formats)()[starts-with(id,substring($x,1,string-length($x) - 1))][last()]/url
       else
         $json/(formats)()[id=$x]/url
-    ' <<< $json
+    ' 2>/dev/null <<< $json
   else
     echo "xivid: geen video beschikbaar." 1>&2
     exit 1
   fi
 elif [[ $i ]]; then
-  xidel -e 'xivid:info($json)' <<< $json
+  xidel -e 'xivid:info($json)' 2>/dev/null <<< $json
 elif [[ $j ]]; then
-  xidel -e '$json' <<< $json
+  xidel -e '$json' 2>/dev/null <<< $json
 elif [[ ${fmts[@]} ]]; then
-  xidel -e '$json/(formats)()[last()]/url' <<< $json
+  xidel -e '$json/(formats)()[last()]/url' 2>/dev/null <<< $json
 else
   echo "xivid: geen video beschikbaar." 1>&2
   exit 1
