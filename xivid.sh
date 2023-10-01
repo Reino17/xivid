@@ -61,12 +61,12 @@ EOF
 }
 
 if command -v xidel >/dev/null; then
-  if [[ $(xidel --version | xidel -s - -e 'extract($raw,"\d{8}")') -ge 20210708 ]]; then
+  if [[ $(xidel --version | xidel -s - -e 'extract($raw,"\d{8}")') -ge 20230503 ]]; then
     export XIDEL_OPTIONS="--silent --module=${0%/*}/xivid.xqm"
   else
     cat 1>&2 <<EOF
 xivid: '$(command -v xidel)' gevonden, maar versie is te oud.
-Installeer Xidel 0.9.9.7941 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.8787 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
     exit 1
@@ -74,7 +74,7 @@ EOF
 else
   cat 1>&2 <<EOF
 xivid: 'xidel' niet gevonden!
-Installeer Xidel 0.9.9.7941 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
+Installeer Xidel 0.9.9.8787 of nieuwer a.u.b. om Xivid te kunnen gebruiken.
 Ga naar http://videlibri.sourceforge.net/xidel.html.
 EOF
   exit 1
@@ -145,54 +145,56 @@ while true; do
   shift
 done
 
-eval "$(xidel -e '
-  let $extractors:={
-        "npo":array{"npostart.nl","gemi.st","radioplayer.npo.nl"},
-        "nos":array{"nos.nl"},
-        "rtl":array{"rtl.nl","rtlxl.nl","rtlnieuws.nl"},
-        "kijk":array{"kijk.nl"},
-        "tvblik":array{"tvblik.nl","uitzendinggemist.net"},
-        "regiogroei":array{
-          "omropfryslan.nl","rtvnoord.nl","rtvdrenthe.nl",
-          "rtvoost.nl","omroepwest.nl","rijnmond.nl",
-          "rtvutrecht.nl","gld.nl","omroepzeeland.nl"
+eval "$(
+  xidel -e '
+    let $extractors:={
+          "npo":array{"npostart.nl","gemi.st","radioplayer.npo.nl"},
+          "nos":array{"nos.nl"},
+          "rtl":array{"rtl.nl","rtlxl.nl","rtlnieuws.nl"},
+          "kijk":array{"kijk.nl"},
+          "tvblik":array{"tvblik.nl","uitzendinggemist.net"},
+          "regiogroei":array{
+            "omropfryslan.nl","rtvnoord.nl","rtvdrenthe.nl",
+            "rtvoost.nl","omroepwest.nl","rijnmond.nl",
+            "rtvutrecht.nl","gld.nl","omroepzeeland.nl"
+          },
+          "obr":array{"omroepbrabant.nl"},
+          "l1":array{"l1.nl"},
+          "nhnieuws":array{"nhnieuws.nl","at5.nl"},
+          "ofl":array{"omroepflevoland.nl"},
+          "dumpert":array{"dumpert.nl"},
+          "autojunk":array{"autojunk.nl"},
+          "abhd":array{"abhd.nl"},
+          "autoblog":array{"autoblog.nl"},
+          "telegraaf":array{"telegraaf.nl"},
+          "ad":array{"ad.nl"},
+          "lc":array{"lc.nl"},
+          "youtube":array{"youtube.com","youtu.be"},
+          "vimeo":array{"vimeo.com"},
+          "dailymotion":array{"dailymotion.com"},
+          "rumble":array{"rumble.com"},
+          "reddit":array{"reddit.com","redd.it"},
+          "twitch":array{"twitch.tv"},
+          "mixcloud":array{"mixcloud.com"},
+          "soundcloud":array{"soundcloud.com"},
+          "facebook":array{"facebook.com","fb.watch"},
+          "twitter":array{"twitter.com"},
+          "instagram":array{"instagram.com"},
+          "pornhub":array{"pornhub.com"},
+          "xhamster":array{"xhamster.com"},
+          "youporn":array{"youporn.com"}
         },
-        "obr":array{"omroepbrabant.nl"},
-        "l1":array{"l1.nl"},
-        "nhnieuws":array{"nhnieuws.nl","at5.nl"},
-        "ofl":array{"omroepflevoland.nl"},
-        "dumpert":array{"dumpert.nl"},
-        "autojunk":array{"autojunk.nl"},
-        "abhd":array{"abhd.nl"},
-        "autoblog":array{"autoblog.nl"},
-        "telegraaf":array{"telegraaf.nl"},
-        "ad":array{"ad.nl"},
-        "lc":array{"lc.nl"},
-        "youtube":array{"youtube.com","youtu.be"},
-        "vimeo":array{"vimeo.com"},
-        "dailymotion":array{"dailymotion.com"},
-        "rumble":array{"rumble.com"},
-        "reddit":array{"reddit.com","redd.it"},
-        "twitch":array{"twitch.tv"},
-        "mixcloud":array{"mixcloud.com"},
-        "soundcloud":array{"soundcloud.com"},
-        "facebook":array{"facebook.com","fb.watch"},
-        "twitter":array{"twitter.com"},
-        "instagram":array{"instagram.com"},
-        "pornhub":array{"pornhub.com"},
-        "xhamster":array{"xhamster.com"},
-        "youporn":array{"youporn.com"}
-      },
-      $host:=request-decode("'$url'")/host
-  for $x in $extractors() return
-  if (matches($host,join($extractors($x)(),"|")))
-  then (
-    json:=eval(x"xivid:{$x}(""'$url'"")"),
-    extractor:=$x,
-    fmts:=$json/(formats)()/id
-  )
-  else ()
-' --output-format=bash 2>/dev/null)"
+        $host:=request-decode("'$url'")/host
+    for $x in $extractors() return
+    if (matches($host,join($extractors($x)(),"|")))
+    then (
+      json:=eval(`xivid:{$x}("'$url'")`),
+      extractor:=$x,
+      fmts:=$json/(formats)()/id
+    )
+    else ()
+  ' --output-format=bash
+)"
 
 if [[ ! $extractor ]]; then
   echo "xivid: url wordt niet ondersteund." 1>&2
@@ -224,17 +226,17 @@ if [[ $f ]]; then
         $json/(formats)()[starts-with(id,substring($x,1,string-length($x) - 1))][last()]/url
       else
         $json/(formats)()[id=$x]/url
-    ' 2>/dev/null <<< $json
+    ' <<< $json
   else
     echo "xivid: geen video beschikbaar." 1>&2
     exit 1
   fi
 elif [[ $i ]]; then
-  xidel -e 'xivid:info($json)' 2>/dev/null <<< $json
+  xidel -e 'xivid:info($json)' <<< $json
 elif [[ $j ]]; then
-  xidel -e '$json' 2>/dev/null <<< $json
+  xidel -e '$json' <<< $json
 elif [[ ${fmts[@]} ]]; then
-  xidel -e '$json/(formats)()[last()]/url' 2>/dev/null <<< $json
+  xidel -e '$json/(formats)()[last()]/url' <<< $json
 else
   echo "xivid: geen video beschikbaar." 1>&2
   exit 1
