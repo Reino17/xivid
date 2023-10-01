@@ -1294,66 +1294,74 @@ declare function xivid:facebook($url as string) as object()? {
 };
 
 declare function xivid:twitter($url as string) as object()? {
-  let $bearer_token:=concat(
-        "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejR",
-        "COuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
-      ),
+  let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejR"||
+                     "COuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
       $guest_token:=x:request({
         "method":"POST",
         "headers":$bearer_token,
         "url":"https://api.twitter.com/1.1/guest/activate.json"
-      })/json/guest_token,
-      $call_api:=function($path as string,$query as object()?) as object() {
-        x:request({
-          "headers":($bearer_token,"x-guest-token: "||$guest_token),
-          "url":if (empty($query)) then
-            "https://api.twitter.com/1.1/"||$path
-          else
-            request-combine("https://api.twitter.com/1.1/"||$path,$query)/url
-        })/json
-      },
-      $statuses:=$call_api(
-        "statuses/show.json",
-        {"id":extract($url,"\d+$"),"tweet_mode":"extended"}
-      )
+      })/json/guest_token
   return
-  if (exists($statuses/extended_entities)) then
-    $statuses/{
-      "name":"Twitter: "||(.//title,full_text)[1],
-      "date":parse-ietf-date(created_at),
-      "duration":round(.//duration_millis div 1000) * duration("PT1S"),
-      "formats":array{
-        for $x at $i in (extended_entities//variants)()[content_type="video/mp4"]
-        order by $x/bitrate
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":extract($x/url,"\d+x\d+"),
-          "bitrate":$x/bitrate div 1000||"kbps",
-          "url":$x/url
-        },
-        xivid:m3u8-to-json(
-          (extended_entities//variants)()[content_type="application/x-mpegURL"]/url
-        )()
+  x:request({
+    "headers":($bearer_token,"x-guest-token: "||$guest_token),
+    "url":request-combine(
+      "https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId",
+      {
+        "variables":serialize(
+          {
+            "tweetId":extract($url,"\d+$"),
+            "withCommunity":false,
+            "includePromotedContent":false,
+            "withVoice":false
+          },
+          {"method":"json"}
+        ),
+        "features":serialize(
+          {
+            "creator_subscriptions_tweet_preview_api_enabled":true,
+            "tweetypie_unmention_optimization_enabled":true,
+            "responsive_web_edit_tweet_api_enabled":true,
+            "graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,
+            "view_counts_everywhere_api_enabled":true,
+            "longform_notetweets_consumption_enabled":true,
+            "responsive_web_twitter_article_tweet_consumption_enabled":false,
+            "tweet_awards_web_tipping_enabled":false,
+            "freedom_of_speech_not_reach_fetch_enabled":true,
+            "standardized_nudges_misinfo":true,
+            "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,
+            "longform_notetweets_rich_text_read_enabled":true,
+            "longform_notetweets_inline_media_enabled":true,
+            "responsive_web_graphql_exclude_directive_enabled":true,
+            "verified_phone_label_enabled":false,
+            "responsive_web_media_download_video_enabled":false,
+            "responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,
+            "responsive_web_graphql_timeline_navigation_enabled":true,
+            "responsive_web_enhance_cards_enabled":false
+          },
+          {"method":"json"}
+        )
       }
+    )/url
+  })/json/data/tweetResult/result/{
+    "name":`Twitter: {core/user_results/result/legacy/screen_name} - {legacy/full_text}`,
+    "date":parse-ietf-date(legacy/created_at),
+    "duration":round(
+      legacy/extended_entities/(media)()/video_info/duration_millis div 1000
+    ) * duration("PT1S"),
+    "formats":legacy/extended_entities/(media)()/video_info/array{
+      for $x at $i in (variants)()[content_type="video/mp4"]
+      order by $x/bitrate
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":extract($x/url,"\d+x\d+"),
+        "bitrate":$x/bitrate div 1000||"kbps",
+        "url":$x/url
+      },
+      xivid:m3u8-to-json((variants)()[content_type="application/x-mpegURL"]/url)()
     }
-  else
-    let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return
-    $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{
-      "name":"Twitter: "||status,
-      "date":round(start_ms div 1000) *
-        duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-      "duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),
-      "formats":array{
-        {
-          "id":"hls-1",
-          "format":"m3u8[h264+aac]",
-          "resolution":`{width}x{height}`,
-          "url":$call_api("live_video_stream/status/"||media_key,())//location
-        }
-      }
-    }
+  }
 };
 
 declare function xivid:instagram($url as string) as object()? {

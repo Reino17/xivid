@@ -8615,277 +8615,228 @@ declare function xivid:facebook($url as string) as object()? {
 
 ================================================================================================
 
-[twitter]
+[twitter / x]
 
-$ url=https://twitter.com/themandalorian/status/1188986316194635777   # https://github.com/ytdl-org/youtube-dl/issues/14977#issuecomment-551283708
+$ url=https://twitter.com/TuckerCarlson/status/1689783814594174976
 
 $ xidel -se '(doc("'$url'")//script/@src)[last()]'
-https://abs.twimg.com/responsive-web/client-web-legacy/main.1ca9fd65.js
+https://abs.twimg.com/responsive-web/client-web-legacy/main.d15dd3ba.js
 
-$ xidel -se 'extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"s=&quot;([A-Za-z0-9%]{96,})&quot;",1)'
+$ xidel -se 'extract(unparsed-text((doc("'$url'")//script/@src)[last()]),"return&quot;([A-Za-z0-9%]{96,})&quot;",1)'
 AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA
 
 Deze token lijkt altijd hetzelfde te zijn, dus kan ik 'm net zo goed als string toevoegen.
 
 $ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA" return x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json'
 {
-  "guest_token": "1504964898748518410"
+  "guest_token": "1691429954611728384"
 }
 
-$ xidel -se 'request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
-{
-  "url": "https://api.twitter.com/1.1/statuses/show.json?id=1188986316194635777&tweet_mode=extended"
-}
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})/url})/json'
-{
-  "created_at": "Tue Oct 29 01:10:02 +0000 2019",
-  [...]
-  "full_text": "“Mandalorian, look outside. They’re waiting for you.” Watch the brand new trailer for #TheMandalorian, an original Star Wars series. Start streaming Nov. 12, only on #DisneyPlus. https://t.co/Ac38wozhZz",
-  [...]
-  "extended_entities": {
-    "media": [
-      {
-        [...]
-        "video_info": {
-          "aspect_ratio": [433, 180],
-          "duration_millis": 104646,
-          "variants": [
-            {
-              "content_type": "application/x-mpegURL",
-              "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13&v=6b4"
-            },
-            {
-              "bitrate": 2176000,
-              "content_type": "video/mp4",
-              "url": "https://video.twimg.com/amplify_video/1188974444523315201/vid/1732x720/Gih93EU1RaZnXxpx.mp4?tag=13"
-            },
-            {
-              "bitrate": 832000,
-              "content_type": "video/mp4",
-              "url": "https://video.twimg.com/amplify_video/1188974444523315201/vid/866x360/K3aaE5vAughE7huI.mp4?tag=13"
-            },
-            {
-              "bitrate": 288000,
-              "content_type": "video/mp4",
-              "url": "https://video.twimg.com/amplify_video/1188974444523315201/vid/648x270/mNhOOfzYKNFj__tb.mp4?tag=13"
-            }
-          ]
+$ xidel -se '
+  request-combine(
+    "https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId",
+    {
+      "variables":serialize(
+        {
+          "tweetId":extract("'$url'","\d+$"),
+          "withCommunity":false,
+          "includePromotedContent":false,
+          "withVoice":false
         },
-        "media_key": "13_1188974444523315201",
-        "additional_media_info": {
-          "title": "The Mandalorian | Official Trailer 2 | Disney+ | Streaming Nov. 12",
-          "description": "",
-          "embeddable": true,
-          "monetizable": false
+        {"method":"json"}
+      ),
+      "features":serialize(
+        {
+          "creator_subscriptions_tweet_preview_api_enabled":true,
+          "tweetypie_unmention_optimization_enabled":true,
+          "responsive_web_edit_tweet_api_enabled":true,
+          "graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,
+          "view_counts_everywhere_api_enabled":true,
+          "longform_notetweets_consumption_enabled":true,
+          "responsive_web_twitter_article_tweet_consumption_enabled":false,
+          "tweet_awards_web_tipping_enabled":false,
+          "freedom_of_speech_not_reach_fetch_enabled":true,
+          "standardized_nudges_misinfo":true,
+          "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,
+          "longform_notetweets_rich_text_read_enabled":true,
+          "longform_notetweets_inline_media_enabled":true,
+          "responsive_web_graphql_exclude_directive_enabled":true,
+          "verified_phone_label_enabled":false,
+          "responsive_web_media_download_video_enabled":false,
+          "responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,
+          "responsive_web_graphql_timeline_navigation_enabled":true,
+          "responsive_web_enhance_cards_enabled":false
+        },
+        {"method":"json"}
+      )
+    }
+  )/url
+'
+https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId?variables=%7B%22tweetId%22%3A%221689783814594174976%22%2C%22withCommunity%22%3Afalse%2C%22includePromotedContent%22%3Afalse%2C%22withVoice%22%3Afalse%7D&features=%7B%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Afalse%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22responsive_web_media_download_video_enabled%22%3Afalse%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D
+
+Helaas zijn "variables" en "features" in z'n volledigheid nodig, omdat anders de GraphQL-query niks oplevert.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId",{"variables":serialize({"tweetId":extract("'$url'","\d+$"),"withCommunity":false,"includePromotedContent":false,"withVoice":false},{"method":"json"}),"features":serialize({"creator_subscriptions_tweet_preview_api_enabled":true,"tweetypie_unmention_optimization_enabled":true,"responsive_web_edit_tweet_api_enabled":true,"graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,"view_counts_everywhere_api_enabled":true,"longform_notetweets_consumption_enabled":true,"responsive_web_twitter_article_tweet_consumption_enabled":false,"tweet_awards_web_tipping_enabled":false,"freedom_of_speech_not_reach_fetch_enabled":true,"standardized_nudges_misinfo":true,"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,"longform_notetweets_rich_text_read_enabled":true,"longform_notetweets_inline_media_enabled":true,"responsive_web_graphql_exclude_directive_enabled":true,"verified_phone_label_enabled":false,"responsive_web_media_download_video_enabled":false,"responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,"responsive_web_graphql_timeline_navigation_enabled":true,"responsive_web_enhance_cards_enabled":false},{"method":"json"})})/url})/json'
+{
+  "data": {
+    "tweetResult": {
+      "result": {
+        "__typename": "Tweet",
+        "rest_id": "1689783814594174976",
+        "core": {
+          "user_results": {
+            "result": {
+              [...]
+              "legacy": {
+                [...]
+                "name": "Tucker Carlson",
+                [...]
+                "screen_name": "TuckerCarlson",
+                [...]
+              }
+            }
+          }
+        },
+        [...]
+        "legacy": {
+          [...]
+          "created_at": "Thu Aug 10 23:40:30 +0000 2023",
+          [...]
+          "entities": {
+            "media": [
+              {
+                [...]
+                "video_info": {
+                  "aspect_ratio": [16, 9],
+                  "duration_millis": 3320283,
+                  "variants": [
+                    {
+                      "bitrate": 288000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/480x270/KKMCY8tkxa9xMGKV.mp4?tag=16"
+                    },
+                    {
+                      "bitrate": 832000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/640x360/6y41Y8d_lnvDCTDo.mp4?tag=16"
+                    },
+                    {
+                      "bitrate": 10368000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/1920x1080/IRGzp3WuySOh2tgD.mp4?tag=16"
+                    },
+                    {
+                      "bitrate": 2176000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/1280x720/x8vy-VoNQVr1Z-sl.mp4?tag=16"
+                    },
+                    {
+                      "content_type": "application/x-mpegURL",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/pl/n-yWELrKqXjTZr2C.m3u8?tag=16&container=fmp4&v=ca3"
+                    }
+                  ]
+                }
+              }
+            ],
+            [...]
+          },
+          "extended_entities": {
+            "media": [
+              {
+                [...]
+                "video_info": {
+                  "aspect_ratio": [16, 9],
+                  "duration_millis": 3320283,
+                  "variants": [
+                    {
+                      "bitrate": 288000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/480x270/KKMCY8tkxa9xMGKV.mp4?tag=16"
+                    },
+                    {
+                      "bitrate": 832000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/640x360/6y41Y8d_lnvDCTDo.mp4?tag=16"
+                    },
+                    {
+                      "bitrate": 10368000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/1920x1080/IRGzp3WuySOh2tgD.mp4?tag=16"
+                    },
+                    {
+                      "bitrate": 2176000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/1280x720/x8vy-VoNQVr1Z-sl.mp4?tag=16"
+                    },
+                    {
+                      "content_type": "application/x-mpegURL",
+                      "url": "https://video.twimg.com/amplify_video/1689779738217172992/pl/n-yWELrKqXjTZr2C.m3u8?tag=16&container=fmp4&v=ca3"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          [...]
+          "full_text": "Ep. 15  Former Capitol Police Chief Steven Sund reveals what really happened on January 6th. Our Fox News interview with him never aired, so we invited him back. https://t.co/opDlu4QGlp",
+          [...]
         }
       }
-    ]
-  },
-  [...]
+    }
+  }
 }
 
-$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})/url})/json/{"name":"Twitter: "||.//title,"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (.//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}}'
+$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token return x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId",{"variables":serialize({"tweetId":extract("'$url'","\d+$"),"withCommunity":false,"includePromotedContent":false,"withVoice":false},{"method":"json"}),"features":serialize({"creator_subscriptions_tweet_preview_api_enabled":true,"tweetypie_unmention_optimization_enabled":true,"responsive_web_edit_tweet_api_enabled":true,"graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,"view_counts_everywhere_api_enabled":true,"longform_notetweets_consumption_enabled":true,"responsive_web_twitter_article_tweet_consumption_enabled":false,"tweet_awards_web_tipping_enabled":false,"freedom_of_speech_not_reach_fetch_enabled":true,"standardized_nudges_misinfo":true,"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,"longform_notetweets_rich_text_read_enabled":true,"longform_notetweets_inline_media_enabled":true,"responsive_web_graphql_exclude_directive_enabled":true,"verified_phone_label_enabled":false,"responsive_web_media_download_video_enabled":false,"responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,"responsive_web_graphql_timeline_navigation_enabled":true,"responsive_web_enhance_cards_enabled":false},{"method":"json"})})/url})/json/data/tweetResult/result/{"name":`Twitter: {core/user_results/result/legacy/screen_name} - {legacy/full_text}`,"date":parse-ietf-date(legacy/created_at),"duration":round(legacy/extended_entities/(media)()/video_info/duration_millis div 1000) * duration("PT1S"),"formats":legacy/extended_entities/(media)()/video_info/array{for $x at $i in (variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((variants)()[content_type="application/x-mpegURL"]/url)()}}'
 {
-  "name": "Twitter: The Mandalorian | Official Trailer 2 | Disney+ | Streaming Nov. 12",
-  "date": "2019-10-29T01:10:02Z",
-  "duration": "PT1M45S",
+  "name": "Twitter: TuckerCarlson - Ep. 15  Former Capitol Police Chief Steven Sund reveals what really happened on January 6th. Our Fox News interview with him never aired, so we invited him back. https://t.co/opDlu4QGlp",
+  "date": "2023-08-10T23:40:30Z",
+  "duration": "PT55M20S",
   "formats": [
     {
       "id": "pg-1",
       "format": "mp4[h264+aac]",
-      "resolution": "648x270",
+      "resolution": "480x270",
       "bitrate": "288kbps",
-      "url": "https://video.twimg.com/amplify_video/1188974444523315201/vid/648x270/mNhOOfzYKNFj__tb.mp4?tag=13"
+      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/480x270/KKMCY8tkxa9xMGKV.mp4?tag=16"
     },
     [...]
     {
-      "id": "pg-3",
+      "id": "pg-4",
       "format": "mp4[h264+aac]",
-      "resolution": "1732x720",
-      "bitrate": "2176kbps",
-      "url": "https://video.twimg.com/amplify_video/1188974444523315201/vid/1732x720/Gih93EU1RaZnXxpx.mp4?tag=13"
+      "resolution": "1920x1080",
+      "bitrate": "10368kbps",
+      "url": "https://video.twimg.com/amplify_video/1689779738217172992/vid/1920x1080/IRGzp3WuySOh2tgD.mp4?tag=16"
     },
     {
       "id": "sub-1",
       "format": "m3u8[vtt]",
       "language": "en",
-      "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/s0/3sjE70yJdGgqp0g1.m3u8"
+      "label": "English",
+      "url": "https://video.twimg.com/amplify_video/1689779738217172992/pl/s0/UoA1z5-di7Lmb5oH.m3u8"
     },
     {
       "id": "hls-0",
       "format": "m3u8[manifest]",
-      "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/OTSOTGtTUnYMAVnX.m3u8?tag=13&v=6b4"
+      "url": "https://video.twimg.com/amplify_video/1689779738217172992/pl/n-yWELrKqXjTZr2C.m3u8?tag=16&container=fmp4&v=ca3"
     },
     {
       "id": "hls-1",
       "format": "m3u8[h264+aac]",
-      "resolution": "648x270",
-      "bitrate": "288kbps",
-      "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/648x270/O7Yd4NsLa4hRURCX.m3u8"
+      "resolution": "480x270",
+      "bitrate": "77kbps",
+      "url": "https://video.twimg.com/amplify_video/1689779738217172992/pl/480x270/M3HFHp7WOdRC3XiV.m3u8?container=fmp4"
     },
     [...]
     {
-      "id": "hls-3",
+      "id": "hls-4",
       "format": "m3u8[h264+aac]",
-      "resolution": "1732x720",
-      "bitrate": "2176kbps",
-      "url": "https://video.twimg.com/amplify_video/1188974444523315201/pl/1732x720/yG0_asM0v9yBC-Xd.m3u8"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://twitter.com/ViviEducation/status/1136534865145286656
-
-Creëer een interne $call_api functie om de nodige api-urls makkelijker aan te spreken:
-
-$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json} return $call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
-{
-  "created_at": "Thu Jun 06 07:26:42 +0000 2019",
-  [...]
-  "entities": {
-    [...]
-    "urls": [
-      {
-        "url": "https://t.co/HJOtr4djsW",
-        "expanded_url": "https://twitter.com/i/broadcasts/1vOGwqejwoWxB",
-        "display_url": "twitter.com/i/broadcasts/1.",
-        "indices": [100, 123]
-      }
-    ]
-  },
-  [...]
-}
-
-$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/(.,$call_api("live_video_stream/status/"||media_key,()))'
-{
-  "id": "1vOGwqejwoWxB",
-  "broadcast_id": "1vOGwqejwoWxB",
-  "media_key": "28_1136534646529769472",
-  "media_id": "1136534646529769472",
-  [...]
-  "status": "Vivi founder @lior_rauchy announcing our new student feedback tool live at @EduTECH_AU #EduTECH2019",
-  [...]
-  "height": 568,
-  "width": 320,
-  [...]
-  "start_ms": "1559806001825",
-  "end_ms": "1559807524882",
-  [...]
-}
-{
-  "source": {
-    "location": "https://prod-fastly-ap-southeast-2.video.pscp.tv/[...]/playlist_16886936549721737423.m3u8?type=replay",
-    "noRedirectPlaybackUrl": "https://prod-fastly-ap-southeast-2.video.pscp.tv/[...]/playlist_16886936549721737423.m3u8?type=replay",
-    "status": "LIVE_PUBLIC",
-    "streamType": "HLS"
-  },
-  [...]
-}
-
-$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses/{"name":"Twitter: "||.//title,"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (.//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((.//variants)()[content_type="application/x-mpegURL"]/url)()}} else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{"name":"Twitter: "||status,"date":round(start_ms div 1000) * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),"formats":array{{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat(width,"x",height),"url":$call_api("live_video_stream/status/"||media_key,())//location}}}'
-{
-  "name": "Twitter: Vivi founder @lior_rauchy announcing our new student feedback tool live at @EduTECH_AU #EduTECH2019",
-  "date": "2019-06-06T07:26:42Z",
-  "duration": "PT25M23S",
-  "formats": [
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "320x568",
-      "url": "https://prod-fastly-ap-southeast-2.video.pscp.tv/[...]/playlist_16886936549721737423.m3u8?type=replay"
-    }
-  ]
-}
-
-------------------------------------------------------------------------------------------------
-
-$ url=https://twitter.com/I_Leak_VN/status/1369649839546400776
-
-$ xidel -se 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json} return $call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"})'
-{
-  "created_at": "Wed Mar 10 14:02:23 +0000 2021",
-  [...]
-  "full_text": "... with oil cooling = the craziest mining ever in the world\n\nhttps://t.co/beYwz9pAux\n\n@elchapuzas @hms1193 @harukaze5719 @hardwareluxx_de @nbc_net @VideoCardz https://t.co/QSSaUxOPwG https://t.co/WVW3dNmo7C",
-  [...]
-  "extended_entities": {
-    "media": [
-      {
-        [...]
-        "video_info": {
-          "aspect_ratio": [25, 14],
-          "duration_millis": 69970,
-          "variants": [
-            {
-              "bitrate": 256000,
-              "content_type": "video/mp4",
-              "url": "https://video.twimg.com/ext_tw_video/1369649503557550089/pu/vid/400x224/DeAvoL4ntzUZ7do_.mp4?tag=12"
-            },
-            {
-              "content_type": "application/x-mpegURL",
-              "url": "https://video.twimg.com/ext_tw_video/1369649503557550089/pu/pl/3OafwKdT_40CDWUH.m3u8?tag=12"
-            }
-          ]
-        },
-        "media_key": "7_1369649503557550089",
-        "additional_media_info": {
-          "monetizable": false
-        }
-      }
-    ]
-  },
-  [...]
-  "quoted_status": {
-    [...]
-    "extended_entities": {
-      "media": [
-        {
-          [...]
-          "video_info": {
-            "aspect_ratio": [249, 244],
-            "variants": [
-              {
-                "bitrate": 0,
-                "content_type": "video/mp4",
-                "url": "https://video.twimg.com/tweet_video/EwH17TuXMAAhv-S.mp4"
-              }
-            ]
-          },
-          "media_key": "16_1369646160953159680"
-        }
-      ]
-    },
-    [...]
-  },
-  [...]
-}
-
-$ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",$guest_token:=x:request({"method":"POST","headers":$bearer_token,"url":"https://api.twitter.com/1.1/guest/activate.json"})/json/guest_token,$call_api:=function($path as string,$query as object()?) as object() {x:request({"headers":($bearer_token,"x-guest-token: "||$guest_token),"url":if (empty($query)) then "https://api.twitter.com/1.1/"||$path else request-combine("https://api.twitter.com/1.1/"||$path,$query)/url})/json},$statuses:=$call_api("statuses/show.json",{"id":extract("'$url'","\d+$"),"tweet_mode":"extended"}) return if (exists($statuses/extended_entities)) then $statuses/{"name":"Twitter: "||(.//title,full_text)[1],"date":parse-ietf-date(created_at),"duration":round(.//duration_millis div 1000) * duration("PT1S"),"formats":array{for $x at $i in (extended_entities//variants)()[content_type="video/mp4"] order by $x/bitrate count $i return {"id":"pg-"||$i,"format":"mp4[h264+aac]","resolution":extract($x/url,"\d+x\d+"),"bitrate":$x/bitrate div 1000||"kbps","url":$x/url},xivid:m3u8-to-json((extended_entities//variants)()[content_type="application/x-mpegURL"]/url)()}} else let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{"name":"Twitter: "||status,"date":round(start_ms div 1000) * duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),"duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),"formats":array{{"id":"hls-1","format":"m3u8[h264+aac]","resolution":concat(width,"x",height),"url":$call_api("live_video_stream/status/"||media_key,())//location}}}'
-{
-  "name": "Twitter: ... with oil cooling = the craziest mining ever in the world\n\nhttps://t.co/beYwz9pAux\n\n@elchapuzas @hms1193 @harukaze5719 @hardwareluxx_de @nbc_net @VideoCardz https://t.co/QSSaUxOPwG https://t.co/WVW3dNmo7C",
-  "date": "2021-03-10T14:02:23Z",
-  "duration": "PT1M10S",
-  "formats": [
-    {
-      "id": "pg-1",
-      "format": "mp4[h264+aac]",
-      "resolution": "400x224",
-      "bitrate": "256kbps",
-      "url": "https://video.twimg.com/ext_tw_video/1369649503557550089/pu/vid/400x224/DeAvoL4ntzUZ7do_.mp4?tag=12"
-    },
-    {
-      "id": "hls-0",
-      "format": "m3u8[manifest]",
-      "url": "https://video.twimg.com/ext_tw_video/1369649503557550089/pu/pl/3OafwKdT_40CDWUH.m3u8?tag=12"
-    },
-    {
-      "id": "hls-1",
-      "format": "m3u8[h264+aac]",
-      "resolution": "400x224",
-      "bitrate": "256kbps",
-      "url": "https://video.twimg.com/ext_tw_video/1369649503557550089/pu/pl/400x224/-qd-LGmPMdvWGhIp.m3u8"
+      "resolution": "1920x1080",
+      "bitrate": "786kbps",
+      "url": "https://video.twimg.com/amplify_video/1689779738217172992/pl/1920x1080/tfAtbxyJW_jBBxrk.m3u8?container=fmp4"
     }
   ]
 }
@@ -8893,66 +8844,74 @@ $ xidel -s --module=xivid.xqm -e 'let $bearer_token:="Authorization: Bearer AAAA
 ------------------------------------------------------------------------------------------------
 
 declare function xivid:twitter($url as string) as object()? {
-  let $bearer_token:=concat(
-        "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejR",
-        "COuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
-      ),
+  let $bearer_token:="Authorization: Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejR"||
+                     "COuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
       $guest_token:=x:request({
         "method":"POST",
         "headers":$bearer_token,
         "url":"https://api.twitter.com/1.1/guest/activate.json"
-      })/json/guest_token,
-      $call_api:=function($path as string,$query as object()?) as object() {
-        x:request({
-          "headers":($bearer_token,"x-guest-token: "||$guest_token),
-          "url":if (empty($query)) then
-            "https://api.twitter.com/1.1/"||$path
-          else
-            request-combine("https://api.twitter.com/1.1/"||$path,$query)/url
-        })/json
-      },
-      $statuses:=$call_api(
-        "statuses/show.json",
-        {"id":extract($url,"\d+$"),"tweet_mode":"extended"}
-      )
+      })/json/guest_token
   return
-  if (exists($statuses/extended_entities)) then
-    $statuses/{
-      "name":"Twitter: "||(.//title,full_text)[1],
-      "date":parse-ietf-date(created_at),
-      "duration":round(.//duration_millis div 1000) * duration("PT1S"),
-      "formats":array{
-        for $x at $i in (extended_entities//variants)()[content_type="video/mp4"]
-        order by $x/bitrate
-        count $i
-        return {
-          "id":"pg-"||$i,
-          "format":"mp4[h264+aac]",
-          "resolution":extract($x/url,"\d+x\d+"),
-          "bitrate":$x/bitrate div 1000||"kbps",
-          "url":$x/url
-        },
-        xivid:m3u8-to-json(
-          (extended_entities//variants)()[content_type="application/x-mpegURL"]/url
-        )()
+  x:request({
+    "headers":($bearer_token,"x-guest-token: "||$guest_token),
+    "url":request-combine(
+      "https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId",
+      {
+        "variables":serialize(
+          {
+            "tweetId":extract($url,"\d+$"),
+            "withCommunity":false,
+            "includePromotedContent":false,
+            "withVoice":false
+          },
+          {"method":"json"}
+        ),
+        "features":serialize(
+          {
+            "creator_subscriptions_tweet_preview_api_enabled":true,
+            "tweetypie_unmention_optimization_enabled":true,
+            "responsive_web_edit_tweet_api_enabled":true,
+            "graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,
+            "view_counts_everywhere_api_enabled":true,
+            "longform_notetweets_consumption_enabled":true,
+            "responsive_web_twitter_article_tweet_consumption_enabled":false,
+            "tweet_awards_web_tipping_enabled":false,
+            "freedom_of_speech_not_reach_fetch_enabled":true,
+            "standardized_nudges_misinfo":true,
+            "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,
+            "longform_notetweets_rich_text_read_enabled":true,
+            "longform_notetweets_inline_media_enabled":true,
+            "responsive_web_graphql_exclude_directive_enabled":true,
+            "verified_phone_label_enabled":false,
+            "responsive_web_media_download_video_enabled":false,
+            "responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,
+            "responsive_web_graphql_timeline_navigation_enabled":true,
+            "responsive_web_enhance_cards_enabled":false
+          },
+          {"method":"json"}
+        )
       }
+    )/url
+  })/json/data/tweetResult/result/{
+    "name":`Twitter: {core/user_results/result/legacy/screen_name} - {legacy/full_text}`,
+    "date":parse-ietf-date(legacy/created_at),
+    "duration":round(
+      legacy/extended_entities/(media)()/video_info/duration_millis div 1000
+    ) * duration("PT1S"),
+    "formats":legacy/extended_entities/(media)()/video_info/array{
+      for $x at $i in (variants)()[content_type="video/mp4"]
+      order by $x/bitrate
+      count $i
+      return {
+        "id":"pg-"||$i,
+        "format":"mp4[h264+aac]",
+        "resolution":extract($x/url,"\d+x\d+"),
+        "bitrate":$x/bitrate div 1000||"kbps",
+        "url":$x/url
+      },
+      xivid:m3u8-to-json((variants)()[content_type="application/x-mpegURL"]/url)()
     }
-  else
-    let $id:=substring-after($statuses/entities//expanded_url,"broadcasts/") return
-    $call_api("broadcasts/show.json",{"ids":$id})/(broadcasts)($id)/{
-      "name":"Twitter: "||status,
-      "date":round(start_ms div 1000) *
-        duration("PT1S") + dateTime("1970-01-01T00:00:00Z"),
-      "duration":round((end_ms - start_ms) div 1000) * duration("PT1S"),
-      "formats":array{
-        {
-          "id":"hls-1",
-          "format":"m3u8[h264+aac]",
-          "resolution":`{width}x{height}`,
-          "url":$call_api("live_video_stream/status/"||media_key,())//location
-        }
-      }
-    }
+  }
 };
 
 ================================================================================================
