@@ -34,9 +34,7 @@ Ondersteuning voor het [TLS encryptie-protocol](https://nl.wikipedia.org/wiki/Tr
 Er is ook een speciale Xidel Windows binary die voor https-urls, net als de Linux binary, gebruik maakt van de [OpenSSL](https://www.openssl.org) beveiligingsbibliotheek, welke wel de nieuwste TLS encryptie-protocollen ondersteunt. Ideaal voor Windows XP gebruikers.  
 Deze Xidel Windows OpenSSL binary kan echter ook uitkomst bieden voor gebruikers van nieuwere Windows versies. Op Windows 7 heb ik al eens ondervonden dat de gewone Xidel Windows binary (gebruik makend van de Windows [SChannel](https://docs.microsoft.com/en-us/windows/win32/secauthn/secure-channel) beveiligingsbibliotheek) bepaalde urls niet kon openen, maar de OpenSSL variant wel.
 
-Deze `xidel.exe` heeft OpenSSL niet geïntegreerd en vereist daarom een aantal OpenSSL dll-bestanden in dezelfde map, `C:\Windows\system32`, of ergens in `%PATH%`:
-- `libcrypto-3.dll` en `libssl-3.dll` uit de OpenSSL 3.0 reeks.
-- of `libcrypto-1_1.dll` en `libssl-1_1.dll` uit de verouderde OpenSSL 1.1.1 reeks.
+Deze `xidel.exe` heeft OpenSSL niet geïntegreerd en vereist daarom de dll-bestanden `libcrypto-3.dll` en `libssl-3.dll` uit de OpenSSL 3.0 reeks in dezelfde map, `C:\Windows\system32`, of ergens in `%PATH%`.
 
 Je kunt deze OpenSSL dll-bestanden [hier](https://wiki.openssl.org/index.php/Binaries) vinden, of op [mijn website](https://rwijnsma.home.xs4all.nl/files/openssl) (zelf gecompileerd).
 
