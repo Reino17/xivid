@@ -1035,6 +1035,23 @@ declare function xivid:rumble($url as string) as object()? {
   }
 };
 
+declare function xivid:odysee($url as string) as object()? {
+  parse-json(
+    doc($url)//script[@type="application/ld+json"]
+  )/{
+    "name":`{substring-after(author/name,"@")}: {name}`,
+    "date":dateTime(uploadDate),
+    "formats":array{
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "resolution":`{width}x{height}`,
+        "url":contentUrl
+      }
+    }
+  }
+};
+
 declare function xivid:reddit($url as string) as object()? {
   json-doc(
     if (request-decode($url)/host = "v.redd.it")

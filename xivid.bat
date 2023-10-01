@@ -35,22 +35,23 @@ ECHO                 beschikbare formaten.
 ECHO   -j            Toon video informatie als JSON.
 ECHO.
 ECHO Ondersteunde websites:
-ECHO   npostart.nl             rtvoost.nl          youtu.be
-ECHO   gemi.st                 omroepwest.nl       vimeo.com
-ECHO   radioplayer.npo.nl      rijnmond.nl         dailymotion.com
-ECHO   nos.nl                  rtvutrecht.nl       rumble.com
-ECHO   tvblik.nl               gld.nl              reddit.com
-ECHO   uitzendinggemist.net    omroepzeeland.nl    redd.it
-ECHO   rtl.nl                  omroepbrabant.nl    twitch.tv
-ECHO   rtlxl.nl                l1.nl               mixcloud.com
-ECHO   rtlnieuws.nl            dumpert.nl          soundcloud.com
-ECHO   kijk.nl                 autojunk.nl         facebook.com
-ECHO   omropfryslan.nl         abhd.nl             fb.watch
-ECHO   rtvnoord.nl             autoblog.nl         instagram.com
-ECHO   rtvdrenthe.nl           telegraaf.nl        twitter.com
-ECHO   nhnieuws.nl             ad.nl               pornhub.com
-ECHO   at5.nl                  lc.nl               xhamster.com
-ECHO   omroepflevoland.nl      youtube.com         youporn.com
+ECHO   npostart.nl             omroepwest.nl       vimeo.com
+ECHO   gemi.st                 rijnmond.nl         dailymotion.com
+ECHO   radioplayer.npo.nl      rtvutrecht.nl       rumble.com
+ECHO   nos.nl                  gld.nl              odysee.com
+ECHO   tvblik.nl               omroepzeeland.nl    reddit.com
+ECHO   uitzendinggemist.net    omroepbrabant.nl    redd.it
+ECHO   rtl.nl                  l1.nl               twitch.tv
+ECHO   rtlxl.nl                dumpert.nl          mixcloud.com
+ECHO   rtlnieuws.nl            autojunk.nl         soundcloud.com
+ECHO   kijk.nl                 abhd.nl             facebook.com
+ECHO   omropfryslan.nl         autoblog.nl         fb.watch
+ECHO   rtvnoord.nl             telegraaf.nl        instagram.com
+ECHO   rtvdrenthe.nl           ad.nl               twitter.com
+ECHO   nhnieuws.nl             lc.nl               pornhub.com
+ECHO   at5.nl                  youtube.com         xhamster.com
+ECHO   omroepflevoland.nl      youtu.be            youporn.com
+ECHO   rtvoost.nl
 ECHO.
 ECHO Voorbeelden:
 ECHO   xivid.bat https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -97,7 +98,7 @@ IF NOT "%~1"=="" (
       )
     ) ELSE IF NOT "%~2"=="" (
       FOR /F "delims=" %%A IN ('
-        xidel -e "matches('%~2','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')"
+        xidel -e "matches('%~2','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;$]*[-A-Za-z0-9\+&@#/%%=~_|]$')"
       ') DO (
         IF "%%A"=="true" (
           ECHO xivid: formaat id ontbreekt.
@@ -130,7 +131,7 @@ IF NOT "%~1"=="" (
     EXIT /B 1
   ) ELSE (
     FOR /F "delims=" %%A IN ('
-      xidel -e "matches('%~1','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%%=~_|]$')"
+      xidel -e "matches('%~1','^https?://[-A-Za-z0-9\+&@#/%%?=~_|!:,.;$]*[-A-Za-z0-9\+&@#/%%=~_|]$')"
     ') DO (
       IF "%%A"=="true" (
         SET "url=%~1"
@@ -175,6 +176,7 @@ FOR /F "delims=" %%A IN ('
           'vimeo':array{'vimeo.com'}^,
           'dailymotion':array{'dailymotion.com'}^,
           'rumble':array{'rumble.com'}^,
+          'odysee':array{'odysee.com'}^,
           'reddit':array{'reddit.com'^,'redd.it'}^,
           'twitch':array{'twitch.tv'}^,
           'mixcloud':array{'mixcloud.com'}^,

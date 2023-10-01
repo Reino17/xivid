@@ -6121,6 +6121,75 @@ declare function xivid:rumble($url as string) as object()? {
 
 ================================================================================================
 
+[odysee]
+
+$ url=https://odysee.com/$/embed/2023-09-30-David-Icke-still-banned-from-26-countries/0c853644c632f77a17cbc832fe03a0bd32535f82   # Via https://videowaarheid.nl/video/david-icke-still-banned-from-26-countries/
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])'
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "David Icke still banned from 26 countries",
+  "description": "David Icke still banned from 26 countries: A day after the verdict Willem Engel, Mordechai Krispijn and IckeΓÇÖs lawyer Jeroen Pols talk with David Icke about the verdict, the inconsistencies, what it m...",
+  "thumbnailUrl": "https://thumbnails.odycdn.com/card/s:1280:720/quality:85/plain/https://thumbs.odycdn.com/928d518bae6c35841ff187ee131c4452.webp",
+  "uploadDate": "2023-09-30T14:21:33.000Z",
+  "duration": "PT54M4S",
+  "url": "https://odysee.com/@Voorwaarheid:1/2023-09-30-David-Icke-still-banned-from-26-countries:0",
+  "contentUrl": "https://player.odycdn.com/api/v3/streams/free/2023-09-30-David-Icke-still-banned-from-26-countries/0c853644c632f77a17cbc832fe03a0bd32535f82/2a6190.mp4",
+  "embedUrl": "https://odysee.com/%24/embed/%40Voorwaarheid%3A1%2F2023-09-30-David-Icke-still-banned-from-26-countries%3A0",
+  "author": {
+    "@type": "Person",
+    "name": "@Voorwaarheid",
+    "url": "https://odysee.com/@Voorwaarheid:1"
+  },
+  "thumbnail": {
+    "@type": "ImageObject",
+    "url": "https://thumbnails.odycdn.com/card/s:1280:720/quality:85/plain/https://thumbs.odycdn.com/928d518bae6c35841ff187ee131c4452.webp"
+  },
+  "width": 1266,
+  "height": 720,
+  "potentialAction": {
+    "@type": "SeekToAction",
+    "target": "https://odysee.com/@Voorwaarheid:1/2023-09-30-David-Icke-still-banned-from-26-countries:0?t={seek_to_second_number}",
+    "startOffset-input": "required name=seek_to_second_number"
+  }
+}
+
+$ xidel -se 'parse-json(doc("'$url'")//script[@type="application/ld+json"])/{"name":`{substring-after(author/name,"@")}: {name}`,"date":dateTime(uploadDate),"formats":array{{"id":"pg-1","format":"mp4[h264+aac]","resolution":`{width}x{height}`,"url":contentUrl}}}'
+{
+  "name": "Voorwaarheid: David Icke still banned from 26 countries",
+  "date": "2023-09-30T14:21:33Z",
+  "formats": [
+    {
+      "id": "pg-1",
+      "format": "mp4[h264+aac]",
+      "resolution": "1266x720",
+      "url": "https://player.odycdn.com/api/v3/streams/free/2023-09-30-David-Icke-still-banned-from-26-countries/0c853644c632f77a17cbc832fe03a0bd32535f82/2a6190.mp4"
+    }
+  ]
+}
+
+------------------------------------------------------------------------------------------------
+
+declare function xivid:odysee($url as string) as object()? {
+  parse-json(
+    doc($url)//script[@type="application/ld+json"]
+  )/{
+    "name":`{substring-after(author/name,"@")}: {name}`,
+    "date":dateTime(uploadDate),
+    "formats":array{
+      {
+        "id":"pg-1",
+        "format":"mp4[h264+aac]",
+        "resolution":`{width}x{height}`,
+        "url":contentUrl
+      }
+    }
+  }
+};
+
+================================================================================================
+
 [reddit]
 
 $ url=https://www.reddit.com/r/therewasanattempt/comments/v61h9j/to_push_past_armed_courtroom_guards/

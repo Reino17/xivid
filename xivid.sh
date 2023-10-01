@@ -36,22 +36,23 @@ Gebruik: ./xivid.sh [optie] url
   -j            Toon video informatie als JSON.
 
 Ondersteunde websites:
-  npostart.nl             rtvoost.nl          youtu.be
-  gemi.st                 omroepwest.nl       vimeo.com
-  radioplayer.npo.nl      rijnmond.nl         dailymotion.com
-  nos.nl                  rtvutrecht.nl       rumble.com
-  tvblik.nl               gld.nl              reddit.com
-  uitzendinggemist.net    omroepzeeland.nl    redd.it
-  rtl.nl                  omroepbrabant.nl    twitch.tv
-  rtlxl.nl                l1.nl               mixcloud.com
-  rtlnieuws.nl            dumpert.nl          soundcloud.com
-  kijk.nl                 autojunk.nl         facebook.com
-  omropfryslan.nl         abhd.nl             fb.watch
-  rtvnoord.nl             autoblog.nl         instagram.com
-  rtvdrenthe.nl           telegraaf.nl        twitter.com
-  nhnieuws.nl             ad.nl               pornhub.com
-  at5.nl                  lc.nl               xhamster.com
-  omroepflevoland.nl      youtube.com         youporn.com
+  npostart.nl             omroepwest.nl       vimeo.com
+  gemi.st                 rijnmond.nl         dailymotion.com
+  radioplayer.npo.nl      rtvutrecht.nl       rumble.com
+  nos.nl                  gld.nl              odysee.com
+  tvblik.nl               omroepzeeland.nl    reddit.com
+  uitzendinggemist.net    omroepbrabant.nl    redd.it
+  rtl.nl                  l1.nl               twitch.tv
+  rtlxl.nl                dumpert.nl          mixcloud.com
+  rtlnieuws.nl            autojunk.nl         soundcloud.com
+  kijk.nl                 abhd.nl             facebook.com
+  omropfryslan.nl         autoblog.nl         fb.watch
+  rtvnoord.nl             telegraaf.nl        instagram.com
+  rtvdrenthe.nl           ad.nl               twitter.com
+  nhnieuws.nl             lc.nl               pornhub.com
+  at5.nl                  youtube.com         xhamster.com
+  omroepflevoland.nl      youtu.be            youporn.com
+  rtvoost.nl
 
 Voorbeelden:
   ./xivid.sh https://www.npostart.nl/nos-journaal/28-02-2017/POW_03375558
@@ -81,7 +82,7 @@ EOF
 fi
 
 while true; do
-  re='^https?://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
+  re='^https?://[-A-Za-z0-9\+&@#/%?=~_|!:,.;$]*[-A-Za-z0-9\+&@#/%=~_|]$'
   case $1 in
     -h)
       help
@@ -173,6 +174,7 @@ eval "$(
           "vimeo":array{"vimeo.com"},
           "dailymotion":array{"dailymotion.com"},
           "rumble":array{"rumble.com"},
+          "odysee":array{"odysee.com"},
           "reddit":array{"reddit.com","redd.it"},
           "twitch":array{"twitch.tv"},
           "mixcloud":array{"mixcloud.com"},
